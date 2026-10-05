@@ -1,0 +1,133 @@
+{
+  "name": "Shubham Chandel",
+  "year": 2026,
+  "roles": [
+    "Logistics Coordinator",
+    "Dispatcher / Team Leader",
+    "AI-assisted builder",
+    "Writer · War Within"
+  ],
+  "email": "a.shubhamchandel@gmail.com",
+  "whatsapp": "https://wa.me/917018254177",
+  "resume": "Shubham-Chandel-Resume.pdf",
+  "youtube": "https://www.youtube.com/@theshubhamchandel",
+  "formEndpoint": "",
+  "seo": {
+    "title": "Shubham Chandel | Logistics, Technology & Writing",
+    "description": "Shubham Chandel — logistics and operations professional since March 2022. Explore professional experience, AI-assisted projects, and War Within, a novel in progress.",
+    "url": "https://o-shubh.github.io/portfolio/"
+  },
+  "navigation": [
+    {
+      "id": "main",
+      "label": "Home"
+    },
+    {
+      "id": "about",
+      "label": "About"
+    },
+    {
+      "id": "projects",
+      "label": "Projects"
+    },
+    {
+      "id": "skills",
+      "label": "Skills"
+    },
+    {
+      "id": "contact",
+      "label": "Contact"
+    }
+  ],
+  "links": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/schandel1998"
+    },
+    {
+      "label": "Instagram · @the_shubham_chandel",
+      "url": "https://www.instagram.com/the_shubham_chandel/"
+    }
+  ],
+  "stats": [
+    {
+      "label": "Years in logistics",
+      "value": 4,
+      "suffix": "+",
+      "note": "Since March 2022"
+    },
+    {
+      "label": "Loads handled",
+      "value": null,
+      "suffix": "+",
+      "note": "Count not published"
+    },
+    {
+      "label": "Team size",
+      "value": null,
+      "suffix": "",
+      "note": "Count not published"
+    }
+  ],
+  "videos": [],
+  "testimonials": [],
+  "sections": {
+    "experience": "<section class=\"section wash\" id=\"experience\"><div class=\"wrap\"><div class=\"section-header\"><div><span class=\"small-label\">04 / Professional experience</span><h2>Hands-on logistics.<br>Day-to-day coordination.</h2></div><p>4+ years in logistics and transportation operations, working with US and Canadian transportation workflows.</p></div><article class=\"experience\"><div><p class=\"date\">March 2022 – Present</p><p class=\"company\">Dispatcher / Team Leader</p><p class=\"note\">Logistics &amp; transportation operations</p></div><div class=\"exp-body\"><h3>Keeping transportation workflows coordinated.</h3><div class=\"responsibilities\"><div><h4>Loads &amp; dispatch</h4><p>Managing inbound and outbound loads, coordinating driver dispatch, and supporting transportation workflows.</p></div><div><h4>Tracking &amp; communication</h4><p>Tracking shipments and maintaining customer portal updates.</p></div><div><h4>Team performance &amp; auditing</h4><p>Monitoring team performance and auditing loads to support daily operations.</p></div><div><h4>Transportation knowledge</h4><p>Understanding OTR transportation, drayage and intermodal concepts, and working with ELD/HOS concepts.</p></div></div><h4>Tools worked with or explored</h4><div class=\"languages\"><span class=\"tag\">TransPlus Fleet Manager</span><span class=\"tag\">Samsara</span><span class=\"tag\">DAT Load Board</span></div></div></article></div></section>",
+    "projects": "<section class=\"section wrap\" id=\"projects\"><div class=\"section-header\"><div><span class=\"small-label\">01 / Selected work</span><h2>Ideas taking shape.</h2></div><p>RideCircle brings together my interest in transportation, product design, and technology.</p></div><article class=\"project\"><div class=\"project-identity\"><span class=\"status\">Building / exploring</span><div><h3>RideCircle</h3><p>Intercity journeys.<br>Shared rides.<br>An India-focused product.</p></div><span class=\"note\">Mobility · Carpooling · Taxi rides</span></div><div class=\"project-content project-summary\"><span class=\"small-label\">01 / Mobility product</span><h3>Making intercity travel<br>more connected.</h3><p>RideCircle is an India-focused ride-sharing concept, bringing together personal carpooling and taxi rides.</p><div class=\"languages\"><span class=\"tag\">Mobility</span><span class=\"tag\">Product exploration</span><span class=\"tag\">AI-assisted development</span></div><button class=\"button project-open\" type=\"button\" data-dialog=\"ridecircle-detail\">Explore the project <span aria-hidden=\"true\">↗</span></button><p class=\"note\">In development / exploring · No public launch yet</p></div></article></section>",
+    "writing": "<section class=\"section wrap book-section\" id=\"writing\"><div class=\"book-cover\"><img src=\"war-within-cover.webp\" alt=\"War Within book cover by Shubham Chandel: The greatest battle is inside\" width=\"768\" height=\"1175\" loading=\"lazy\"></div><div class=\"book-copy\"><span class=\"small-label\">Writing / Work in progress</span><span class=\"status\">Currently writing</span><h2>War Within</h2><p class=\"book-tagline\">The greatest battle is inside.</p><p>Alongside my work in logistics and product building, I’m writing <em>War Within</em>—a novel of average origins and massive dreams.</p><p class=\"note\">By Shubham Chandel · Manuscript in progress</p></div></section>",
+    "about": "<section class=\"section wrap\" id=\"about\"><span class=\"small-label\">02 / Profile</span><div class=\"about-layout\"><div><h2>The person<br>behind the work.</h2><div class=\"about-copy\"><p>My strongest professional experience is in logistics and transportation operations. Coordinating loads, drivers, and customer updates has shaped my interest in practical business problems.</p><p>I’m now learning how technology can help solve them. I use AI development tools to explore ideas and build, while developing my understanding of software, product design, and business.</p></div></div><div class=\"journey\" aria-label=\"Professional direction\"><span>Logistics experience</span><span>Business problem solving</span><span>Technology learning</span><span>Product building</span></div></div></section>",
+    "skills": "<section class=\"section wash\" id=\"skills\"><div class=\"wrap\"><div class=\"section-header\"><div><span class=\"small-label\">03 / Capabilities</span><h2>Experience meets curiosity.</h2></div><p>My operational experience informs the problems I explore. My technology journey is driven by learning through projects.</p></div><div class=\"skill-grid\"><article class=\"skill-card\"><span class=\"skill-no\">01 / PRACTICAL EXPERIENCE</span><h3>Logistics operations</h3><ul><li>Load &amp; driver coordination</li><li>Shipment tracking &amp; portal updates</li><li>Team performance monitoring</li><li>Load auditing &amp; transportation workflows</li></ul></article><article class=\"skill-card\"><span class=\"skill-no\">02 / LEARNING INTERESTS</span><h3>Technology &amp; automation</h3><ul><li>Python, AI, ML &amp; deep learning</li><li>LLMs &amp; AI agents</li><li>Web &amp; mobile development</li><li>APIs, databases &amp; product design</li></ul></article><article class=\"skill-card\"><span class=\"skill-no\">03 / TOOLS EXPLORED</span><h3>AI-assisted building</h3><ul><li>ChatGPT, Codex &amp; Claude</li><li>Gemini, Perplexity &amp; Ollama</li><li>VS Code, Node.js &amp; Expo</li><li>Figma &amp; creative tools</li></ul></article></div></div></section>",
+    "approach": "<section class=\"section wrap\" id=\"approach\"><div class=\"section-header\"><div><span class=\"small-label\">05 / How I build</span><h2>I learn by building.</h2></div><p>I use modern AI tools to turn ideas into prototypes while learning the technical decisions behind them.</p></div><div class=\"responsibilities\"><div><h4>Start with a practical problem</h4><p>Look at operations, mobility, and business workflows to identify ideas worth exploring.</p></div><div><h4>Think through the product</h4><p>Explore the user journey, business model, and features needed to make an idea useful.</p></div><div><h4>Build with AI assistance</h4><p>Use development tools to work through unfamiliar concepts and move ideas toward prototypes.</p></div><div><h4>Learn through experimentation</h4><p>Develop technical understanding through hands-on work, questions, and iteration.</p></div></div></section>",
+    "hero": "<section class=\"hero\" aria-labelledby=\"hero-title\"><div><p class=\"eyebrow\">Logistics professional. Curious builder.</p><h1 id=\"hero-title\">Grounded in operations.<br><em>Driven to <span>build.</span></em></h1><p class=\"intro\">I’m <strong>Shubham Chandel</strong>—a logistics and operations professional exploring AI-assisted development and product building.</p><div class=\"actions\"><a class=\"button\" href=\"#projects\">View my work <span aria-hidden=\"true\">↗</span></a><a class=\"button secondary\" href=\"#contact\">Let’s connect</a></div><p class=\"location\">From Himachal Pradesh · Working around Chandigarh–Mohali–Kharar</p></div><aside class=\"profile portrait-card\" aria-label=\"Shubham Chandel\"><img class=\"hero-portrait\" src=\"hero-portrait.webp\" width=\"903\" height=\"980\" alt=\"Portrait of Shubham Chandel\" fetchpriority=\"high\"><div class=\"portrait-caption\"><span class=\"small-label\">Operations &amp; product building</span><h2>Shubham Chandel</h2><p>Logistics professional. Learning by building.</p></div></aside></section>",
+    "education": "<section class=\"section wrap education\" aria-label=\"Education\"><div><span class=\"small-label\">Education</span><h2>Technical foundations.</h2><h3>Diploma in Electronics &amp;<br>Communication Engineering</h3><p>Government Polytechnic Kangra</p></div><div><span class=\"small-label\">Continuing education</span><h2>Building business understanding.</h2><h3>Bachelor of Business Administration</h3><p>IGNOU · Currently pursuing</p></div></section>",
+    "exploring": "<section class=\"section wrap\" id=\"exploring\"><div class=\"learning-note\"><span class=\"small-label\">Current explorations</span><h2>Always a little curious.</h2><p>Learning through practical projects in logistics, technology, and writing.</p></div></section>",
+    "dialog": "<dialog id=\"ridecircle-detail\" aria-labelledby=\"ridecircle-title\"><div class=\"dialog-bar\"><span class=\"small-label\">Project / RideCircle</span><button class=\"dialog-close\" type=\"button\" aria-label=\"Close project details\">Close ×</button></div><h2 id=\"ridecircle-title\">RideCircle</h2><span class=\"status\">In development / exploring</span><div class=\"project-content\"><h3>An intercity ride-sharing and carpooling platform for India.</h3><p>The goal is to connect drivers and passengers for intercity travel, supporting cost-sharing in personal vehicles alongside taxi rides.</p><h4>Product scope being explored</h4><ul><li>Driver and passenger apps, with an admin dashboard</li><li>Driver-approved bookings, verification, and ride management</li><li>Separate carpool and taxi pricing models</li><li>Cash and online payments</li><li>GPS tracking and driver/passenger location visibility</li></ul><h4>Technology directions explored</h4><div class=\"languages\"><span class=\"tag\">React Native / Flutter</span><span class=\"tag\">PostgreSQL &amp; PostGIS</span><span class=\"tag\">Redis</span><span class=\"tag\">WebSockets</span><span class=\"tag\">Firebase concepts</span></div><p class=\"note\">An ongoing product exploration using AI-assisted development. The features above describe the intended product scope.</p></div></dialog>"
+  },
+  "ui": {
+    "skip": "Skip to content",
+    "navigation": "Main navigation",
+    "theme": "Switch color theme",
+    "stats": "Experience at a glance",
+    "resume": "Download résumé",
+    "playVideo": "Load video",
+    "videosEmptyTitle": "More perspectives. On video.",
+    "videosEmpty": "Visit my YouTube channel. Featured videos will appear here when selected.",
+    "testimonialsEmptyTitle": "A space for shared experience.",
+    "testimonialsEmpty": "Professional recommendations will be added here with permission.",
+    "previous": "Previous testimonial",
+    "next": "Next testimonial",
+    "youtubeLabel": "07 / On YouTube",
+    "youtubeTitle": "Beyond the day-to-day.",
+    "subscribe": "Subscribe on YouTube",
+    "testimonialsLabel": "08 / Recommendations",
+    "testimonialsTitle": "In good company.",
+    "contactLabel": "Let’s connect",
+    "contactTitle": "Good work starts with a conversation.",
+    "contactIntro": "Connect with me about logistics, AI-assisted product building, or creative projects worth exploring.",
+    "whatsapp": "Chat on WhatsApp",
+    "location": "Himachal Pradesh / Chandigarh–Mohali–Kharar",
+    "formTitle": "Leave a note.",
+    "formNote": "This form opens a draft in your email app. Review it there and press Send.",
+    "nameLabel": "Your name",
+    "emailLabel": "Email address",
+    "messageLabel": "Your message",
+    "send": "Open email draft ↗",
+    "noScriptContact": "Email me directly at",
+    "backTop": "Back to top",
+    "footer": "Logistics & operations · AI-assisted product building",
+    "switchLight": "Switch to light theme",
+    "switchDark": "Switch to dark theme",
+    "nameError": "Please enter your name.",
+    "emailError": "Please enter a valid email address.",
+    "messageError": "Please write at least 10 characters.",
+    "invalidForm": "Please check the highlighted fields.",
+    "sending": "Sending…",
+    "sendEndpoint": "Send message ↗",
+    "endpointNote": "Your message will be sent using the contact service.",
+    "sent": "Thanks — your message was sent successfully.",
+    "sendError": "Your message could not be sent. Please try again or use email or WhatsApp.",
+    "draftOpened": "Email draft requested. If your email app opens, review the draft and press Send. If nothing opens, use the email link beside this form.",
+    "subject": "Portfolio enquiry from",
+    "videoTitle": "YouTube video"
+  }
+}
