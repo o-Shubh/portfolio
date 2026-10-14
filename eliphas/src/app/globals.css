@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* Dark mode follows the phone/computer setting, unless the person picks one
+   with the theme button (stored as data-theme on <html>). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------- Brand colours (fixed) ---------- */
+@theme {
+  --color-ink: #17214a;
+  --color-marigold: #c98200;
+  --color-on-marigold: #2e1e00;
+  --color-deodar: #2e6150;
+  --color-paper: #f3f4f7;
+
+  --font-heading: var(--font-literata), var(--font-mukta), Georgia, serif;
+  --font-sans: var(--font-mukta), system-ui, sans-serif;
+}
+
+/* ---------- Semantic colours (change in dark mode) ----------
+   Use these in components: bg-bg, bg-surface, text-fg, text-muted,
+   border-line, bg-primary text-on-primary, text-success, text-danger */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+}
+
+:root {
+  color-scheme: light;
+  --bg: #f3f4f7;
+  --surface: #ffffff;
+  --surface-2: #e8eaf1;
+  --fg: #17214a;
+  --muted: #4a5378;
+  --line: #d6d9e4;
+  --primary: #17214a;
+  --on-primary: #f3f4f7;
+  --success: #2e6150;
+  --danger: #a3261b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d1330;
+    --surface: #17214a;
+    --surface-2: #212c5c;
+    --fg: #f3f4f7;
+    --muted: #b3b9d1;
+    --line: #2d3970;
+    --primary: #f3f4f7;
+    --on-primary: #17214a;
+    --success: #7cc4a8;
+    --danger: #ff9a8f;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d1330;
+  --surface: #17214a;
+  --surface-2: #212c5c;
+  --fg: #f3f4f7;
+  --muted: #b3b9d1;
+  --line: #2d3970;
+  --primary: #f3f4f7;
+  --on-primary: #17214a;
+  --success: #7cc4a8;
+  --danger: #ff9a8f;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+}
+
+/* ---------- Small shared building blocks ---------- */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 text-base font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-60;
+}
+@utility btn-primary {
+  @apply btn bg-primary text-on-primary hover:opacity-90;
+}
+@utility btn-accent {
+  @apply btn bg-marigold text-on-marigold hover:opacity-90;
+}
+@utility btn-ghost {
+  @apply btn border border-line bg-transparent text-fg hover:bg-surface-2;
+}
+@utility card {
+  @apply rounded-2xl border border-line bg-surface p-5;
+}
+@utility field {
+  @apply block w-full min-h-11 rounded-xl border border-line bg-surface px-4 text-base text-fg placeholder:text-muted focus:border-marigold focus:outline-none focus:ring-2 focus:ring-marigold/40;
+}
+@utility label {
+  @apply mb-1.5 block text-sm font-medium text-fg;
+}
+
+/* Room for the phone's home bar / notch in the installed app */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}

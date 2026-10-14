@@ -1,0 +1,144 @@
+# Eliphas Indicus Publications
+
+Print-on-demand self-publishing for Indian authors. One Next.js app that works as
+a website, a web app and (from milestone 7) an installable phone app.
+
+**Stack:** Next.js 16 (App Router, TypeScript) · Tailwind CSS 4 · Supabase (Postgres,
+phone OTP login, file storage) · Razorpay (test mode) · Vercel.
+
+## Milestones
+
+| # | What | Status |
+|---|------|--------|
+| 1 | Project setup, database, phone OTP login, role-based layouts | ✅ Done |
+| 2 | Public website: home, pricing, FAQ, bookstore, book pages | |
+| 3 | Author publishing flow + live earnings calculator | |
+| 4 | Admin: review queue, printers, payouts | |
+| 5 | Razorpay checkout, orders, printer portal | |
+| 6 | Author dashboard: earnings, sales by month and city | |
+| 7 | Install prompt (PWA) and deploy to Vercel | |
+
+## Run it on your computer
+
+You need **Node.js 20.9 or newer** and **Docker Desktop** (running). Docker runs a
+private copy of Supabase on your machine, so you can test without touching the real one.
+
+```sh
+cd eliphas
+npm install
+npm run db:start          # first time downloads Supabase (a few minutes)
+npx supabase status       # shows the keys you need in the next step
+cp .env.example .env.local
+```
+
+Open `.env.local` and paste from `npx supabase status`:
+
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ← "Publishable" key (`sb_publishable_…`)
+- `SUPABASE_SECRET_KEY` ← "Secret" key (`sb_secret_…`)
+
+Then:
+
+```sh
+npm run dev
+```
+
+Open http://localhost:3000 and log in with a test number. **No SMS is sent; the code is always `123456`.**
+
+| Mobile number | Becomes |
+|---|---|
+| 90000 00001 | Admin |
+| 90000 00002 | Author |
+| 90000 00003 | Printer (linked to "Sample Press Delhi") |
+| 90000 00004 | Reader (any other new number is also a reader) |
+
+### Useful commands
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the app at http://localhost:3000 |
+| `npm run db:start` / `npm run db:stop` | Start / stop local Supabase |
+| `npm run db:reset` | Wipe the local database and rebuild it from `supabase/migrations` + `supabase/seed.sql` |
+| `npm run db:types` | Regenerate `src/lib/database.types.ts` after changing the database |
+| `npm run typecheck` · `npm run lint` · `npm run build` | Checks to run before pushing |
+
+## How it fits together
+
+```
+eliphas/
+├── supabase/
+│   ├── migrations/      database tables, security rules, default settings (runs in order)
+│   ├── seed.sql         local test data only (never runs on the real database)
+│   └── config.toml      local Supabase settings, including the test phone numbers
+└── src/
+    ├── proxy.ts         runs before every page: refreshes login, sends logged-out visitors to /login
+    ├── lib/
+    │   ├── auth.ts      getCurrentProfile(), requireRole([...]), where each role lands
+    │   ├── supabase/    client.ts (browser), server.ts (pages/actions), admin.ts (full access, server only)
+    │   └── nav.ts       menu items for each area
+    ├── components/      AppShell (sidebar + phone tab bar), Logo, ThemeToggle, forms
+    └── app/
+        ├── page.tsx     homepage (full website in milestone 2)
+        ├── login/       phone number → 6-digit code
+        ├── onboarding/  name, city, state, "I want to publish" (first login only)
+        ├── dashboard/   sends you to your area based on your role
+        ├── account/     everyone: orders, profile
+        ├── author/      authors (and admin)
+        ├── printer/     printers (and admin)
+        └── admin/       admin only
+```
+
+### Roles
+
+- **Reader** – everyone starts here. Can buy books.
+- **Author** – a reader can switch to author themselves ("I want to publish").
+- **Printer** and **Admin** – only given by an admin. Add the phone number to the
+  `role_invites` table (or, from milestone 4, the printer list); when that person
+  logs in for the first time they get the role.
+
+Security is enforced **inside the database** (Row Level Security), not only in the
+app. For example, an author cannot make themselves admin or publish their own book
+without review, even with direct API calls.
+
+### Print rates and fees (no code needed)
+
+Stored in the `settings` table:
+
+- `print_rates` – per-page and binding costs for each size, paper, binding, finish (**sample values for now**)
+- `fees` – platform fee per copy (₹15) and Razorpay charges (2% + 18% GST)
+- `shipping` – flat shipping and free-shipping threshold
+
+To change them: Supabase dashboard → **Table Editor → settings** → edit the `value`.
+Milestone 4 adds an admin screen for this.
+
+## Setting up the real (hosted) Supabase
+
+Do this once, before deploying (milestone 7). You can do it now if you like.
+
+1. Create a project at https://supabase.com (region: **Mumbai, ap-south-1**).
+2. Link and push the database:
+   ```sh
+   npx supabase login
+   npx supabase link --project-ref YOUR_PROJECT_REF
+   npx supabase db push
+   ```
+3. **Phone login:** Dashboard → Authentication → Sign In / Providers → **Phone** → enable.
+   Pick an SMS provider (Twilio, MessageBird, Textlocal or Vonage) and enter its keys.
+   For Indian numbers you will need DLT registration with your SMS provider.
+   While testing, add **test phone numbers** with fixed codes on the same screen (no SMS sent).
+4. **Make yourself admin.** Dashboard → SQL Editor → run (use your number, 91 + 10 digits, no +):
+   ```sql
+   insert into public.role_invites (phone, role) values ('919876543210', 'admin');
+   -- if you already logged in once:
+   update public.profiles set role = 'admin' where phone = '919876543210';
+   ```
+5. Copy the project URL, publishable key and secret key (Project Settings → API Keys)
+   into `.env.local` (and into Vercel in milestone 7).
+
+## Notes
+
+- Built for phones first; tablet and desktop get a sidebar. Light and dark mode follow
+  the device, or tap the theme button (device → light → dark).
+- Brand: ink `#17214A`, marigold `#C98200` (text on it `#2E1E00`), deodar `#2E6150`,
+  paper `#F3F4F7`. Headings in Literata, body in Mukta (which also covers Hindi).
+- Capacitor: the app avoids anything that would block wrapping it later. The wrapper
+  will load the deployed site URL.
