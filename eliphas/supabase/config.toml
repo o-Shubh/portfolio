@@ -274,6 +274,8 @@ max_frequency = "5s"
 919000000004 = "123456"
 919000000005 = "123456"
 919000000006 = "123456"
+# Sample author from seed.sql (Meera Iyer), to see a dashboard full of sales
+919000000011 = "123456"
 
 # Configure logged in session timeouts.
 # [auth.sessions]

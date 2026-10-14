@@ -636,9 +636,60 @@ export type Database = {
         Args: { s: Database["public"]["Enums"]["order_status"] };
         Returns: boolean;
       };
+      my_balance: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          balance: number;
+          copies_sold: number;
+          earned: number;
+          paid: number;
+        }[];
+      };
+      my_book_orders: {
+        Args: { max_rows?: number; skip?: number };
+        Returns: {
+          book_title: string;
+          delivered_at: string;
+          earning: number;
+          order_item_id: string;
+          order_number: string;
+          paid_at: string;
+          quantity: number;
+          ship_city: string;
+          ship_state: string;
+          shipped_at: string;
+          status: Database["public"]["Enums"]["order_status"];
+          total_count: number;
+        }[];
+      };
       my_role: {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["app_role"];
+      };
+      my_sales_by_book: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          book_id: string;
+          copies: number;
+          earnings: number;
+        }[];
+      };
+      my_sales_by_city: {
+        Args: { since?: string };
+        Returns: {
+          city: string;
+          copies: number;
+          earnings: number;
+          state: string;
+        }[];
+      };
+      my_sales_by_month: {
+        Args: { months?: number };
+        Returns: {
+          copies: number;
+          earnings: number;
+          month: string;
+        }[];
       };
     };
     Enums: {

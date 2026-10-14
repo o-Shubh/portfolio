@@ -15,7 +15,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 3 | Author publishing flow + live earnings calculator | ✅ Done |
 | 4 | Admin: review queue, printers, payouts, settings | ✅ Done |
 | 5 | Razorpay checkout, orders, printer portal | ✅ Done |
-| 6 | Author dashboard: earnings, sales by month and city | |
+| 6 | Author dashboard: earnings, sales by month and city | ✅ Done |
 | 7 | Install prompt (PWA) and deploy to Vercel | |
 
 ## Live preview link (no computer needed)
@@ -79,6 +79,7 @@ Open http://localhost:3000 and log in with a test number. **No SMS is sent; the 
 | 90000 00003 | Printer (linked to "Sample Press Delhi") |
 | 90000 00004 | Reader (any other new number is also a reader) |
 | 90000 00005, 90000 00006 | Readers — spare numbers for testing (e.g. add one as a new printer) |
+| 90000 00011 | Meera Iyer, a sample author with 6 months of sample sales (to see a full dashboard) |
 
 ### Useful commands
 
@@ -163,6 +164,19 @@ milestone 4) → author fixes → In review again.
   Pay by UPI/bank outside the app, then **Record a payout** with the UTR number.
   Authors add their UPI ID on their profile.
 - **Settings** – print rates, fees and shipping (see above).
+
+### Author dashboard
+
+`/author` shows, for the logged-in author only:
+- **Copies sold, total earned, paid to you, due to you** (all time, with this month underneath)
+- **Copies sold by month** (6 or 12 months; tap a bar for that month's earnings; "Show as table" for exact numbers)
+- **Where your readers are**: copies by delivery city (top 7, the rest grouped)
+- **Your books**: copies and earnings per book
+- **Latest orders** and **Payouts**; `/author/orders` lists every order with its status
+
+Only paid orders count. Authors never see buyers' names, phones or addresses: the numbers come
+from database functions (`my_balance`, `my_sales_by_month`, `my_sales_by_city`, `my_sales_by_book`,
+`my_book_orders`) that return the caller's own sales and only the city and status of each order.
 
 ### Orders and payments
 
