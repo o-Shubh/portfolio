@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+/* Dark mode follows the phone/computer setting, unless the person picks one
+   with the theme button (stored as data-theme on <html>). */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+/* ---------- Brand colours (fixed) ---------- */
+@theme {
+  --color-ink: #17214a;
+  --color-marigold: #c98200;
+  --color-on-marigold: #2e1e00;
+  --color-deodar: #2e6150;
+  --color-paper: #f3f4f7;
+
+  --font-heading: var(--font-literata), var(--font-mukta), Georgia, serif;
+  --font-sans: var(--font-mukta), system-ui, sans-serif;
+}
+
+/* ---------- Semantic colours (change in dark mode) ----------
+   Use these in components: bg-bg, bg-surface, text-fg, text-muted,
+   border-line, bg-primary text-on-primary, text-success, text-danger */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-chart: var(--chart);
+}
+
+:root {
+  color-scheme: light;
+  --bg: #f3f4f7;
+  --surface: #ffffff;
+  --surface-2: #eceef4;
+  --fg: #17214a;
+  --muted: #5a6386;
+  --line: rgb(23 33 74 / 0.09);
+  --primary: #17214a;
+  --on-primary: #ffffff;
+  --success: #2e6150;
+  --danger: #b42318;
+  --chart: #1f7a55; /* chart bars: passes contrast and chroma checks on white */
+  --shadow-color: 23 33 74;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0a0f26;
+    --surface: #121a3b;
+    --surface-2: #1b2452;
+    --fg: #f3f4f7;
+    --muted: #a9b0cc;
+    --line: rgb(255 255 255 / 0.08);
+    --primary: #f3f4f7;
+    --on-primary: #17214a;
+    --success: #7cc4a8;
+    --danger: #ff9a8f;
+    --chart: #3a9d73;
+    --shadow-color: 0 0 0;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a0f26;
+  --surface: #121a3b;
+  --surface-2: #1b2452;
+  --fg: #f3f4f7;
+  --muted: #a9b0cc;
+  --line: rgb(255 255 255 / 0.08);
+  --primary: #f3f4f7;
+  --on-primary: #17214a;
+  --success: #7cc4a8;
+  --danger: #ff9a8f;
+  --chart: #3a9d73;
+  --shadow-color: 0 0 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+/* In the base layer so utility classes (font-sans, font-bold…) can override it */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+}
+
+::selection {
+  background: rgb(201 130 0 / 0.3);
+}
+
+/* ---------- Shared building blocks ---------- */
+@utility shadow-soft {
+  box-shadow:
+    0 1px 2px rgb(var(--shadow-color) / 0.04),
+    0 10px 30px -12px rgb(var(--shadow-color) / 0.14);
+}
+@utility shadow-lift {
+  box-shadow:
+    0 2px 4px rgb(var(--shadow-color) / 0.05),
+    0 24px 48px -16px rgb(var(--shadow-color) / 0.25);
+}
+@utility btn {
+  @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.95rem] font-semibold tracking-tight whitespace-nowrap transition duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-primary text-on-primary shadow-soft hover:-translate-y-px hover:opacity-90;
+}
+@utility btn-accent {
+  @apply btn bg-marigold text-on-marigold shadow-[0_8px_24px_-8px_rgb(201_130_0/0.7)] hover:-translate-y-px hover:brightness-105;
+}
+@utility btn-ghost {
+  @apply btn bg-surface text-fg ring-1 ring-line ring-inset hover:bg-surface-2;
+}
+@utility card {
+  @apply rounded-3xl bg-surface p-5 shadow-soft ring-1 ring-line md:p-6;
+}
+@utility field {
+  @apply block min-h-12 w-full rounded-2xl bg-surface-2 px-4 text-base text-fg ring-1 ring-transparent transition outline-none ring-inset placeholder:text-muted/80 hover:ring-line focus:bg-surface focus:ring-2 focus:ring-marigold disabled:opacity-70;
+}
+@utility label {
+  @apply mb-2 block text-sm font-semibold text-fg;
+}
+@utility eyebrow {
+  @apply inline-flex items-center gap-2 rounded-full bg-marigold/15 px-3 py-1 text-xs font-bold tracking-[0.14em] text-[#8a5900] uppercase dark:text-marigold;
+}
+
+/* Room for the phone's home bar / notch in the installed app */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
