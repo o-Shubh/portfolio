@@ -1,7 +1,7 @@
 # Eliphas Indicus Publications
 
 Print-on-demand self-publishing for Indian authors. One Next.js app that works as
-a website, a web app and (from milestone 7) an installable phone app.
+a website, a web app and an installable phone app (Android and iPhone).
 
 **Stack:** Next.js 16 (App Router, TypeScript) · Tailwind CSS 4 · Supabase (Postgres,
 phone OTP login, file storage) · Razorpay (test mode) · Vercel.
@@ -16,35 +16,94 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 4 | Admin: review queue, printers, payouts, settings | ✅ Done |
 | 5 | Razorpay checkout, orders, printer portal | ✅ Done |
 | 6 | Author dashboard: earnings, sales by month and city | ✅ Done |
-| 7 | Install prompt (PWA) and deploy to Vercel | |
+| 7 | Install prompt (PWA) and deploy to Vercel | ✅ Done (deploy steps below) |
 
-## Live preview link (no computer needed)
+## Deploy to Vercel (step by step, about 20 minutes)
 
-`http://localhost:3000` only works on the computer running the app. To get a link that opens
-on any phone, put the app online (free plans are enough):
+`http://localhost:3000` only works on the computer running the app. These steps put it online
+with a real link. You only need a browser. Free plans are enough to start.
 
-**1. Database: Supabase** (supabase.com → New project, region **Mumbai**)
-- SQL Editor → New query → paste all of [`supabase/hosted-setup.sql`](supabase/hosted-setup.sql) → **Run**.
-- Optional, for a demo with sample books and orders: run [`supabase/seed.sql`](supabase/seed.sql) the same way.
-  It also makes the test numbers 90000 00001 (admin), …02 (author) and …03 (printer). **Don't run it on the real launch database.**
-- Authentication → Sign In / Providers → **Phone** → enable. Under **Test phone numbers** add
-  `919000000001=123456, 919000000002=123456, 919000000003=123456, 919000000004=123456`.
-  Test numbers never send an SMS. If it asks for SMS provider details before you have them, choose Twilio and
-  enter placeholder values for now.
-- To make **your own** number admin: SQL Editor →
-  `insert into public.role_invites (phone, role) values ('91XXXXXXXXXX', 'admin');` (91 + your 10 digits).
-- Project Settings → API Keys: copy the **Project URL**, **Publishable key** and **Secret key**.
+**1. Database: Supabase** (supabase.com → New project, region **Mumbai (ap-south-1)**)
+1. SQL Editor → New query → paste all of [`supabase/hosted-setup.sql`](supabase/hosted-setup.sql) → **Run**.
+2. *Demo only:* run [`supabase/seed.sql`](supabase/seed.sql) the same way for sample books, orders and test logins.
+   **Skip this for the real launch database.**
+3. Authentication → Sign In / Providers → **Phone** → enable.
+   - For testing, add **Test phone numbers**: `919000000001=123456, 919000000002=123456, 919000000003=123456, 919000000004=123456`
+     (no SMS is sent). If it asks for SMS provider details first, choose Twilio with placeholder values for now.
+   - For launch, pick a real SMS provider (Twilio, MessageBird, Textlocal or Vonage). Indian numbers need
+     **DLT registration** with that provider, which can take a few days, so start early.
+4. Make **your own** number admin: SQL Editor →
+   `insert into public.role_invites (phone, role) values ('91XXXXXXXXXX', 'admin');` (91 + your 10 digits),
+   then log in with that number.
+5. Project Settings → API Keys: copy the **Project URL**, **Publishable key** and **Secret key**.
 
-**2. Website: Vercel** (vercel.com → sign in with GitHub → Add New → Project → import `portfolio`)
-- **Root Directory:** `eliphas`
-- **Environment Variables:** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
-  `SUPABASE_SECRET_KEY` (from step 1) and `NEXT_PUBLIC_SITE_URL` (your Vercel address, e.g. `https://eliphas.vercel.app`).
-- Deploy. Every push to a branch then gets its own preview link automatically (shown on the Vercel dashboard).
+**2. Website: Vercel** (vercel.com → Sign up with GitHub → **Add New → Project** → import `portfolio`)
+1. **Root Directory:** `eliphas` (click Edit next to it). Framework is detected as Next.js.
+2. **Environment Variables** (paste each name and value):
 
-**3. Back in Supabase:** Authentication → URL Configuration → set **Site URL** to your Vercel address.
+   | Name | Value |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL from Supabase |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key |
+   | `SUPABASE_SECRET_KEY` | Secret key (keep private) |
+   | `NEXT_PUBLIC_SITE_URL` | Your Vercel address, e.g. `https://eliphas.vercel.app` |
+   | `RAZORPAY_KEY_ID` | Razorpay test Key ID (`rzp_test_…`) |
+   | `RAZORPAY_KEY_SECRET` | Razorpay test Key Secret |
+   | `RAZORPAY_WEBHOOK_SECRET` | Any long random text; use the same in step 4 |
 
-When the database changes in a later milestone, run only the new file(s) from `supabase/migrations/`
-in the SQL Editor (each milestone summary says which).
+3. **Deploy.** The app code lives on the branch `claude/eliphas-indicus-platform-yee31f`. Either merge it into
+   `main` (via a pull request), or in Vercel → Settings → Git set **Production Branch** to that branch.
+   Every other push gets its own preview link automatically.
+
+**3. Supabase again:** Authentication → URL Configuration → **Site URL** = your Vercel address.
+
+**4. Razorpay** (dashboard.razorpay.com, **Test mode** switch on)
+- Account & Settings → API Keys → **Generate test key** → put them in Vercel (step 2).
+- Webhooks → **Add new webhook**: URL `https://<your-site>/api/razorpay/webhook`, event **payment.captured**,
+  secret = your `RAZORPAY_WEBHOOK_SECRET`.
+- Test cards and UPI: razorpay.com/docs/payments/payments/test-card-details. When you're ready for real money,
+  complete Razorpay's KYC, generate **live** keys and replace the test ones in Vercel.
+
+After changing environment variables in Vercel, click **Redeploy** so they take effect.
+When a future change adds a database file in `supabase/migrations/`, run just that file in the SQL Editor.
+
+### Launch checklist
+- [ ] Real SMS provider with DLT approval; remove the test phone numbers
+- [ ] Real print rates in Admin → Settings, and untick "These are sample rates"
+- [ ] Ask the printer for paper thickness (spine) and update it in Settings
+- [ ] Your printers added in Admin → Printers
+- [ ] Razorpay live keys and webhook
+- [ ] FAQ promises checked (review time, delivery time) in `src/content/faq.ts`
+- [ ] Custom domain in Vercel (Settings → Domains), then update `NEXT_PUBLIC_SITE_URL` and Supabase Site URL
+
+## Install as an app (Android and iPhone)
+
+The site is a **Progressive Web App**: no app store needed.
+- **Android (Chrome):** an "Get the Eliphas app" card offers an **Install app** button. Chrome's menu
+  → *Install app* also works.
+- **iPhone (Safari):** the card shows two steps: **Share** → **Add to Home Screen**.
+- The card hides once the app is installed, and for 14 days after "Not now".
+- Installed, it opens full-screen with the Eliphas icon, has shortcuts (Bookstore, My account,
+  Publish a book; long-press the icon on Android), and shows a friendly page when there's no internet.
+- The service worker (`public/sw.js`) only caches static files (code, icons, fonts). Pages, account data and
+  payments always come fresh from the network, so nothing private is stored on the phone.
+
+Files: `src/app/manifest.ts`, `public/sw.js`, `public/offline.html`, `public/icons/`,
+`src/components/InstallPrompt.tsx`, `src/components/ServiceWorker.tsx`.
+
+### Later: Play Store / App Store with Capacitor
+
+The app is ready to be wrapped: it already uses safe-area spacing for notches, a phone-style tab bar,
+and no browser-only tricks. Capacitor loads the live website inside a native shell:
+
+```sh
+cd eliphas
+npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios
+npx cap init "Eliphas Indicus" in.eliphas.app --web-dir public
+```
+Then in `capacitor.config.ts` set `server: { url: "https://<your-site>", cleartext: false }`, run
+`npx cap add android` (and `npx cap add ios` on a Mac), and open the project in Android Studio / Xcode.
+Use Razorpay's Capacitor plugin for payments inside the native app, and keep the web checkout for the website.
 
 ## Run it on your computer
 
@@ -224,35 +283,10 @@ nothing at the new rates. Past orders always keep the prices they were bought at
 The print cover size shown to authors = 2 × book width + spine + bleed on each side, where
 spine = pages × paper's `spine_mm_per_page` (sample values: ask your printer).
 
-## Setting up the real (hosted) Supabase
-
-Do this once, before deploying (milestone 7). You can do it now if you like.
-
-1. Create a project at https://supabase.com (region: **Mumbai, ap-south-1**).
-2. Link and push the database:
-   ```sh
-   npx supabase login
-   npx supabase link --project-ref YOUR_PROJECT_REF
-   npx supabase db push
-   ```
-3. **Phone login:** Dashboard → Authentication → Sign In / Providers → **Phone** → enable.
-   Pick an SMS provider (Twilio, MessageBird, Textlocal or Vonage) and enter its keys.
-   For Indian numbers you will need DLT registration with your SMS provider.
-   While testing, add **test phone numbers** with fixed codes on the same screen (no SMS sent).
-4. **Make yourself admin.** Dashboard → SQL Editor → run (use your number, 91 + 10 digits, no +):
-   ```sql
-   insert into public.role_invites (phone, role) values ('919876543210', 'admin');
-   -- if you already logged in once:
-   update public.profiles set role = 'admin' where phone = '919876543210';
-   ```
-5. Copy the project URL, publishable key and secret key (Project Settings → API Keys)
-   into `.env.local` (and into Vercel in milestone 7).
-
 ## Notes
 
 - Built for phones first; tablet and desktop get a sidebar. Light and dark mode follow
   the device, or tap the theme button (device → light → dark).
 - Brand: ink `#17214A`, marigold `#C98200` (text on it `#2E1E00`), deodar `#2E6150`,
   paper `#F3F4F7`. Headings in Literata, body in Mukta (which also covers Hindi).
-- Capacitor: the app avoids anything that would block wrapping it later. The wrapper
-  will load the deployed site URL.
+- Capacitor: see "Later: Play Store / App Store with Capacitor" above.

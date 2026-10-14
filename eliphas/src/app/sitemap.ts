@@ -9,7 +9,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages: MetadataRoute.Sitemap = ["", "/books", "/pricing", "/faq"].map((p) => ({ url: `${site}${p}` }));
 
   // Public client without cookies: only published books are visible to it.
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return pages; // keys not set yet: still build, just without book pages
+  const supabase = createClient(url, key);
   const { data } = await supabase.from("books").select("slug, updated_at").eq("status", "published");
   return [
     ...pages,

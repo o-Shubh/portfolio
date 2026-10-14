@@ -3,6 +3,7 @@ import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
 import { ROLE_LABEL, type Profile } from "@/lib/auth";
 import { formatPhone } from "@/lib/phone";
+import { InstallPrompt } from "./InstallPrompt";
 import { Logo } from "./Logo";
 import { NavLinks, type NavItem } from "./NavLinks";
 import { ThemeToggle } from "./ThemeToggle";
@@ -88,6 +89,8 @@ export function AppShell({
       <main className="flex-1 px-4 pt-6 pb-32 md:px-8 md:pt-10 md:pb-12">
         <div className="mx-auto max-w-5xl">{children}</div>
       </main>
+
+      <InstallPrompt aboveTabBar />
 
       {/* Floating tab bar (phones) */}
       <nav aria-label={`${areaLabel} navigation`} className="safe-bottom fixed inset-x-0 bottom-0 z-20 px-3 pb-3 md:hidden">

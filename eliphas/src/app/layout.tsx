@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Literata, Mukta } from "next/font/google";
+import { ServiceWorker } from "@/components/ServiceWorker";
 import "./globals.css";
 
 const literata = Literata({
@@ -25,6 +26,9 @@ export const metadata: Metadata = {
   description:
     "Publish your book in print across India. Print on demand, no stock, no upfront cost. For Hindi and English authors.",
   applicationName: "Eliphas Indicus",
+  // iPhone home-screen app: full screen, with the status bar over the app's own colours
+  appleWebApp: { capable: true, title: "Eliphas", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
@@ -50,7 +54,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <ServiceWorker />
+      </body>
     </html>
   );
 }
