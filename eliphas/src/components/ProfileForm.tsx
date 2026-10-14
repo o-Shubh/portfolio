@@ -1,14 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
 import { updateProfile } from "@/app/actions/profile";
 import type { Profile } from "@/lib/auth";
 import { ProfileFields } from "./ProfileFields";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
-  const [state, action, pending] = useActionState(updateProfile, undefined);
+  const [state, onSubmit, pending] = useFormAction(updateProfile);
   return (
-    <form action={action} className="card space-y-4">
+    <form onSubmit={onSubmit} className="card space-y-4">
       <ProfileFields profile={profile} />
       {state?.error && (
         <p role="alert" className="text-sm font-medium text-danger">

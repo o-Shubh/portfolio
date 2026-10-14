@@ -1,16 +1,17 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
+import { useState } from "react";
 import { saveDetails } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
 import { GENRES, type Book } from "@/lib/publishing";
 
 export function DetailsForm({ book, disabled }: { book: Book; disabled: boolean }) {
-  const [state, action, pending] = useActionState(saveDetails.bind(null, book.id), undefined);
+  const [state, onSubmit, pending] = useFormAction(saveDetails.bind(null, book.id));
   const [desc, setDesc] = useState(book.description ?? "");
 
   return (
-    <form action={action} className="max-w-2xl space-y-5">
+    <form onSubmit={onSubmit} className="max-w-2xl space-y-5">
       <fieldset disabled={disabled} className="space-y-5">
         <div>
           <label htmlFor="title" className="label">

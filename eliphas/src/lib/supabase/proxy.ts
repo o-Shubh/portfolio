@@ -4,7 +4,7 @@ import type { Database } from "@/lib/database.types";
 import { supabasePublishableKey, supabaseUrl } from "@/lib/env";
 
 /** Areas that need a login. Role checks happen in each area's layout. */
-const PROTECTED_PREFIXES = ["/account", "/author", "/printer", "/admin", "/onboarding", "/dashboard"];
+const PROTECTED_PREFIXES = ["/account", "/author", "/printer", "/admin", "/onboarding", "/dashboard", "/checkout"];
 
 /**
  * Keeps the Supabase login cookie fresh on every request and sends logged-out

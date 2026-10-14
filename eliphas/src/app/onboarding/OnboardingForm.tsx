@@ -1,15 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
 import { completeOnboarding } from "@/app/actions/profile";
 import { ProfileFields } from "@/components/ProfileFields";
 import type { Profile } from "@/lib/auth";
 
 export function OnboardingForm({ profile }: { profile: Profile }) {
-  const [state, action, pending] = useActionState(completeOnboarding, undefined);
+  const [state, onSubmit, pending] = useFormAction(completeOnboarding);
 
   return (
-    <form action={action} className="mt-6 space-y-4">
+    <form onSubmit={onSubmit} className="mt-6 space-y-4">
       <ProfileFields profile={profile} />
       {profile.role === "reader" && (
         <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line p-4">

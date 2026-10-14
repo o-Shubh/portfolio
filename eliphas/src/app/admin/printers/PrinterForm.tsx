@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
 import { savePrinter } from "@/app/actions/admin";
 import { FormMessage } from "@/components/FormMessage";
 import type { Database } from "@/lib/database.types";
@@ -9,10 +9,10 @@ import { INDIAN_STATES } from "@/lib/india";
 type Printer = Database["public"]["Tables"]["printers"]["Row"];
 
 export function PrinterForm({ printer }: { printer: Printer | null }) {
-  const [state, action, pending] = useActionState(savePrinter.bind(null, printer?.id ?? null), undefined);
+  const [state, onSubmit, pending] = useFormAction(savePrinter.bind(null, printer?.id ?? null));
   const v = printer;
   return (
-    <form action={action} className="card max-w-2xl space-y-4">
+    <form onSubmit={onSubmit} className="card max-w-2xl space-y-4">
       <div>
         <label htmlFor="name" className="label">
           Print shop name

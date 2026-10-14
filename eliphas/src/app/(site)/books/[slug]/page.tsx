@@ -77,13 +77,9 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
           <div className="card mt-6" lang="en">
             <p className="font-heading text-3xl font-semibold">{rupees(Number(book.mrp))}</p>
             <p className="text-sm text-muted">MRP, inclusive of taxes</p>
-            {/* Checkout arrives in milestone 5 */}
-            <button type="button" className="btn-accent mt-4 w-full sm:w-auto" disabled aria-describedby="buy-note">
+            <Link href={`/checkout/${book.slug}`} className="btn-accent mt-4 w-full sm:w-auto">
               Buy now
-            </button>
-            <p id="buy-note" className="mt-2 text-sm text-muted">
-              Online ordering opens soon.
-            </p>
+            </Link>
             <p className="mt-4 flex items-start gap-2 text-sm">
               <Truck className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
               <span>

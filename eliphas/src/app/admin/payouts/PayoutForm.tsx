@@ -1,13 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
 import { recordPayout } from "@/app/actions/admin";
 import { FormMessage } from "@/components/FormMessage";
 
 export function PayoutForm({ authorId, balance }: { authorId: string; balance: number }) {
-  const [state, action, pending] = useActionState(recordPayout.bind(null, authorId), undefined);
+  const [state, onSubmit, pending] = useFormAction(recordPayout.bind(null, authorId));
   return (
-    <form action={action} className="mt-3 grid gap-3 sm:grid-cols-3">
+    <form onSubmit={onSubmit} className="mt-3 grid gap-3 sm:grid-cols-3">
       <div>
         <label className="label" htmlFor={`amount-${authorId}`}>
           Amount (₹)

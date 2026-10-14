@@ -14,7 +14,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 2 | Public website: home, pricing, FAQ, bookstore, book pages | ✅ Done |
 | 3 | Author publishing flow + live earnings calculator | ✅ Done |
 | 4 | Admin: review queue, printers, payouts, settings | ✅ Done |
-| 5 | Razorpay checkout, orders, printer portal | |
+| 5 | Razorpay checkout, orders, printer portal | ✅ Done |
 | 6 | Author dashboard: earnings, sales by month and city | |
 | 7 | Install prompt (PWA) and deploy to Vercel | |
 
@@ -163,6 +163,28 @@ milestone 4) → author fixes → In review again.
   Pay by UPI/bank outside the app, then **Record a payout** with the UTR number.
   Authors add their UPI ID on their profile.
 - **Settings** – print rates, fees and shipping (see above).
+
+### Orders and payments
+
+1. **Buy now** on a book → `/checkout/<book>`: copies (1–10) and delivery address. The total is
+   worked out again on the server from the database; the browser's numbers are never trusted.
+2. The order is saved as *Awaiting payment* and Razorpay Checkout opens (UPI, cards, net banking, wallets).
+3. On success the server checks Razorpay's signature, marks the order **Paid** and sends it to a
+   printer: an active printer in the buyer's state if there is one, otherwise the least busy one.
+   Razorpay's webhook (`/api/razorpay/webhook`) does the same in case the buyer closes the app mid-payment.
+4. The printer sees it under **New**, downloads the PDFs, and moves it along:
+   Accept → Printed → Shipped (courier + tracking number) → Delivered. The reader sees each step
+   and the tracking number under **My orders**. Admin → **Orders** shows everything and can move
+   an order to another printer.
+
+The money split per copy (print cost, ₹15 fee, payment charges, author earning) is saved with each
+order, so later rate changes never alter past orders or payouts.
+
+**Razorpay setup** (test mode first): Dashboard → Account & Settings → API Keys → generate test keys.
+Add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to `.env.local` (and Vercel). Then Dashboard →
+Webhooks → add `https://<your-site>/api/razorpay/webhook`, event `payment.captured`, with a secret you
+also set as `RAZORPAY_WEBHOOK_SECRET`. Test cards and UPI IDs: razorpay.com/docs/payments/payments/test-card-details.
+Without keys, local development shows a built-in **test payment** window instead (it refuses to run on the live site).
 
 ### Sample books
 

@@ -287,3 +287,27 @@ export async function saveRatesJson(_prev: ActionState, fd: FormData): Promise<A
   revalidatePath("/", "layout");
   return { ok: "Print rates saved." };
 }
+
+// ---------------------------------------------------------------------------
+// Orders
+// ---------------------------------------------------------------------------
+
+/** Send an order to a different printer (only before it has been printed). */
+export async function reassignOrder(orderId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  const { supabase } = await admin();
+  const printerId = String(fd.get("printer_id") ?? "");
+  const { data: order } = await supabase.from("orders").select("status").eq("id", orderId).single();
+  if (!order) return { error: "Order not found." };
+  if (!["paid", "printing"].includes(order.status)) return { error: "Only orders not yet printed can be moved." };
+  const { data: printer } = await supabase.from("printers").select("id, active").eq("id", printerId).maybeSingle();
+  if (!printer?.active) return { error: "Choose an active printer." };
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ printer_id: printerId, status: "paid", accepted_at: null })
+    .eq("id", orderId);
+  if (error) return { error: "Could not move the order." };
+  revalidatePath("/admin/orders");
+  revalidatePath("/printer", "layout");
+  return { ok: "Moved. The new printer sees it under New." };
+}

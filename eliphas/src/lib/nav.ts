@@ -16,6 +16,7 @@ export const PRINTER_NAV: NavItem[] = [
 export const ADMIN_NAV: NavItem[] = [
   { href: "/admin", label: "Overview", icon: "dashboard", exact: true },
   { href: "/admin/review", label: "Review", icon: "review" },
+  { href: "/admin/orders", label: "Orders", icon: "orders" },
   { href: "/admin/printers", label: "Printers", icon: "printer" },
   { href: "/admin/payouts", label: "Payouts", icon: "money" },
   { href: "/admin/settings", label: "Settings", icon: "settings" },

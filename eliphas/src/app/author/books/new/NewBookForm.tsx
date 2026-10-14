@@ -1,13 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
 import { createBook } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
 
 export function NewBookForm() {
-  const [state, action, pending] = useActionState(createBook, undefined);
+  const [state, onSubmit, pending] = useFormAction(createBook);
   return (
-    <form action={action} className="card space-y-4">
+    <form onSubmit={onSubmit} className="card space-y-4">
       <div>
         <label htmlFor="title" className="label">
           Book title

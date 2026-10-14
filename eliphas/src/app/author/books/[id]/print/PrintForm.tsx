@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
 import { savePrintOptions } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
 import { PrintCalculator, type CalculatorValues } from "@/components/PrintCalculator";
@@ -22,7 +22,7 @@ export function PrintForm({
   disabled: boolean;
   pdfSize: { w: number; h: number } | null;
 }) {
-  const [state, action, pending] = useActionState(savePrintOptions.bind(null, bookId), undefined);
+  const [state, onSubmit, pending] = useFormAction(savePrintOptions.bind(null, bookId));
 
   const sizeWarning = (trimKey: string) => {
     const trim = rates.trim_sizes[trimKey];
@@ -31,7 +31,7 @@ export function PrintForm({
   };
 
   return (
-    <form action={action} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6">
       <PrintCalculator rates={rates} fees={fees} initial={initial} disabled={disabled} sizeWarning={sizeWarning} />
       <FormMessage state={state} />
       {!disabled && (

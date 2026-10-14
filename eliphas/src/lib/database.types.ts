@@ -246,6 +246,7 @@ export type Database = {
       };
       orders: {
         Row: {
+          accepted_at: string | null;
           buyer_id: string;
           courier: string | null;
           created_at: string;
@@ -253,6 +254,7 @@ export type Database = {
           id: string;
           order_number: string;
           paid_at: string | null;
+          payment_mode: string | null;
           printed_at: string | null;
           printer_id: string | null;
           razorpay_order_id: string | null;
@@ -274,6 +276,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          accepted_at?: string | null;
           buyer_id: string;
           courier?: string | null;
           created_at?: string;
@@ -281,6 +284,7 @@ export type Database = {
           id?: string;
           order_number?: string;
           paid_at?: string | null;
+          payment_mode?: string | null;
           printed_at?: string | null;
           printer_id?: string | null;
           razorpay_order_id?: string | null;
@@ -301,6 +305,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          accepted_at?: string | null;
           buyer_id?: string;
           courier?: string | null;
           created_at?: string;
@@ -308,6 +313,7 @@ export type Database = {
           id?: string;
           order_number?: string;
           paid_at?: string | null;
+          payment_mode?: string | null;
           printed_at?: string | null;
           printer_id?: string | null;
           razorpay_order_id?: string | null;
@@ -341,6 +347,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_printer_id_fkey";
+            columns: ["printer_id"];
+            isOneToOne: false;
+            referencedRelation: "printer_load";
+            referencedColumns: ["printer_id"];
           },
           {
             foreignKeyName: "orders_printer_id_fkey";
@@ -601,6 +614,16 @@ export type Database = {
           paid: number | null;
           payout_upi: string | null;
           phone: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
+      printer_load: {
+        Row: {
+          active: boolean | null;
+          open_jobs: number | null;
+          printer_id: string | null;
+          state: string | null;
         };
         ComputedFields: never;
         Relationships: [];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormAction } from "@/lib/use-form-action";
 import { saveRatesJson, saveSettingsForm } from "@/app/actions/admin";
 import { FormMessage } from "@/components/FormMessage";
 import { RATE_FIELDS, sortedOptions, type PricingSettings, type RateGroup } from "@/lib/pricing";
@@ -24,11 +24,11 @@ const FIELD_LABEL: Record<string, string> = {
 };
 
 export function SettingsForm({ settings }: { settings: PricingSettings }) {
-  const [state, action, pending] = useActionState(saveSettingsForm, undefined);
+  const [state, onSubmit, pending] = useFormAction(saveSettingsForm);
   const { rates, fees, shipping } = settings;
 
   return (
-    <form action={action} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6">
       <section className="card space-y-4">
         <h2 className="text-lg font-semibold">Fees and shipping</h2>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -97,9 +97,9 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
 }
 
 export function RatesJsonForm({ json }: { json: string }) {
-  const [state, action, pending] = useActionState(saveRatesJson, undefined);
+  const [state, onSubmit, pending] = useFormAction(saveRatesJson);
   return (
-    <form action={action} className="mt-4 space-y-3">
+    <form onSubmit={onSubmit} className="mt-4 space-y-3">
       <label htmlFor="json" className="sr-only">
         Print rates JSON
       </label>
