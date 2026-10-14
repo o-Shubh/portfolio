@@ -18,7 +18,20 @@ function readProfileFields(formData: FormData) {
   if (!city) return { error: "Please enter your city." } as const;
   if (!(INDIAN_STATES as readonly string[]).includes(state)) return { error: "Please choose your state." } as const;
   if (pincode && !/^[1-9]\d{5}$/.test(pincode)) return { error: "PIN code should be 6 digits." } as const;
-  return { values: { full_name, city, state, pincode: pincode || null } } as const;
+  // UPI is only on the form for authors; leave it unchanged when the field isn't there
+  const upiField = formData.get("payout_upi");
+  const payout_upi = upiField === null ? undefined : String(upiField).trim();
+  if (payout_upi && !/^[\w.-]{2,256}@[a-zA-Z][a-zA-Z0-9]{1,63}$/.test(payout_upi))
+    return { error: "UPI ID should look like name@bank." } as const;
+  return {
+    values: {
+      full_name,
+      city,
+      state,
+      pincode: pincode || null,
+      ...(payout_upi !== undefined ? { payout_upi: payout_upi || null } : {}),
+    },
+  } as const;
 }
 
 /** First-time setup after the first login. */

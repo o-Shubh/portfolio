@@ -27,7 +27,7 @@ export function BookCover({
   author: string;
   slug: string;
   src: string | null;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   priority?: boolean;
 }) {
   const shell =
@@ -47,17 +47,18 @@ export function BookCover({
   }
 
   const p = pick(slug);
-  const titleSize = size === "lg" ? "text-3xl" : size === "sm" ? "text-base" : "text-xl";
+  const titleSize =
+    size === "lg" ? "text-3xl" : size === "sm" ? "text-base" : size === "xs" ? "text-[0.55rem] leading-tight" : "text-xl";
   return (
     <div className={shell} style={{ background: p.bg, color: p.fg }} role="img" aria-label={`Cover of ${title}`}>
       {/* spine shadow */}
       <div className="absolute inset-y-0 left-0 w-2 bg-black/15" />
       <div className="flex h-full flex-col justify-between p-[9%] pl-[13%]">
         <div className="h-1 w-10 rounded" style={{ background: p.accent }} />
-        <p className={`font-heading font-semibold leading-snug ${titleSize}`} style={{ overflowWrap: "anywhere" }}>
+        <p className={`line-clamp-4 font-heading font-semibold leading-snug ${titleSize}`} style={{ overflowWrap: "break-word" }}>
           {title}
         </p>
-        <p className="text-sm font-medium opacity-85">{author}</p>
+        {size === "xs" ? <span /> : <p className="text-sm font-medium opacity-85">{author}</p>}
       </div>
     </div>
   );

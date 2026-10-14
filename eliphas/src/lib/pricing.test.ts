@@ -1,17 +1,17 @@
 // Run with: npm test
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { earnings, minimumMrp, paymentFee, printCost, rupees, shippingFor, sortedOptions, type PrintRates } from "./pricing.ts";
+import { earnings, minimumMrp, paymentFee, printCost, rupees, shippingFor, sortedOptions, validateRates, type PrintRates } from "./pricing.ts";
 
 // Same values as the default settings migration
 const rates: PrintRates = {
   min_pages: 24,
   max_pages: 800,
-  trim_sizes: { "5x8": { label: "", page_multiplier: 1 }, "6x9": { label: "", page_multiplier: 1.15 } },
-  interior: { bw: { label: "", per_page: 0.45 }, color: { label: "", per_page: 2.8 } },
-  paper: { cream: { label: "", per_page_extra: 0 }, white: { label: "", per_page_extra: 0.05 } },
-  binding: { paperback: { label: "", base: 30 }, hardcover: { label: "", base: 140 } },
-  cover_finish: { matte: { label: "", extra: 0 } },
+  trim_sizes: { "5x8": { label: "x", page_multiplier: 1 }, "6x9": { label: "x", page_multiplier: 1.15 } },
+  interior: { bw: { label: "x", per_page: 0.45 }, color: { label: "x", per_page: 2.8 } },
+  paper: { cream: { label: "x", per_page_extra: 0 }, white: { label: "x", per_page_extra: 0.05 } },
+  binding: { paperback: { label: "x", base: 30 }, hardcover: { label: "x", base: 140 } },
+  cover_finish: { matte: { label: "x", extra: 0 } },
 };
 const fees = { platform_fee_per_copy: 15, gateway_percent: 2, gateway_gst_percent: 18 };
 const base = { trim_size: "5x8", binding: "paperback", interior: "bw", paper: "cream", cover_finish: "matte" };
@@ -58,4 +58,21 @@ test("options sort small-to-large / cheapest first", () => {
   const sizes = { a5: { label: "A5", page_multiplier: 1.05, width_in: 5.83 }, "5x8": { label: "5x8", page_multiplier: 1, width_in: 5 }, "6x9": { label: "6x9", page_multiplier: 1.15, width_in: 6 } };
   assert.deepEqual(sortedOptions(sizes).map(([k]) => k), ["5x8", "a5", "6x9"]);
   assert.deepEqual(sortedOptions(rates.binding).map(([k]) => k), ["paperback", "hardcover"]);
+});
+
+test("validateRates accepts the defaults and catches mistakes", () => {
+  const good = {
+    ...rates,
+    trim_sizes: { "5x8": { label: "5x8", page_multiplier: 1, width_in: 5, height_in: 8 } },
+    paper: { cream: { label: "Cream", per_page_extra: 0, spine_mm_per_page: 0.055 } },
+  };
+  assert.deepEqual(validateRates(good), []);
+  const bad = structuredClone(good);
+  bad.interior.bw.per_page = -1;
+  (bad.binding.paperback as { label: string }).label = "";
+  bad.max_pages = 10;
+  const errs = validateRates(bad);
+  assert.ok(errs.some((e) => e.includes("interior.bw.per_page")));
+  assert.ok(errs.some((e) => e.includes("binding.paperback needs a label")));
+  assert.ok(errs.some((e) => e.includes("max_pages")));
 });

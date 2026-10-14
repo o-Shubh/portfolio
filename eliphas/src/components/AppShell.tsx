@@ -1,4 +1,4 @@
-import { LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
 import { ROLE_LABEL, type Profile } from "@/lib/auth";
@@ -46,6 +46,13 @@ export function AppShell({
       <header className="safe-top sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface/95 px-4 py-2 backdrop-blur md:hidden">
         <Logo href="/" />
         <div className="flex items-center">
+          <Link
+            href="/account/profile"
+            className="grid h-11 w-11 place-items-center rounded-xl hover:bg-surface-2"
+            aria-label="My profile"
+          >
+            <UserRound className="h-5 w-5" />
+          </Link>
           <ThemeToggle />
           <form action={signOut}>
             <button

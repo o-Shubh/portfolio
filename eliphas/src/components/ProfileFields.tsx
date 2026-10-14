@@ -61,6 +61,22 @@ export function ProfileFields({ profile }: { profile: Profile }) {
           defaultValue={profile.pincode ?? ""}
         />
       </div>
+      {(profile.role === "author" || profile.role === "admin") && (
+        <div className="sm:w-1/2">
+          <label htmlFor="payout_upi" className="label">
+            UPI ID for payouts
+          </label>
+          <input
+            id="payout_upi"
+            name="payout_upi"
+            className="field"
+            placeholder="yourname@okbank"
+            autoComplete="off"
+            defaultValue={profile.payout_upi ?? ""}
+          />
+          <p className="mt-1 text-sm text-muted">Your earnings are sent here.</p>
+        </div>
+      )}
     </>
   );
 }

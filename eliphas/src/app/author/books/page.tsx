@@ -40,7 +40,7 @@ export default async function MyBooksPage() {
                 className="card flex items-center gap-4 p-3 hover:border-marigold/60"
               >
                 <div className="w-14 shrink-0">
-                  <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size="sm" />
+                  <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size="xs" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-heading text-lg font-semibold">{b.title}</p>

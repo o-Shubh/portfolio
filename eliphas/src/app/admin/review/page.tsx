@@ -1,0 +1,101 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { BookCover } from "@/components/BookCover";
+import { PageHeader } from "@/components/PageHeader";
+import { StatusBadge } from "@/components/StatusBadge";
+import { timeAgo } from "@/lib/admin";
+import { requireRole } from "@/lib/auth";
+import { coverUrl, LANGUAGE_LABEL } from "@/lib/books";
+import { STATUS, type BookStatus } from "@/lib/publishing";
+import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Review queue" };
+
+const FILTERS: { value: BookStatus | "all"; label: string }[] = [
+  { value: "in_review", label: "Waiting" },
+  { value: "changes_requested", label: STATUS.changes_requested.label },
+  { value: "published", label: STATUS.published.label },
+  { value: "unpublished", label: STATUS.unpublished.label },
+  { value: "draft", label: "Drafts" },
+  { value: "all", label: "All" },
+];
+
+export default async function ReviewQueue({ searchParams }: PageProps<"/admin/review">) {
+  await requireRole(["admin"]);
+  const sp = await searchParams;
+  const status = (FILTERS.find((f) => f.value === sp.status)?.value ?? "in_review") as BookStatus | "all";
+  const q = typeof sp.q === "string" ? sp.q.replace(/[,()*%\\:."']/g, " ").trim().slice(0, 80) : "";
+
+  const supabase = await createClient();
+  let query = supabase
+    .from("books")
+    .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp")
+    .limit(100);
+  if (status !== "all") query = query.eq("status", status);
+  if (q) query = query.or(`title.ilike.%${q}%,author_name.ilike.%${q}%`);
+  // Oldest submission first, so nobody waits too long
+  query = status === "in_review" ? query.order("submitted_at", { ascending: true }) : query.order("updated_at", { ascending: false });
+  const [{ data: books }, { count: waiting }] = await Promise.all([
+    query,
+    supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "in_review"),
+  ]);
+
+  return (
+    <>
+      <PageHeader title="Review queue" intro={`${waiting ?? 0} book${waiting === 1 ? "" : "s"} waiting for review.`} />
+
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+        {FILTERS.map((f) => (
+          <Link
+            key={f.value}
+            href={`/admin/review?status=${f.value}`}
+            aria-current={status === f.value ? "true" : undefined}
+            className={`inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-sm font-semibold ${
+              status === f.value ? "bg-marigold text-on-marigold" : "bg-surface-2 text-fg"
+            }`}
+          >
+            {f.label}
+            {f.value === "in_review" && waiting ? ` (${waiting})` : ""}
+          </Link>
+        ))}
+      </div>
+      <form action="/admin/review" className="mb-6 flex gap-2">
+        <input type="hidden" name="status" value={status} />
+        <label htmlFor="q" className="sr-only">
+          Search title or author
+        </label>
+        <input id="q" name="q" type="search" defaultValue={q} placeholder="Search title or author" className="field" />
+        <button className="btn-ghost">Search</button>
+      </form>
+
+      {!books?.length ? (
+        <div className="card text-center text-muted">
+          {status === "in_review" ? "Nothing waiting. All caught up!" : "No books here."}
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {books.map((b) => (
+            <li key={b.id}>
+              <Link href={`/admin/books/${b.id}`} className="card flex items-center gap-4 p-3 hover:border-marigold/60">
+                <div className="w-12 shrink-0">
+                  <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size="xs" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-heading text-lg font-semibold">{b.title}</p>
+                  <p className="truncate text-sm text-muted">
+                    {b.author_name} · {LANGUAGE_LABEL[b.language]}
+                    {b.page_count ? ` · ${b.page_count} pages` : ""}
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <StatusBadge status={b.status} />
+                    {b.status === "in_review" && <span className="text-xs text-muted">submitted {timeAgo(b.submitted_at)}</span>}
+                  </div>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}

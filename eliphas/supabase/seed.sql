@@ -49,3 +49,73 @@ on conflict (slug) do nothing;
 -- Mark them published (the status guard allows this because seed runs without a logged-in user)
 update public.books set status = 'published', submitted_at = published_at, reviewed_at = published_at
 where author_id in ('00000000-0000-4000-a000-000000000011', '00000000-0000-4000-a000-000000000012', '00000000-0000-4000-a000-000000000013');
+
+-- ---------------------------------------------------------------------------
+-- Sample reader and ~80 past orders over the last 6 months, for the payouts
+-- screen and the author dashboard. Money split uses the default fees.
+-- ---------------------------------------------------------------------------
+insert into auth.users (instance_id, id, aud, role, phone, phone_confirmed_at, created_at, updated_at,
+  raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token, email_change_token_new, email_change)
+values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-a000-000000000021', 'authenticated', 'authenticated',
+  '919000000021', now(), now(), now(), '{"provider":"phone","providers":["phone"]}', '{}', '', '', '', '')
+on conflict (id) do nothing;
+update public.profiles set full_name = 'Sample Reader', city = 'Mumbai', state = 'Maharashtra'
+where id = '00000000-0000-4000-a000-000000000021';
+
+do $$
+declare
+  cities text[][] := array[
+    ['Mumbai', 'Maharashtra', '400001'], ['Delhi', 'Delhi', '110001'], ['Bengaluru', 'Karnataka', '560001'],
+    ['Lucknow', 'Uttar Pradesh', '226001'], ['Jaipur', 'Rajasthan', '302001'], ['Patna', 'Bihar', '800001'],
+    ['Pune', 'Maharashtra', '411001'], ['Kolkata', 'West Bengal', '700001'], ['Bhopal', 'Madhya Pradesh', '462001'],
+    ['Varanasi', 'Uttar Pradesh', '221001']];
+  b record;
+  i int;
+  c int;
+  q int;
+  days int;
+  st public.order_status;
+  sub numeric;
+  ship numeric;
+  oid uuid;
+  fee numeric;
+  printer uuid := (select id from public.printers order by created_at limit 1);
+begin
+  for i in 1..80 loop
+    select * into b from public.books where status = 'published' order by slug offset ((i * 7) % 10) limit 1;
+    -- busier cities appear more often
+    c := 1 + (case when i % 3 = 0 then 0 when i % 5 = 0 then 1 else (i * 3) % 10 end);
+    q := case when i % 6 = 0 then 2 else 1 end;
+    days := (i * 173) % 180;
+    st := case when days < 2 then 'paid' when days < 4 then 'printing' when days < 6 then 'printed'
+               when days < 10 then 'shipped' else 'delivered' end;
+    sub := b.mrp * q;
+    ship := case when sub >= 499 then 0 else 60 end;
+    fee := round(b.mrp * 0.02 * 1.18, 2);
+
+    insert into public.orders (buyer_id, status, subtotal, shipping, total, razorpay_order_id, razorpay_payment_id,
+      ship_name, ship_phone, ship_line1, ship_city, ship_state, ship_pincode, printer_id,
+      courier, tracking_number, paid_at, printed_at, shipped_at, delivered_at, created_at)
+    values ('00000000-0000-4000-a000-000000000021', st, sub, ship, sub + ship, 'seed_order_' || i, 'seed_pay_' || i,
+      'Sample Reader', '919000000021', 'Sample address ' || i, cities[c][1], cities[c][2], cities[c][3],
+      case when st = 'paid' then null else printer end,
+      case when st in ('shipped', 'delivered') then 'India Post' end,
+      case when st in ('shipped', 'delivered') then 'EE' || lpad(i::text, 9, '0') || 'IN' end,
+      now() - make_interval(days => days),
+      case when st in ('printed', 'shipped', 'delivered') then now() - make_interval(days => greatest(days - 2, 0)) end,
+      case when st in ('shipped', 'delivered') then now() - make_interval(days => greatest(days - 3, 0)) end,
+      case when st = 'delivered' then now() - make_interval(days => greatest(days - 8, 0)) end,
+      now() - make_interval(days => days))
+    returning id into oid;
+
+    insert into public.order_items (order_id, book_id, author_id, quantity, unit_price, print_cost, platform_fee,
+      payment_fee, author_earning, created_at)
+    values (oid, b.id, b.author_id, q, b.mrp, b.print_cost, 15, fee, b.mrp - b.print_cost - 15 - fee,
+      now() - make_interval(days => days));
+  end loop;
+end $$;
+
+-- One past payout, so the payouts screen shows history
+insert into public.payouts (author_id, amount, status, reference, note, paid_at, created_at)
+values ('00000000-0000-4000-a000-000000000011', 1000, 'paid', 'UTR-SAMPLE-0001', 'Sample payout',
+  now() - interval '45 days', now() - interval '45 days');

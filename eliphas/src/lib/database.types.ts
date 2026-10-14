@@ -146,8 +146,22 @@ export type Database = {
             foreignKeyName: "books_author_id_fkey";
             columns: ["author_id"];
             isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "books_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "books_reviewed_by_fkey";
+            columns: ["reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
           },
           {
             foreignKeyName: "books_reviewed_by_fkey";
@@ -200,6 +214,13 @@ export type Database = {
           unit_price?: number;
         };
         Relationships: [
+          {
+            foreignKeyName: "order_items_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
           {
             foreignKeyName: "order_items_author_id_fkey";
             columns: ["author_id"];
@@ -311,6 +332,13 @@ export type Database = {
             foreignKeyName: "orders_buyer_id_fkey";
             columns: ["buyer_id"];
             isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "orders_buyer_id_fkey";
+            columns: ["buyer_id"];
+            isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
@@ -369,8 +397,22 @@ export type Database = {
             foreignKeyName: "payouts_author_id_fkey";
             columns: ["author_id"];
             isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "payouts_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payouts_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
           },
           {
             foreignKeyName: "payouts_created_by_fkey";
@@ -429,6 +471,13 @@ export type Database = {
           user_id?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "printers_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
           {
             foreignKeyName: "printers_user_id_fkey";
             columns: ["user_id"];
@@ -528,6 +577,13 @@ export type Database = {
             foreignKeyName: "settings_updated_by_fkey";
             columns: ["updated_by"];
             isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "settings_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
@@ -535,11 +591,28 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      author_balances: {
+        Row: {
+          author_id: string | null;
+          balance: number | null;
+          copies_sold: number | null;
+          earned: number | null;
+          full_name: string | null;
+          paid: number | null;
+          payout_upi: string | null;
+          phone: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
     };
     Functions: {
       can_edit_book_files: { Args: { object_name: string }; Returns: boolean };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      is_earning_status: {
+        Args: { s: Database["public"]["Enums"]["order_status"] };
+        Returns: boolean;
+      };
       my_role: {
         Args: Record<PropertyKey, never>;
         Returns: Database["public"]["Enums"]["app_role"];

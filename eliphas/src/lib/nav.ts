@@ -15,7 +15,10 @@ export const PRINTER_NAV: NavItem[] = [
 
 export const ADMIN_NAV: NavItem[] = [
   { href: "/admin", label: "Overview", icon: "dashboard", exact: true },
-  { href: "/account", label: "Account", icon: "profile" },
+  { href: "/admin/review", label: "Review", icon: "review" },
+  { href: "/admin/printers", label: "Printers", icon: "printer" },
+  { href: "/admin/payouts", label: "Payouts", icon: "money" },
+  { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
 
 /** The account area is shared by everyone; it links back to their workspace. */

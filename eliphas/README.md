@@ -13,7 +13,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 1 | Project setup, database, phone OTP login, role-based layouts | ✅ Done |
 | 2 | Public website: home, pricing, FAQ, bookstore, book pages | ✅ Done |
 | 3 | Author publishing flow + live earnings calculator | ✅ Done |
-| 4 | Admin: review queue, printers, payouts | |
+| 4 | Admin: review queue, printers, payouts, settings | ✅ Done |
 | 5 | Razorpay checkout, orders, printer portal | |
 | 6 | Author dashboard: earnings, sales by month and city | |
 | 7 | Install prompt (PWA) and deploy to Vercel | |
@@ -50,6 +50,7 @@ Open http://localhost:3000 and log in with a test number. **No SMS is sent; the 
 | 90000 00002 | Author |
 | 90000 00003 | Printer (linked to "Sample Press Delhi") |
 | 90000 00004 | Reader (any other new number is also a reader) |
+| 90000 00005, 90000 00006 | Readers — spare numbers for testing (e.g. add one as a new printer) |
 
 ### Useful commands
 
@@ -90,7 +91,7 @@ eliphas/
         ├── account/     everyone: orders, profile
         ├── author/      authors: dashboard, books/ list, books/new, books/[id]/{details,files,print,submit}
         ├── printer/     printers (and admin)
-        └── admin/       admin only
+        └── admin/       admin: overview, review/ queue, books/[id] review page, printers/, payouts/, settings/
 ```
 
 ### Roles
@@ -121,9 +122,23 @@ without review, even with direct API calls.
 Book statuses: Draft → In review → Live, or Changes needed (admin sends back with a note,
 milestone 4) → author fixes → In review again.
 
+### Admin
+
+- **Review** – books waiting for review, oldest first. Open one to download the manuscript
+  and print cover, see automatic checks (page size, cover size, earnings), then **Approve and
+  publish** or **Send back** with a note the author sees. Live books can be unpublished with a reason.
+- **Printers** – add a print shop with its mobile number. That number gets printer access the
+  first time it logs in (or straight away if the person already has a reader account).
+  Pause a printer to stop new orders going to them.
+- **Payouts** – each author's earnings from paid orders, what's been paid, and the balance.
+  Pay by UPI/bank outside the app, then **Record a payout** with the UTR number.
+  Authors add their UPI ID on their profile.
+- **Settings** – print rates, fees and shipping (see above).
+
 ### Sample books
 
-Local development has 10 sample published books (5 Hindi, 5 English) from `supabase/seed.sql`.
+Local development has 10 sample published books (5 Hindi, 5 English) and about 80 past
+orders from 10 cities from `supabase/seed.sql`, so payouts and dashboards have numbers to show.
 They have no cover image, so the site draws a simple typographic cover in brand colours.
 Real covers uploaded by authors (milestone 3) replace these automatically.
 
@@ -135,8 +150,14 @@ Stored in the `settings` table:
 - `fees` – platform fee per copy (₹15) and Razorpay charges (2% + 18% GST)
 - `shipping` – flat shipping and free-shipping threshold
 
-To change them: Supabase dashboard → **Table Editor → settings** → edit the `value`.
-Milestone 4 adds an admin screen for this.
+To change them: log in as admin → **Settings**. Every number and label has a field; the
+"Advanced" box lets you add or remove options (e.g. a new book size) as JSON. Every change is
+checked before it is saved. The page also lists any live books whose authors would earn
+nothing at the new rates. Past orders always keep the prices they were bought at.
+(You can also edit the `settings` table directly in the Supabase dashboard.)
+
+The print cover size shown to authors = 2 × book width + spine + bleed on each side, where
+spine = pages × paper's `spine_mm_per_page` (sample values: ask your printer).
 
 ## Setting up the real (hosted) Supabase
 
