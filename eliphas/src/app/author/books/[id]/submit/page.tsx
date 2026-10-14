@@ -34,7 +34,6 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
         )
       : null;
   const e = cost !== null && book.mrp !== null ? earnings(Number(book.mrp), cost, settings.fees) : null;
-  const isCover = book.cover_path && !book.cover_path.endsWith(".pdf");
 
   return (
     <div className="grid max-w-4xl gap-6 md:grid-cols-[1fr_minmax(0,320px)]">
@@ -71,7 +70,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
             title={book.title}
             author={book.author_name}
             slug={book.slug}
-            src={isCover ? `${coverUrl(book.cover_path)}?v=${new Date(book.updated_at).getTime()}` : null}
+            src={book.cover_path ? `${coverUrl(book.cover_path)}?v=${new Date(book.updated_at).getTime()}` : null}
           />
         </div>
         {e && (

@@ -1,6 +1,6 @@
 // Publishing rules shared by the browser and the server (no database calls here).
 import type { Database } from "@/lib/database.types";
-import { earnings, printCost, type PricingSettings } from "@/lib/pricing";
+import { earnings, printCost, type PricingSettings, type PrintRates } from "@/lib/pricing";
 
 export type Book = Database["public"]["Tables"]["books"]["Row"];
 export type BookStatus = Database["public"]["Enums"]["book_status"];
@@ -39,14 +39,15 @@ export function makeSlug(title: string): string {
 /** Where files live in Storage. The first folder must be the author's id (security rule). */
 export const manuscriptPath = (authorId: string, bookId: string) => `${authorId}/${bookId}/manuscript.pdf`;
 export const coverPath = (authorId: string, bookId: string, ext: string) => `${authorId}/${bookId}/cover.${ext}`;
+export const printCoverPath = (authorId: string, bookId: string) => `${authorId}/${bookId}/print-cover.pdf`;
+/** Front cover image types (shown in the bookstore) */
 export const COVER_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
-  "application/pdf": "pdf",
 };
 export const MAX_MANUSCRIPT_MB = 50;
-export const MAX_COVER_MB = 10;
+export const MAX_COVER_MB = 10; // front image and print cover PDF
 
 /**
  * Does the PDF page size match the chosen book size? Allows for bleed
@@ -56,6 +57,32 @@ export function pageSizeMatches(widthIn: number, heightIn: number, trim: { width
   if (!trim.width_in || !trim.height_in) return true; // size unknown: don't warn
   const ok = (actual: number, target: number) => actual >= target - 0.06 && actual <= target + 0.31;
   return ok(widthIn, trim.width_in) && ok(heightIn, trim.height_in);
+}
+
+/**
+ * Size the full print cover (back + spine + front, with bleed) should be.
+ * Spine = pages × paper thickness. Null if the size or paper is unknown.
+ */
+export function fullCoverSize(
+  b: { page_count: number | null; trim_size: string; paper: string },
+  rates: PrintRates,
+): { spineMm: number; widthIn: number; heightIn: number } | null {
+  const trim = rates.trim_sizes[b.trim_size];
+  const perPage = rates.paper[b.paper]?.spine_mm_per_page;
+  if (!b.page_count || !trim?.width_in || !trim.height_in || !perPage) return null;
+  const bleed = rates.cover_bleed_in ?? 0.125;
+  const spineMm = Math.round(b.page_count * perPage * 10) / 10;
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  return {
+    spineMm,
+    widthIn: round2(trim.width_in * 2 + spineMm / 25.4 + bleed * 2),
+    heightIn: round2(trim.height_in + bleed * 2),
+  };
+}
+
+/** Is an uploaded print cover PDF close enough (±0.15 in) to the expected size? */
+export function coverSizeMatches(w: number, h: number, expected: { widthIn: number; heightIn: number }) {
+  return Math.abs(w - expected.widthIn) <= 0.15 && Math.abs(h - expected.heightIn) <= 0.15;
 }
 
 export type CheckItem = { ok: boolean; label: string; step: "details" | "files" | "print" };
@@ -84,7 +111,8 @@ export function submitChecklist(book: Book, s: PricingSettings): CheckItem[] {
     { ok: (book.description ?? "").trim().length >= 50, label: "Description (at least 50 characters)", step: "details" },
     { ok: Boolean(book.genre), label: "Genre", step: "details" },
     { ok: Boolean(book.manuscript_path), label: "Manuscript PDF uploaded", step: "files" },
-    { ok: Boolean(book.cover_path), label: "Cover uploaded", step: "files" },
+    { ok: Boolean(book.cover_path), label: "Front cover image uploaded", step: "files" },
+    { ok: Boolean(book.print_cover_path), label: "Print cover PDF uploaded", step: "files" },
     {
       ok: Boolean(book.page_count && book.page_count >= s.rates.min_pages && book.page_count <= s.rates.max_pages),
       label: `Page count (${s.rates.min_pages}–${s.rates.max_pages})`,

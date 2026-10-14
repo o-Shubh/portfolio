@@ -11,9 +11,11 @@ export type PrintRates = {
   max_pages: number;
   trim_sizes: Record<string, Option & { page_multiplier: number; width_in?: number; height_in?: number }>;
   interior: Record<string, Option & { per_page: number }>;
-  paper: Record<string, Option & { per_page_extra: number }>;
+  paper: Record<string, Option & { per_page_extra: number; spine_mm_per_page?: number }>;
   binding: Record<string, Option & { base: number }>;
   cover_finish: Record<string, Option & { extra: number }>;
+  /** Extra margin around the full print cover, in inches */
+  cover_bleed_in?: number;
 };
 export type Fees = { platform_fee_per_copy: number; gateway_percent: number; gateway_gst_percent: number };
 export type Shipping = { flat: number; free_above: number };

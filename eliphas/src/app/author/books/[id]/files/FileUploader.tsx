@@ -11,6 +11,7 @@ import {
   manuscriptPath,
   MAX_COVER_MB,
   MAX_MANUSCRIPT_MB,
+  printCoverPath,
 } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/client";
 
@@ -36,7 +37,7 @@ export function FileUploader({
   current,
   disabled,
 }: {
-  kind: "manuscript" | "cover";
+  kind: "manuscript" | "cover" | "print_cover";
   bookId: string;
   authorId: string;
   current: Current;
@@ -48,7 +49,8 @@ export function FileUploader({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
 
-  const accept = kind === "manuscript" ? "application/pdf" : Object.keys(COVER_TYPES).join(",");
+  const isPdf = kind !== "cover";
+  const accept = isPdf ? "application/pdf" : Object.keys(COVER_TYPES).join(",");
   const maxMb = kind === "manuscript" ? MAX_MANUSCRIPT_MB : MAX_COVER_MB;
 
   async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
@@ -59,18 +61,23 @@ export function FileUploader({
     setDone(null);
 
     if (file.size > maxMb * 1024 * 1024) return setError(`File is larger than ${maxMb} MB.`);
-    if (kind === "manuscript" && file.type !== "application/pdf") return setError("Please choose a PDF file.");
-    if (kind === "cover" && !COVER_TYPES[file.type]) return setError("Please choose a JPG, PNG, WebP or PDF file.");
+    if (isPdf && file.type !== "application/pdf") return setError("Please choose a PDF file.");
+    if (kind === "cover" && !COVER_TYPES[file.type]) return setError("Please choose a JPG, PNG or WebP image.");
 
     let info: Awaited<ReturnType<typeof inspectPdf>> = null;
-    if (kind === "manuscript") {
+    if (isPdf) {
       setStatus("checking");
       info = await inspectPdf(file);
     }
 
     setStatus("uploading");
-    const path = kind === "manuscript" ? manuscriptPath(authorId, bookId) : coverPath(authorId, bookId, COVER_TYPES[file.type]);
-    const bucket = kind === "manuscript" ? "manuscripts" : "covers";
+    const path =
+      kind === "manuscript"
+        ? manuscriptPath(authorId, bookId)
+        : kind === "print_cover"
+          ? printCoverPath(authorId, bookId)
+          : coverPath(authorId, bookId, COVER_TYPES[file.type]);
+    const bucket = isPdf ? "manuscripts" : "covers";
     const { error: upErr } = await createClient()
       .storage.from(bucket)
       .upload(path, file, { upsert: true, contentType: file.type, cacheControl: "60" });
@@ -137,9 +144,9 @@ export function FileUploader({
                 ? "Uploading… keep this page open"
                 : current
                   ? "Replace file"
-                  : kind === "manuscript"
-                    ? "Choose PDF"
-                    : "Choose cover"}
+                  : kind === "cover"
+                    ? "Choose image"
+                    : "Choose PDF"}
           </label>
           <input id={inputId} type="file" accept={accept} className="sr-only" onChange={onPick} disabled={busy} />
         </>

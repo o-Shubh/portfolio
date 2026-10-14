@@ -11,6 +11,7 @@ import {
   isEditable,
   makeSlug,
   manuscriptPath,
+  printCoverPath,
   submitChecklist,
   type Book,
 } from "@/lib/publishing";
@@ -116,7 +117,7 @@ export async function saveDetails(bookId: string, _prev: ActionState, fd: FormDa
  */
 export async function attachFile(
   bookId: string,
-  kind: "manuscript" | "cover",
+  kind: "manuscript" | "cover" | "print_cover",
   input: { path: string; mime?: string; pageCount?: number; widthIn?: number; heightIn?: number },
 ): Promise<ActionState> {
   const { profile, supabase, book } = await ownBook(bookId);
@@ -138,6 +139,18 @@ export async function attachFile(
       })
       .eq("id", bookId);
     if (error) return { error: error.message.includes("page_count") ? "The page count of this PDF isn't supported." : "Could not save the file." };
+  } else if (kind === "print_cover") {
+    if (input.path !== printCoverPath(profile.id, bookId)) return { error: "Unexpected file location." };
+    const size = (n?: number) => (typeof n === "number" && n > 0 && n < 100 ? Math.round(n * 100) / 100 : null);
+    const { error } = await supabase
+      .from("books")
+      .update({
+        print_cover_path: input.path,
+        print_cover_width_in: size(input.widthIn),
+        print_cover_height_in: size(input.heightIn),
+      })
+      .eq("id", bookId);
+    if (error) return { error: "Could not save the file." };
   } else {
     const ext = input.mime ? COVER_TYPES[input.mime] : undefined;
     if (!ext || input.path !== coverPath(profile.id, bookId, ext)) return { error: "Unexpected file location." };
@@ -245,7 +258,8 @@ export async function deleteDraft(bookId: string): Promise<ActionState> {
   if (!book) return { error: "Book not found." };
   if (book.status !== "draft") return { error: "Only drafts can be deleted." };
 
-  if (book.manuscript_path) await supabase.storage.from("manuscripts").remove([book.manuscript_path]);
+  const privateFiles = [book.manuscript_path, book.print_cover_path].filter((p): p is string => Boolean(p));
+  if (privateFiles.length) await supabase.storage.from("manuscripts").remove(privateFiles);
   if (book.cover_path) await supabase.storage.from("covers").remove([book.cover_path]);
   const { error } = await supabase.from("books").delete().eq("id", bookId);
   if (error) return { error: "Could not delete. Please try again." };

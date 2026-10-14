@@ -55,6 +55,9 @@ export type Database = {
           page_count: number | null;
           paper: string;
           print_cost: number | null;
+          print_cover_height_in: number | null;
+          print_cover_path: string | null;
+          print_cover_width_in: number | null;
           published_at: string | null;
           review_note: string | null;
           reviewed_at: string | null;
@@ -88,6 +91,9 @@ export type Database = {
           page_count?: number | null;
           paper?: string;
           print_cost?: number | null;
+          print_cover_height_in?: number | null;
+          print_cover_path?: string | null;
+          print_cover_width_in?: number | null;
           published_at?: string | null;
           review_note?: string | null;
           reviewed_at?: string | null;
@@ -120,6 +126,9 @@ export type Database = {
           page_count?: number | null;
           paper?: string;
           print_cost?: number | null;
+          print_cover_height_in?: number | null;
+          print_cover_path?: string | null;
+          print_cover_width_in?: number | null;
           published_at?: string | null;
           review_note?: string | null;
           reviewed_at?: string | null;
