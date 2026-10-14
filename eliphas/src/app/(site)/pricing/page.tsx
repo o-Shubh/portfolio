@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EarningsBreakdown } from "@/components/EarningsBreakdown";
-import { earnings, minimumMrp, printCost, rupees, type PrintOptions } from "@/lib/pricing";
+import { PrintCalculator } from "@/components/PrintCalculator";
+import { earnings, minimumMrp, printCost, rupees, sortedOptions, type PrintOptions } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
@@ -80,6 +81,16 @@ export default async function PricingPage() {
         </section>
       )}
 
+      <section className="mt-14" aria-labelledby="calc-heading">
+        <h2 id="calc-heading" className="text-2xl font-semibold">
+          Earnings calculator
+        </h2>
+        <p className="mt-1 text-muted">Try your own book. Change any option and see your earning per copy.</p>
+        <div className="mt-5">
+          <PrintCalculator rates={rates} fees={fees} initial={{ ...BASE, page_count: 200, mrp: 299 }} />
+        </div>
+      </section>
+
       <section className="mt-14">
         <h2 className="text-2xl font-semibold">Print cost per copy</h2>
         <p className="mt-1 text-muted">Matte cover. The lowest MRP is where your earning is just above zero.</p>
@@ -130,13 +141,13 @@ export default async function PricingPage() {
         <div className="card">
           <h2 className="text-xl font-semibold">Rate card</h2>
           <dl className="mt-3 space-y-2 text-sm">
-            {Object.entries(rates.binding).map(([k, b]) => (
+            {sortedOptions(rates.binding).map(([k, b]) => (
               <RateRow key={k} label={`${b.label} binding and cover`} value={rupees(b.base)} />
             ))}
-            {Object.entries(rates.interior).map(([k, i]) => (
+            {sortedOptions(rates.interior).map(([k, i]) => (
               <RateRow key={k} label={`${i.label} page`} value={`${rupees(i.per_page)} / page`} />
             ))}
-            {Object.entries(rates.paper)
+            {sortedOptions(rates.paper)
               .filter(([, p]) => p.per_page_extra > 0)
               .map(([k, p]) => (
                 <RateRow key={k} label={p.label} value={`+ ${rupees(p.per_page_extra)} / page`} />
@@ -144,8 +155,8 @@ export default async function PricingPage() {
           </dl>
           <p className="mt-3 text-xs text-muted">
             Bigger page sizes cost more per page:{" "}
-            {Object.values(rates.trim_sizes)
-              .map((t) => `${t.label.split(" (")[0]} ×${t.page_multiplier}`)
+            {sortedOptions(rates.trim_sizes)
+              .map(([, t]) => `${t.label.split(" (")[0]} ×${t.page_multiplier}`)
               .join(", ")}
             .
           </p>

@@ -1,7 +1,7 @@
 // Run with: npm test
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { earnings, minimumMrp, paymentFee, printCost, rupees, shippingFor, type PrintRates } from "./pricing.ts";
+import { earnings, minimumMrp, paymentFee, printCost, rupees, shippingFor, sortedOptions, type PrintRates } from "./pricing.ts";
 
 // Same values as the default settings migration
 const rates: PrintRates = {
@@ -52,4 +52,10 @@ test("shipping is free at or above the threshold", () => {
 test("rupees uses Indian grouping", () => {
   assert.equal(rupees(123456), "₹1,23,456");
   assert.equal(rupees(7.5), "₹7.50");
+});
+
+test("options sort small-to-large / cheapest first", () => {
+  const sizes = { a5: { label: "A5", page_multiplier: 1.05, width_in: 5.83 }, "5x8": { label: "5x8", page_multiplier: 1, width_in: 5 }, "6x9": { label: "6x9", page_multiplier: 1.15, width_in: 6 } };
+  assert.deepEqual(sortedOptions(sizes).map(([k]) => k), ["5x8", "a5", "6x9"]);
+  assert.deepEqual(sortedOptions(rates.binding).map(([k]) => k), ["paperback", "hardcover"]);
 });

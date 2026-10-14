@@ -48,7 +48,9 @@ export type Database = {
           interior: string;
           isbn: string | null;
           language: string;
+          manuscript_height_in: number | null;
           manuscript_path: string | null;
+          manuscript_width_in: number | null;
           mrp: number | null;
           page_count: number | null;
           paper: string;
@@ -79,7 +81,9 @@ export type Database = {
           interior?: string;
           isbn?: string | null;
           language?: string;
+          manuscript_height_in?: number | null;
           manuscript_path?: string | null;
+          manuscript_width_in?: number | null;
           mrp?: number | null;
           page_count?: number | null;
           paper?: string;
@@ -109,7 +113,9 @@ export type Database = {
           interior?: string;
           isbn?: string | null;
           language?: string;
+          manuscript_height_in?: number | null;
           manuscript_path?: string | null;
+          manuscript_width_in?: number | null;
           mrp?: number | null;
           page_count?: number | null;
           paper?: string;
@@ -523,6 +529,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      can_edit_book_files: { Args: { object_name: string }; Returns: boolean };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       my_role: {
         Args: Record<PropertyKey, never>;

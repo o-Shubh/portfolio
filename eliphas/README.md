@@ -12,7 +12,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 |---|------|--------|
 | 1 | Project setup, database, phone OTP login, role-based layouts | ✅ Done |
 | 2 | Public website: home, pricing, FAQ, bookstore, book pages | ✅ Done |
-| 3 | Author publishing flow + live earnings calculator | |
+| 3 | Author publishing flow + live earnings calculator | ✅ Done |
 | 4 | Admin: review queue, printers, payouts | |
 | 5 | Razorpay checkout, orders, printer portal | |
 | 6 | Author dashboard: earnings, sales by month and city | |
@@ -77,6 +77,7 @@ eliphas/
     │   ├── pricing.ts   print cost and earnings maths (one place, used everywhere)
     │   ├── settings.ts  loads print rates and fees from the settings table
     │   ├── books.ts     bookstore queries (search, filters, book page)
+    │   ├── publishing.ts book statuses, genres, file locations, "ready to submit" checklist
     │   ├── supabase/    client.ts (browser), server.ts (pages/actions), admin.ts (full access, server only)
     │   └── nav.ts       menu items for each area
     ├── components/      AppShell (sidebar + phone tab bar), BookCover, BookCard, Logo, ThemeToggle, forms
@@ -87,7 +88,7 @@ eliphas/
         ├── onboarding/  name, city, state, "I want to publish" (first login only)
         ├── dashboard/   sends you to your area based on your role
         ├── account/     everyone: orders, profile
-        ├── author/      authors (and admin)
+        ├── author/      authors: dashboard, books/ list, books/new, books/[id]/{details,files,print,submit}
         ├── printer/     printers (and admin)
         └── admin/       admin only
 ```
@@ -103,6 +104,22 @@ eliphas/
 Security is enforced **inside the database** (Row Level Security), not only in the
 app. For example, an author cannot make themselves admin or publish their own book
 without review, even with direct API calls.
+
+### How publishing works
+
+1. **Details** – title, author name, language, genre, description, optional ISBN.
+2. **Files** – manuscript PDF (up to 50 MB) and cover (JPG/PNG/WebP/PDF, up to 10 MB). Files go
+   straight from the author's phone to Supabase Storage. The app reads the PDF's page count and
+   page size, and warns if the size doesn't match the chosen book size.
+3. **Print & price** – size, inside pages, paper, binding, finish and MRP, with a live
+   earnings breakdown. The server recalculates the price on save; the browser's numbers are never trusted.
+4. **Submit** – a checklist must be complete. Then the book is **In review** and locked:
+   neither the details nor the files can change (enforced by the database and storage rules),
+   so the admin approves exactly what will be printed. Authors can withdraw from review,
+   unpublish a live book to edit it, or delete a draft (its files are deleted too).
+
+Book statuses: Draft → In review → Live, or Changes needed (admin sends back with a note,
+milestone 4) → author fixes → In review again.
 
 ### Sample books
 

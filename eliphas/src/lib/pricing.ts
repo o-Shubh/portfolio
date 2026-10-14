@@ -9,7 +9,7 @@ export type PrintRates = {
   is_sample?: boolean;
   min_pages: number;
   max_pages: number;
-  trim_sizes: Record<string, Option & { page_multiplier: number }>;
+  trim_sizes: Record<string, Option & { page_multiplier: number; width_in?: number; height_in?: number }>;
   interior: Record<string, Option & { per_page: number }>;
   paper: Record<string, Option & { per_page_extra: number }>;
   binding: Record<string, Option & { base: number }>;
@@ -84,4 +84,16 @@ export function rupees(n: number): string {
     "₹" +
     n.toLocaleString("en-IN", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: 2 })
   );
+}
+
+/**
+ * Options in a sensible display order: sizes small to large, everything else
+ * cheapest first. (The database doesn't keep the order they were typed in.)
+ */
+export function sortedOptions<T extends Option>(group: Record<string, T>): [string, T][] {
+  const rank = (o: Option) => {
+    const x = o as Option & Partial<{ width_in: number; page_multiplier: number; base: number; per_page: number; per_page_extra: number; extra: number }>;
+    return x.width_in ?? x.page_multiplier ?? x.base ?? x.per_page ?? x.per_page_extra ?? x.extra ?? 0;
+  };
+  return Object.entries(group).sort(([ka, a], [kb, b]) => rank(a) - rank(b) || ka.localeCompare(kb));
 }

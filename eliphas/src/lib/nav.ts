@@ -4,6 +4,7 @@ import type { Role } from "@/lib/auth";
 // Navigation for each logged-in area. Later milestones add items here.
 export const AUTHOR_NAV: NavItem[] = [
   { href: "/author", label: "Dashboard", icon: "dashboard", exact: true },
+  { href: "/author/books", label: "My books", icon: "books" },
   { href: "/account", label: "Account", icon: "profile" },
 ];
 
