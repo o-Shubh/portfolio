@@ -18,6 +18,34 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 6 | Author dashboard: earnings, sales by month and city | |
 | 7 | Install prompt (PWA) and deploy to Vercel | |
 
+## Live preview link (no computer needed)
+
+`http://localhost:3000` only works on the computer running the app. To get a link that opens
+on any phone, put the app online (free plans are enough):
+
+**1. Database: Supabase** (supabase.com → New project, region **Mumbai**)
+- SQL Editor → New query → paste all of [`supabase/hosted-setup.sql`](supabase/hosted-setup.sql) → **Run**.
+- Optional, for a demo with sample books and orders: run [`supabase/seed.sql`](supabase/seed.sql) the same way.
+  It also makes the test numbers 90000 00001 (admin), …02 (author) and …03 (printer). **Don't run it on the real launch database.**
+- Authentication → Sign In / Providers → **Phone** → enable. Under **Test phone numbers** add
+  `919000000001=123456, 919000000002=123456, 919000000003=123456, 919000000004=123456`.
+  Test numbers never send an SMS. If it asks for SMS provider details before you have them, choose Twilio and
+  enter placeholder values for now.
+- To make **your own** number admin: SQL Editor →
+  `insert into public.role_invites (phone, role) values ('91XXXXXXXXXX', 'admin');` (91 + your 10 digits).
+- Project Settings → API Keys: copy the **Project URL**, **Publishable key** and **Secret key**.
+
+**2. Website: Vercel** (vercel.com → sign in with GitHub → Add New → Project → import `portfolio`)
+- **Root Directory:** `eliphas`
+- **Environment Variables:** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+  `SUPABASE_SECRET_KEY` (from step 1) and `NEXT_PUBLIC_SITE_URL` (your Vercel address, e.g. `https://eliphas.vercel.app`).
+- Deploy. Every push to a branch then gets its own preview link automatically (shown on the Vercel dashboard).
+
+**3. Back in Supabase:** Authentication → URL Configuration → set **Site URL** to your Vercel address.
+
+When the database changes in a later milestone, run only the new file(s) from `supabase/migrations/`
+in the SQL Editor (each milestone summary says which).
+
 ## Run it on your computer
 
 You need **Node.js 20.9 or newer** and **Docker Desktop** (running). Docker runs a
@@ -60,6 +88,7 @@ Open http://localhost:3000 and log in with a test number. **No SMS is sent; the 
 | `npm run db:start` / `npm run db:stop` | Start / stop local Supabase |
 | `npm run db:reset` | Wipe the local database and rebuild it from `supabase/migrations` + `supabase/seed.sql` |
 | `npm run db:types` | Regenerate `src/lib/database.types.ts` after changing the database |
+| `npm run db:bundle` | Rebuild `supabase/hosted-setup.sql` (all migrations in one file for pasting into Supabase) |
 | `npm test` | Check the pricing maths (print cost, fees, earnings) |
 | `npm run typecheck` · `npm run lint` · `npm run build` | Checks to run before pushing |
 
