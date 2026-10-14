@@ -11,7 +11,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | # | What | Status |
 |---|------|--------|
 | 1 | Project setup, database, phone OTP login, role-based layouts | ✅ Done |
-| 2 | Public website: home, pricing, FAQ, bookstore, book pages | |
+| 2 | Public website: home, pricing, FAQ, bookstore, book pages | ✅ Done |
 | 3 | Author publishing flow + live earnings calculator | |
 | 4 | Admin: review queue, printers, payouts | |
 | 5 | Razorpay checkout, orders, printer portal | |
@@ -59,6 +59,7 @@ Open http://localhost:3000 and log in with a test number. **No SMS is sent; the 
 | `npm run db:start` / `npm run db:stop` | Start / stop local Supabase |
 | `npm run db:reset` | Wipe the local database and rebuild it from `supabase/migrations` + `supabase/seed.sql` |
 | `npm run db:types` | Regenerate `src/lib/database.types.ts` after changing the database |
+| `npm test` | Check the pricing maths (print cost, fees, earnings) |
 | `npm run typecheck` · `npm run lint` · `npm run build` | Checks to run before pushing |
 
 ## How it fits together
@@ -73,11 +74,15 @@ eliphas/
     ├── proxy.ts         runs before every page: refreshes login, sends logged-out visitors to /login
     ├── lib/
     │   ├── auth.ts      getCurrentProfile(), requireRole([...]), where each role lands
+    │   ├── pricing.ts   print cost and earnings maths (one place, used everywhere)
+    │   ├── settings.ts  loads print rates and fees from the settings table
+    │   ├── books.ts     bookstore queries (search, filters, book page)
     │   ├── supabase/    client.ts (browser), server.ts (pages/actions), admin.ts (full access, server only)
     │   └── nav.ts       menu items for each area
-    ├── components/      AppShell (sidebar + phone tab bar), Logo, ThemeToggle, forms
+    ├── components/      AppShell (sidebar + phone tab bar), BookCover, BookCard, Logo, ThemeToggle, forms
+    ├── content/faq.ts   FAQ questions and answers (edit freely)
     └── app/
-        ├── page.tsx     homepage (full website in milestone 2)
+        ├── (site)/      public website: home, books/, books/[slug]/, pricing/, faq/
         ├── login/       phone number → 6-digit code
         ├── onboarding/  name, city, state, "I want to publish" (first login only)
         ├── dashboard/   sends you to your area based on your role
@@ -98,6 +103,12 @@ eliphas/
 Security is enforced **inside the database** (Row Level Security), not only in the
 app. For example, an author cannot make themselves admin or publish their own book
 without review, even with direct API calls.
+
+### Sample books
+
+Local development has 10 sample published books (5 Hindi, 5 English) from `supabase/seed.sql`.
+They have no cover image, so the site draws a simple typographic cover in brand colours.
+Real covers uploaded by authors (milestone 3) replace these automatically.
 
 ### Print rates and fees (no code needed)
 
