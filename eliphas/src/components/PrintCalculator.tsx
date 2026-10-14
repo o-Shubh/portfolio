@@ -56,7 +56,7 @@ export function PrintCalculator({
               aria-describedby="pages-help"
               required
             />
-            <p id="pages-help" className={`mt-1 text-sm ${pagesOk ? "text-muted" : "text-danger"}`}>
+            <p id="pages-help" className={`mt-1 text-sm ${pagesOk || Number.isNaN(v.page_count) ? "text-muted" : "text-danger"}`}>
               Between {rates.min_pages} and {rates.max_pages}, counting blank pages.
             </p>
           </div>
@@ -85,7 +85,7 @@ export function PrintCalculator({
 
         <OptionGroup label="Book size" name="trim_size" options={rates.trim_sizes} value={v.trim_size} onChange={(x) => set("trim_size", x)} />
         {warning && (
-          <p role="note" className="-mt-3 rounded-xl border border-marigold/60 bg-marigold/10 p-3 text-sm">
+          <p role="note" className="-mt-3 rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 p-3 text-sm">
             {warning}
           </p>
         )}
@@ -142,7 +142,7 @@ function OptionGroup({
         {sortedOptions(options).map(([key, o]) => (
           <label
             key={key}
-            className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-line px-3 has-[:checked]:border-marigold has-[:checked]:bg-marigold/10 has-[:disabled]:cursor-not-allowed"
+            className="flex min-h-11 cursor-pointer items-center gap-2 rounded-2xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line px-3 has-[:checked]:ring-2 has-[:checked]:ring-marigold has-[:checked]:bg-marigold/10 has-[:disabled]:cursor-not-allowed"
           >
             <input
               type="radio"

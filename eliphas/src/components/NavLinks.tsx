@@ -36,7 +36,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
 
   if (variant === "tabs") {
     return (
-      <ul className="mx-auto flex max-w-lg justify-around">
+      <ul className="flex justify-around">
         {items.map((item) => {
           const Icon = ICONS[item.icon];
           const active = isActive(item);
@@ -45,13 +45,11 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-medium ${
-                  active ? "text-fg" : "text-muted"
+                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-[1.25rem] text-[0.7rem] font-semibold transition ${
+                  active ? "bg-primary text-on-primary" : "text-muted"
                 }`}
               >
-                <span className={`rounded-full px-4 py-1 ${active ? "bg-marigold text-on-marigold" : ""}`}>
-                  <Icon className="h-5 w-5" />
-                </span>
+                <Icon className="h-5 w-5" aria-hidden />
                 {item.label}
               </Link>
             </li>
@@ -71,11 +69,11 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-11 items-center gap-3 rounded-xl px-3 font-medium ${
-                active ? "bg-marigold text-on-marigold" : "text-fg hover:bg-surface-2"
+              className={`flex min-h-11 items-center gap-3 rounded-2xl px-3 font-semibold transition ${
+                active ? "bg-primary text-on-primary shadow-soft" : "text-muted hover:bg-surface-2 hover:text-fg"
               }`}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5" aria-hidden />
               {item.label}
             </Link>
           </li>

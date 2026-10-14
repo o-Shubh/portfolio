@@ -12,7 +12,7 @@ export function OnboardingForm({ profile }: { profile: Profile }) {
     <form action={action} className="mt-6 space-y-4">
       <ProfileFields profile={profile} />
       {profile.role === "reader" && (
-        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4">
+        <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line p-4">
           <input type="checkbox" name="publish" className="mt-1 h-5 w-5 accent-[#C98200]" />
           <span>
             <span className="block font-semibold">I want to publish my book</span>

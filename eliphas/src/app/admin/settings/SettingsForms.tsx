@@ -86,7 +86,7 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
         </section>
       ))}
 
-      <div className="sticky bottom-20 z-10 rounded-2xl border border-line bg-surface/95 p-4 backdrop-blur md:bottom-4">
+      <div className="sticky bottom-20 z-10 rounded-3xl bg-surface shadow-soft ring-1 ring-line/95 p-4 backdrop-blur md:bottom-4">
         <FormMessage state={state} />
         <button type="submit" className="btn-accent mt-2" disabled={pending}>
           {pending ? "Saving…" : "Save all changes"}

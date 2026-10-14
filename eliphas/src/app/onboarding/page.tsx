@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Logo } from "@/components/Logo";
+import { AuthFrame } from "@/components/AuthFrame";
 import { getCurrentProfile } from "@/lib/auth";
 import { OnboardingForm } from "./OnboardingForm";
 
@@ -12,17 +12,11 @@ export default async function OnboardingPage() {
   if (profile.full_name) redirect("/dashboard");
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
-          <Logo />
-        </div>
-        <div className="card">
-          <h1 className="text-2xl font-semibold">Welcome! Tell us about you</h1>
-          <p className="mt-1 text-muted">This takes 30 seconds.</p>
-          <OnboardingForm profile={profile} />
-        </div>
-      </div>
-    </main>
+    <AuthFrame>
+      <span className="eyebrow">Almost there</span>
+      <h1 className="mt-3 text-4xl">Tell us about you</h1>
+      <p className="mt-2 text-muted">This takes 30 seconds.</p>
+      <OnboardingForm profile={profile} />
+    </AuthFrame>
   );
 }

@@ -57,7 +57,7 @@ export default async function AdminHome() {
             </>
           );
           return s.href ? (
-            <Link key={s.label} href={s.href} className="card hover:border-marigold/60">
+            <Link key={s.label} href={s.href} className="card transition hover:-translate-y-0.5 hover:shadow-lift">
               {inner}
             </Link>
           ) : (

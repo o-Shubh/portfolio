@@ -22,7 +22,7 @@ export default async function PrinterHome() {
         intro={printer ? `${printer.name} · ${printer.city}, ${printer.state}` : "Your print queue."}
       />
       {!printer && profile.role === "printer" && (
-        <div className="card mb-4 border-marigold/50">
+        <div className="card mb-4 ring-2 ring-marigold/50">
           Your login isn&apos;t linked to a print shop yet. Ask the admin to add your phone number in the printer list.
         </div>
       )}

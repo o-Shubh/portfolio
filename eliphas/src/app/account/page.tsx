@@ -14,7 +14,7 @@ export default async function AccountHome() {
       <div className="card text-muted">You haven&apos;t ordered any books yet.</div>
 
       {profile.role === "reader" && (
-        <div className="card mt-6 border-marigold/50">
+        <div className="card mt-6 ring-2 ring-marigold/50">
           <h2 className="text-xl font-semibold">Have a book in you?</h2>
           <p className="mt-1 text-muted">
             Publish in print across India. No upfront cost — we print each copy when someone orders it.

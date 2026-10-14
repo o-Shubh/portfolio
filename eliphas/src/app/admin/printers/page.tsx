@@ -40,7 +40,7 @@ export default async function PrintersPage({ searchParams }: PageProps<"/admin/p
         <ul className="grid gap-3 md:grid-cols-2">
           {printers.map((p) => (
             <li key={p.id}>
-              <Link href={`/admin/printers/${p.id}`} className={`card block hover:border-marigold/60 ${p.active ? "" : "opacity-60"}`}>
+              <Link href={`/admin/printers/${p.id}`} className={`card block transition hover:-translate-y-0.5 hover:shadow-lift ${p.active ? "" : "opacity-60"}`}>
                 <div className="flex items-start justify-between gap-3">
                   <p className="font-heading text-lg font-semibold">{p.name}</p>
                   <span

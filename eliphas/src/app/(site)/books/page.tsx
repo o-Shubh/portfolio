@@ -36,7 +36,8 @@ export default async function BooksPage({ searchParams }: PageProps<"/books">) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-3xl font-semibold md:text-4xl">Bookstore</h1>
+      <span className="eyebrow">हिन्दी · English</span>
+      <h1 className="mt-3 text-4xl font-semibold md:text-5xl">Bookstore</h1>
       <p className="mt-1 text-muted">Books by independent Indian authors. Every copy printed fresh when you order.</p>
 
       {/* A plain GET form: works even before JavaScript loads */}

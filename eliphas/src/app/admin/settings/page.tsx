@@ -44,7 +44,7 @@ export default async function SettingsPage() {
       )}
 
       {affected.length > 0 && (
-        <div role="alert" className="card mb-6 border-danger/50">
+        <div role="alert" className="card mb-6 ring-2 ring-danger/40">
           <h2 className="text-lg font-semibold text-danger">Live books affected by the current rates</h2>
           <p className="mt-1 text-sm text-muted">
             These authors would earn nothing per copy, or an option they use no longer exists. Ask them to raise the

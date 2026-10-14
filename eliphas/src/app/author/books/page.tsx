@@ -37,7 +37,7 @@ export default async function MyBooksPage() {
             <li key={b.id}>
               <Link
                 href={`/author/books/${b.id}`}
-                className="card flex items-center gap-4 p-3 hover:border-marigold/60"
+                className="card flex items-center gap-4 p-3 transition hover:-translate-y-0.5 hover:shadow-lift"
               >
                 <div className="w-14 shrink-0">
                   <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size="xs" />

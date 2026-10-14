@@ -117,7 +117,7 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
           </section>
 
           {warnings.length > 0 && (
-            <section role="note" className="rounded-2xl border border-marigold/60 bg-marigold/10 p-5">
+            <section role="note" className="rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 p-5">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <AlertTriangle className="h-5 w-5" aria-hidden /> Check these
               </h2>

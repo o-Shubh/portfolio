@@ -3,38 +3,42 @@ import { LogoMark } from "./Logo";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 bg-ink text-paper">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <LogoMark />
-            <span className="font-heading text-lg font-semibold">Eliphas Indicus Publications</span>
+    <footer className="px-3 pb-3">
+      <div className="relative mx-auto mt-20 max-w-6xl overflow-hidden rounded-[2rem] bg-ink text-paper">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-marigold/25 blur-3xl"
+        />
+        <div className="relative grid gap-10 px-6 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:px-10">
+          <div>
+            <div className="flex items-center gap-3">
+              <LogoMark className="h-10 w-10" />
+              <span className="font-heading text-xl font-semibold tracking-tight">Eliphas Indicus</span>
+            </div>
+            <p className="mt-4 max-w-xs text-paper/70">
+              Print-on-demand publishing for Indian authors. Hindi and English. Printed in India, delivered across India.
+            </p>
           </div>
-          <p className="mt-3 max-w-xs text-sm text-paper/75">
-            Print-on-demand publishing for Indian authors. Hindi and English. Printed in India, shipped across India.
-          </p>
+          <FooterCol
+            title="Readers"
+            links={[
+              { href: "/books", label: "Bookstore" },
+              { href: "/books?lang=hi", label: "हिन्दी पुस्तकें" },
+              { href: "/books?lang=en", label: "English books" },
+            ]}
+          />
+          <FooterCol
+            title="Authors"
+            links={[
+              { href: "/login?next=/author", label: "Start publishing" },
+              { href: "/pricing", label: "Pricing and earnings" },
+              { href: "/faq", label: "Questions" },
+            ]}
+          />
         </div>
-        <FooterCol
-          title="Readers"
-          links={[
-            { href: "/books", label: "Bookstore" },
-            { href: "/books?lang=hi", label: "हिन्दी पुस्तकें" },
-            { href: "/books?lang=en", label: "English books" },
-          ]}
-        />
-        <FooterCol
-          title="Authors"
-          links={[
-            { href: "/login?next=/author", label: "Start publishing" },
-            { href: "/pricing", label: "Pricing and earnings" },
-            { href: "/faq", label: "Questions" },
-          ]}
-        />
-      </div>
-      <div className="safe-bottom border-t border-paper/15">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-sm text-paper/60">
+        <div className="safe-bottom relative border-t border-white/10 px-6 py-5 text-sm text-paper/50 md:px-10">
           © {new Date().getFullYear()} Eliphas Indicus Publications
-        </p>
+        </div>
       </div>
     </footer>
   );
@@ -43,11 +47,11 @@ export function SiteFooter() {
 function FooterCol({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
     <div>
-      <h2 className="font-sans text-sm font-semibold uppercase tracking-wider text-marigold">{title}</h2>
-      <ul className="mt-3 space-y-1">
+      <h2 className="font-sans text-xs font-bold tracking-[0.16em] text-marigold uppercase">{title}</h2>
+      <ul className="mt-4 space-y-1">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="inline-flex min-h-9 items-center text-paper/85 hover:text-paper">
+            <Link href={l.href} className="inline-flex min-h-9 items-center text-paper/80 transition hover:text-paper">
               {l.label}
             </Link>
           </li>

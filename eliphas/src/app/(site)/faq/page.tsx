@@ -24,7 +24,7 @@ export default function FaqPage() {
       {FAQ.map((group) => (
         <section key={group.title} className="mt-10">
           <h2 className="text-2xl font-semibold">{group.title}</h2>
-          <div className="mt-4 divide-y divide-line rounded-2xl border border-line bg-surface">
+          <div className="mt-4 divide-y divide-line rounded-3xl bg-surface shadow-soft ring-1 ring-line">
             {group.items.map((f) => (
               <details key={f.q} className="group p-5">
                 <summary className="cursor-pointer list-none font-semibold marker:hidden">

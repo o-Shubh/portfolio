@@ -37,7 +37,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={next}
-      className="grid h-11 w-11 place-items-center rounded-xl text-fg hover:bg-surface-2"
+      className="grid h-11 w-11 place-items-center rounded-full text-fg transition hover:bg-surface-2"
       aria-label={`${LABEL[theme]}. Tap to change.`}
       title={LABEL[theme]}
     >

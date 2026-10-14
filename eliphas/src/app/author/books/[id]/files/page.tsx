@@ -66,7 +66,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
           }
         />
         {pageWarning && trim && (
-          <p role="note" className="mt-4 rounded-xl border border-marigold/60 bg-marigold/10 p-3 text-sm">
+          <p role="note" className="mt-4 rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 p-3 text-sm">
             Your PDF pages are {book.manuscript_width_in} × {book.manuscript_height_in} in, but the book size is{" "}
             <strong>{trim.label}</strong>. Change the size on the {printLink} step, or export your PDF at the right size.
           </p>
@@ -134,7 +134,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
           }
         />
         {coverWarning && expected && (
-          <p role="note" className="mt-4 rounded-xl border border-marigold/60 bg-marigold/10 p-3 text-sm">
+          <p role="note" className="mt-4 rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 p-3 text-sm">
             This PDF is {book.print_cover_width_in} × {book.print_cover_height_in} in, but it should be {expected.widthIn} ×{" "}
             {expected.heightIn} in. Please re-export it at that size.
           </p>

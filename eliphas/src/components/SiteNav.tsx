@@ -15,8 +15,8 @@ export function SiteNav({ links, className = "" }: { links: { href: string; labe
               <Link
                 href={l.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-11 items-center rounded-lg px-3 font-medium ${
-                  active ? "text-fg underline decoration-marigold decoration-2 underline-offset-8" : "text-muted hover:text-fg"
+                className={`flex min-h-10 items-center rounded-full px-4 text-[0.95rem] font-semibold transition ${
+                  active ? "bg-surface-2 text-fg" : "text-muted hover:text-fg"
                 }`}
               >
                 {l.label}

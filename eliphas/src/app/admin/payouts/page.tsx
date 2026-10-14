@@ -81,7 +81,7 @@ export default async function PayoutsPage() {
       {!history?.length ? (
         <div className="card text-muted">No payouts yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
+        <div className="overflow-x-auto rounded-3xl bg-surface shadow-soft ring-1 ring-line">
           <table className="w-full min-w-[520px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>

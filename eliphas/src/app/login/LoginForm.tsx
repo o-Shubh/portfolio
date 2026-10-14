@@ -58,8 +58,8 @@ export function LoginForm({ next }: { next: string }) {
             Mobile number
           </label>
           <div className="flex gap-2">
-            <span className="field flex w-auto shrink-0 items-center bg-surface-2" aria-hidden="true">
-              +91
+            <span className="field flex w-auto shrink-0 items-center font-semibold" aria-hidden="true">
+              🇮🇳 +91
             </span>
             <input
               id="phone"
@@ -79,7 +79,7 @@ export function LoginForm({ next }: { next: string }) {
           </div>
         </div>
         {error && <ErrorText>{error}</ErrorText>}
-        <button type="submit" className="btn-accent w-full" disabled={busy}>
+        <button type="submit" className="btn-primary w-full" disabled={busy}>
           {busy ? "Sending…" : "Send code"}
         </button>
       </form>
@@ -114,7 +114,7 @@ export function LoginForm({ next }: { next: string }) {
           autoComplete="one-time-code"
           pattern="\d{6}"
           maxLength={6}
-          className="field text-center text-2xl tracking-[0.5em]"
+          className="field min-h-14 text-center text-2xl font-semibold tracking-[0.6em]"
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
           aria-invalid={Boolean(error)}

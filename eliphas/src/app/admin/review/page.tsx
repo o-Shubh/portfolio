@@ -76,7 +76,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
         <ul className="space-y-3">
           {books.map((b) => (
             <li key={b.id}>
-              <Link href={`/admin/books/${b.id}`} className="card flex items-center gap-4 p-3 hover:border-marigold/60">
+              <Link href={`/admin/books/${b.id}`} className="card flex items-center gap-4 p-3 transition hover:-translate-y-0.5 hover:shadow-lift">
                 <div className="w-12 shrink-0">
                   <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size="xs" />
                 </div>

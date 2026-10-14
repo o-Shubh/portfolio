@@ -36,14 +36,15 @@ export default async function PricingPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="text-3xl font-semibold md:text-5xl">Free to publish. You set the price.</h1>
+      <span className="eyebrow">Pricing</span>
+      <h1 className="mt-3 text-4xl font-semibold md:text-6xl">Free to publish. You set the price.</h1>
       <p className="mt-3 max-w-2xl text-lg text-muted">
         No setup fee, no stock to buy, no yearly charges. When a copy sells, three things come out of the MRP and the
         rest is your earning.
       </p>
 
       {rates.is_sample && (
-        <p role="note" className="mt-6 rounded-xl border border-marigold/60 bg-marigold/10 px-4 py-3 text-sm">
+        <p role="note" className="mt-6 rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 px-4 py-3 text-sm">
           <strong>Sample rates.</strong> Print costs below are indicative and will be updated once printer rates are
           final. Your dashboard always shows the current rate.
         </p>
@@ -94,7 +95,7 @@ export default async function PricingPage() {
       <section className="mt-14">
         <h2 className="text-2xl font-semibold">Print cost per copy</h2>
         <p className="mt-1 text-muted">Matte cover. The lowest MRP is where your earning is just above zero.</p>
-        <div className="mt-5 overflow-x-auto rounded-2xl border border-line bg-surface">
+        <div className="mt-5 overflow-x-auto rounded-3xl bg-surface shadow-soft ring-1 ring-line">
           <table className="w-full min-w-[560px] text-left">
             <caption className="sr-only">Print cost per copy by format and page count</caption>
             <thead className="border-b border-line text-sm text-muted">
@@ -179,7 +180,7 @@ export default async function PricingPage() {
 function FeeCard({ title, value, text }: { title: string; value: string; text: string }) {
   return (
     <div className="card">
-      <h2 className="font-sans text-sm font-semibold uppercase tracking-wider text-muted">{title}</h2>
+      <h2 className="font-sans text-xs font-bold tracking-[0.14em] text-muted uppercase">{title}</h2>
       <p className="mt-2 font-heading text-3xl font-semibold">{value}</p>
       <p className="mt-2 text-muted">{text}</p>
     </div>
