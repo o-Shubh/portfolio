@@ -3,10 +3,13 @@
 import { cookies } from "next/headers";
 import { getCurrentProfile } from "@/lib/auth";
 import { CAMPAIGN_COOKIE } from "@/lib/campaigns";
+import { readCart, writeCart } from "@/lib/cart";
+import { parseCheckoutItems, type CheckoutItem } from "@/lib/cart-codec";
 import { toRupees } from "@/lib/commission";
 import { INDIAN_STATES } from "@/lib/india";
+import type { Book } from "@/lib/publishing";
 import { markOrderPaid } from "@/lib/orders";
-import { MAX_QTY, orderItemRows, priceOrder } from "@/lib/order-pricing";
+import { orderItemRows, priceOrder } from "@/lib/order-pricing";
 import { createRazorpayOrder, fetchPaymentFee, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
 import { cleanIndianMobile } from "@/lib/phone";
 import { verifyPaymentSignature } from "@/lib/razorpay-signature";
@@ -25,6 +28,7 @@ export type CheckoutResult =
       amountPaise: number;
       name: string;
       phone: string;
+      fromCart: boolean;
     };
 
 const text = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
@@ -33,13 +37,34 @@ export type ShippingQuoteResult =
   | { error: string }
   | { shippingPaise: number; basePaise: number; discountPaise: number; promotion: string | null; booksPaise: number; totalPaise: number; isSample: boolean };
 
-/** Live quote shown before payment: shipping for this PIN code and the total to pay. */
-export async function quoteCheckout(slug: string, qty: number, pincode: string): Promise<ShippingQuoteResult> {
-  if (!/^[1-9]\d{5}$/.test(pincode)) return { error: "Enter a 6-digit PIN code to see shipping." };
+/** The published books for the order, in the order given. Every book must still be on sale. */
+async function orderLines(items: CheckoutItem[]): Promise<{ lines: { book: Book; quantity: number }[] } | { error: string }> {
   const supabase = await createClient();
-  const { data: book } = await supabase.from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
-  if (!book) return { error: "This book is no longer available." };
-  const priced = await priceOrder([{ book, quantity: qty }], pincode, await getPricingSettings());
+  const { data: books } = await supabase
+    .from("books")
+    .select("*")
+    .in(
+      "slug",
+      items.map((i) => i.slug),
+    )
+    .eq("status", "published");
+  const lines: { book: Book; quantity: number }[] = [];
+  for (const i of items) {
+    const book = books?.find((b) => b.slug === i.slug);
+    if (!book) return { error: items.length > 1 ? "A book in your cart is no longer available. Please check your cart." : "This book is no longer available." };
+    lines.push({ book, quantity: i.qty });
+  }
+  return { lines };
+}
+
+/** Live quote shown before payment: shipping for this PIN code (one parcel for all books) and the total to pay. */
+export async function quoteCheckout(input: CheckoutItem[], pincode: string): Promise<ShippingQuoteResult> {
+  if (!/^[1-9]\d{5}$/.test(pincode)) return { error: "Enter a 6-digit PIN code to see shipping." };
+  const items = parseCheckoutItems(input);
+  if ("error" in items) return items;
+  const found = await orderLines(items);
+  if ("error" in found) return { error: found.error };
+  const priced = await priceOrder(found.lines, pincode, await getPricingSettings());
   if ("error" in priced) return { error: priced.error };
   return {
     shippingPaise: priced.split.shippingPaise,
@@ -57,8 +82,8 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   const profile = await getCurrentProfile();
   if (!profile) return { error: "Please log in again." };
 
-  const slug = text(fd, "slug");
-  const qty = Number(fd.get("qty"));
+  const items = parseCheckoutItems(text(fd, "items"));
+  const fromCart = fd.get("from_cart") === "1";
   const name = text(fd, "ship_name");
   const mobile = cleanIndianMobile(text(fd, "ship_phone"));
   const line1 = text(fd, "ship_line1");
@@ -67,7 +92,7 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   const state = text(fd, "ship_state");
   const pincode = text(fd, "ship_pincode");
 
-  if (!Number.isInteger(qty) || qty < 1 || qty > MAX_QTY) return { error: `Quantity must be between 1 and ${MAX_QTY}.` };
+  if ("error" in items) return items;
   const expectedTotal = Number(fd.get("expected_total_paise"));
   if (name.length < 2) return { error: "Enter the name for delivery." };
   if (!mobile) return { error: "Enter a valid 10-digit mobile number for the courier." };
@@ -78,22 +103,22 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
 
   // Price from the database, never from the browser
   const supabase = await createClient();
-  const { data: book } = await supabase.from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
-  if (!book) return { error: "This book is no longer available." };
+  const found = await orderLines(items);
+  if ("error" in found) return { error: found.error };
   const settings = await getPricingSettings();
-  const priced = await priceOrder([{ book, quantity: qty }], pincode, settings);
+  const priced = await priceOrder(found.lines, pincode, settings);
   if ("error" in priced) return { error: priced.error };
   // The reader must see the same total they are asked to pay
   if (Number.isFinite(expectedTotal) && expectedTotal > 0 && expectedTotal !== priced.split.totalPaise) {
     return { error: "The price or shipping changed. Please check the new total and pay again." };
   }
 
-  // Campaign attribution: a link for this same book clicked in the last 30 days
+  // Campaign attribution: a link for one of these books clicked in the last 30 days
   let campaignLinkId: string | null = null;
   const code = (await cookies()).get(CAMPAIGN_COOKIE)?.value;
   if (code && /^[a-z0-9]{6,12}$/.test(code)) {
     const { data: link } = await createAdminClient().from("campaign_links").select("id, book_id").eq("code", code).maybeSingle();
-    if (link?.book_id === book.id) campaignLinkId = link.id;
+    if (link && found.lines.some((l) => l.book.id === link.book_id)) campaignLinkId = link.id;
   }
 
   let mode: "razorpay" | "mock";
@@ -168,6 +193,7 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
     amountPaise: priced.split.totalPaise,
     name,
     phone: mobile,
+    fromCart,
   };
 }
 
@@ -177,6 +203,7 @@ export async function confirmPayment(input: {
   razorpayOrderId: string;
   razorpayPaymentId: string;
   razorpaySignature: string;
+  fromCart?: boolean;
 }): Promise<{ ok: true } | { error: string }> {
   const profile = await getCurrentProfile();
   if (!profile) return { error: "Please log in again." };
@@ -203,5 +230,11 @@ export async function confirmPayment(input: {
   const fee = mode === "razorpay" ? await fetchPaymentFee(input.razorpayPaymentId) : null;
   const res = await markOrderPaid(order.id, input.razorpayPaymentId, mode, fee);
   if (!res.ok) return { error: "Payment received, but we couldn't update your order. Our team will fix it." };
+  // Take the books just bought out of the cart (anything else stays for later)
+  if (input.fromCart) {
+    const { data: bought } = await admin.from("order_items").select("book_id").eq("order_id", order.id);
+    const ids = new Set((bought ?? []).map((b) => b.book_id));
+    await writeCart((await readCart()).filter((l) => !ids.has(l.bookId)));
+  }
   return { ok: true };
 }

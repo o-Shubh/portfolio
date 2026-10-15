@@ -9,7 +9,8 @@ import { canSell, MAX_QTY } from "@/lib/order-pricing";
 import { paymentMode } from "@/lib/payments";
 import { getPricingSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
-import { CheckoutForm } from "./CheckoutForm";
+import { addressDefaults } from "../address";
+import { CheckoutForm } from "../CheckoutForm";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
 
@@ -24,15 +25,6 @@ export default async function CheckoutPage({ params }: PageProps<"/checkout/[slu
   if (!book) notFound();
   const settings = await getPricingSettings();
   const sellable = await canSell(book, settings);
-
-  // Pre-fill from the last order's address, or the profile
-  const { data: last } = await supabase
-    .from("orders")
-    .select("ship_name, ship_phone, ship_line1, ship_line2, ship_city, ship_state, ship_pincode")
-    .eq("buyer_id", profile.id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
 
   let mode: "razorpay" | "mock" | "off" = "off";
   try {
@@ -55,24 +47,16 @@ export default async function CheckoutPage({ params }: PageProps<"/checkout/[slu
         <CheckoutForm
           mode={mode}
           maxQty={MAX_QTY}
-          book={{
-            slug: book.slug,
-            title: book.title,
-            author: book.author_name,
-            mrp: Number(book.mrp),
-            cover: (
-              <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" />
-            ),
-          }}
-          defaults={{
-            ship_name: last?.ship_name ?? profile.full_name ?? "",
-            ship_phone: (last?.ship_phone ?? profile.phone ?? "").slice(-10),
-            ship_line1: last?.ship_line1 ?? "",
-            ship_line2: last?.ship_line2 ?? "",
-            ship_city: last?.ship_city ?? profile.city ?? "",
-            ship_state: last?.ship_state ?? profile.state ?? "",
-            ship_pincode: last?.ship_pincode ?? profile.pincode ?? "",
-          }}
+          items={[
+            {
+              slug: book.slug,
+              title: book.title,
+              author: book.author_name,
+              mrp: Number(book.mrp),
+              cover: <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" />,
+            },
+          ]}
+          defaults={await addressDefaults(profile)}
         />
       )}
     </div>

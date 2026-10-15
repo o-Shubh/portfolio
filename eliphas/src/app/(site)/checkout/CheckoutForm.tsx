@@ -30,19 +30,35 @@ function loadRazorpay(): Promise<boolean> {
   });
 }
 
+export type CheckoutBook = { slug: string; title: string; author: string; mrp: number; cover: React.ReactNode };
+
+/**
+ * Delivery address, live shipping quote and payment for one or more books (one parcel).
+ * "Buy now" passes one book with a copies stepper; the cart passes its books with quantities set on the cart page.
+ */
 export function CheckoutForm({
-  book,
+  items,
+  initialQty,
+  fromCart = false,
   defaults,
   mode,
   maxQty,
 }: {
-  book: { slug: string; title: string; author: string; mrp: number; cover: React.ReactNode };
+  items: CheckoutBook[];
+  initialQty?: number[];
+  fromCart?: boolean;
   defaults: Record<string, string>;
   mode: "razorpay" | "mock";
   maxQty: number;
 }) {
   const router = useRouter();
-  const [qty, setQty] = useState(1);
+  const [qtys, setQtys] = useState<number[]>(() => items.map((_, i) => initialQty?.[i] ?? 1));
+  const editable = !fromCart && items.length === 1;
+  const qty = qtys[0];
+  const setQty = (f: (q: number) => number) => setQtys((qs) => [f(qs[0]), ...qs.slice(1)]);
+  const lines = items.map((it, i) => ({ slug: it.slug, qty: qtys[i] }));
+  const booksTotal = items.reduce((a, it, i) => a + it.mrp * qtys[i], 0);
+  const copies = qtys.reduce((a, q) => a + q, 0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mockOrder, setMockOrder] = useState<Started | null>(null);
@@ -51,13 +67,17 @@ export function CheckoutForm({
   const [result, setResult] = useState<{ key: string; quote: ShippingQuoteResult } | null>(null);
   const [quoting, startQuote] = useTransition();
   const validPin = /^[1-9]\d{5}$/.test(pincode);
-  const key = `${pincode}:${qty}`;
+  const key = `${pincode}:${qtys.join(",")}`;
 
   // Shipping depends on the PIN code and parcel weight, so ask the server for a quote
   useEffect(() => {
     if (!validPin) return;
-    startQuote(async () => setResult({ key, quote: await quoteCheckout(book.slug, qty, pincode) }));
-  }, [validPin, key, pincode, qty, book.slug]);
+    const forKey = key;
+    const order = items.map((it, i) => ({ slug: it.slug, qty: qtys[i] }));
+    startQuote(async () => setResult({ key: forKey, quote: await quoteCheckout(order, pincode) }));
+    // key covers the PIN code and every quantity
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validPin, key]);
   // Only show a quote that matches what's on screen now
   const quote = validPin && result?.key === key ? result.quote : null;
   const priced = quote && !("error" in quote) ? quote : null;
@@ -68,6 +88,7 @@ export function CheckoutForm({
       razorpayOrderId: order.razorpayOrderId,
       razorpayPaymentId: paymentId,
       razorpaySignature: signature,
+      fromCart: order.fromCart,
     });
     if ("error" in res) {
       setBusy(false);
@@ -122,8 +143,8 @@ export function CheckoutForm({
   return (
     <>
       <form onSubmit={onSubmit} className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
-        <input type="hidden" name="slug" value={book.slug} />
-        <input type="hidden" name="qty" value={qty} />
+        <input type="hidden" name="items" value={JSON.stringify(lines)} />
+        <input type="hidden" name="from_cart" value={fromCart ? "1" : "0"} />
 
         <section className="card space-y-4">
           <h2 className="text-2xl">Delivery address</h2>
@@ -169,15 +190,33 @@ export function CheckoutForm({
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card space-y-5">
-            <div className="flex gap-4">
-              <div className="w-20 shrink-0">{book.cover}</div>
-              <div className="min-w-0">
-                <p className="font-medium leading-snug">{book.title}</p>
-                <p className="text-sm text-muted">{book.author}</p>
-                <p className="mt-1 font-semibold">{rupees(book.mrp)}</p>
+            {fromCart && (
+              <div className="flex items-baseline justify-between">
+                <h2 className="text-lg">
+                  {items.length} {items.length === 1 ? "book" : "books"} · {copies} {copies === 1 ? "copy" : "copies"}
+                </h2>
+                <Link href="/cart" className="text-sm font-semibold underline underline-offset-2">
+                  Edit cart
+                </Link>
               </div>
-            </div>
+            )}
+            <ul className="space-y-4">
+              {items.map((it, i) => (
+                <li key={it.slug} className="flex gap-4">
+                  <div className={`${items.length > 1 ? "w-14" : "w-20"} shrink-0`}>{it.cover}</div>
+                  <div className="min-w-0">
+                    <p className="leading-snug font-medium">{it.title}</p>
+                    <p className="text-sm text-muted">{it.author}</p>
+                    <p className="mt-1 font-semibold tabular-nums">
+                      {rupees(it.mrp)}
+                      {!editable && <span className="font-normal text-muted"> × {qtys[i]}</span>}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
 
+            {editable && (
             <div className="flex items-center justify-between">
               <span className="font-semibold">Copies</span>
               <div className="flex items-center gap-1 rounded-full bg-surface-2 p-1">
@@ -192,11 +231,12 @@ export function CheckoutForm({
                 </button>
               </div>
             </div>
+            )}
 
             <dl className="space-y-2 border-t border-line pt-4">
               <div className="flex justify-between text-muted">
                 <dt>Books</dt>
-                <dd className="tabular-nums">{rupees(book.mrp * qty)}</dd>
+                <dd className="tabular-nums">{rupees(booksTotal)}</dd>
               </div>
               <div className="flex justify-between text-muted">
                 <dt>Shipping</dt>
@@ -227,7 +267,11 @@ export function CheckoutForm({
             </button>
             <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
               <ShieldCheck className="h-4 w-4" aria-hidden />
-              {mode === "mock" ? "Test mode: no real money is taken." : "Printed fresh and shipped in 5–9 working days."}
+              {mode === "mock"
+                ? "Test mode: no real money is taken."
+                : items.length > 1
+                  ? "Printed fresh and shipped together in one parcel in 5–9 working days."
+                  : "Printed fresh and shipped in 5–9 working days."}
             </p>
             <p className="text-center text-xs text-muted">
               By paying you agree to our{" "}

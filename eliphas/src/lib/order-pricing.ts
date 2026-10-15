@@ -1,4 +1,5 @@
 import "server-only";
+import { MAX_QTY } from "@/lib/cart-codec";
 import { estimateCopy, splitOrder, toRupees, type OrderLineInput, type OrderSplit } from "@/lib/commission";
 import type { PlanVersion } from "@/lib/plans";
 import { authorRule } from "@/lib/plans";
@@ -7,7 +8,7 @@ import type { Book } from "@/lib/publishing";
 import { bookWeightGrams, parcelWeightGrams, quoteShipping, type ParcelSettings, type ShippingQuote } from "@/lib/shipping";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export const MAX_QTY = 10;
+export { MAX_QTY };
 
 /** Loads the admin-managed shipping tables and parcel settings. */
 export async function loadShippingConfig() {
