@@ -5,9 +5,9 @@ import { BookCover } from "@/components/BookCover";
 import { EarningsBreakdown } from "@/components/EarningsBreakdown";
 import { getOwnBookOr404 } from "@/lib/author-books";
 import { coverUrl } from "@/lib/books";
-import { estimateCopy } from "@/lib/commission";
+import { estimateCopy, ruleFromPlanVersion } from "@/lib/commission";
 import { getCurrentProfile } from "@/lib/auth";
-import { authorRule, getCommissionTerms, termsRequirement } from "@/lib/plans";
+import { authorRule, getCommissionTerms, getCurrentPlans, termsRequirement } from "@/lib/plans";
 import { gatewayPercent, printCost } from "@/lib/pricing";
 import { submitChecklist } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
@@ -20,8 +20,11 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
   const { id } = await params;
   const { book } = await getOwnBookOr404(id);
   const settings = await getPricingSettings();
-  const [profile, { rule, version }, terms] = await Promise.all([getCurrentProfile(), authorRule(book.author_id), getCommissionTerms()]);
+  const [profile, current, terms, plans] = await Promise.all([getCurrentProfile(), authorRule(book.author_id), getCommissionTerms(), getCurrentPlans()]);
   const termsReq = termsRequirement(book, profile!);
+  // A new book can only go on sale under the current terms, so preview it on Free rather than original terms.
+  const version = termsReq.required ? plans.free : current.version;
+  const rule = termsReq.required ? ruleFromPlanVersion(plans.free) : current.rule;
   const checklist = submitChecklist(book, settings, rule, termsReq);
   const ready = checklist.every((c) => c.ok);
 

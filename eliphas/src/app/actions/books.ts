@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
-import { estimateCopy } from "@/lib/commission";
-import { authorRule, termsRequirement } from "@/lib/plans";
+import { estimateCopy, ruleFromPlanVersion } from "@/lib/commission";
+import { authorRule, getCurrentPlans, termsRequirement } from "@/lib/plans";
 import { gatewayPercent, printCost } from "@/lib/pricing";
 import {
   COVER_TYPES,
@@ -169,7 +169,7 @@ export async function attachFile(
 }
 
 export async function savePrintOptions(bookId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const { supabase, book } = await ownBook(bookId);
+  const { supabase, book, profile } = await ownBook(bookId);
   if (!book) return { error: "Book not found." };
   if (!isEditable(book)) return { error: LOCKED };
 
@@ -191,8 +191,8 @@ export async function savePrintOptions(bookId: string, _prev: ActionState, fd: F
   const cost = printCost(opts, rates);
   if (cost === null) return { error: "Please choose a valid option for every print setting." };
   if (!Number.isInteger(mrp) || mrp < 1 || mrp > 99999) return { error: "MRP must be a whole number of rupees." };
-  // Negative-earnings guard, using the author's own commission rule
-  const { rule } = await authorRule(book.author_id);
+  // Negative-earnings guard, using the author's own commission rule (Free for a new book that needs the current terms)
+  const rule = termsRequirement(book, profile).required ? ruleFromPlanVersion((await getCurrentPlans()).free) : (await authorRule(book.author_id)).rule;
   const e = estimateCopy(mrp * 100, cost * 100, rule, gatewayPercent(fees));
   if (e.authorEarningPaise < 100) return { error: "At this price you would not earn anything. Please raise the price." };
 
