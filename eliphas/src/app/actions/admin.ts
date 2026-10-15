@@ -253,11 +253,11 @@ export async function saveSettingsForm(_prev: ActionState, fd: FormData): Promis
     }
   }
   const fees: Fees = {
-    platform_fee_per_copy: n(fd, "platform_fee_per_copy"),
+    platform_fee_per_copy: current.fees.platform_fee_per_copy, // legacy terms now live in plan_versions
     gateway_percent: n(fd, "gateway_percent"),
     gateway_gst_percent: n(fd, "gateway_gst_percent"),
   };
-  const shipping: Shipping = { flat: n(fd, "shipping_flat"), free_above: n(fd, "shipping_free_above") };
+  const shipping: Shipping = current.shipping; // shipping is now managed in Admin → Shipping
 
   const errors = [...validateRates(rates), ...validateFees(fees), ...validateShipping(shipping)];
   if (errors.length) return { error: errors.slice(0, 5).join(" ") };
@@ -316,7 +316,7 @@ export async function reassignOrder(orderId: string, _prev: ActionState, fd: For
   const printerId = String(fd.get("printer_id") ?? "");
   const { data: order } = await supabase.from("orders").select("status").eq("id", orderId).single();
   if (!order) return { error: "Order not found." };
-  if (!["paid", "printing"].includes(order.status)) return { error: "Only orders not yet printed can be moved." };
+  if (!["paid", "accepted", "printing"].includes(order.status)) return { error: "Only orders not yet printed can be moved." };
   const { data: printer } = await supabase.from("printers").select("id, active").eq("id", printerId).maybeSingle();
   if (!printer?.active) return { error: "Choose an active printer." };
 

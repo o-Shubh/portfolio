@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Detail, LegalPage } from "@/components/LegalPage";
-import { rupees } from "@/lib/pricing";
-import { getBusiness, getPricingSettings } from "@/lib/settings";
+import { formatPaise } from "@/lib/commission";
+import { getCurrentPlans } from "@/lib/plans";
+import { getBusiness } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Terms of use", description: "The rules for readers and authors using Eliphas Indicus Publications." };
 
 export default async function TermsPage() {
-  const [b, { fees }] = await Promise.all([getBusiness(), getPricingSettings()]);
+  const [b, plans] = await Promise.all([getBusiness(), getCurrentPlans()]);
   const name = <Detail value={b.legal_name} label="Business name" />;
   return (
     <LegalPage title="Terms of use" updated="15 October 2026" path="/terms">
@@ -69,13 +70,34 @@ export default async function TermsPage() {
       <h3>Earnings and payouts</h3>
       <ul>
         <li>
-          You set the price (MRP). For each copy sold you earn the MRP minus the print cost, a platform fee (currently{" "}
-          {rupees(fees.platform_fee_per_copy)} per copy) and payment charges. You see the exact amount before you publish.
+          You set the price (MRP). For each copy sold through our bookstore you earn the price minus the print cost, our commission, GST on the
+          commission and an allocated share of the payment gateway fee. Commission is currently {Number(plans.free.commission_percent)}% of the book price
+          (minimum {formatPaise(plans.free.commission_min_paise)}) on Free and {Number(plans.pro.commission_percent)}% (minimum{" "}
+          {formatPaise(plans.pro.commission_min_paise)}) on Pro. Commission never applies to shipping. You see the estimate before you publish.
         </li>
-        <li>The split is fixed when an order is paid. Later price or rate changes do not affect existing orders.</li>
+        <li>The split, your plan and the commission rule are fixed when an order is placed. Later price, plan or rate changes do not affect existing orders.</li>
+        <li>
+          If you joined before our current terms, your existing books keep your original terms until you accept the current ones. New books need the
+          current terms. We never move you to new rates without your acceptance.
+        </li>
+        <li>Discounts funded by us never reduce your earnings. Discounts that would reduce your earnings need your consent first.</li>
+        <li>Pro subscriptions and paid services are never deducted from your royalties unless you separately authorise it.</li>
         <li>Earnings on cancelled or refunded orders are reversed.</li>
         <li>We pay earnings to the UPI ID or bank account in your profile. Payout dates are shown in your dashboard.</li>
         <li>You are responsible for declaring your earnings and paying your own taxes.</li>
+      </ul>
+
+      <h2>Author Pro and author services</h2>
+      <ul>
+        <li>
+          Pro is optional and prepaid one month at a time. It does not renew automatically. Access, the lower commission and creative credits apply only
+          during paid months; credits do not roll over. Sales after Pro ends use Free rates. Your books and earnings are never affected.
+        </li>
+        <li>
+          One-time services (covers, formatting, launch kits, bundles) are quoted at a fixed price with deliverables, revisions and a delivery date before you
+          pay. Extra work needs a new quote you accept. Editing, translation, printing, ads and guaranteed sales are not included unless quoted.
+        </li>
+        <li>You confirm you have the rights to everything you send us for a service.</li>
       </ul>
 
       <h2>Acceptable use</h2>

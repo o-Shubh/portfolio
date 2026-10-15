@@ -34,6 +34,52 @@ export type Database = {
   };
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          created_at: string;
+          details: NonNullable<Json>;
+          entity: string;
+          entity_id: string | null;
+          id: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          entity: string;
+          entity_id?: string | null;
+          id?: number;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string | null;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          entity?: string;
+          entity_id?: string | null;
+          id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "audit_log_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       books: {
         Row: {
           author_id: string;
@@ -172,45 +218,257 @@ export type Database = {
           },
         ];
       };
-      order_items: {
+      campaign_clicks: {
         Row: {
-          author_earning: number;
-          author_id: string;
-          book_id: string;
-          created_at: string;
-          id: string;
-          order_id: string;
-          payment_fee: number;
-          platform_fee: number;
-          print_cost: number;
-          quantity: number;
-          unit_price: number;
+          clicked_at: string;
+          id: number;
+          link_id: string;
         };
         ComputedFields: never;
         Insert: {
-          author_earning: number;
+          clicked_at?: string;
+          id?: number;
+          link_id: string;
+        };
+        Update: {
+          clicked_at?: string;
+          id?: number;
+          link_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "campaign_clicks_link_id_fkey";
+            columns: ["link_id"];
+            isOneToOne: false;
+            referencedRelation: "campaign_links";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      campaign_links: {
+        Row: {
+          archived: boolean;
           author_id: string;
           book_id: string;
+          code: string;
+          created_at: string;
+          id: string;
+          label: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          archived?: boolean;
+          author_id: string;
+          book_id: string;
+          code: string;
           created_at?: string;
+          id?: string;
+          label: string;
+        };
+        Update: {
+          archived?: boolean;
+          author_id?: string;
+          book_id?: string;
+          code?: string;
+          created_at?: string;
+          id?: string;
+          label?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "campaign_links_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "campaign_links_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "campaign_links_book_id_fkey";
+            columns: ["book_id"];
+            isOneToOne: false;
+            referencedRelation: "books";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      order_issues: {
+        Row: {
+          buyer_id: string | null;
+          created_at: string;
+          description: string;
+          id: string;
+          kind: string;
+          order_id: string;
+          photo_paths: string[];
+          refund_paise: number | null;
+          replacement_order_id: string | null;
+          resolution_note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          buyer_id?: string | null;
+          created_at?: string;
+          description: string;
+          id?: string;
+          kind: string;
+          order_id: string;
+          photo_paths?: string[];
+          refund_paise?: number | null;
+          replacement_order_id?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: string;
+        };
+        Update: {
+          buyer_id?: string | null;
+          created_at?: string;
+          description?: string;
+          id?: string;
+          kind?: string;
+          order_id?: string;
+          photo_paths?: string[];
+          refund_paise?: number | null;
+          replacement_order_id?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "order_issues_buyer_id_fkey";
+            columns: ["buyer_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "order_issues_buyer_id_fkey";
+            columns: ["buyer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "order_issues_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "order_issues_replacement_order_id_fkey";
+            columns: ["replacement_order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "order_issues_resolved_by_fkey";
+            columns: ["resolved_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "order_issues_resolved_by_fkey";
+            columns: ["resolved_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      order_items: {
+        Row: {
+          author_discount: number;
+          author_earning: number;
+          author_earning_total: number | null;
+          author_id: string;
+          author_plan: string | null;
+          book_id: string;
+          commission: number | null;
+          commission_gst: number | null;
+          commission_rule: Json | null;
+          created_at: string;
+          file_snapshot: Json | null;
+          gateway_allocated: number | null;
+          id: string;
+          order_id: string;
+          payment_fee: number;
+          platform_discount: number;
+          platform_fee: number;
+          print_cost: number;
+          print_cost_total: number | null;
+          quantity: number;
+          reversal_reason: string | null;
+          reversed_at: string | null;
+          sale_channel: string;
+          unit_price: number;
+          line_earning: number | null;
+        };
+        ComputedFields: "line_earning";
+        Insert: {
+          author_discount?: number;
+          author_earning: number;
+          author_earning_total?: number | null;
+          author_id: string;
+          author_plan?: string | null;
+          book_id: string;
+          commission?: number | null;
+          commission_gst?: number | null;
+          commission_rule?: Json | null;
+          created_at?: string;
+          file_snapshot?: Json | null;
+          gateway_allocated?: number | null;
           id?: string;
           order_id: string;
           payment_fee: number;
+          platform_discount?: number;
           platform_fee: number;
           print_cost: number;
+          print_cost_total?: number | null;
           quantity: number;
+          reversal_reason?: string | null;
+          reversed_at?: string | null;
+          sale_channel?: string;
           unit_price: number;
         };
         Update: {
+          author_discount?: number;
           author_earning?: number;
+          author_earning_total?: number | null;
           author_id?: string;
+          author_plan?: string | null;
           book_id?: string;
+          commission?: number | null;
+          commission_gst?: number | null;
+          commission_rule?: Json | null;
           created_at?: string;
+          file_snapshot?: Json | null;
+          gateway_allocated?: number | null;
           id?: string;
           order_id?: string;
           payment_fee?: number;
+          platform_discount?: number;
           platform_fee?: number;
           print_cost?: number;
+          print_cost_total?: number | null;
           quantity?: number;
+          reversal_reason?: string | null;
+          reversed_at?: string | null;
+          sale_channel?: string;
           unit_price?: number;
         };
         Relationships: [
@@ -244,28 +502,70 @@ export type Database = {
           },
         ];
       };
+      order_status_history: {
+        Row: {
+          actor_id: string | null;
+          created_at: string;
+          from_status: Database["public"]["Enums"]["order_status"] | null;
+          id: number;
+          order_id: string;
+          to_status: Database["public"]["Enums"]["order_status"];
+        };
+        ComputedFields: never;
+        Insert: {
+          actor_id?: string | null;
+          created_at?: string;
+          from_status?: Database["public"]["Enums"]["order_status"] | null;
+          id?: number;
+          order_id: string;
+          to_status: Database["public"]["Enums"]["order_status"];
+        };
+        Update: {
+          actor_id?: string | null;
+          created_at?: string;
+          from_status?: Database["public"]["Enums"]["order_status"] | null;
+          id?: number;
+          order_id?: string;
+          to_status?: Database["public"]["Enums"]["order_status"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       orders: {
         Row: {
           accepted_at: string | null;
           buyer_id: string | null;
+          campaign_link_id: string | null;
           cancel_reason: string | null;
           cancelled_at: string | null;
           cancelled_by: string | null;
           courier: string | null;
           created_at: string;
           delivered_at: string | null;
+          gateway_fee: number | null;
+          gateway_fee_source: string | null;
           id: string;
           order_number: string;
+          packed_at: string | null;
           paid_at: string | null;
           payment_mode: string | null;
           printed_at: string | null;
           printer_id: string | null;
+          printing_at: string | null;
           razorpay_order_id: string | null;
           razorpay_payment_id: string | null;
           refund_amount: number | null;
           refund_id: string | null;
           refund_status: string | null;
           refunded_at: string | null;
+          replacement_of: string | null;
           ship_city: string;
           ship_line1: string;
           ship_line2: string | null;
@@ -275,6 +575,9 @@ export type Database = {
           ship_state: string;
           shipped_at: string | null;
           shipping: number;
+          shipping_discount: number;
+          shipping_promotion_id: string | null;
+          shipping_quote: Json | null;
           status: Database["public"]["Enums"]["order_status"];
           subtotal: number;
           total: number;
@@ -285,24 +588,30 @@ export type Database = {
         Insert: {
           accepted_at?: string | null;
           buyer_id?: string | null;
+          campaign_link_id?: string | null;
           cancel_reason?: string | null;
           cancelled_at?: string | null;
           cancelled_by?: string | null;
           courier?: string | null;
           created_at?: string;
           delivered_at?: string | null;
+          gateway_fee?: number | null;
+          gateway_fee_source?: string | null;
           id?: string;
           order_number?: string;
+          packed_at?: string | null;
           paid_at?: string | null;
           payment_mode?: string | null;
           printed_at?: string | null;
           printer_id?: string | null;
+          printing_at?: string | null;
           razorpay_order_id?: string | null;
           razorpay_payment_id?: string | null;
           refund_amount?: number | null;
           refund_id?: string | null;
           refund_status?: string | null;
           refunded_at?: string | null;
+          replacement_of?: string | null;
           ship_city: string;
           ship_line1: string;
           ship_line2?: string | null;
@@ -312,6 +621,9 @@ export type Database = {
           ship_state: string;
           shipped_at?: string | null;
           shipping?: number;
+          shipping_discount?: number;
+          shipping_promotion_id?: string | null;
+          shipping_quote?: Json | null;
           status?: Database["public"]["Enums"]["order_status"];
           subtotal: number;
           total: number;
@@ -321,24 +633,30 @@ export type Database = {
         Update: {
           accepted_at?: string | null;
           buyer_id?: string | null;
+          campaign_link_id?: string | null;
           cancel_reason?: string | null;
           cancelled_at?: string | null;
           cancelled_by?: string | null;
           courier?: string | null;
           created_at?: string;
           delivered_at?: string | null;
+          gateway_fee?: number | null;
+          gateway_fee_source?: string | null;
           id?: string;
           order_number?: string;
+          packed_at?: string | null;
           paid_at?: string | null;
           payment_mode?: string | null;
           printed_at?: string | null;
           printer_id?: string | null;
+          printing_at?: string | null;
           razorpay_order_id?: string | null;
           razorpay_payment_id?: string | null;
           refund_amount?: number | null;
           refund_id?: string | null;
           refund_status?: string | null;
           refunded_at?: string | null;
+          replacement_of?: string | null;
           ship_city?: string;
           ship_line1?: string;
           ship_line2?: string | null;
@@ -348,6 +666,9 @@ export type Database = {
           ship_state?: string;
           shipped_at?: string | null;
           shipping?: number;
+          shipping_discount?: number;
+          shipping_promotion_id?: string | null;
+          shipping_quote?: Json | null;
           status?: Database["public"]["Enums"]["order_status"];
           subtotal?: number;
           total?: number;
@@ -370,6 +691,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "orders_campaign_link_id_fkey";
+            columns: ["campaign_link_id"];
+            isOneToOne: false;
+            referencedRelation: "campaign_links";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "orders_printer_id_fkey";
             columns: ["printer_id"];
             isOneToOne: false;
@@ -381,6 +709,112 @@ export type Database = {
             columns: ["printer_id"];
             isOneToOne: false;
             referencedRelation: "printers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_replacement_of_fkey";
+            columns: ["replacement_of"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_shipping_promotion_id_fkey";
+            columns: ["shipping_promotion_id"];
+            isOneToOne: false;
+            referencedRelation: "shipping_promotions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payments: {
+        Row: {
+          amount_paise: number;
+          base_paise: number;
+          created_at: string;
+          description: string;
+          fee_paise: number | null;
+          gst_paise: number;
+          gst_percent: number;
+          id: string;
+          mode: string;
+          paid_at: string | null;
+          payer_id: string | null;
+          purpose: string;
+          razorpay_order_id: string | null;
+          razorpay_payment_id: string | null;
+          receipt_number: string | null;
+          refund_id: string | null;
+          refunded_at: string | null;
+          refunded_paise: number;
+          service_quote_id: string | null;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_paise: number;
+          base_paise: number;
+          created_at?: string;
+          description: string;
+          fee_paise?: number | null;
+          gst_paise?: number;
+          gst_percent?: number;
+          id?: string;
+          mode: string;
+          paid_at?: string | null;
+          payer_id?: string | null;
+          purpose: string;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          receipt_number?: string | null;
+          refund_id?: string | null;
+          refunded_at?: string | null;
+          refunded_paise?: number;
+          service_quote_id?: string | null;
+          status?: string;
+        };
+        Update: {
+          amount_paise?: number;
+          base_paise?: number;
+          created_at?: string;
+          description?: string;
+          fee_paise?: number | null;
+          gst_paise?: number;
+          gst_percent?: number;
+          id?: string;
+          mode?: string;
+          paid_at?: string | null;
+          payer_id?: string | null;
+          purpose?: string;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          receipt_number?: string | null;
+          refund_id?: string | null;
+          refunded_at?: string | null;
+          refunded_paise?: number;
+          service_quote_id?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payments_payer_id_fkey";
+            columns: ["payer_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "payments_payer_id_fkey";
+            columns: ["payer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_service_quote_id_fkey";
+            columns: ["service_quote_id"];
+            isOneToOne: true;
+            referencedRelation: "service_quotes";
             referencedColumns: ["id"];
           },
         ];
@@ -457,6 +891,70 @@ export type Database = {
           },
         ];
       };
+      plan_versions: {
+        Row: {
+          commission_gst_percent: number;
+          commission_min_paise: number;
+          commission_percent: number;
+          created_at: string;
+          created_by: string | null;
+          credits_per_period: number;
+          effective_from: string;
+          gst_percent: number;
+          id: string;
+          note: string | null;
+          plan: string;
+          price_paise: number;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          commission_gst_percent?: number;
+          commission_min_paise?: number;
+          commission_percent: number;
+          created_at?: string;
+          created_by?: string | null;
+          credits_per_period?: number;
+          effective_from?: string;
+          gst_percent?: number;
+          id?: string;
+          note?: string | null;
+          plan: string;
+          price_paise?: number;
+          version: number;
+        };
+        Update: {
+          commission_gst_percent?: number;
+          commission_min_paise?: number;
+          commission_percent?: number;
+          created_at?: string;
+          created_by?: string | null;
+          credits_per_period?: number;
+          effective_from?: string;
+          gst_percent?: number;
+          id?: string;
+          note?: string | null;
+          plan?: string;
+          price_paise?: number;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "plan_versions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "plan_versions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       printers: {
         Row: {
           active: boolean;
@@ -521,8 +1019,83 @@ export type Database = {
           },
         ];
       };
+      pro_credit_ledger: {
+        Row: {
+          actor_id: string | null;
+          author_id: string;
+          created_at: string;
+          delta: number;
+          id: string;
+          note: string | null;
+          period_id: string;
+          reason: string;
+          service_order_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          actor_id?: string | null;
+          author_id: string;
+          created_at?: string;
+          delta: number;
+          id?: string;
+          note?: string | null;
+          period_id: string;
+          reason: string;
+          service_order_id?: string | null;
+        };
+        Update: {
+          actor_id?: string | null;
+          author_id?: string;
+          created_at?: string;
+          delta?: number;
+          id?: string;
+          note?: string | null;
+          period_id?: string;
+          reason?: string;
+          service_order_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pro_credit_ledger_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "pro_credit_ledger_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pro_credit_ledger_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "pro_credit_ledger_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pro_credit_ledger_period_id_fkey";
+            columns: ["period_id"];
+            isOneToOne: false;
+            referencedRelation: "subscription_periods";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
+          author_terms_accepted_at: string | null;
+          author_terms_version: string | null;
           city: string | null;
           created_at: string;
           full_name: string | null;
@@ -536,6 +1109,8 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          author_terms_accepted_at?: string | null;
+          author_terms_version?: string | null;
           city?: string | null;
           created_at?: string;
           full_name?: string | null;
@@ -548,6 +1123,8 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          author_terms_accepted_at?: string | null;
+          author_terms_version?: string | null;
           city?: string | null;
           created_at?: string;
           full_name?: string | null;
@@ -582,6 +1159,400 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"];
         };
         Relationships: [];
+      };
+      service_catalog: {
+        Row: {
+          active: boolean;
+          code: string;
+          created_at: string;
+          created_by: string | null;
+          deliverables: string[];
+          exclusions: string[];
+          gst_percent: number;
+          id: string;
+          max_paise: number | null;
+          min_paise: number | null;
+          name: string;
+          price_paise: number | null;
+          pricing: string;
+          requires: string[];
+          revision_rounds: number;
+          scope: string;
+          sort: number;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          code: string;
+          created_at?: string;
+          created_by?: string | null;
+          deliverables?: string[];
+          exclusions?: string[];
+          gst_percent?: number;
+          id?: string;
+          max_paise?: number | null;
+          min_paise?: number | null;
+          name: string;
+          price_paise?: number | null;
+          pricing: string;
+          requires?: string[];
+          revision_rounds?: number;
+          scope: string;
+          sort?: number;
+          version: number;
+        };
+        Update: {
+          active?: boolean;
+          code?: string;
+          created_at?: string;
+          created_by?: string | null;
+          deliverables?: string[];
+          exclusions?: string[];
+          gst_percent?: number;
+          id?: string;
+          max_paise?: number | null;
+          min_paise?: number | null;
+          name?: string;
+          price_paise?: number | null;
+          pricing?: string;
+          requires?: string[];
+          revision_rounds?: number;
+          scope?: string;
+          sort?: number;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "service_catalog_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "service_catalog_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      service_events: {
+        Row: {
+          actor_id: string | null;
+          created_at: string;
+          from_status: Database["public"]["Enums"]["service_status"] | null;
+          id: number;
+          note: string | null;
+          service_order_id: string;
+          to_status: Database["public"]["Enums"]["service_status"] | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          actor_id?: string | null;
+          created_at?: string;
+          from_status?: Database["public"]["Enums"]["service_status"] | null;
+          id?: number;
+          note?: string | null;
+          service_order_id: string;
+          to_status?: Database["public"]["Enums"]["service_status"] | null;
+        };
+        Update: {
+          actor_id?: string | null;
+          created_at?: string;
+          from_status?: Database["public"]["Enums"]["service_status"] | null;
+          id?: number;
+          note?: string | null;
+          service_order_id?: string;
+          to_status?: Database["public"]["Enums"]["service_status"] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "service_events_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "service_events_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_events_service_order_id_fkey";
+            columns: ["service_order_id"];
+            isOneToOne: false;
+            referencedRelation: "service_orders";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      service_files: {
+        Row: {
+          created_at: string;
+          file_name: string;
+          id: string;
+          kind: string;
+          note: string | null;
+          path: string;
+          service_order_id: string;
+          size_bytes: number | null;
+          uploaded_by: string | null;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          file_name: string;
+          id?: string;
+          kind: string;
+          note?: string | null;
+          path: string;
+          service_order_id: string;
+          size_bytes?: number | null;
+          uploaded_by?: string | null;
+          version?: number;
+        };
+        Update: {
+          created_at?: string;
+          file_name?: string;
+          id?: string;
+          kind?: string;
+          note?: string | null;
+          path?: string;
+          service_order_id?: string;
+          size_bytes?: number | null;
+          uploaded_by?: string | null;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "service_files_service_order_id_fkey";
+            columns: ["service_order_id"];
+            isOneToOne: false;
+            referencedRelation: "service_orders";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_files_uploaded_by_fkey";
+            columns: ["uploaded_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "service_files_uploaded_by_fkey";
+            columns: ["uploaded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      service_orders: {
+        Row: {
+          author_id: string;
+          book_id: string | null;
+          cancel_reason: string | null;
+          cancelled_at: string | null;
+          catalog_id: string | null;
+          completed_at: string | null;
+          created_at: string;
+          id: string;
+          kind: string;
+          order_number: string;
+          pro_period_id: string | null;
+          qc: Json | null;
+          requirements: NonNullable<Json>;
+          revisions_allowed: number;
+          revisions_used: number;
+          rights_confirmed: boolean;
+          started_at: string | null;
+          status: Database["public"]["Enums"]["service_status"];
+          submitted_at: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id: string;
+          book_id?: string | null;
+          cancel_reason?: string | null;
+          cancelled_at?: string | null;
+          catalog_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          kind: string;
+          order_number?: string;
+          pro_period_id?: string | null;
+          qc?: Json | null;
+          requirements?: NonNullable<Json>;
+          revisions_allowed?: number;
+          revisions_used?: number;
+          rights_confirmed?: boolean;
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["service_status"];
+          submitted_at?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          author_id?: string;
+          book_id?: string | null;
+          cancel_reason?: string | null;
+          cancelled_at?: string | null;
+          catalog_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          kind?: string;
+          order_number?: string;
+          pro_period_id?: string | null;
+          qc?: Json | null;
+          requirements?: NonNullable<Json>;
+          revisions_allowed?: number;
+          revisions_used?: number;
+          rights_confirmed?: boolean;
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["service_status"];
+          submitted_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "service_orders_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "service_orders_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_orders_book_id_fkey";
+            columns: ["book_id"];
+            isOneToOne: false;
+            referencedRelation: "books";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_orders_catalog_id_fkey";
+            columns: ["catalog_id"];
+            isOneToOne: false;
+            referencedRelation: "current_service_catalog";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_orders_catalog_id_fkey";
+            columns: ["catalog_id"];
+            isOneToOne: false;
+            referencedRelation: "service_catalog";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_orders_pro_period_id_fkey";
+            columns: ["pro_period_id"];
+            isOneToOne: false;
+            referencedRelation: "subscription_periods";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      service_quotes: {
+        Row: {
+          accepted_at: string | null;
+          base_paise: number;
+          deliverables: string[];
+          delivery_by: string;
+          gst_paise: number;
+          gst_percent: number;
+          id: string;
+          issued_at: string;
+          issued_by: string | null;
+          kind: string;
+          notes: string | null;
+          payment_id: string | null;
+          revisions: number;
+          service_order_id: string;
+          status: string;
+          total_paise: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          accepted_at?: string | null;
+          base_paise: number;
+          deliverables?: string[];
+          delivery_by: string;
+          gst_paise: number;
+          gst_percent: number;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          kind?: string;
+          notes?: string | null;
+          payment_id?: string | null;
+          revisions?: number;
+          service_order_id: string;
+          status?: string;
+          total_paise: number;
+        };
+        Update: {
+          accepted_at?: string | null;
+          base_paise?: number;
+          deliverables?: string[];
+          delivery_by?: string;
+          gst_paise?: number;
+          gst_percent?: number;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          kind?: string;
+          notes?: string | null;
+          payment_id?: string | null;
+          revisions?: number;
+          service_order_id?: string;
+          status?: string;
+          total_paise?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "service_quotes_issued_by_fkey";
+            columns: ["issued_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "service_quotes_issued_by_fkey";
+            columns: ["issued_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_quotes_payment_id_fkey";
+            columns: ["payment_id"];
+            isOneToOne: false;
+            referencedRelation: "payments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "service_quotes_service_order_id_fkey";
+            columns: ["service_order_id"];
+            isOneToOne: false;
+            referencedRelation: "service_orders";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       settings: {
         Row: {
@@ -623,6 +1594,197 @@ export type Database = {
           },
         ];
       };
+      shipping_promotions: {
+        Row: {
+          active: boolean;
+          amount_paise: number;
+          created_at: string;
+          created_by: string | null;
+          ends_at: string | null;
+          funded_by: string;
+          id: string;
+          kind: string;
+          min_books_paise: number;
+          name: string;
+          starts_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          amount_paise?: number;
+          created_at?: string;
+          created_by?: string | null;
+          ends_at?: string | null;
+          funded_by?: string;
+          id?: string;
+          kind: string;
+          min_books_paise?: number;
+          name: string;
+          starts_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          amount_paise?: number;
+          created_at?: string;
+          created_by?: string | null;
+          ends_at?: string | null;
+          funded_by?: string;
+          id?: string;
+          kind?: string;
+          min_books_paise?: number;
+          name?: string;
+          starts_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shipping_promotions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "shipping_promotions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shipping_rates: {
+        Row: {
+          id: string;
+          max_weight_g: number;
+          price_paise: number;
+          zone_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: string;
+          max_weight_g: number;
+          price_paise: number;
+          zone_id: string;
+        };
+        Update: {
+          id?: string;
+          max_weight_g?: number;
+          price_paise?: number;
+          zone_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shipping_rates_zone_id_fkey";
+            columns: ["zone_id"];
+            isOneToOne: false;
+            referencedRelation: "shipping_zones";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      shipping_zones: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          extra_per_500g_paise: number;
+          id: string;
+          is_sample: boolean;
+          name: string;
+          pincode_prefixes: string[];
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          extra_per_500g_paise?: number;
+          id?: string;
+          is_sample?: boolean;
+          name: string;
+          pincode_prefixes: string[];
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          extra_per_500g_paise?: number;
+          id?: string;
+          is_sample?: boolean;
+          name?: string;
+          pincode_prefixes?: string[];
+        };
+        Relationships: [];
+      };
+      subscription_periods: {
+        Row: {
+          author_id: string;
+          created_at: string;
+          credits_granted: number;
+          ends_at: string | null;
+          id: string;
+          payment_id: string | null;
+          plan_version_id: string;
+          refund_note: string | null;
+          refunded_at: string | null;
+          starts_at: string | null;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id: string;
+          created_at?: string;
+          credits_granted?: number;
+          ends_at?: string | null;
+          id?: string;
+          payment_id?: string | null;
+          plan_version_id: string;
+          refund_note?: string | null;
+          refunded_at?: string | null;
+          starts_at?: string | null;
+          status?: string;
+        };
+        Update: {
+          author_id?: string;
+          created_at?: string;
+          credits_granted?: number;
+          ends_at?: string | null;
+          id?: string;
+          payment_id?: string | null;
+          plan_version_id?: string;
+          refund_note?: string | null;
+          refunded_at?: string | null;
+          starts_at?: string | null;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subscription_periods_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "subscription_periods_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscription_periods_payment_id_fkey";
+            columns: ["payment_id"];
+            isOneToOne: true;
+            referencedRelation: "payments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscription_periods_plan_version_id_fkey";
+            columns: ["plan_version_id"];
+            isOneToOne: false;
+            referencedRelation: "plan_versions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       author_balances: {
@@ -639,6 +1801,45 @@ export type Database = {
         ComputedFields: never;
         Relationships: [];
       };
+      current_service_catalog: {
+        Row: {
+          active: boolean | null;
+          code: string | null;
+          created_at: string | null;
+          created_by: string | null;
+          deliverables: string[] | null;
+          exclusions: string[] | null;
+          gst_percent: number | null;
+          id: string | null;
+          max_paise: number | null;
+          min_paise: number | null;
+          name: string | null;
+          price_paise: number | null;
+          pricing: string | null;
+          requires: string[] | null;
+          revision_rounds: number | null;
+          scope: string | null;
+          sort: number | null;
+          version: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: "service_catalog_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "author_balances";
+            referencedColumns: ["author_id"];
+          },
+          {
+            foreignKeyName: "service_catalog_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       printer_load: {
         Row: {
           active: boolean | null;
@@ -651,11 +1852,94 @@ export type Database = {
       };
     };
     Functions: {
+      activate_subscription: {
+        Args: {
+          p_fee_paise?: number;
+          p_payment: string;
+          p_razorpay_payment_id: string;
+        };
+        Returns: {
+          author_id: string;
+          created_at: string;
+          credits_granted: number;
+          ends_at: string | null;
+          id: string;
+          payment_id: string | null;
+          plan_version_id: string;
+          refund_note: string | null;
+          refunded_at: string | null;
+          starts_at: string | null;
+          status: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "subscription_periods";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      active_pro_period: {
+        Args: { p_at?: string; p_author: string };
+        Returns: {
+          author_id: string;
+          created_at: string;
+          credits_granted: number;
+          ends_at: string | null;
+          id: string;
+          payment_id: string | null;
+          plan_version_id: string;
+          refund_note: string | null;
+          refunded_at: string | null;
+          starts_at: string | null;
+          status: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "subscription_periods";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      admin_finance: { Args: { p_from: string; p_to: string }; Returns: Json };
+      author_commission_rule: {
+        Args: { p_at?: string; p_author: string };
+        Returns: {
+          commission_gst_percent: number;
+          commission_min_paise: number;
+          commission_percent: number;
+          created_at: string;
+          created_by: string | null;
+          credits_per_period: number;
+          effective_from: string;
+          gst_percent: number;
+          id: string;
+          note: string | null;
+          plan: string;
+          price_paise: number;
+          version: number;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "plan_versions";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       can_edit_book_files: { Args: { object_name: string }; Returns: boolean };
+      has_active_pro: { Args: { p_author: string }; Returns: boolean };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_earning_status: {
         Args: { s: Database["public"]["Enums"]["order_status"] };
         Returns: boolean;
+      };
+      line_earning: {
+        Args: {
+          oi: Omit<
+            Database["public"]["Tables"]["order_items"]["Row"],
+            Database["public"]["Tables"]["order_items"]["ComputedFields"]
+          >;
+        };
+        Returns: number;
       };
       my_balance: {
         Args: Record<PropertyKey, never>;
@@ -681,6 +1965,20 @@ export type Database = {
           shipped_at: string;
           status: Database["public"]["Enums"]["order_status"];
           total_count: number;
+        }[];
+      };
+      my_campaign_stats: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          archived: boolean;
+          book_id: string;
+          clicks: number;
+          code: string;
+          copies: number;
+          created_at: string;
+          label: string;
+          link_id: string;
+          orders: number;
         }[];
       };
       my_role: {
@@ -712,6 +2010,80 @@ export type Database = {
           month: string;
         }[];
       };
+      my_sales_series: {
+        Args: { p_from: string; p_grain?: string; p_to: string };
+        Returns: {
+          book_id: string;
+          copies: number;
+          earnings: number;
+          period: string;
+        }[];
+      };
+      owns_service_order: { Args: { object_name: string }; Returns: boolean };
+      pay_service_quote: {
+        Args: {
+          p_fee_paise?: number;
+          p_payment: string;
+          p_razorpay_payment_id: string;
+        };
+        Returns: {
+          author_id: string;
+          book_id: string | null;
+          cancel_reason: string | null;
+          cancelled_at: string | null;
+          catalog_id: string | null;
+          completed_at: string | null;
+          created_at: string;
+          id: string;
+          kind: string;
+          order_number: string;
+          pro_period_id: string | null;
+          qc: Json | null;
+          requirements: NonNullable<Json>;
+          revisions_allowed: number;
+          revisions_used: number;
+          rights_confirmed: boolean;
+          started_at: string | null;
+          status: Database["public"]["Enums"]["service_status"];
+          submitted_at: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "service_orders";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      period_credit_balance: { Args: { p_period: string }; Returns: number };
+      plan_version_at: {
+        Args: { p_at?: string; p_plan: string };
+        Returns: {
+          commission_gst_percent: number;
+          commission_min_paise: number;
+          commission_percent: number;
+          created_at: string;
+          created_by: string | null;
+          credits_per_period: number;
+          effective_from: string;
+          gst_percent: number;
+          id: string;
+          note: string | null;
+          plan: string;
+          price_paise: number;
+          version: number;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "plan_versions";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      use_pro_credit: {
+        Args: { p_author: string; p_service_order: string };
+        Returns: string;
+      };
     };
     Enums: {
       app_role: "reader" | "author" | "printer" | "admin";
@@ -724,12 +2096,26 @@ export type Database = {
       order_status:
         | "pending_payment"
         | "paid"
+        | "accepted"
         | "printing"
         | "printed"
+        | "packed"
         | "shipped"
         | "delivered"
         | "cancelled";
       payout_status: "pending" | "paid" | "cancelled";
+      service_status:
+        | "requirements_pending"
+        | "scope_review"
+        | "quote_awaiting_acceptance"
+        | "payment_pending"
+        | "queued"
+        | "in_progress"
+        | "author_review"
+        | "revision_requested"
+        | "completed"
+        | "cancelled"
+        | "refunded";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -874,13 +2260,28 @@ export const Constants = {
       order_status: [
         "pending_payment",
         "paid",
+        "accepted",
         "printing",
         "printed",
+        "packed",
         "shipped",
         "delivered",
         "cancelled",
       ],
       payout_status: ["pending", "paid", "cancelled"],
+      service_status: [
+        "requirements_pending",
+        "scope_review",
+        "quote_awaiting_acceptance",
+        "payment_pending",
+        "queued",
+        "in_progress",
+        "author_review",
+        "revision_requested",
+        "completed",
+        "cancelled",
+        "refunded",
+      ],
     },
   },
 } as const;

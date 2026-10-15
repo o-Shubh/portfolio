@@ -12,7 +12,7 @@ import { ReassignForm } from "./ReassignForm";
 export const metadata: Metadata = { title: "Orders" };
 
 const FILTERS: { key: string; label: string; statuses: OrderStatus[] }[] = [
-  { key: "open", label: "Not shipped", statuses: ["paid", "printing", "printed"] },
+  { key: "open", label: "Not shipped", statuses: ["paid", "accepted", "printing", "printed", "packed"] },
   { key: "shipped", label: "Shipped", statuses: ["shipped"] },
   { key: "delivered", label: "Delivered", statuses: ["delivered"] },
   { key: "unpaid", label: "Unpaid", statuses: ["pending_payment"] },
@@ -85,11 +85,11 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
                 <span className="text-muted">
                   Printer: <span className="font-semibold text-fg">{o.printers?.name ?? "not assigned"}</span>
                 </span>
-                {(o.status === "paid" || o.status === "printing") && (
+                {(o.status === "paid" || o.status === "accepted" || o.status === "printing") && (
                   <ReassignForm orderId={o.id} current={o.printer_id} printers={printers ?? []} />
                 )}
               </div>
-              {["pending_payment", "paid", "printing", "printed"].includes(o.status) && (
+              {["pending_payment", "paid", "accepted", "printing", "printed", "packed"].includes(o.status) && (
                 <div className="mt-3 border-t border-line pt-3">
                   <CancelForm orderId={o.id} paid={o.status !== "pending_payment"} />
                 </div>

@@ -5,9 +5,13 @@ import { BookCover } from "@/components/BookCover";
 import { EarningsBreakdown } from "@/components/EarningsBreakdown";
 import { getOwnBookOr404 } from "@/lib/author-books";
 import { coverUrl } from "@/lib/books";
-import { earnings, printCost } from "@/lib/pricing";
+import { estimateCopy } from "@/lib/commission";
+import { getCurrentProfile } from "@/lib/auth";
+import { authorRule, getCommissionTerms, termsRequirement } from "@/lib/plans";
+import { gatewayPercent, printCost } from "@/lib/pricing";
 import { submitChecklist } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
+import { AcceptTerms } from "@/components/AcceptTerms";
 import { SubmitActions } from "./SubmitActions";
 
 export const metadata: Metadata = { title: "Submit for review" };
@@ -16,7 +20,9 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
   const { id } = await params;
   const { book } = await getOwnBookOr404(id);
   const settings = await getPricingSettings();
-  const checklist = submitChecklist(book, settings);
+  const [profile, { rule, version }, terms] = await Promise.all([getCurrentProfile(), authorRule(book.author_id), getCommissionTerms()]);
+  const termsReq = termsRequirement(book, profile!);
+  const checklist = submitChecklist(book, settings, rule, termsReq);
   const ready = checklist.every((c) => c.ok);
 
   const cost =
@@ -33,7 +39,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
           settings.rates,
         )
       : null;
-  const e = cost !== null && book.mrp !== null ? earnings(Number(book.mrp), cost, settings.fees) : null;
+  const e = cost !== null && book.mrp !== null ? estimateCopy(Number(book.mrp) * 100, cost * 100, rule, gatewayPercent(settings.fees)) : null;
 
   return (
     <div className="grid max-w-4xl gap-6 md:grid-cols-[1fr_minmax(0,320px)]">
@@ -59,6 +65,12 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
           </ul>
         </section>
 
+        {termsReq.required && !termsReq.accepted && (
+          <section className="card">
+            <AcceptTerms summary={terms.summary} version={terms.version} />
+          </section>
+        )}
+
         <section className="card">
           <SubmitActions bookId={book.id} status={book.status} ready={ready} slug={book.slug} />
         </section>
@@ -75,7 +87,8 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
         </div>
         {e && (
           <div className="card">
-            <h2 className="mb-3 text-lg">Per copy</h2>
+            <h2 className="text-lg">Per copy</h2>
+            <p className="mb-3 text-xs text-muted">Your plan: {version.plan === "legacy" ? "original terms" : version.plan === "pro" ? "Pro" : "Free"}</p>
             <EarningsBreakdown e={e} />
           </div>
         )}

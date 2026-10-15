@@ -12,6 +12,7 @@ import { formatPhone } from "@/lib/phone";
 import { rupees } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
 import { CancelOrder } from "./CancelOrder";
+import { ReportIssue } from "./ReportIssue";
 
 export const metadata: Metadata = { title: "Order" };
 
@@ -29,6 +30,10 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
     .eq("buyer_id", profile.id)
     .maybeSingle();
   if (!o) notFound();
+  const { data: issue } = await supabase.from("order_issues").select("status, resolution_note, kind").eq("order_id", o.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+  const canReport =
+    !issue &&
+    ((o.status === "delivered" && o.delivered_at && new Date().getTime() - new Date(o.delivered_at).getTime() < 7 * 86_400_000) || o.status === "shipped");
 
   return (
     <>
@@ -118,12 +123,28 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
               </div>
             </dl>
           </section>
-          {o.status === "paid" && (
+          {(o.status === "paid" || o.status === "accepted") && (
             <section className="space-y-2">
               <CancelOrder orderId={o.id} />
               <p className="text-xs text-muted">Free cancellation until the printer starts on your copy.</p>
             </section>
           )}
+          {issue && (
+            <section className="card text-sm">
+              <h2 className="mb-1 text-lg">Problem reported</h2>
+              <p className="text-muted">
+                {issue.status === "open"
+                  ? "We're looking into it and will arrange a replacement or refund."
+                  : issue.status === "replacement"
+                    ? "A replacement copy is being printed for you."
+                    : issue.status === "refund"
+                      ? "Refunded in full."
+                      : "Reviewed."}
+              </p>
+              {issue.resolution_note && <p className="mt-1">{issue.resolution_note}</p>}
+            </section>
+          )}
+          {canReport && <ReportIssue orderId={o.id} userId={profile.id} shippedOnly={o.status === "shipped"} />}
           <section className="card text-sm">
             <h2 className="mb-2 text-lg">Delivering to</h2>
             <p className="font-semibold">{o.ship_name}</p>

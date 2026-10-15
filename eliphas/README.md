@@ -60,7 +60,7 @@ with a real link. You only need a browser. Free plans are enough to start.
 **4. Razorpay** (dashboard.razorpay.com, **Test mode** switch on)
 - Account & Settings → API Keys → **Generate test key** → put them in Vercel (step 2).
 - Webhooks → **Add new webhook**: URL `https://<your-site>/api/razorpay/webhook`, events **payment.captured**,
-  **refund.processed** and **refund.failed**, secret = your `RAZORPAY_WEBHOOK_SECRET`.
+  **payment.failed**, **refund.processed** and **refund.failed**, secret = your `RAZORPAY_WEBHOOK_SECRET`.
 - Test cards and UPI: razorpay.com/docs/payments/payments/test-card-details. When you're ready for real money,
   complete Razorpay's KYC, generate **live** keys and replace the test ones in Vercel.
 
@@ -68,6 +68,12 @@ After changing environment variables in Vercel, click **Redeploy** so they take 
 When a future change adds a database file in `supabase/migrations/`, run just that file in the SQL Editor.
 For a project set up before 15 October 2026, run
 [`supabase/migrations/20261015000008_launch.sql`](supabase/migrations/20261015000008_launch.sql) once.
+For a project set up before the plans and services update, run these two files **as two separate runs, in
+this order** (the first adds order steps the second uses; Postgres needs them committed first):
+[`20261016000009_order_steps.sql`](supabase/migrations/20261016000009_order_steps.sql), then
+[`20261016000010_monetisation.sql`](supabase/migrations/20261016000010_monetisation.sql).
+Back up the database first (Supabase → Database → Backups). Existing authors keep their original
+₹15-per-copy terms until they accept the new terms themselves; past orders are not changed.
 
 ### Launch checklist
 Admin → **Overview** shows a live checklist of the items it can check (business details, rates, printers,
@@ -81,6 +87,9 @@ Razorpay keys, webhook, site address).
 - [ ] Your printers added in Admin → Printers
 - [ ] Razorpay live keys and webhook
 - [ ] FAQ promises checked (review time, delivery time) in `src/content/faq.ts`
+- [ ] Real shipping rates in Admin → Shipping (the seeded All-India zone is a sample), then untick "sample"
+- [ ] Accountant has checked the tax settings in Admin → Plans (GST registration, GSTIN, rate) and TDS/TCS duties
+- [ ] Author terms, Pro and service terms reviewed by a lawyer before the 1 Nov 2026 effective date
 - [ ] Custom domain in Vercel (Settings → Domains), then update `NEXT_PUBLIC_SITE_URL` and Supabase Site URL
 
 ## Install as an app (Android and iPhone)
@@ -247,7 +256,21 @@ milestone 4) → author fixes → In review again.
 - **Payouts** – each author's earnings from paid orders, what's been paid, and the balance.
   Pay by UPI/bank outside the app, then **Record a payout** with the UTR number.
   Authors add their UPI ID on their profile.
-- **Settings** – print rates, fees and shipping (see above).
+- **Plans** – Free / Pro / original-terms rates as versions with an effective date (a new version never
+  changes past orders), the author terms version, and tax settings.
+- **Services** – the versioned service catalogue and the fulfilment queue: requirements pending → scope
+  review → quote → payment → queued → in progress → author review → revision → completed (or cancelled /
+  refunded). Quotes that differ from the catalogue need a reason; final print files need the QC checklist.
+- **Subscriptions** – Pro periods, credits (with manual adjustments) and audited refunds.
+- **Shipping** – zones by PIN-code prefix, weight slabs, extra per 500 g, and shipping promotions
+  (funded by the platform, never from author earnings).
+- **Finance** – reader payments, platform commission and GST on it, actual gateway costs, shipping,
+  Pro and service income, refunds and author liabilities. Total book sales are shown as sales value,
+  never as platform profit.
+- **Issues** – damaged / wrong / missing book reports with photos; resolve with a free replacement or refund.
+- **Settings** – print rates, fees and business details.
+
+Every money change made by an admin is written to `audit_log`.
 
 ### Author dashboard
 
@@ -275,8 +298,22 @@ from database functions (`my_balance`, `my_sales_by_month`, `my_sales_by_city`, 
    and the tracking number under **My orders**. Admin → **Orders** shows everything and can move
    an order to another printer.
 
-The money split per copy (print cost, ₹15 fee, payment charges, author earning) is saved with each
-order, so later rate changes never alter past orders or payouts.
+**Author earning per copy** = price − print cost − commission − GST on commission − share of the actual
+Razorpay fee (taken from the payment; estimated only until Razorpay reports it). All in paise. Commission:
+Free 15% (minimum ₹35), Pro 10% (minimum ₹25), original terms ₹15; each line stores the rule it used
+(`commission_rule`), so later rate changes never alter past orders or payouts. Example, ₹299 book with ₹120
+print cost: Free ₹119.02, Pro ₹136.66 to the author. Shipping is weight and PIN-code based, paid by the
+reader, and never taken from author earnings.
+
+Order steps: Paid → Accepted → Printing → Packed → Shipped → Delivered; every change is kept in
+`order_status_history`.
+
+**Pro and services.** Pro is ₹299 + 18% GST = ₹352.82 for one month, prepaid; it doesn't renew
+automatically (buying again extends it). Each paid month grants 3 template creatives (1 revision each), no
+rollover. Paid services (cover, formatting, launch kit, bundle) are separate from Pro credits and use a fixed
+quote the author accepts before paying. All payments go through `payments` with a receipt number; the
+webhook and the in-app confirmation both call the same idempotent database functions, so a payment is never
+applied twice.
 
 **Cancellations and refunds.** A buyer can cancel from the order page until the printer accepts it.
 An admin can cancel any order that hasn't shipped (Admin → Orders → Cancel order, with a reason the buyer
@@ -290,7 +327,8 @@ records. Authors with books, printers and admins are asked to contact support.
 
 **Razorpay setup** (test mode first): Dashboard → Account & Settings → API Keys → generate test keys.
 Add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to `.env.local` (and Vercel). Then Dashboard →
-Webhooks → add `https://<your-site>/api/razorpay/webhook`, event `payment.captured`, with a secret you
+Webhooks → add `https://<your-site>/api/razorpay/webhook`, events `payment.captured`, `payment.failed`,
+`refund.processed` and `refund.failed`, with a secret you
 also set as `RAZORPAY_WEBHOOK_SECRET`. Test cards and UPI IDs: razorpay.com/docs/payments/payments/test-card-details.
 Without keys, local development shows a built-in **test payment** window instead (it refuses to run on the live site).
 
@@ -306,8 +344,9 @@ Real covers uploaded by authors (milestone 3) replace these automatically.
 Stored in the `settings` table:
 
 - `print_rates` – per-page and binding costs for each size, paper, binding, finish (**sample values for now**)
-- `fees` – platform fee per copy (₹15) and Razorpay charges (2% + 18% GST)
-- `shipping` – flat shipping and free-shipping threshold
+- `fees` – Razorpay charge estimate (2% + 18% GST), used only until the actual fee is known
+- `tax`, `commission_terms`, `parcel` – GST settings, author terms version, parcel weight assumptions
+- Commission rates live in `plan_versions`, shipping in `shipping_zones` / `shipping_rates`
 
 To change them: log in as admin → **Settings**. Every number and label has a field; the
 "Advanced" box lets you add or remove options (e.g. a new book size) as JSON. Every change is

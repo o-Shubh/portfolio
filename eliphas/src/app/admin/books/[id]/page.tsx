@@ -4,12 +4,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookCover } from "@/components/BookCover";
 import { EarningsBreakdown } from "@/components/EarningsBreakdown";
+import { estimateCopy } from "@/lib/commission";
+import { authorRule } from "@/lib/plans";
 import { StatusBadge } from "@/components/StatusBadge";
 import { printFileLinks, timeAgo } from "@/lib/admin";
 import { requireRole } from "@/lib/auth";
 import { coverUrl, LANGUAGE_LABEL } from "@/lib/books";
 import { formatPhone } from "@/lib/phone";
-import { earnings, printCost } from "@/lib/pricing";
+import { gatewayPercent, printCost } from "@/lib/pricing";
 import { coverSizeMatches, fullCoverSize, pageSizeMatches, submitChecklist } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
@@ -46,7 +48,8 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
         rates,
       )
     : null;
-  const e = cost !== null && book.mrp !== null ? earnings(Number(book.mrp), cost, fees) : null;
+  const { rule, version } = await authorRule(book.author_id);
+  const e = cost !== null && book.mrp !== null ? estimateCopy(Number(book.mrp) * 100, cost * 100, rule, gatewayPercent(fees)) : null;
 
   // Automatic checks to help the reviewer
   const trim = rates.trim_sizes[book.trim_size];
@@ -57,8 +60,8 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
   if (expectedCover && book.print_cover_width_in && !coverSizeMatches(Number(book.print_cover_width_in), Number(book.print_cover_height_in), expectedCover))
     warnings.push(`Print cover is ${book.print_cover_width_in} × ${book.print_cover_height_in} in; expected ${expectedCover.widthIn} × ${expectedCover.heightIn} in.`);
   if (book.binding === "hardcover") warnings.push("Hardcover: confirm the cover wrap size with the printer.");
-  if (e && e.authorEarning < 1) warnings.push("At today's rates the author would earn nothing at this MRP.");
-  const checklist = submitChecklist(book, settings);
+  if (e && e.authorEarningPaise < 100) warnings.push("At today's rates the author would earn nothing at this MRP.");
+  const checklist = submitChecklist(book, settings, rule);
 
   const details = [
     ["Language", LANGUAGE_LABEL[book.language]],
@@ -152,6 +155,7 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
           {e && (
             <section className="card">
               <h2 className="mb-3 text-lg">Per copy at today&apos;s rates</h2>
+              <p className="-mt-1 mb-3 text-xs text-muted">Author&apos;s plan: {version.plan === "legacy" ? "original terms" : version.plan}</p>
               <EarningsBreakdown e={e} />
             </section>
           )}

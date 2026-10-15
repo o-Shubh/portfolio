@@ -1,9 +1,13 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { getCurrentProfile } from "@/lib/auth";
+import { CAMPAIGN_COOKIE } from "@/lib/campaigns";
+import { toRupees } from "@/lib/commission";
 import { INDIAN_STATES } from "@/lib/india";
-import { MAX_QTY, markOrderPaid, priceLine } from "@/lib/orders";
-import { createRazorpayOrder, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
+import { markOrderPaid } from "@/lib/orders";
+import { MAX_QTY, orderItemRows, priceOrder } from "@/lib/order-pricing";
+import { createRazorpayOrder, fetchPaymentFee, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
 import { cleanIndianMobile } from "@/lib/phone";
 import { verifyPaymentSignature } from "@/lib/razorpay-signature";
 import { getPricingSettings } from "@/lib/settings";
@@ -25,6 +29,29 @@ export type CheckoutResult =
 
 const text = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 
+export type ShippingQuoteResult =
+  | { error: string }
+  | { shippingPaise: number; basePaise: number; discountPaise: number; promotion: string | null; booksPaise: number; totalPaise: number; isSample: boolean };
+
+/** Live quote shown before payment: shipping for this PIN code and the total to pay. */
+export async function quoteCheckout(slug: string, qty: number, pincode: string): Promise<ShippingQuoteResult> {
+  if (!/^[1-9]\d{5}$/.test(pincode)) return { error: "Enter a 6-digit PIN code to see shipping." };
+  const supabase = await createClient();
+  const { data: book } = await supabase.from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
+  if (!book) return { error: "This book is no longer available." };
+  const priced = await priceOrder([{ book, quantity: qty }], pincode, await getPricingSettings());
+  if ("error" in priced) return { error: priced.error };
+  return {
+    shippingPaise: priced.split.shippingPaise,
+    basePaise: priced.shipping.basePaise,
+    discountPaise: priced.shipping.discountPaise,
+    promotion: priced.shipping.promotionName,
+    booksPaise: priced.split.booksPaise,
+    totalPaise: priced.split.totalPaise,
+    isSample: priced.shipping.isSample,
+  };
+}
+
 /** Step 1: check the address, price the order on the server, create it, and start the payment. */
 export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   const profile = await getCurrentProfile();
@@ -41,6 +68,7 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   const pincode = text(fd, "ship_pincode");
 
   if (!Number.isInteger(qty) || qty < 1 || qty > MAX_QTY) return { error: `Quantity must be between 1 and ${MAX_QTY}.` };
+  const expectedTotal = Number(fd.get("expected_total_paise"));
   if (name.length < 2) return { error: "Enter the name for delivery." };
   if (!mobile) return { error: "Enter a valid 10-digit mobile number for the courier." };
   if (line1.length < 5) return { error: "Enter the house / street address." };
@@ -53,8 +81,20 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   const { data: book } = await supabase.from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
   if (!book) return { error: "This book is no longer available." };
   const settings = await getPricingSettings();
-  const priced = priceLine(book, qty, settings);
-  if (!priced) return { error: "This book can't be ordered right now. Please try again later." };
+  const priced = await priceOrder([{ book, quantity: qty }], pincode, settings);
+  if ("error" in priced) return { error: priced.error };
+  // The reader must see the same total they are asked to pay
+  if (Number.isFinite(expectedTotal) && expectedTotal > 0 && expectedTotal !== priced.split.totalPaise) {
+    return { error: "The price or shipping changed. Please check the new total and pay again." };
+  }
+
+  // Campaign attribution: a link for this same book clicked in the last 30 days
+  let campaignLinkId: string | null = null;
+  const code = (await cookies()).get(CAMPAIGN_COOKIE)?.value;
+  if (code && /^[a-z0-9]{6,12}$/.test(code)) {
+    const { data: link } = await createAdminClient().from("campaign_links").select("id, book_id").eq("code", code).maybeSingle();
+    if (link?.book_id === book.id) campaignLinkId = link.id;
+  }
 
   let mode: "razorpay" | "mock";
   try {
@@ -69,9 +109,15 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
     .from("orders")
     .insert({
       buyer_id: profile.id,
-      subtotal: priced.subtotal,
-      shipping: priced.shipping,
-      total: priced.total,
+      subtotal: toRupees(priced.split.booksPaise),
+      shipping: toRupees(priced.split.shippingPaise),
+      total: toRupees(priced.split.totalPaise),
+      shipping_quote: priced.shipping,
+      shipping_discount: toRupees(priced.shipping.discountPaise),
+      shipping_promotion_id: priced.shipping.promotionId,
+      gateway_fee: toRupees(priced.split.gatewayTotalPaise),
+      gateway_fee_source: "estimated",
+      campaign_link_id: campaignLinkId,
       ship_name: name,
       ship_phone: `91${mobile}`,
       ship_line1: line1,
@@ -84,7 +130,7 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
     .single();
   if (error || !order) return { error: "Could not create the order. Please try again." };
 
-  const { error: itemError } = await admin.from("order_items").insert({ ...priced.item, order_id: order.id });
+  const { error: itemError } = await admin.from("order_items").insert(orderItemRows(order.id, priced));
   if (itemError) {
     await admin.from("orders").delete().eq("id", order.id);
     return { error: "Could not create the order. Please try again." };
@@ -99,7 +145,7 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   if (mode === "razorpay") {
     try {
       razorpayOrderId = await createRazorpayOrder({
-        amountRupees: priced.total,
+        amountRupees: toRupees(priced.split.totalPaise),
         receipt: order.order_number,
         notes: { order_id: order.id, order_number: order.order_number },
       });
@@ -119,7 +165,7 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
     mode,
     razorpayOrderId,
     keyId: mode === "razorpay" ? razorpayKeyId() : "",
-    amountPaise: Math.round(priced.total * 100),
+    amountPaise: priced.split.totalPaise,
     name,
     phone: mobile,
   };
@@ -153,7 +199,9 @@ export async function confirmPayment(input: {
     return { error: "Invalid test payment." };
   }
 
-  const res = await markOrderPaid(order.id, input.razorpayPaymentId, mode);
+  // The actual Razorpay fee, when available, replaces the estimate in the money split
+  const fee = mode === "razorpay" ? await fetchPaymentFee(input.razorpayPaymentId) : null;
+  const res = await markOrderPaid(order.id, input.razorpayPaymentId, mode, fee);
   if (!res.ok) return { error: "Payment received, but we couldn't update your order. Our team will fix it." };
   return { ok: true };
 }

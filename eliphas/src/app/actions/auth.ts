@@ -30,7 +30,7 @@ export async function deleteMyAccount(confirm: string): Promise<{ error?: string
       .from("orders")
       .select("*", { count: "exact", head: true })
       .eq("buyer_id", profile.id)
-      .in("status", ["paid", "printing", "printed", "shipped"]),
+      .in("status", ["paid", "accepted", "printing", "printed", "packed", "shipped"]),
   ]);
   if (books) return { error: `Your account has books and earnings linked to it. ${support}` };
   if (open) return { error: "You have an order on its way. You can delete your account after it's delivered." };

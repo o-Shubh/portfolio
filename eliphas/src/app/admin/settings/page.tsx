@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { requireRole } from "@/lib/auth";
-import { earnings, printCost, rupees } from "@/lib/pricing";
+import { estimateCopy } from "@/lib/commission";
+import { authorRule } from "@/lib/plans";
+import { gatewayPercent, printCost, rupees } from "@/lib/pricing";
 import { BUSINESS_FIELDS, getBusiness, getPricingSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
 import { BusinessForm, RatesJsonForm, SettingsForm } from "./SettingsForms";
@@ -16,17 +18,20 @@ export default async function SettingsPage() {
   const [{ data: live }, { data: meta }] = await Promise.all([
     supabase
       .from("books")
-      .select("id, title, mrp, page_count, trim_size, binding, interior, paper, cover_finish")
+      .select("id, title, mrp, page_count, trim_size, binding, interior, paper, cover_finish, author_id")
       .eq("status", "published"),
     supabase.from("settings").select("key, updated_at, profiles!settings_updated_by_fkey(full_name)").eq("key", "print_rates").single(),
   ]);
 
   // Live books that would lose money (or can't be priced) at the current rates
+  const authorIds = [...new Set((live ?? []).map((b) => b.author_id))];
+  const rules = new Map(await Promise.all(authorIds.map(async (id) => [id, (await authorRule(id)).rule] as const)));
   const affected = (live ?? [])
     .map((b) => {
       const cost = b.page_count ? printCost({ ...b, page_count: b.page_count }, settings.rates) : null;
-      const e = cost !== null && b.mrp !== null ? earnings(Number(b.mrp), cost, settings.fees) : null;
-      return { ...b, cost, earning: e?.authorEarning ?? null };
+      const e =
+        cost !== null && b.mrp !== null ? estimateCopy(Number(b.mrp) * 100, cost * 100, rules.get(b.author_id)!, gatewayPercent(settings.fees)) : null;
+      return { ...b, cost, earning: e ? e.authorEarningPaise / 100 : null };
     })
     .filter((b) => b.cost === null || b.earning === null || b.earning < 1);
 

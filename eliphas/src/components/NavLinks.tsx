@@ -10,6 +10,12 @@ import {
   Settings,
   ShoppingBag,
   UserRound,
+  Sparkles,
+  BarChart3,
+  Truck,
+  Crown,
+  AlertTriangle,
+  Receipt,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,9 +31,15 @@ const ICONS = {
   settings: Settings,
   shop: ShoppingBag,
   profile: UserRound,
+  services: Sparkles,
+  analytics: BarChart3,
+  shipping: Truck,
+  plan: Crown,
+  issues: AlertTriangle,
+  finance: Receipt,
 };
 
-export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; exact?: boolean };
+export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; exact?: boolean; /** hide from the phone tab bar (sidebar only) */ sidebarOnly?: boolean };
 
 export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sidebar" | "tabs" }) {
   const pathname = usePathname();
@@ -37,7 +49,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
   if (variant === "tabs") {
     return (
       <ul className="flex justify-around">
-        {items.map((item) => {
+        {items.filter((i) => !i.sidebarOnly).map((item) => {
           const Icon = ICONS[item.icon];
           const active = isActive(item);
           return (

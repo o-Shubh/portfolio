@@ -19,7 +19,9 @@ import Link from "next/link";
 import { BookShelf } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
 import { coverUrl, listGenres, listPublishedBooks } from "@/lib/books";
-import { earnings, printCost, rupees } from "@/lib/pricing";
+import { estimateCopy, formatPaise, ruleFromPlanVersion } from "@/lib/commission";
+import { getCurrentPlans } from "@/lib/plans";
+import { gatewayPercent, printCost, rupees } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 
 // Example used in the author banner. Prices come from the settings table.
@@ -43,16 +45,17 @@ const DEFAULT_STYLE = { icon: BookMarked, tint: "bg-[#e6ecf7] text-[#1d3157]" };
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const { account } = await searchParams;
-  const [{ books }, genres, { rates, fees, shipping }] = await Promise.all([
+  const [{ books }, genres, { rates, fees }, plans] = await Promise.all([
     listPublishedBooks({ page: 1 }),
     listGenres(),
     getPricingSettings(),
+    getCurrentPlans(),
   ]);
   const heroBooks = books.slice(0, 3);
   const hindi = books.filter((b) => b.language === "hi");
   const affordable = books.filter((b) => Number(b.mrp) < 300);
   const cost = printCost(EXAMPLE, rates);
-  const example = cost === null ? null : earnings(EXAMPLE_MRP, cost, fees);
+  const example = cost === null ? null : estimateCopy(EXAMPLE_MRP * 100, cost * 100, ruleFromPlanVersion(plans.free), gatewayPercent(fees));
 
   return (
     <div className="container-x space-y-8 pt-4 md:space-y-10 md:pt-6">
@@ -106,7 +109,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
         <Link href="/books" className="flex items-center justify-between rounded-xl bg-gold px-4 py-3 text-sm font-semibold text-navy sm:hidden">
           <span className="flex items-center gap-2">
-            <Truck className="h-4 w-4" aria-hidden /> Free delivery above {rupees(shipping.free_above)}
+            <Truck className="h-4 w-4" aria-hidden /> Delivered across India · shipping shown before you pay
           </span>
           <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
@@ -114,9 +117,9 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           <Link href="/books" className="group flex items-center justify-between gap-4 rounded-2xl bg-gold p-6 text-navy">
             <span>
               <span className="flex items-center gap-2 text-sm font-semibold">
-                <Truck className="h-4 w-4" aria-hidden /> Free delivery
+                <Truck className="h-4 w-4" aria-hidden /> Delivered across India
               </span>
-              <span className="mt-1 block text-2xl font-semibold">On orders above {rupees(shipping.free_above)}</span>
+              <span className="mt-1 block text-2xl font-semibold">Shipping shown by PIN code before you pay</span>
             </span>
             <ArrowRight className="h-5 w-5 shrink-0 transition group-hover:translate-x-1" aria-hidden />
           </Link>
@@ -199,18 +202,19 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                 {EXAMPLE.page_count}-page paperback sold at {rupees(EXAMPLE_MRP)}
               </p>
               <p className="mt-1 text-4xl font-semibold text-[#15803d]">
-                {rupees(example.authorEarning)}
+                {formatPaise(example.authorEarningPaise)}
                 <span className="ml-2 text-base font-medium text-[#5b6478]">to you per copy</span>
               </p>
               <dl className="mt-5 space-y-2 border-t border-[#13223c]/10 pt-4 text-sm">
                 {[
-                  ["Printing", example.printCost],
-                  ["Platform fee", example.platformFee],
-                  ["Payment charges", example.paymentFee],
+                  ["Printing", example.printCostPaise],
+                  ["Commission (Free plan)", example.commissionPaise],
+                  ["GST on commission", example.commissionGstPaise],
+                  ["Payment charges (estimate)", example.gatewayPaise],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between text-[#5b6478]">
                     <dt>{k}</dt>
-                    <dd className="tabular-nums">− {rupees(Number(v))}</dd>
+                    <dd className="tabular-nums">− {formatPaise(Number(v))}</dd>
                   </div>
                 ))}
               </dl>

@@ -26,7 +26,7 @@ export default async function AdminHome() {
         .gte("paid_at", monthStart)
         .not("status", "in", "(pending_payment,cancelled)"),
     ),
-    count(supabase.from("orders").select("*", { count: "exact", head: true }).in("status", ["paid", "printing", "printed"])),
+    count(supabase.from("orders").select("*", { count: "exact", head: true }).in("status", ["paid", "accepted", "printing", "printed", "packed"])),
     supabase.from("author_balances").select("balance"),
     supabase
       .from("books")

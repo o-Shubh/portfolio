@@ -25,7 +25,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   const book = await getPublishedBook(slug);
   if (!book) notFound();
 
-  const [more, { rates, shipping }] = await Promise.all([moreByAuthor(book), getPricingSettings()]);
+  const [more, { rates }] = await Promise.all([moreByAuthor(book), getPricingSettings()]);
   const cover = coverUrl(book.cover_path);
   const label = (group: Record<string, { label: string }>, key: string) => group[key]?.label ?? key;
 
@@ -108,16 +108,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
               <p className="mt-0.5 text-sm text-muted">Inclusive of all taxes</p>
               <p className="mt-3 flex items-start gap-2 text-sm">
                 <Truck className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
-                <span>
-                  {Number(book.mrp) >= shipping.free_above ? (
-                    <strong className="font-semibold text-success">Free delivery</strong>
-                  ) : (
-                    <>
-                      Delivery {rupees(shipping.flat)} · <strong className="font-semibold text-success">free above {rupees(shipping.free_above)}</strong>
-                    </>
-                  )}{" "}
-                  · arrives in 5–9 working days
-                </span>
+                <span>Delivery across India · shipping for your PIN code is shown at checkout · usually arrives in 5–9 working days</span>
               </p>
               <Link href={`/checkout/${book.slug}`} className="btn-accent mt-5 hidden min-h-12 w-full text-base md:flex">
                 Buy now

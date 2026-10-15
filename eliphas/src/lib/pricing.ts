@@ -46,6 +46,11 @@ export function printCost(o: PrintOptions, rates: PrintRates): number | null {
   return Math.ceil(binding.base + finish.extra + pages);
 }
 
+/** The payment gateway estimate as one percentage: Razorpay % plus GST on it (2% + 18% = 2.36%). */
+export function gatewayPercent(fees: Pick<Fees, "gateway_percent" | "gateway_gst_percent">): number {
+  return Math.round(fees.gateway_percent * (1 + fees.gateway_gst_percent / 100) * 10000) / 10000;
+}
+
 /** Razorpay charges on one copy: gateway % of MRP plus GST on that charge. */
 export function paymentFee(mrp: number, fees: Fees): number {
   return round2(mrp * (fees.gateway_percent / 100) * (1 + fees.gateway_gst_percent / 100));

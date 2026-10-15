@@ -3,21 +3,23 @@
 import { useFormAction } from "@/lib/use-form-action";
 import { savePrintOptions } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
-import { PrintCalculator, type CalculatorValues } from "@/components/PrintCalculator";
-import type { Fees, PrintRates } from "@/lib/pricing";
+import { PrintCalculator, type CalculatorPlan, type CalculatorValues } from "@/components/PrintCalculator";
+import type { PrintRates } from "@/lib/pricing";
 import { pageSizeMatches } from "@/lib/publishing";
 
 export function PrintForm({
   bookId,
   rates,
-  fees,
+  gatewayPercent,
+  plans,
   initial,
   disabled,
   pdfSize,
 }: {
   bookId: string;
   rates: PrintRates;
-  fees: Fees;
+  gatewayPercent: number;
+  plans: CalculatorPlan[];
   initial: CalculatorValues;
   disabled: boolean;
   pdfSize: { w: number; h: number } | null;
@@ -32,7 +34,7 @@ export function PrintForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <PrintCalculator rates={rates} fees={fees} initial={initial} disabled={disabled} sizeWarning={sizeWarning} />
+      <PrintCalculator rates={rates} gatewayPercent={gatewayPercent} plans={plans} initial={initial} disabled={disabled} sizeWarning={sizeWarning} />
       <FormMessage state={state} />
       {!disabled && (
         <div className="flex flex-wrap gap-3">
