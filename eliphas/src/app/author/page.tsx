@@ -10,6 +10,9 @@ import { requireRole } from "@/lib/auth";
 import { getAuthorStats, monthLong, monthShort } from "@/lib/author-stats";
 import { listOwnBooks } from "@/lib/author-books";
 import { rupees } from "@/lib/pricing";
+import { getCommissionTerms, proStatus } from "@/lib/plans";
+import { AUTHOR_ACTION_STATUSES } from "@/lib/services";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Author dashboard" };
 
@@ -24,7 +27,13 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
   const profile = await requireRole(["author", "admin"]);
   const sp = await searchParams;
   const range = RANGES.find((r) => r.key === sp.range) ?? RANGES[1];
-  const [books, stats] = await Promise.all([listOwnBooks(), getAuthorStats(profile.id, range.months)]);
+  const [books, stats, pro, terms, { data: serviceActions }] = await Promise.all([
+    listOwnBooks(),
+    getAuthorStats(profile.id, range.months),
+    proStatus(profile.id),
+    getCommissionTerms(),
+    createAdminClient().from("service_orders").select("id, status, order_number").eq("author_id", profile.id).in("status", AUTHOR_ACTION_STATUSES),
+  ]);
   const { totals } = stats;
   const needsAction = books.filter((b) => b.status === "changes_requested");
 
@@ -61,6 +70,47 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
         }
       />
 
+      <section className="card mb-6 flex flex-wrap items-center justify-between gap-4" aria-label="Plan">
+        <div>
+          <p className="text-sm text-muted">Plan</p>
+          <p className="text-lg font-semibold">
+            {pro.active ? "Author Pro" : profile.author_terms_accepted_at ? "Free" : "Original terms"}
+          </p>
+          <p className="text-sm text-muted">
+            {pro.active
+              ? `Paid until ${new Date(pro.accessUntil!).toLocaleDateString("en-IN", { dateStyle: "medium" })} · ${pro.credits} creative credit${pro.credits === 1 ? "" : "s"} left · renews only if you pay again`
+              : profile.author_terms_accepted_at
+                ? "Upgrade any time for a lower commission, analytics and promotional creatives."
+                : `New author terms (version ${terms.version}) need your acceptance before you publish new books.`}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {pro.active && (
+            <Link href="/author/analytics" className="btn-ghost">
+              Analytics
+            </Link>
+          )}
+          <Link href="/author/plan" className="btn-primary">
+            {pro.active ? "Manage plan" : profile.author_terms_accepted_at ? "Upgrade to Pro" : "Review terms"}
+          </Link>
+        </div>
+      </section>
+
+      {(serviceActions ?? []).length > 0 && (
+        <div className="card mb-6 ring-2 ring-gold">
+          <h2 className="text-lg">Service requests waiting for you</h2>
+          <ul className="mt-2 space-y-1">
+            {serviceActions!.map((o) => (
+              <li key={o.id}>
+                <Link href={`/author/services/${o.id}`} className="font-medium underline">
+                  {o.order_number}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {needsAction.length > 0 && (
         <div className="card mb-6 ring-2 ring-danger/40">
           <h2 className="text-lg">Needs your attention</h2>
@@ -90,6 +140,10 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
           highlight
         />
       </dl>
+      <p className="mt-2 text-xs text-muted">
+        Earnings are after printing, platform commission (+ GST) and payment charges. No tax is withheld from your earnings at present; any TDS will be
+        shown here separately if it applies. Shipping is paid by readers and never deducted.
+      </p>
 
       {/* Range filter for the two charts */}
       <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3">

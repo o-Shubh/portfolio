@@ -1,52 +1,9 @@
 import "server-only";
 import { refundOrder } from "@/lib/refunds";
-import { earnings, paymentFee, printCost, shippingFor, type PricingSettings } from "@/lib/pricing";
-import type { Book } from "@/lib/publishing";
+import { applyActualGatewayFee } from "@/lib/order-pricing";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export const MAX_QTY = 10;
-
-/**
- * The money split for buying `qty` copies of a book, at today's rates.
- * Returns null if the book can't be sold right now (e.g. rates changed so the
- * author would lose money, or a print option was removed).
- */
-export function priceLine(book: Book, qty: number, s: PricingSettings) {
-  if (book.status !== "published" || book.mrp === null || !book.page_count) return null;
-  const cost = printCost(
-    {
-      page_count: book.page_count,
-      trim_size: book.trim_size,
-      binding: book.binding,
-      interior: book.interior,
-      paper: book.paper,
-      cover_finish: book.cover_finish,
-    },
-    s.rates,
-  );
-  if (cost === null) return null;
-  const mrp = Number(book.mrp);
-  const e = earnings(mrp, cost, s.fees);
-  if (e.authorEarning < 0) return null;
-
-  const subtotal = mrp * qty;
-  const shipping = shippingFor(subtotal, s.shipping);
-  return {
-    item: {
-      book_id: book.id,
-      author_id: book.author_id,
-      quantity: qty,
-      unit_price: mrp,
-      print_cost: cost,
-      platform_fee: s.fees.platform_fee_per_copy,
-      payment_fee: paymentFee(mrp, s.fees),
-      author_earning: e.authorEarning,
-    },
-    subtotal,
-    shipping,
-    total: subtotal + shipping,
-  };
-}
+export { MAX_QTY } from "@/lib/order-pricing";
 
 /**
  * Picks the printer for a new order: an active printer in the buyer's state if
@@ -67,7 +24,7 @@ async function pickPrinter(state: string): Promise<string | null> {
  * (the browser and Razorpay's webhook may both report the same payment):
  * only an order still waiting for payment is changed.
  */
-export async function markOrderPaid(orderId: string, paymentId: string, mode: "razorpay" | "mock") {
+export async function markOrderPaid(orderId: string, paymentId: string, mode: "razorpay" | "mock", feePaise: number | null = null) {
   const admin = createAdminClient();
   const { data: order } = await admin
     .from("orders")
@@ -81,7 +38,11 @@ export async function markOrderPaid(orderId: string, paymentId: string, mode: "r
     await refundOrder(orderId);
     return { ok: true as const, already: true };
   }
-  if (order.status !== "pending_payment") return { ok: true as const, already: true };
+  if (order.status !== "pending_payment") {
+    // A later report may carry the actual fee (e.g. the webhook after the browser callback)
+    if (feePaise !== null && order.status !== "cancelled") await applyActualGatewayFee(orderId, feePaise);
+    return { ok: true as const, already: true };
+  }
 
   const printerId = await pickPrinter(order.ship_state);
   const { data: updated, error } = await admin
@@ -97,5 +58,6 @@ export async function markOrderPaid(orderId: string, paymentId: string, mode: "r
     .eq("status", "pending_payment") // guard against a double update
     .select("id");
   if (error) return { ok: false as const, reason: error.message };
+  if (updated?.length && feePaise !== null) await applyActualGatewayFee(orderId, feePaise);
   return { ok: true as const, already: !updated?.length };
 }

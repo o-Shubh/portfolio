@@ -10,7 +10,7 @@ export const FAQ: FaqGroup[] = [
     items: [
       {
         q: "How much does it cost to publish?",
-        a: "Nothing upfront. There is no setup fee and no minimum order. A small amount is taken only when a copy sells: the print cost, a ₹15 platform fee and the payment gateway charge. The rest is yours.",
+        a: "Nothing upfront. There is no setup fee and no minimum order. When a copy sells we deduct the print cost, our commission (15% of the book price, minimum ₹35, plus GST on the Free plan) and the payment gateway charge. The rest is yours. Author Pro and one-time services are optional.",
       },
       {
         q: "What do I need to get started?",
@@ -39,7 +39,7 @@ export const FAQ: FaqGroup[] = [
     items: [
       {
         q: "How much will I earn per copy?",
-        a: "Earning per copy = MRP − print cost − ₹15 platform fee − payment charges. You see the exact figure live while you set your price, before you publish. See the Pricing page for examples.",
+        a: "Earning per copy = book price − print cost − commission − GST on the commission − payment charges. You see the figure live while you set your price, before you publish. See the Pricing page for Free and Pro examples.",
       },
       {
         q: "When do I get paid?",

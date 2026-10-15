@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 export type ActionState = { error?: string; ok?: string } | undefined;
 
 /**
- * Moves an order one step forward (accept → printed → shipped → delivered).
+ * Moves an order one step forward (accept → printing → packed → shipped → delivered).
  * Only the printer the order is assigned to (or an admin) may do this, and only
  * one step at a time.
  */
@@ -32,8 +32,9 @@ export async function advanceOrder(orderId: string, _prev: ActionState, fd: Form
 
   const now = new Date().toISOString();
   const update: Database["public"]["Tables"]["orders"]["Update"] = { status: next.to };
-  if (next.to === "printing") update.accepted_at = now;
-  if (next.to === "printed") update.printed_at = now;
+  if (next.to === "accepted") update.accepted_at = now;
+  if (next.to === "printing") update.printing_at = now;
+  if (next.to === "packed") Object.assign(update, { packed_at: now, printed_at: now });
   if (next.to === "delivered") update.delivered_at = now;
   if (next.to === "shipped") {
     const courier = String(fd.get("courier") ?? "").trim();

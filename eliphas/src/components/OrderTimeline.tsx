@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
-import { TRACKING_STEPS } from "@/lib/order-status";
+import { TRACKING_STEPS, type StepTime } from "@/lib/order-status";
 
-type Times = Partial<Record<"paid_at" | "accepted_at" | "printed_at" | "shipped_at" | "delivered_at", string | null>>;
+type Times = Partial<Record<StepTime, string | null>>;
 
 const when = (iso: string | null | undefined) =>
   iso ? new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : null;
@@ -11,7 +11,7 @@ export function OrderTimeline({ order }: { order: Times }) {
   return (
     <ol className="space-y-0">
       {TRACKING_STEPS.map((step, i) => {
-        const at = order[step.at];
+        const at = order[step.at] ?? (step.fallback ? order[step.fallback] : null);
         const done = Boolean(at);
         const last = i === TRACKING_STEPS.length - 1;
         return (

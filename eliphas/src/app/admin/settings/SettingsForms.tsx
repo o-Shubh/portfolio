@@ -25,18 +25,19 @@ const FIELD_LABEL: Record<string, string> = {
 
 export function SettingsForm({ settings }: { settings: PricingSettings }) {
   const [state, onSubmit, pending] = useFormAction(saveSettingsForm);
-  const { rates, fees, shipping } = settings;
+  const { rates, fees } = settings;
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <section className="card space-y-4">
-        <h2 className="text-lg">Fees and shipping</h2>
+        <h2 className="text-lg">Payment gateway estimate</h2>
+        <p className="text-sm text-muted">
+          Used to estimate payment charges before an order exists. The actual Razorpay fee replaces it when a payment is confirmed. Commission is set in{" "}
+          <a href="/admin/plans" className="underline">Plans</a>; shipping in <a href="/admin/shipping" className="underline">Shipping</a>.
+        </p>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Num name="platform_fee_per_copy" label="Platform fee (₹ per copy)" value={fees.platform_fee_per_copy} />
           <Num name="gateway_percent" label="Razorpay charge (%)" value={fees.gateway_percent} />
           <Num name="gateway_gst_percent" label="GST on Razorpay charge (%)" value={fees.gateway_gst_percent} />
-          <Num name="shipping_flat" label="Shipping per order (₹)" value={shipping.flat} />
-          <Num name="shipping_free_above" label="Free shipping from (₹)" value={shipping.free_above} />
         </div>
       </section>
 

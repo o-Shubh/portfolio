@@ -13,8 +13,9 @@ export const metadata: Metadata = { title: "Print jobs" };
 
 const TABS: { key: string; label: string; statuses: OrderStatus[] }[] = [
   { key: "new", label: "New", statuses: ["paid"] },
+  { key: "accepted", label: "Accepted", statuses: ["accepted"] },
   { key: "printing", label: "Printing", statuses: ["printing"] },
-  { key: "to-ship", label: "To ship", statuses: ["printed"] },
+  { key: "to-ship", label: "To ship", statuses: ["printed", "packed"] },
   { key: "shipped", label: "Shipped", statuses: ["shipped"] },
   { key: "done", label: "Delivered", statuses: ["delivered"] },
 ];
@@ -49,7 +50,7 @@ export default async function PrinterHome({ searchParams }: PageProps<"/printer"
       .in("status", tab.statuses)
       .order("paid_at", { ascending: tab.key !== "done" && tab.key !== "shipped" })
       .limit(100),
-    admin.from("orders").select("status").eq("printer_id", printer.id).in("status", ["paid", "printing", "printed"]),
+    admin.from("orders").select("status").eq("printer_id", printer.id).in("status", ["paid", "accepted", "printing", "printed", "packed"]),
   ]);
   const countFor = (s: OrderStatus[]) => (counts ?? []).filter((c) => s.includes(c.status)).length;
 

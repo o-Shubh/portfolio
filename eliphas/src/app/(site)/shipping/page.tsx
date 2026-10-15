@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Detail, LegalPage } from "@/components/LegalPage";
-import { rupees } from "@/lib/pricing";
-import { getBusiness, getPricingSettings } from "@/lib/settings";
+import { getBusiness } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Shipping and delivery", description: "Where we deliver, how long it takes and what it costs." };
 
 export default async function ShippingPage() {
-  const [b, { shipping }] = await Promise.all([getBusiness(), getPricingSettings()]);
+  const b = await getBusiness();
   return (
     <LegalPage title="Shipping and delivery" updated="15 October 2026" path="/shipping">
       <h2>Where we deliver</h2>
@@ -30,8 +29,8 @@ export default async function ShippingPage() {
 
       <h2>What it costs</h2>
       <p>
-        Shipping is {rupees(shipping.flat)} per order, and free when your books total {rupees(shipping.free_above)} or more.
-        The exact amount is shown at checkout before you pay.
+        Shipping depends on your PIN code and the weight of the parcel (pages, size and number of copies). The exact amount is shown at checkout before
+        you pay, and never changes after you order. From time to time we may run shipping offers; they are shown at checkout and paid by us.
       </p>
 
       <h2>Tracking your order</h2>

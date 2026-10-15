@@ -5,8 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Who may cancel at which stage. Buyers only before the printer starts; admins until it ships. */
 export const CANCELLABLE: Record<"buyer" | "admin", OrderStatus[]> = {
-  buyer: ["paid"],
-  admin: ["pending_payment", "paid", "printing", "printed"],
+  buyer: ["paid", "accepted"], // full refund until printing starts
+  admin: ["pending_payment", "paid", "accepted", "printing", "printed", "packed"],
 };
 
 type RefundResult = { ok: true; status: "processed" | "pending" | "none" } | { ok: false; reason: string };

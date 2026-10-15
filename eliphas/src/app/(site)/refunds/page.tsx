@@ -54,6 +54,21 @@ export default async function RefundsPage() {
         see the refund status on the order page.
       </p>
 
+      <h2>Author Pro</h2>
+      <p>
+        Pro is prepaid for one month and doesn&apos;t renew automatically, so there is nothing to cancel. If you paid for a month that hasn&apos;t started, we
+        refund it in full on request. For a month already running, contact us; refunds for unused time are at our discretion and end Pro access with
+        unused credits removed. Requests you already submitted are still completed.
+      </p>
+
+      <h2>Author services</h2>
+      <ul>
+        <li>Before you pay: cancel at no cost.</li>
+        <li>After you pay, before work starts: cancel from the request page for a full refund.</li>
+        <li>After work starts: contact us; we refund for work not yet done.</li>
+        <li>Cancelling Pro never cancels a paid service, and the other way round.</li>
+      </ul>
+
       <h2>For authors</h2>
       <p>
         If an order is cancelled or refunded, the earning for that copy is removed from your balance. Copies you order of

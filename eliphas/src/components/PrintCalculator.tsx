@@ -1,25 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { earnings, minimumMrp, printCost, rupees, sortedOptions, type Fees, type PrintOptions, type PrintRates } from "@/lib/pricing";
+import { estimateCopy, formatPaise, minimumPriceRupees, type CommissionRule } from "@/lib/commission";
+import { printCost, rupees, sortedOptions, type PrintOptions, type PrintRates } from "@/lib/pricing";
 import { EarningsBreakdown } from "./EarningsBreakdown";
+
+/** A plan to show earnings for. The first one decides the lowest allowed price. */
+export type CalculatorPlan = { key: string; label: string; rule: CommissionRule; note?: string };
 
 export type CalculatorValues = PrintOptions & { mrp: number | "" };
 
 /**
- * Print options + MRP with a live earnings breakdown.
+ * Print options + book price with a live earnings breakdown for one or more plans.
  * Used on the author's "Print & price" step (inside a form, fields are submitted)
  * and on the public pricing page (just a calculator).
  */
 export function PrintCalculator({
   rates,
-  fees,
+  gatewayPercent,
+  plans,
   initial,
   disabled = false,
   sizeWarning,
 }: {
   rates: PrintRates;
-  fees: Fees;
+  gatewayPercent: number;
+  plans: CalculatorPlan[];
   initial: CalculatorValues;
   disabled?: boolean;
   /** Optional: PDF page size, to warn if the chosen size doesn't match */
@@ -30,9 +36,12 @@ export function PrintCalculator({
 
   const pagesOk = Number.isInteger(v.page_count) && v.page_count >= rates.min_pages && v.page_count <= rates.max_pages;
   const cost = pagesOk ? printCost(v, rates) : null;
-  const minMrp = cost !== null ? minimumMrp(cost, fees, 1) : null;
+  const costPaise = cost === null ? null : cost * 100;
+  const minMrp = costPaise !== null ? minimumPriceRupees(costPaise, plans[0].rule, gatewayPercent) : null;
   const mrp = typeof v.mrp === "number" ? v.mrp : 0;
-  const result = cost !== null && mrp > 0 ? earnings(mrp, cost, fees) : null;
+  const results =
+    costPaise !== null && mrp > 0 ? plans.map((p) => ({ ...p, e: estimateCopy(mrp * 100, costPaise, p.rule, gatewayPercent) })) : null;
+  const mine = results?.[0];
   const warning = sizeWarning?.(v.trim_size) ?? null;
 
   return (
@@ -62,7 +71,7 @@ export function PrintCalculator({
           </div>
           <div>
             <label htmlFor="mrp" className="label">
-              MRP (₹)
+              Book price / MRP (₹)
             </label>
             <input
               id="mrp"
@@ -95,28 +104,35 @@ export function PrintCalculator({
         <OptionGroup label="Cover finish" name="cover_finish" options={rates.cover_finish} value={v.cover_finish} onChange={(x) => set("cover_finish", x)} />
       </fieldset>
 
-      <aside className="lg:sticky lg:top-6 lg:self-start" aria-live="polite">
-        <div className="card">
-          <h2 className="text-lg">Your earnings per copy</h2>
-          {cost === null ? (
-            <p className="mt-3 text-muted">Enter a valid page count to see the print cost.</p>
-          ) : result ? (
-            <div className="mt-4">
-              <EarningsBreakdown e={result} />
-              {result.authorEarning < 1 && (
-                <p className="mt-3 text-sm font-medium text-danger">Raise the MRP to at least {rupees(minMrp!)} to earn.</p>
-              )}
-              <p className="mt-4 text-sm text-muted">
-                Sell 100 copies: <strong className="text-fg">{rupees(Math.max(0, result.authorEarning) * 100)}</strong>
-              </p>
+      <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start" aria-live="polite">
+        {cost === null ? (
+          <div className="card text-muted">Enter a valid page count to see the print cost.</div>
+        ) : !results ? (
+          <div className="card text-muted">
+            Print cost is <strong className="text-fg">{rupees(cost)}</strong> per copy. Enter a price to see your earning.
+          </div>
+        ) : (
+          results.map((r, i) => (
+            <div key={r.key} className={`card ${i === 0 ? "ring-2 ring-gold" : ""}`}>
+              <h2 className="text-base">{r.label}</h2>
+              {r.note && <p className="mt-0.5 text-xs text-muted">{r.note}</p>}
+              <div className="mt-4">
+                <EarningsBreakdown
+                  e={r.e}
+                  commissionLabel={r.rule.percent > 0 ? `Commission (${r.rule.percent}%, min ${formatPaise(r.rule.minPaise)})` : `Platform fee (${formatPaise(r.rule.minPaise)} per copy)`}
+                />
+              </div>
             </div>
-          ) : (
-            <p className="mt-3 text-muted">
-              Print cost is <strong className="text-fg">{rupees(cost)}</strong> per copy. Enter an MRP to see your earning.
-            </p>
-          )}
-          {rates.is_sample && <p className="mt-4 text-xs text-muted">Using sample print rates.</p>}
-        </div>
+          ))
+        )}
+        {mine && mine.e.authorEarningPaise < 100 && minMrp !== null && (
+          <p className="text-sm font-medium text-danger">Raise the price to at least {rupees(minMrp)} so you earn on every copy.</p>
+        )}
+        <p className="text-xs text-muted">
+          Estimates per copy. Payment charges are estimated at {gatewayPercent}% of the book price; the actual Razorpay fee
+          is shared across the books and shipping in each order. Shipping is paid by the reader and is not part of your
+          earnings. {rates.is_sample && "Using sample print rates."}
+        </p>
       </aside>
     </div>
   );

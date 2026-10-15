@@ -3,10 +3,11 @@
 import { Minus, Plus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { confirmPayment, startCheckout, type CheckoutResult } from "@/app/actions/checkout";
+import { useEffect, useState, useTransition } from "react";
+import { confirmPayment, quoteCheckout, startCheckout, type CheckoutResult, type ShippingQuoteResult } from "@/app/actions/checkout";
+import { formatPaise } from "@/lib/commission";
 import { INDIAN_STATES } from "@/lib/india";
-import { rupees, shippingFor, type Shipping } from "@/lib/pricing";
+import { rupees } from "@/lib/pricing";
 
 type Started = Extract<CheckoutResult, { orderId: string }>;
 
@@ -31,13 +32,11 @@ function loadRazorpay(): Promise<boolean> {
 
 export function CheckoutForm({
   book,
-  shipping,
   defaults,
   mode,
   maxQty,
 }: {
   book: { slug: string; title: string; author: string; mrp: number; cover: React.ReactNode };
-  shipping: Shipping;
   defaults: Record<string, string>;
   mode: "razorpay" | "mock";
   maxQty: number;
@@ -48,9 +47,20 @@ export function CheckoutForm({
   const [error, setError] = useState<string | null>(null);
   const [mockOrder, setMockOrder] = useState<Started | null>(null);
 
-  const subtotal = book.mrp * qty;
-  const ship = shippingFor(subtotal, shipping);
-  const total = subtotal + ship;
+  const [pincode, setPincode] = useState(defaults.ship_pincode ?? "");
+  const [result, setResult] = useState<{ key: string; quote: ShippingQuoteResult } | null>(null);
+  const [quoting, startQuote] = useTransition();
+  const validPin = /^[1-9]\d{5}$/.test(pincode);
+  const key = `${pincode}:${qty}`;
+
+  // Shipping depends on the PIN code and parcel weight, so ask the server for a quote
+  useEffect(() => {
+    if (!validPin) return;
+    startQuote(async () => setResult({ key, quote: await quoteCheckout(book.slug, qty, pincode) }));
+  }, [validPin, key, pincode, qty, book.slug]);
+  // Only show a quote that matches what's on screen now
+  const quote = validPin && result?.key === key ? result.quote : null;
+  const priced = quote && !("error" in quote) ? quote : null;
 
   async function finish(order: Started, paymentId: string, signature: string) {
     const res = await confirmPayment({
@@ -145,7 +155,15 @@ export function CheckoutForm({
                 ))}
               </select>
             </div>
-            <Field id="ship_pincode" label="PIN code" inputMode="numeric" maxLength={6} autoComplete="postal-code" defaultValue={defaults.ship_pincode} />
+            <Field
+              id="ship_pincode"
+              label="PIN code"
+              inputMode="numeric"
+              maxLength={6}
+              autoComplete="postal-code"
+              value={pincode}
+              onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            />
           </div>
         </section>
 
@@ -178,18 +196,23 @@ export function CheckoutForm({
             <dl className="space-y-2 border-t border-line pt-4">
               <div className="flex justify-between text-muted">
                 <dt>Books</dt>
-                <dd className="tabular-nums">{rupees(subtotal)}</dd>
+                <dd className="tabular-nums">{rupees(book.mrp * qty)}</dd>
               </div>
               <div className="flex justify-between text-muted">
                 <dt>Shipping</dt>
-                <dd className="tabular-nums">{ship === 0 ? "Free" : rupees(ship)}</dd>
+                <dd className="tabular-nums" aria-live="polite">
+                  {quoting ? "Checking…" : priced ? (priced.shippingPaise === 0 ? "Free" : formatPaise(priced.shippingPaise)) : "Enter PIN code"}
+                </dd>
               </div>
-              {ship > 0 && (
-                <p className="text-xs text-muted">Free shipping on orders of {rupees(shipping.free_above)} or more.</p>
+              {priced && priced.discountPaise > 0 && (
+                <p className="text-xs text-success">
+                  {priced.promotion}: {formatPaise(priced.discountPaise)} off shipping (was {formatPaise(priced.basePaise)})
+                </p>
               )}
+              {quote && "error" in quote && <p className="text-xs text-danger">{quote.error}</p>}
               <div className="flex justify-between border-t border-line pt-3 text-lg font-semibold">
                 <dt>Total</dt>
-                <dd className="tabular-nums">{rupees(total)}</dd>
+                <dd className="tabular-nums">{priced ? formatPaise(priced.totalPaise) : "—"}</dd>
               </div>
             </dl>
 
@@ -198,8 +221,9 @@ export function CheckoutForm({
                 {error}
               </p>
             )}
-            <button type="submit" className="btn-primary w-full" disabled={busy}>
-              {busy ? "Opening payment…" : `Pay ${rupees(total)}`}
+            <input type="hidden" name="expected_total_paise" value={priced?.totalPaise ?? ""} />
+            <button type="submit" className="btn-accent w-full" disabled={busy || !priced || quoting}>
+              {busy ? "Opening payment…" : priced ? `Pay ${formatPaise(priced.totalPaise)}` : "Enter delivery PIN code"}
             </button>
             <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
               <ShieldCheck className="h-4 w-4" aria-hidden />

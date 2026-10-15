@@ -6,7 +6,11 @@ export const AUTHOR_NAV: NavItem[] = [
   { href: "/author", label: "Dashboard", icon: "dashboard", exact: true },
   { href: "/author/books", label: "My books", icon: "books" },
   { href: "/author/orders", label: "Orders", icon: "orders" },
-  { href: "/account", label: "Account", icon: "profile" },
+  { href: "/author/services", label: "Services", icon: "services" },
+  { href: "/author/plan", label: "Plan", icon: "plan" },
+  { href: "/author/analytics", label: "Analytics", icon: "analytics", sidebarOnly: true },
+  { href: "/author/payments", label: "Payments", icon: "finance", sidebarOnly: true },
+  { href: "/account", label: "Account", icon: "profile", sidebarOnly: true },
 ];
 
 export const PRINTER_NAV: NavItem[] = [
@@ -19,8 +23,14 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/review", label: "Review", icon: "review" },
   { href: "/admin/orders", label: "Orders", icon: "orders" },
   { href: "/admin/printers", label: "Printers", icon: "printer" },
-  { href: "/admin/payouts", label: "Payouts", icon: "money" },
-  { href: "/admin/settings", label: "Settings", icon: "settings" },
+  { href: "/admin/services", label: "Services", icon: "services" },
+  { href: "/admin/payouts", label: "Payouts", icon: "money", sidebarOnly: true },
+  { href: "/admin/finance", label: "Finance", icon: "finance", sidebarOnly: true },
+  { href: "/admin/subscriptions", label: "Subscriptions", icon: "plan", sidebarOnly: true },
+  { href: "/admin/issues", label: "Issues", icon: "issues", sidebarOnly: true },
+  { href: "/admin/shipping", label: "Shipping", icon: "shipping", sidebarOnly: true },
+  { href: "/admin/plans", label: "Plans", icon: "plan", sidebarOnly: true },
+  { href: "/admin/settings", label: "Settings", icon: "settings", sidebarOnly: true },
 ];
 
 /** The account area is shared by everyone; it links back to their workspace. */

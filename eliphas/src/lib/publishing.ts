@@ -1,6 +1,7 @@
 // Publishing rules shared by the browser and the server (no database calls here).
 import type { Database } from "@/lib/database.types";
-import { earnings, printCost, type PricingSettings, type PrintRates } from "@/lib/pricing";
+import { estimateCopy, type CommissionRule } from "@/lib/commission";
+import { gatewayPercent, printCost, type PricingSettings, type PrintRates } from "@/lib/pricing";
 
 export type Book = Database["public"]["Tables"]["books"]["Row"];
 export type BookStatus = Database["public"]["Enums"]["book_status"];
@@ -88,7 +89,12 @@ export function coverSizeMatches(w: number, h: number, expected: { widthIn: numb
 export type CheckItem = { ok: boolean; label: string; step: "details" | "files" | "print" };
 
 /** Everything that must be done before a book can be sent for review. */
-export function submitChecklist(book: Book, s: PricingSettings): CheckItem[] {
+export function submitChecklist(
+  book: Book,
+  s: PricingSettings,
+  rule: CommissionRule,
+  terms?: { required: boolean; accepted: boolean },
+): CheckItem[] {
   const cost =
     book.page_count && book.mrp !== null
       ? printCost(
@@ -103,7 +109,10 @@ export function submitChecklist(book: Book, s: PricingSettings): CheckItem[] {
           s.rates,
         )
       : null;
-  const earning = cost !== null && book.mrp !== null ? earnings(Number(book.mrp), cost, s.fees).authorEarning : null;
+  const earning =
+    cost !== null && book.mrp !== null
+      ? estimateCopy(Number(book.mrp) * 100, cost * 100, rule, gatewayPercent(s.fees)).authorEarningPaise / 100
+      : null;
 
   return [
     { ok: book.title.trim().length > 0, label: "Title", step: "details" },
@@ -119,5 +128,6 @@ export function submitChecklist(book: Book, s: PricingSettings): CheckItem[] {
       step: "print",
     },
     { ok: earning !== null && earning >= 1, label: "Price set, with earnings above ₹0", step: "print" },
+    ...(terms?.required ? [{ ok: terms.accepted, label: "Author terms accepted", step: "print" as const }] : []),
   ];
 }

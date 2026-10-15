@@ -816,3 +816,874 @@ alter table public.orders alter column buyer_id drop not null;
 alter table public.orders drop constraint orders_buyer_id_fkey;
 alter table public.orders
   add constraint orders_buyer_id_fkey foreign key (buyer_id) references public.profiles (id) on delete set null;
+
+-- ===== 20261016000009_order_steps.sql =====
+-- New printer steps: paid → accepted → printing → packed → shipped → delivered.
+-- Kept in its own file: Postgres can't use a new enum value in the same transaction that adds it.
+-- 'printed' stays for orders created before this change.
+alter type public.order_status add value if not exists 'accepted' after 'paid';
+alter type public.order_status add value if not exists 'packed' after 'printed';
+
+-- ===== 20261016000010_monetisation.sql =====
+-- Monetisation: plans (Free / Pro / original terms), prepaid Pro subscriptions and creative
+-- credits, one-time author services with quotes, a payments ledger for services and
+-- subscriptions, weight/PIN-code shipping, campaign links, order status history, damaged-book
+-- issues, and an audit log. Existing orders keep their original numbers.
+--
+-- Money in new columns is stored in rupees with 2 decimals (numeric) like the existing tables,
+-- or in whole paise (integer) where the column name ends in _paise.
+
+-- ===========================================================================
+-- Settings
+-- ===========================================================================
+insert into public.settings (key, value, description) values
+(
+  'tax',
+  '{"platform_gst_percent": 18, "gst_registered": false, "withholding_configured": false,
+    "review_note": "Proposed values. Have a chartered accountant confirm GST on commission, subscriptions and services, and any TDS/TCS (e.g. section 194-O / 52) before charging real customers."}'::jsonb,
+  'Tax settings. Proposed values, to be confirmed by an accountant before production.'
+),
+(
+  'commission_terms',
+  '{"version": "2026-11", "effective_from": "2026-11-01",
+    "summary": "Free: 15% of the book price (minimum ₹35) + GST per copy. Pro: 10% (minimum ₹25) + GST."}'::jsonb,
+  'The current author terms. Authors who joined before keep their original terms until they accept these.'
+),
+(
+  'parcel',
+  '{"paper_gsm": 70, "cover_grams": {"paperback": 20, "hardcover": 160}, "packaging_grams": 60}'::jsonb,
+  'Used to estimate parcel weight for shipping. Ask your printer for real figures.'
+)
+on conflict (key) do nothing;
+
+-- ===========================================================================
+-- Audit log (manual changes to payments, plans, quotas, quotes and orders)
+-- ===========================================================================
+create table public.audit_log (
+  id         bigserial primary key,
+  actor_id   uuid references public.profiles (id) on delete set null,
+  action     text not null,
+  entity     text not null,
+  entity_id  text,
+  details    jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+create index audit_log_entity_idx on public.audit_log (entity, entity_id);
+alter table public.audit_log enable row level security;
+create policy "audit_log: admin reads" on public.audit_log for select using (public.is_admin());
+
+-- ===========================================================================
+-- Plans and commission rules (versioned; never edited in place)
+-- ===========================================================================
+create table public.plan_versions (
+  id                     uuid primary key default gen_random_uuid(),
+  plan                   text not null check (plan in ('legacy', 'free', 'pro')),
+  version                integer not null,
+  price_paise            integer not null default 0 check (price_paise >= 0),
+  gst_percent            numeric(5, 2) not null default 18,
+  credits_per_period     integer not null default 0 check (credits_per_period >= 0),
+  commission_percent     numeric(5, 2) not null check (commission_percent between 0 and 100),
+  commission_min_paise   integer not null default 0 check (commission_min_paise >= 0),
+  commission_gst_percent numeric(5, 2) not null default 18,
+  effective_from         timestamptz not null default now(),
+  note                   text,
+  created_by             uuid references public.profiles (id) on delete set null,
+  created_at             timestamptz not null default now(),
+  unique (plan, version)
+);
+alter table public.plan_versions enable row level security;
+create policy "plan_versions: public read" on public.plan_versions for select using (true);
+create policy "plan_versions: admin" on public.plan_versions for all using (public.is_admin()) with check (public.is_admin());
+
+insert into public.plan_versions
+  (plan, version, price_paise, gst_percent, credits_per_period, commission_percent, commission_min_paise, commission_gst_percent, effective_from, note)
+values
+  ('legacy', 1, 0, 0, 0, 0, 1500, 0, '2026-01-01', 'Original terms: flat ₹15 platform fee per copy, no separate GST. Kept for authors who joined before the new terms until they accept them.'),
+  ('free',   1, 0, 18, 0, 15, 3500, 18, '2026-01-01', 'Free Author: 15% of book price, minimum ₹35, plus GST on the commission.'),
+  ('pro',    1, 29900, 18, 3, 10, 2500, 18, '2026-01-01', 'Author Pro: ₹299/month + GST. 10% commission, minimum ₹25, plus GST. Three creative credits per paid period.');
+
+-- Latest version of a plan in force at a moment
+create function public.plan_version_at(p_plan text, p_at timestamptz default now())
+returns public.plan_versions language sql stable set search_path = public as $$
+  select * from public.plan_versions
+  where plan = p_plan and effective_from <= p_at
+  order by effective_from desc, version desc
+  limit 1
+$$;
+
+-- Author acceptance of the current author terms
+alter table public.profiles
+  add column author_terms_version text,
+  add column author_terms_accepted_at timestamptz;
+
+-- ===========================================================================
+-- Payments for subscriptions and services (book orders keep their own columns)
+-- ===========================================================================
+create sequence public.receipt_seq;
+
+create table public.payments (
+  id                  uuid primary key default gen_random_uuid(),
+  payer_id            uuid references public.profiles (id) on delete set null,
+  purpose             text not null check (purpose in ('subscription', 'service')),
+  description         text not null,
+  base_paise          integer not null check (base_paise >= 0),
+  gst_percent         numeric(5, 2) not null default 0,
+  gst_paise           integer not null default 0 check (gst_paise >= 0),
+  amount_paise        integer not null check (amount_paise > 0),
+  mode                text not null check (mode in ('razorpay', 'mock')),
+  status              text not null default 'created' check (status in ('created', 'paid', 'failed', 'refunded', 'partially_refunded')),
+  razorpay_order_id   text unique,
+  razorpay_payment_id text unique,
+  fee_paise           integer,            -- Razorpay's fee incl. its GST, when known
+  refunded_paise      integer not null default 0,
+  refund_id           text,
+  receipt_number      text unique,
+  created_at          timestamptz not null default now(),
+  paid_at             timestamptz,
+  refunded_at         timestamptz,
+  check (amount_paise = base_paise + gst_paise)
+);
+create index payments_payer_idx on public.payments (payer_id);
+alter table public.payments enable row level security;
+create policy "payments: payer reads own" on public.payments for select using (payer_id = auth.uid());
+create policy "payments: admin" on public.payments for all using (public.is_admin()) with check (public.is_admin());
+
+-- ===========================================================================
+-- Pro subscriptions: prepaid monthly periods (no automatic renewal)
+-- ===========================================================================
+create table public.subscription_periods (
+  id              uuid primary key default gen_random_uuid(),
+  author_id       uuid not null references public.profiles (id),
+  plan_version_id uuid not null references public.plan_versions (id),
+  status          text not null default 'pending' check (status in ('pending', 'paid', 'failed', 'refunded')),
+  starts_at       timestamptz,
+  ends_at         timestamptz,
+  payment_id      uuid unique references public.payments (id),
+  credits_granted integer not null default 0,
+  refunded_at     timestamptz,
+  refund_note     text,
+  created_at      timestamptz not null default now(),
+  check (status <> 'paid' or (starts_at is not null and ends_at > starts_at))
+);
+create index subscription_periods_author_idx on public.subscription_periods (author_id, status, ends_at);
+alter table public.subscription_periods enable row level security;
+create policy "subscriptions: author reads own" on public.subscription_periods for select using (author_id = auth.uid());
+create policy "subscriptions: admin" on public.subscription_periods for all using (public.is_admin()) with check (public.is_admin());
+
+-- The paid period covering a moment, if any
+create function public.active_pro_period(p_author uuid, p_at timestamptz default now())
+returns public.subscription_periods language sql stable security definer set search_path = public as $$
+  select * from public.subscription_periods
+  where author_id = p_author and status = 'paid' and starts_at <= p_at and ends_at > p_at
+  order by starts_at
+  limit 1
+$$;
+
+create function public.has_active_pro(p_author uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.subscription_periods
+    where author_id = p_author and status = 'paid' and starts_at <= now() and ends_at > now()
+  )
+$$;
+
+-- The commission rule for an author's sale at a moment:
+-- Pro (the version they paid for) during a paid period; otherwise Free if they accepted the
+-- current terms; otherwise their original (legacy) terms.
+create function public.author_commission_rule(p_author uuid, p_at timestamptz default now())
+returns public.plan_versions language plpgsql stable security definer set search_path = public as $$
+declare
+  per public.subscription_periods;
+  pv public.plan_versions;
+  accepted timestamptz;
+begin
+  select * into per from public.active_pro_period(p_author, p_at);
+  if per.id is not null then
+    select * into pv from public.plan_versions where id = per.plan_version_id;
+    return pv;
+  end if;
+  select author_terms_accepted_at into accepted from public.profiles where id = p_author;
+  if accepted is not null then
+    return public.plan_version_at('free', p_at);
+  end if;
+  return public.plan_version_at('legacy', p_at);
+end $$;
+
+-- Pro creative credits. Credits belong to one paid period and never roll over.
+create table public.pro_credit_ledger (
+  id               uuid primary key default gen_random_uuid(),
+  author_id        uuid not null references public.profiles (id),
+  period_id        uuid not null references public.subscription_periods (id),
+  delta            integer not null check (delta <> 0),
+  reason           text not null check (reason in ('grant', 'use', 'return', 'admin_adjust', 'refund_void')),
+  service_order_id uuid,
+  actor_id         uuid references public.profiles (id) on delete set null,
+  note             text,
+  created_at       timestamptz not null default now()
+);
+-- A period gets its credits exactly once, however many times the payment is reported
+create unique index pro_credit_one_grant on public.pro_credit_ledger (period_id) where reason = 'grant';
+create index pro_credit_period_idx on public.pro_credit_ledger (period_id);
+alter table public.pro_credit_ledger enable row level security;
+create policy "credits: author reads own" on public.pro_credit_ledger for select using (author_id = auth.uid());
+create policy "credits: admin" on public.pro_credit_ledger for select using (public.is_admin());
+
+create function public.period_credit_balance(p_period uuid)
+returns integer language sql stable security definer set search_path = public as $$
+  select coalesce(sum(delta), 0)::integer from public.pro_credit_ledger where period_id = p_period
+$$;
+
+-- Marks a subscription payment paid and starts (or queues) the period. Idempotent:
+-- a second call for the same payment changes nothing and grants no extra credits.
+create function public.activate_subscription(p_payment uuid, p_razorpay_payment_id text, p_fee_paise integer default null)
+returns public.subscription_periods language plpgsql security definer set search_path = public as $$
+declare
+  pay public.payments;
+  per public.subscription_periods;
+  pv public.plan_versions;
+  start_at timestamptz;
+begin
+  select * into pay from public.payments where id = p_payment for update;
+  if pay.id is null or pay.purpose <> 'subscription' then raise exception 'subscription payment not found'; end if;
+  select * into per from public.subscription_periods where payment_id = p_payment for update;
+  if per.id is null then raise exception 'subscription period not found'; end if;
+  if per.status = 'paid' then return per; end if;           -- already done
+  if per.status = 'refunded' then return per; end if;
+
+  -- Renewals start when the current paid access ends, so no paid day is lost
+  select greatest(now(), coalesce(max(ends_at), now())) into start_at
+  from public.subscription_periods
+  where author_id = per.author_id and status = 'paid' and ends_at > now();
+
+  select * into pv from public.plan_versions where id = per.plan_version_id;
+
+  update public.payments
+     set status = 'paid', paid_at = now(), razorpay_payment_id = coalesce(p_razorpay_payment_id, razorpay_payment_id),
+         fee_paise = coalesce(p_fee_paise, fee_paise),
+         receipt_number = coalesce(receipt_number, 'EIP-R-' || lpad(nextval('public.receipt_seq')::text, 6, '0'))
+   where id = p_payment;
+
+  update public.subscription_periods
+     set status = 'paid', starts_at = start_at, ends_at = start_at + interval '1 month', credits_granted = pv.credits_per_period
+   where id = per.id
+  returning * into per;
+
+  if pv.credits_per_period > 0 then
+    insert into public.pro_credit_ledger (author_id, period_id, delta, reason, note)
+    values (per.author_id, per.id, pv.credits_per_period, 'grant', 'Credits for this paid period')
+    on conflict do nothing;
+  end if;
+  return per;
+end $$;
+
+-- Uses one creative credit from the author's current paid period. Locks the period row so
+-- concurrent requests can't spend the same credit twice.
+create function public.use_pro_credit(p_author uuid, p_service_order uuid)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare
+  per public.subscription_periods;
+  bal integer;
+begin
+  select * into per from public.subscription_periods
+   where author_id = p_author and status = 'paid' and starts_at <= now() and ends_at > now()
+   order by starts_at limit 1
+   for update;
+  if per.id is null then raise exception 'NO_ACTIVE_PRO'; end if;
+  select coalesce(sum(delta), 0) into bal from public.pro_credit_ledger where period_id = per.id;
+  if bal <= 0 then raise exception 'NO_CREDITS_LEFT'; end if;
+  insert into public.pro_credit_ledger (author_id, period_id, delta, reason, service_order_id)
+  values (p_author, per.id, -1, 'use', p_service_order);
+  return per.id;
+end $$;
+
+revoke execute on function public.activate_subscription(uuid, text, integer) from public, anon, authenticated;
+revoke execute on function public.use_pro_credit(uuid, uuid) from public, anon, authenticated;
+revoke execute on function public.author_commission_rule(uuid, timestamptz) from public, anon;
+grant execute on function public.author_commission_rule(uuid, timestamptz) to authenticated;
+revoke execute on function public.active_pro_period(uuid, timestamptz) from public, anon;
+grant execute on function public.has_active_pro(uuid) to authenticated;
+
+-- ===========================================================================
+-- Author services: versioned catalogue, orders, quotes, files and events
+-- ===========================================================================
+create table public.service_catalog (
+  id                uuid primary key default gen_random_uuid(),
+  code              text not null check (code ~ '^[a-z0-9_]{2,40}$'),
+  version           integer not null,
+  name              text not null,
+  pricing           text not null check (pricing in ('fixed', 'quote')),
+  price_paise       integer,             -- fixed price, before GST
+  min_paise         integer,             -- quote range, before GST
+  max_paise         integer,
+  gst_percent       numeric(5, 2) not null default 18,
+  revision_rounds   integer not null default 0,
+  deliverables      text[] not null default '{}',
+  scope             text not null,
+  exclusions        text[] not null default '{}',
+  requires          text[] not null default '{}',  -- requirement fields that must be filled
+  sort              integer not null default 0,
+  active            boolean not null default true,
+  created_by        uuid references public.profiles (id) on delete set null,
+  created_at        timestamptz not null default now(),
+  unique (code, version),
+  check (pricing <> 'fixed' or price_paise > 0),
+  check (pricing <> 'quote' or (min_paise > 0 and max_paise >= min_paise))
+);
+alter table public.service_catalog enable row level security;
+create policy "service_catalog: public read" on public.service_catalog for select using (true);
+create policy "service_catalog: admin" on public.service_catalog for all using (public.is_admin()) with check (public.is_admin());
+
+create view public.current_service_catalog with (security_invoker = true) as
+select distinct on (code) * from public.service_catalog order by code, version desc;
+
+insert into public.service_catalog
+  (code, version, name, pricing, price_paise, min_paise, max_paise, revision_rounds, deliverables, scope, exclusions, requires, sort)
+values
+  ('basic_cover', 1, 'Basic Book Cover', 'fixed', 149900, null, null, 2,
+   array['One design concept', 'Print-ready full cover: front, spine and back', 'Front cover image for the bookstore'],
+   'One cover concept turned into a print-ready wrap. Before the final wrap we confirm trim size, final page count, paper and the printer''s cover template, so the spine is exact.',
+   array['Custom illustration', 'Stock images beyond our licensed library', 'More than two revision rounds'],
+   array['title', 'author_name', 'trim_size', 'page_count', 'paper', 'preferences'], 10),
+  ('formatting', 1, 'Interior Formatting', 'quote', null, 149900, 399900, 2,
+   array['Print-ready interior PDF', 'Fonts embedded, margins and bleed for your trim size'],
+   'Typesetting your finished manuscript into a print-ready interior. The fixed price depends on length and complexity; we quote after reviewing your file.',
+   array['Editing, proofreading, translation or rewriting', 'Complex tables, equations or heavy illustrations unless quoted'],
+   array['title', 'author_name', 'language', 'trim_size', 'page_count', 'manuscript_words'], 20),
+  ('launch_kit', 1, 'Launch Kit', 'quote', null, 99900, 199900, 1,
+   array['Five promotional creatives', 'Captions for each creative'],
+   'Five social-media creatives with captions for your book launch. The fixed price depends on scope; we quote after reviewing your brief.',
+   array['Paid advertising spend', 'Posting or managing your accounts', 'Guaranteed sales'],
+   array['title', 'author_name', 'blurb', 'preferences'], 30),
+  ('bundle', 1, 'Complete Publishing Bundle', 'fixed', 399900, null, null, 2,
+   array['One basic cover (front, spine, back)', 'Interior formatting up to 200 final pages of simple text', 'Five promotional creatives with captions', 'Two consolidated revision rounds'],
+   'Cover, formatting and launch creatives together. We check your manuscript length and files before you pay; if it is longer than 200 pages or complex, we offer a revised quote first. No surprise charges.',
+   array['Editing, proofreading, translation and rewriting', 'Complex tables, equations, heavy illustrations and custom illustration', 'Printing, shipping, paid advertising and marketplace listing', 'Additional revision rounds or substantial manuscript changes after work starts'],
+   array['title', 'author_name', 'language', 'genre', 'trim_size', 'page_count', 'paper', 'manuscript_words', 'blurb'], 40);
+
+create type public.service_status as enum (
+  'requirements_pending', 'scope_review', 'quote_awaiting_acceptance', 'payment_pending',
+  'queued', 'in_progress', 'author_review', 'revision_requested', 'completed', 'cancelled', 'refunded'
+);
+
+create table public.service_orders (
+  id                uuid primary key default gen_random_uuid(),
+  order_number      text not null unique default ('SRV-' || to_char(now(), 'YYMMDD') || '-' || upper(substr(md5(gen_random_uuid()::text), 1, 5))),
+  author_id         uuid not null references public.profiles (id),
+  kind              text not null check (kind in ('service', 'pro_creative')),
+  catalog_id        uuid references public.service_catalog (id),   -- the version that was shown
+  status            public.service_status not null default 'requirements_pending',
+  book_id           uuid references public.books (id) on delete set null,
+  requirements      jsonb not null default '{}',
+  rights_confirmed  boolean not null default false,
+  revisions_allowed integer not null default 0,
+  revisions_used    integer not null default 0 check (revisions_used >= 0),
+  pro_period_id     uuid references public.subscription_periods (id),
+  qc                jsonb,
+  submitted_at      timestamptz,
+  started_at        timestamptz,
+  completed_at      timestamptz,
+  cancelled_at      timestamptz,
+  cancel_reason     text,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now(),
+  check (kind <> 'service' or catalog_id is not null),
+  check (kind <> 'pro_creative' or pro_period_id is not null)
+);
+create index service_orders_author_idx on public.service_orders (author_id);
+create index service_orders_status_idx on public.service_orders (status);
+create trigger service_orders_touch before update on public.service_orders
+  for each row execute function public.touch_updated_at();
+alter table public.service_orders enable row level security;
+create policy "service_orders: author reads own" on public.service_orders for select using (author_id = auth.uid());
+create policy "service_orders: admin" on public.service_orders for all using (public.is_admin()) with check (public.is_admin());
+
+create table public.service_quotes (
+  id               uuid primary key default gen_random_uuid(),
+  service_order_id uuid not null references public.service_orders (id) on delete cascade,
+  kind             text not null default 'initial' check (kind in ('initial', 'additional')),
+  base_paise       integer not null check (base_paise > 0),
+  gst_percent      numeric(5, 2) not null,
+  gst_paise        integer not null,
+  total_paise      integer not null,
+  deliverables     text[] not null default '{}',
+  revisions        integer not null default 0,
+  delivery_by      date not null,
+  notes            text,
+  status           text not null default 'issued' check (status in ('issued', 'accepted', 'declined', 'superseded', 'paid', 'refunded')),
+  payment_id       uuid references public.payments (id),
+  issued_by        uuid references public.profiles (id) on delete set null,
+  issued_at        timestamptz not null default now(),
+  accepted_at      timestamptz,
+  check (total_paise = base_paise + gst_paise)
+);
+create index service_quotes_order_idx on public.service_quotes (service_order_id);
+alter table public.service_quotes enable row level security;
+create policy "service_quotes: author reads own" on public.service_quotes for select
+  using (exists (select 1 from public.service_orders s where s.id = service_order_id and s.author_id = auth.uid()));
+create policy "service_quotes: admin" on public.service_quotes for all using (public.is_admin()) with check (public.is_admin());
+
+alter table public.payments add column service_quote_id uuid unique references public.service_quotes (id);
+
+create table public.service_files (
+  id               uuid primary key default gen_random_uuid(),
+  service_order_id uuid not null references public.service_orders (id) on delete cascade,
+  uploaded_by      uuid references public.profiles (id) on delete set null,
+  kind             text not null check (kind in ('requirement', 'reference', 'draft', 'final')),
+  path             text not null unique,
+  file_name        text not null,
+  size_bytes       bigint,
+  version          integer not null default 1,
+  note             text,
+  created_at       timestamptz not null default now()
+);
+create index service_files_order_idx on public.service_files (service_order_id);
+alter table public.service_files enable row level security;
+create policy "service_files: author reads own" on public.service_files for select
+  using (exists (select 1 from public.service_orders s where s.id = service_order_id and s.author_id = auth.uid()));
+create policy "service_files: admin" on public.service_files for all using (public.is_admin()) with check (public.is_admin());
+
+create table public.service_events (
+  id               bigserial primary key,
+  service_order_id uuid not null references public.service_orders (id) on delete cascade,
+  actor_id         uuid references public.profiles (id) on delete set null,
+  from_status      public.service_status,
+  to_status        public.service_status,
+  note             text,
+  created_at       timestamptz not null default now()
+);
+create index service_events_order_idx on public.service_events (service_order_id);
+alter table public.service_events enable row level security;
+create policy "service_events: author reads own" on public.service_events for select
+  using (exists (select 1 from public.service_orders s where s.id = service_order_id and s.author_id = auth.uid()));
+create policy "service_events: admin" on public.service_events for all using (public.is_admin()) with check (public.is_admin());
+
+-- Private bucket for service files: <service_order_id>/<kind>/<file>
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('service-files', 'service-files', false, 52428800, array[
+  'application/pdf', 'image/png', 'image/jpeg', 'image/webp',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
+  'application/vnd.oasis.opendocument.text', 'text/plain', 'application/zip'
+]);
+
+create function public.owns_service_order(object_name text)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.service_orders s
+    where s.id::text = (storage.foldername(object_name))[1] and s.author_id = auth.uid()
+  )
+$$;
+
+create policy "service-files: author or admin reads" on storage.objects for select
+  using (bucket_id = 'service-files' and (public.is_admin() or public.owns_service_order(name)));
+create policy "service-files: author uploads requirements" on storage.objects for insert
+  with check (
+    bucket_id = 'service-files' and public.owns_service_order(name)
+    and (storage.foldername(name))[2] in ('requirement', 'reference')
+  );
+create policy "service-files: admin uploads" on storage.objects for insert
+  with check (bucket_id = 'service-files' and public.is_admin());
+
+-- ===========================================================================
+-- Shipping: admin-managed zones by PIN-code prefix, weight slabs, promotions
+-- ===========================================================================
+create table public.shipping_zones (
+  id                   uuid primary key default gen_random_uuid(),
+  name                 text not null,
+  pincode_prefixes     text[] not null,          -- '' matches every PIN code
+  extra_per_500g_paise integer not null default 0 check (extra_per_500g_paise >= 0),
+  active               boolean not null default true,
+  is_sample            boolean not null default false,
+  created_at           timestamptz not null default now()
+);
+create table public.shipping_rates (
+  id           uuid primary key default gen_random_uuid(),
+  zone_id      uuid not null references public.shipping_zones (id) on delete cascade,
+  max_weight_g integer not null check (max_weight_g > 0),
+  price_paise  integer not null check (price_paise >= 0),
+  unique (zone_id, max_weight_g)
+);
+create table public.shipping_promotions (
+  id              uuid primary key default gen_random_uuid(),
+  name            text not null,
+  kind            text not null check (kind in ('free', 'flat_off')),
+  amount_paise    integer not null default 0 check (amount_paise >= 0),
+  min_books_paise integer not null default 0 check (min_books_paise >= 0),
+  funded_by       text not null default 'platform' check (funded_by = 'platform'),
+  starts_at       timestamptz not null default now(),
+  ends_at         timestamptz,
+  active          boolean not null default true,
+  created_by      uuid references public.profiles (id) on delete set null,
+  created_at      timestamptz not null default now()
+);
+alter table public.shipping_zones enable row level security;
+alter table public.shipping_rates enable row level security;
+alter table public.shipping_promotions enable row level security;
+create policy "shipping_zones: public read" on public.shipping_zones for select using (true);
+create policy "shipping_zones: admin" on public.shipping_zones for all using (public.is_admin()) with check (public.is_admin());
+create policy "shipping_rates: public read" on public.shipping_rates for select using (true);
+create policy "shipping_rates: admin" on public.shipping_rates for all using (public.is_admin()) with check (public.is_admin());
+create policy "shipping_promotions: public read" on public.shipping_promotions for select using (true);
+create policy "shipping_promotions: admin" on public.shipping_promotions for all using (public.is_admin()) with check (public.is_admin());
+
+-- Sample rates so checkout works out of the box. Replace with your courier's real rates.
+with z as (
+  insert into public.shipping_zones (name, pincode_prefixes, extra_per_500g_paise, is_sample)
+  values ('All India (sample rates)', array[''], 3000, true)
+  returning id
+)
+insert into public.shipping_rates (zone_id, max_weight_g, price_paise)
+select z.id, w, p from z, (values (500, 6000), (1000, 8000), (2000, 11000)) as r(w, p);
+
+-- ===========================================================================
+-- Orders: snapshots of the money split, shipping, campaign attribution, history
+-- ===========================================================================
+create table public.campaign_links (
+  id         uuid primary key default gen_random_uuid(),
+  author_id  uuid not null references public.profiles (id),
+  book_id    uuid not null references public.books (id) on delete cascade,
+  code       text not null unique check (code ~ '^[a-z0-9]{6,12}$'),
+  label      text not null,
+  archived   boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create table public.campaign_clicks (
+  id         bigserial primary key,
+  link_id    uuid not null references public.campaign_links (id) on delete cascade,
+  clicked_at timestamptz not null default now()     -- no reader details are stored
+);
+create index campaign_clicks_link_idx on public.campaign_clicks (link_id, clicked_at);
+alter table public.campaign_links enable row level security;
+alter table public.campaign_clicks enable row level security;
+create policy "campaign_links: author reads own" on public.campaign_links for select using (author_id = auth.uid());
+create policy "campaign_links: admin" on public.campaign_links for all using (public.is_admin()) with check (public.is_admin());
+create policy "campaign_clicks: admin reads" on public.campaign_clicks for select using (public.is_admin());
+
+alter table public.orders
+  add column shipping_quote      jsonb,
+  add column shipping_discount   numeric(10, 2) not null default 0,   -- platform-funded
+  add column shipping_promotion_id uuid references public.shipping_promotions (id),
+  add column gateway_fee         numeric(10, 2),
+  add column gateway_fee_source  text check (gateway_fee_source in ('estimated', 'actual')),
+  add column campaign_link_id    uuid references public.campaign_links (id) on delete set null,
+  add column replacement_of      uuid references public.orders (id),
+  add column printing_at         timestamptz,
+  add column packed_at           timestamptz;
+
+alter table public.orders drop constraint if exists orders_payment_mode_check;
+alter table public.orders add constraint orders_payment_mode_check check (payment_mode in ('razorpay', 'mock', 'none'));
+
+alter table public.order_items
+  add column print_cost_total     numeric(12, 2),
+  add column commission           numeric(12, 2),     -- line total
+  add column commission_gst       numeric(12, 2),
+  add column gateway_allocated    numeric(12, 2),
+  add column author_earning_total numeric(12, 2),
+  add column commission_rule      jsonb,              -- snapshot of the plan rule used
+  add column author_plan          text,
+  add column platform_discount    numeric(12, 2) not null default 0,   -- funded by us, never by the author
+  add column author_discount      numeric(12, 2) not null default 0,   -- only with the author's consent
+  add column sale_channel         text not null default 'store' check (sale_channel in ('store', 'author_copy', 'marketplace', 'replacement')),
+  add column file_snapshot        jsonb,              -- manuscript/cover paths printed for this order
+  add column reversed_at          timestamptz,
+  add column reversal_reason      text;
+
+-- What one order line earns the author (new orders store the line total; old ones per copy)
+create function public.line_earning(oi public.order_items)
+returns numeric language sql immutable as $$
+  select case when oi.reversed_at is not null then 0
+              else coalesce(oi.author_earning_total, oi.quantity * oi.author_earning) end
+$$;
+
+create or replace function public.is_earning_status(s public.order_status)
+returns boolean language sql immutable as $$
+  select s in ('paid', 'accepted', 'printing', 'printed', 'packed', 'shipped', 'delivered')
+$$;
+
+create or replace view public.printer_load
+with (security_invoker = true) as
+select p.id as printer_id, p.state, p.active,
+  count(o.id) filter (where o.status in ('paid', 'accepted', 'printing', 'printed', 'packed')) as open_jobs
+from public.printers p
+left join public.orders o on o.printer_id = p.id
+group by p.id;
+
+-- Earnings functions now use the line totals and skip reversed lines
+create or replace view public.author_balances
+with (security_invoker = true) as
+select p.id as author_id, p.full_name, p.phone, p.payout_upi,
+  coalesce(e.earned, 0)::numeric(12, 2) as earned,
+  coalesce(e.copies, 0)::integer as copies_sold,
+  coalesce(pd.paid, 0)::numeric(12, 2) as paid,
+  (coalesce(e.earned, 0) - coalesce(pd.paid, 0))::numeric(12, 2) as balance
+from public.profiles p
+left join (
+  select oi.author_id, sum(public.line_earning(oi)) as earned, sum(oi.quantity) filter (where oi.reversed_at is null) as copies
+  from public.order_items oi
+  join public.orders o on o.id = oi.order_id
+  where public.is_earning_status(o.status)
+  group by oi.author_id
+) e on e.author_id = p.id
+left join (
+  select author_id, sum(amount) as paid from public.payouts where status = 'paid' group by author_id
+) pd on pd.author_id = p.id
+where p.role = 'author' or e.earned is not null;
+
+create or replace function public.my_sales_by_month(months int default 12)
+returns table (month date, copies bigint, earnings numeric)
+language sql stable security definer set search_path = public as $$
+  with m as (
+    select generate_series(
+      date_trunc('month', now() at time zone 'Asia/Kolkata') - make_interval(months => greatest(months, 1) - 1),
+      date_trunc('month', now() at time zone 'Asia/Kolkata'),
+      interval '1 month'
+    )::date as month
+  )
+  select m.month,
+         coalesce(sum(oi.quantity) filter (where oi.reversed_at is null), 0)::bigint,
+         coalesce(sum(public.line_earning(oi)), 0)::numeric(12, 2)
+  from m
+  left join public.orders o
+    on date_trunc('month', o.paid_at at time zone 'Asia/Kolkata')::date = m.month
+   and public.is_earning_status(o.status)
+  left join public.order_items oi
+    on oi.order_id = o.id and oi.author_id = auth.uid()
+  group by m.month
+  order by m.month
+$$;
+
+create or replace function public.my_sales_by_city(since timestamptz default null)
+returns table (city text, state text, copies bigint, earnings numeric)
+language sql stable security definer set search_path = public as $$
+  select initcap(trim(o.ship_city)), o.ship_state,
+         sum(oi.quantity)::bigint, sum(public.line_earning(oi))::numeric(12, 2)
+  from public.order_items oi
+  join public.orders o on o.id = oi.order_id
+  where oi.author_id = auth.uid() and oi.reversed_at is null
+    and public.is_earning_status(o.status)
+    and (since is null or o.paid_at >= since)
+  group by 1, 2
+  order by 3 desc, 1
+$$;
+
+create or replace function public.my_sales_by_book()
+returns table (book_id uuid, copies bigint, earnings numeric)
+language sql stable security definer set search_path = public as $$
+  select oi.book_id, sum(oi.quantity)::bigint, sum(public.line_earning(oi))::numeric(12, 2)
+  from public.order_items oi
+  join public.orders o on o.id = oi.order_id
+  where oi.author_id = auth.uid() and oi.reversed_at is null and public.is_earning_status(o.status)
+  group by oi.book_id
+$$;
+
+create or replace function public.my_book_orders(max_rows int default 50, skip int default 0)
+returns table (
+  order_item_id uuid, order_number text, paid_at timestamptz, status public.order_status,
+  ship_city text, ship_state text, book_title text, quantity int, earning numeric,
+  shipped_at timestamptz, delivered_at timestamptz, total_count bigint
+)
+language sql stable security definer set search_path = public as $$
+  select oi.id, o.order_number, o.paid_at, o.status, initcap(trim(o.ship_city)), o.ship_state,
+         b.title, oi.quantity, public.line_earning(oi)::numeric(12, 2),
+         o.shipped_at, o.delivered_at, count(*) over ()
+  from public.order_items oi
+  join public.orders o on o.id = oi.order_id
+  join public.books b on b.id = oi.book_id
+  where oi.author_id = auth.uid() and public.is_earning_status(o.status)
+  order by o.paid_at desc
+  limit least(greatest(max_rows, 1), 200) offset greatest(skip, 0)
+$$;
+
+create or replace function public.my_balance()
+returns table (earned numeric, copies_sold bigint, paid numeric, balance numeric)
+language sql stable security definer set search_path = public as $$
+  with e as (
+    select coalesce(sum(public.line_earning(oi)), 0) as earned,
+           coalesce(sum(oi.quantity) filter (where oi.reversed_at is null), 0) as copies
+    from public.order_items oi
+    join public.orders o on o.id = oi.order_id
+    where oi.author_id = auth.uid() and public.is_earning_status(o.status)
+  ), p as (
+    select coalesce(sum(amount), 0) as paid from public.payouts where author_id = auth.uid() and status = 'paid'
+  )
+  select e.earned::numeric(12, 2), e.copies::bigint, p.paid::numeric(12, 2), (e.earned - p.paid)::numeric(12, 2)
+  from e, p
+$$;
+
+-- Status history for every order, written by a trigger so no code path can skip it
+create table public.order_status_history (
+  id          bigserial primary key,
+  order_id    uuid not null references public.orders (id) on delete cascade,
+  from_status public.order_status,
+  to_status   public.order_status not null,
+  actor_id    uuid,
+  created_at  timestamptz not null default now()
+);
+create index order_status_history_order_idx on public.order_status_history (order_id);
+alter table public.order_status_history enable row level security;
+create policy "order_history: buyer reads own" on public.order_status_history for select
+  using (exists (select 1 from public.orders o where o.id = order_id and o.buyer_id = auth.uid()));
+create policy "order_history: printer reads assigned" on public.order_status_history for select
+  using (exists (select 1 from public.orders o join public.printers p on p.id = o.printer_id where o.id = order_id and p.user_id = auth.uid()));
+create policy "order_history: admin" on public.order_status_history for select using (public.is_admin());
+
+create function public.log_order_status()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'INSERT' or new.status is distinct from old.status then
+    insert into public.order_status_history (order_id, from_status, to_status, actor_id)
+    values (new.id, case when tg_op = 'UPDATE' then old.status end, new.status, auth.uid());
+  end if;
+  return new;
+end $$;
+create trigger orders_status_history after insert or update of status on public.orders
+  for each row execute function public.log_order_status();
+
+-- Damaged, misprinted, wrong or missing books: replacement or refund
+create table public.order_issues (
+  id                   uuid primary key default gen_random_uuid(),
+  order_id             uuid not null references public.orders (id),
+  buyer_id             uuid references public.profiles (id) on delete set null,
+  kind                 text not null check (kind in ('damaged', 'misprint', 'wrong_item', 'not_delivered')),
+  description          text not null,
+  photo_paths          text[] not null default '{}',
+  status               text not null default 'open' check (status in ('open', 'replacement', 'refund', 'rejected')),
+  resolution_note      text,
+  replacement_order_id uuid references public.orders (id),
+  refund_paise         integer,
+  resolved_by          uuid references public.profiles (id) on delete set null,
+  resolved_at          timestamptz,
+  created_at           timestamptz not null default now()
+);
+create unique index order_issues_one_open on public.order_issues (order_id) where status = 'open';
+alter table public.order_issues enable row level security;
+create policy "order_issues: buyer reads own" on public.order_issues for select using (buyer_id = auth.uid());
+create policy "order_issues: admin" on public.order_issues for all using (public.is_admin()) with check (public.is_admin());
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('issue-photos', 'issue-photos', false, 5242880, array['image/png', 'image/jpeg', 'image/webp']);
+create policy "issue-photos: buyer uploads own" on storage.objects for insert
+  with check (bucket_id = 'issue-photos' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy "issue-photos: buyer or admin reads" on storage.objects for select
+  using (bucket_id = 'issue-photos' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()));
+
+-- ===========================================================================
+-- Pro analytics (real sales only) and campaign stats. Pro is checked here, not just in the UI.
+-- ===========================================================================
+create function public.my_sales_series(p_from date, p_to date, p_grain text default 'day')
+returns table (period date, book_id uuid, copies bigint, earnings numeric)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.has_active_pro(auth.uid()) then raise exception 'PRO_REQUIRED'; end if;
+  if p_grain not in ('day', 'week', 'month') then raise exception 'bad grain'; end if;
+  return query
+  select date_trunc(p_grain, o.paid_at at time zone 'Asia/Kolkata')::date, oi.book_id,
+         sum(oi.quantity)::bigint, sum(public.line_earning(oi))::numeric(12, 2)
+  from public.order_items oi
+  join public.orders o on o.id = oi.order_id
+  where oi.author_id = auth.uid() and oi.reversed_at is null and public.is_earning_status(o.status)
+    and (o.paid_at at time zone 'Asia/Kolkata')::date between p_from and p_to
+  group by 1, 2
+  order by 1, 2;
+end $$;
+
+create function public.my_campaign_stats()
+returns table (link_id uuid, code text, label text, book_id uuid, archived boolean, created_at timestamptz,
+               clicks bigint, orders bigint, copies bigint)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.has_active_pro(auth.uid()) then raise exception 'PRO_REQUIRED'; end if;
+  return query
+  select l.id, l.code, l.label, l.book_id, l.archived, l.created_at,
+         (select count(*) from public.campaign_clicks c where c.link_id = l.id),
+         (select count(distinct o.id) from public.orders o join public.order_items oi on oi.order_id = o.id
+            where o.campaign_link_id = l.id and oi.book_id = l.book_id and public.is_earning_status(o.status)),
+         (select coalesce(sum(oi.quantity), 0) from public.orders o join public.order_items oi on oi.order_id = o.id
+            where o.campaign_link_id = l.id and oi.book_id = l.book_id and oi.reversed_at is null and public.is_earning_status(o.status))::bigint
+  from public.campaign_links l
+  where l.author_id = auth.uid()
+  order by l.created_at desc;
+end $$;
+
+revoke execute on function public.my_sales_series(date, date, text) from public, anon;
+revoke execute on function public.my_campaign_stats() from public, anon;
+grant execute on function public.my_sales_series(date, date, text) to authenticated;
+grant execute on function public.my_campaign_stats() to authenticated;
+
+-- ===========================================================================
+-- Admin finance summary. Book sales value is NOT platform income.
+-- ===========================================================================
+create function public.admin_finance(p_from timestamptz, p_to timestamptz)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare
+  result jsonb;
+begin
+  if not public.is_admin() then raise exception 'ADMIN_ONLY'; end if;
+  with lines as (
+    select oi.*, o.status as order_status
+    from public.order_items oi join public.orders o on o.id = oi.order_id
+    where o.paid_at >= p_from and o.paid_at < p_to and public.is_earning_status(o.status) and oi.reversed_at is null
+  ), ord as (
+    select * from public.orders o
+    where o.paid_at >= p_from and o.paid_at < p_to and o.status <> 'pending_payment'
+  )
+  select jsonb_build_object(
+    'book_sales_value', coalesce((select sum(unit_price * quantity) from lines), 0),
+    'print_costs',      coalesce((select sum(coalesce(print_cost_total, print_cost * quantity)) from lines), 0),
+    'commission',       coalesce((select sum(coalesce(commission, platform_fee * quantity)) from lines), 0),
+    'commission_gst',   coalesce((select sum(coalesce(commission_gst, 0)) from lines), 0),
+    'gateway_costs',    coalesce((select sum(coalesce(gateway_allocated, payment_fee * quantity)) from lines), 0),
+    'author_earnings',  coalesce((select sum(public.line_earning(l::public.order_items)) from lines l), 0),
+    'shipping_collected', coalesce((select sum(shipping) from ord where public.is_earning_status(status)), 0),
+    'shipping_promotions', coalesce((select sum(shipping_discount) from ord where public.is_earning_status(status)), 0),
+    'book_refunds',     coalesce((select sum(refund_amount) from ord where refund_status in ('processed', 'pending')), 0),
+    'service_revenue',  coalesce((select sum(base_paise) from public.payments where purpose = 'service' and status in ('paid', 'partially_refunded') and paid_at >= p_from and paid_at < p_to), 0) / 100.0,
+    'service_gst',      coalesce((select sum(gst_paise) from public.payments where purpose = 'service' and status in ('paid', 'partially_refunded') and paid_at >= p_from and paid_at < p_to), 0) / 100.0,
+    'subscription_revenue', coalesce((select sum(base_paise) from public.payments where purpose = 'subscription' and status in ('paid', 'partially_refunded') and paid_at >= p_from and paid_at < p_to), 0) / 100.0,
+    'subscription_gst', coalesce((select sum(gst_paise) from public.payments where purpose = 'subscription' and status in ('paid', 'partially_refunded') and paid_at >= p_from and paid_at < p_to), 0) / 100.0,
+    'other_refunds',    coalesce((select sum(refunded_paise) from public.payments where refunded_at >= p_from and refunded_at < p_to), 0) / 100.0,
+    'author_liability', coalesce((select sum(greatest(balance, 0)) from public.author_balances), 0)
+  ) into result;
+  return result;
+end $$;
+revoke execute on function public.admin_finance(timestamptz, timestamptz) from public, anon;
+grant execute on function public.admin_finance(timestamptz, timestamptz) to authenticated;
+
+-- ===========================================================================
+-- Service payments: mark a quote paid and queue the work. Idempotent.
+-- ===========================================================================
+create function public.pay_service_quote(p_payment uuid, p_razorpay_payment_id text, p_fee_paise integer default null)
+returns public.service_orders language plpgsql security definer set search_path = public as $$
+declare
+  pay public.payments;
+  q public.service_quotes;
+  so public.service_orders;
+begin
+  select * into pay from public.payments where id = p_payment for update;
+  if pay.id is null or pay.purpose <> 'service' then raise exception 'service payment not found'; end if;
+  select * into q from public.service_quotes where id = pay.service_quote_id for update;
+  select * into so from public.service_orders where id = q.service_order_id for update;
+  if pay.status = 'paid' then return so; end if;            -- already done
+
+  update public.payments
+     set status = 'paid', paid_at = now(), razorpay_payment_id = coalesce(p_razorpay_payment_id, razorpay_payment_id),
+         fee_paise = coalesce(p_fee_paise, fee_paise),
+         receipt_number = coalesce(receipt_number, 'EIP-R-' || lpad(nextval('public.receipt_seq')::text, 6, '0'))
+   where id = p_payment;
+  update public.service_quotes set status = 'paid' where id = q.id;
+
+  if so.status = 'payment_pending' then
+    update public.service_orders
+       set status = 'queued',
+           revisions_allowed = case when q.kind = 'additional' then revisions_allowed + q.revisions else q.revisions end
+     where id = so.id
+    returning * into so;
+    insert into public.service_events (service_order_id, from_status, to_status, note)
+    values (so.id, 'payment_pending', 'queued', 'Payment received. Work starts once requirements are complete.');
+  else
+    -- Paid after the order was cancelled: keep the record so admin can refund it
+    insert into public.service_events (service_order_id, from_status, to_status, note)
+    values (so.id, so.status, so.status, 'Payment received for an order that is no longer awaiting payment. Refund needed.');
+  end if;
+  return so;
+end $$;
+revoke execute on function public.pay_service_quote(uuid, text, integer) from public, anon, authenticated;

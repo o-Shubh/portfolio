@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { getOwnBookOr404 } from "@/lib/author-books";
 import { isEditable } from "@/lib/publishing";
+import { getCurrentProfile } from "@/lib/auth";
+import { calculatorPlans } from "@/lib/calculator-plans";
+import { termsRequirement } from "@/lib/plans";
+import { gatewayPercent } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { PrintForm } from "./PrintForm";
 
@@ -10,12 +14,15 @@ export default async function PrintPage({ params }: PageProps<"/author/books/[id
   const { id } = await params;
   const { book } = await getOwnBookOr404(id);
   const { rates, fees } = await getPricingSettings();
+  const profile = await getCurrentProfile();
+  const plans = await calculatorPlans(book.author_id, termsRequirement(book, profile!).required);
 
   return (
     <PrintForm
       bookId={book.id}
       rates={rates}
-      fees={fees}
+      gatewayPercent={gatewayPercent(fees)}
+      plans={plans}
       disabled={!isEditable(book)}
       pdfSize={
         book.manuscript_width_in && book.manuscript_height_in

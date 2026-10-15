@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { BookCover } from "@/components/BookCover";
 import { getCurrentProfile } from "@/lib/auth";
 import { coverUrl } from "@/lib/books";
-import { MAX_QTY, priceLine } from "@/lib/orders";
+import { canSell, MAX_QTY } from "@/lib/order-pricing";
 import { paymentMode } from "@/lib/payments";
 import { getPricingSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
@@ -23,7 +23,7 @@ export default async function CheckoutPage({ params }: PageProps<"/checkout/[slu
   const { data: book } = await supabase.from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
   if (!book) notFound();
   const settings = await getPricingSettings();
-  const sellable = priceLine(book, 1, settings) !== null;
+  const sellable = await canSell(book, settings);
 
   // Pre-fill from the last order's address, or the profile
   const { data: last } = await supabase
@@ -64,7 +64,6 @@ export default async function CheckoutPage({ params }: PageProps<"/checkout/[slu
               <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" />
             ),
           }}
-          shipping={settings.shipping}
           defaults={{
             ship_name: last?.ship_name ?? profile.full_name ?? "",
             ship_phone: (last?.ship_phone ?? profile.phone ?? "").slice(-10),
