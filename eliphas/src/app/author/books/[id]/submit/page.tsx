@@ -39,7 +39,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
     <div className="grid max-w-4xl gap-6 md:grid-cols-[1fr_minmax(0,320px)]">
       <div className="space-y-6">
         <section className="card">
-          <h2 className="text-xl font-semibold">Checklist</h2>
+          <h2 className="text-xl">Checklist</h2>
           <ul className="mt-3 space-y-2">
             {checklist.map((c) => (
               <li key={c.label} className="flex items-center gap-3">
@@ -75,7 +75,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
         </div>
         {e && (
           <div className="card">
-            <h2 className="mb-3 text-lg font-semibold">Per copy</h2>
+            <h2 className="mb-3 text-lg">Per copy</h2>
             <EarningsBreakdown e={e} />
           </div>
         )}

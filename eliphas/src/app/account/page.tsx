@@ -41,7 +41,7 @@ export default async function AccountHome() {
               <li key={o.id}>
                 <Link href={`/account/orders/${o.id}`} className="card flex items-center gap-4 transition hover:-translate-y-0.5 hover:shadow-lift">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-heading text-lg font-semibold">{titles}</p>
+                    <p className="truncate font-medium">{titles}</p>
                     <p className="text-sm text-muted">
                       {o.order_number} · {copies} {copies === 1 ? "copy" : "copies"} · {rupees(Number(o.total))} ·{" "}
                       {new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
@@ -59,13 +59,13 @@ export default async function AccountHome() {
       )}
 
       {profile.role === "reader" && (
-        <div className="card mt-8 ring-2 ring-marigold/50">
-          <h2 className="text-xl font-semibold">Have a book in you?</h2>
+        <div className="card mt-8 ring-2 ring-accent/50">
+          <h2 className="text-xl">Have a book in you?</h2>
           <p className="mt-1 text-muted">
             Publish in print across India. No upfront cost: we print each copy when someone orders it.
           </p>
           <form action={becomeAuthor} className="mt-4">
-            <button type="submit" className="btn-accent">
+            <button type="submit" className="btn-primary">
               Start publishing
             </button>
           </form>

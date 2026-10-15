@@ -85,7 +85,7 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
               <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold md:text-3xl" lang={book.language}>
+              <h1 className="text-2xl md:text-3xl" lang={book.language}>
                 {book.title}
               </h1>
               {book.subtitle && <p className="text-muted">{book.subtitle}</p>}
@@ -103,7 +103,7 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
           </div>
 
           <section className="card">
-            <h2 className="text-lg font-semibold">Files</h2>
+            <h2 className="text-lg">Files</h2>
             <div className="mt-3 flex flex-wrap gap-3">
               <FileButton href={links.manuscript} label="Manuscript PDF" />
               <FileButton href={links.printCover} label="Print cover PDF" />
@@ -117,8 +117,8 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
           </section>
 
           {warnings.length > 0 && (
-            <section role="note" className="rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 p-5">
-              <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <section role="note" className="rounded-xl bg-accent/10 ring-1 ring-accent/30 p-5">
+              <h2 className="flex items-center gap-2 text-lg">
                 <AlertTriangle className="h-5 w-5" aria-hidden /> Check these
               </h2>
               <ul className="mt-2 list-disc space-y-1 pl-5">
@@ -130,7 +130,7 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
           )}
 
           <section className="card">
-            <h2 className="text-lg font-semibold">Description</h2>
+            <h2 className="text-lg">Description</h2>
             <p className="mt-2 whitespace-pre-line" lang={book.language}>
               {book.description ?? "—"}
             </p>
@@ -151,12 +151,12 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
           </section>
           {e && (
             <section className="card">
-              <h2 className="mb-3 text-lg font-semibold">Per copy at today&apos;s rates</h2>
+              <h2 className="mb-3 text-lg">Per copy at today&apos;s rates</h2>
               <EarningsBreakdown e={e} />
             </section>
           )}
           <section className="card">
-            <h2 className="text-lg font-semibold">Author&apos;s checklist</h2>
+            <h2 className="text-lg">Author&apos;s checklist</h2>
             <ul className="mt-2 space-y-1 text-sm">
               {checklist.map((c) => (
                 <li key={c.label} className="flex items-center gap-2">

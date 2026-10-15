@@ -37,10 +37,10 @@ export function ReviewActions({
   if (status === "in_review") {
     return (
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Decision</h2>
+        <h2 className="text-lg">Decision</h2>
         <button
           type="button"
-          className="btn-accent w-full"
+          className="btn-primary w-full"
           disabled={pending}
           onClick={() => {
             if (window.confirm("Approve and publish this book in the bookstore?")) run(() => approveBook(bookId));
@@ -77,7 +77,7 @@ export function ReviewActions({
   if (status === "published") {
     return (
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Live in the bookstore</h2>
+        <h2 className="text-lg">Live in the bookstore</h2>
         <Link href={`/books/${slug}`} className="btn-ghost w-full">
           View book page
         </Link>
@@ -102,7 +102,7 @@ export function ReviewActions({
 
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-semibold">Nothing to decide</h2>
+      <h2 className="text-lg">Nothing to decide</h2>
       <p className="text-muted">
         {status === "changes_requested"
           ? "Waiting for the author to make changes and resubmit."

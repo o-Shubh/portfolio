@@ -24,12 +24,12 @@ export function BookSteps({ bookId }: { bookId: string }) {
                 href={href}
                 aria-current={active ? "step" : undefined}
                 className={`-mb-px flex min-h-11 items-center gap-2 border-b-2 px-3 font-medium ${
-                  active ? "border-marigold text-fg" : "border-transparent text-muted hover:text-fg"
+                  active ? "border-accent text-fg" : "border-transparent text-muted hover:text-fg"
                 }`}
               >
                 <span
                   className={`grid h-6 w-6 place-items-center rounded-full text-xs ${
-                    active ? "bg-marigold text-on-marigold" : "bg-surface-2"
+                    active ? "bg-accent text-on-accent" : "bg-surface-2"
                   }`}
                 >
                   {i + 1}

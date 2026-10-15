@@ -76,14 +76,14 @@ export function PrinterForm({ printer }: { printer: Printer | null }) {
         </div>
       </div>
       <label className="flex items-center gap-3">
-        <input type="checkbox" name="active" defaultChecked={v?.active ?? true} className="h-5 w-5 accent-[#C98200]" />
+        <input type="checkbox" name="active" defaultChecked={v?.active ?? true} className="h-5 w-5 accent-fg" />
         <span>
           <span className="font-semibold">Active</span>
           <span className="block text-sm text-muted">Paused printers don&apos;t get new orders.</span>
         </span>
       </label>
       <FormMessage state={state} />
-      <button type="submit" className="btn-accent" disabled={pending}>
+      <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? "Saving…" : printer ? "Save changes" : "Add printer"}
       </button>
     </form>

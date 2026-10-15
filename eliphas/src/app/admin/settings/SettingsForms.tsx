@@ -30,7 +30,7 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <section className="card space-y-4">
-        <h2 className="text-lg font-semibold">Fees and shipping</h2>
+        <h2 className="text-lg">Fees and shipping</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <Num name="platform_fee_per_copy" label="Platform fee (₹ per copy)" value={fees.platform_fee_per_copy} />
           <Num name="gateway_percent" label="Razorpay charge (%)" value={fees.gateway_percent} />
@@ -41,9 +41,9 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
       </section>
 
       <section className="card space-y-4">
-        <h2 className="text-lg font-semibold">General</h2>
+        <h2 className="text-lg">General</h2>
         <label className="flex items-center gap-3">
-          <input type="checkbox" name="is_sample" defaultChecked={rates.is_sample} className="h-5 w-5 accent-[#C98200]" />
+          <input type="checkbox" name="is_sample" defaultChecked={rates.is_sample} className="h-5 w-5 accent-fg" />
           <span>
             <span className="font-semibold">These are sample rates</span>
             <span className="block text-sm text-muted">Shows a &quot;sample rates&quot; notice on the pricing page. Untick once printer rates are final.</span>
@@ -61,7 +61,7 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
 
       {(Object.keys(RATE_FIELDS) as RateGroup[]).map((group) => (
         <section key={group} className="card">
-          <h2 className="text-lg font-semibold">{GROUP_TITLE[group]}</h2>
+          <h2 className="text-lg">{GROUP_TITLE[group]}</h2>
           <div className="mt-3 space-y-4">
             {sortedOptions(rates[group] as Record<string, { label: string }>).map(([key, opt]) => (
               <fieldset key={key} className="grid gap-3 border-t border-line pt-4 first:border-0 first:pt-0 sm:grid-cols-4">
@@ -86,9 +86,9 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
         </section>
       ))}
 
-      <div className="sticky bottom-20 z-10 rounded-3xl bg-surface shadow-soft ring-1 ring-line/95 p-4 backdrop-blur md:bottom-4">
+      <div className="sticky bottom-20 z-10 rounded-xl bg-surface shadow-soft ring-1 ring-line/95 p-4 backdrop-blur md:bottom-4">
         <FormMessage state={state} />
-        <button type="submit" className="btn-accent mt-2" disabled={pending}>
+        <button type="submit" className="btn-primary mt-2" disabled={pending}>
           {pending ? "Saving…" : "Save all changes"}
         </button>
       </div>

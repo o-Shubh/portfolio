@@ -87,4 +87,4 @@ export function coverUrl(path: string | null): string | null {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/covers/${path}`;
 }
 
-export const LANGUAGE_LABEL: Record<string, string> = { hi: "हिन्दी", en: "English" };
+export const LANGUAGE_LABEL: Record<string, string> = { hi: "Hindi", en: "English" };

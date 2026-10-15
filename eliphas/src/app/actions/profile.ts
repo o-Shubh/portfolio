@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
-import { INDIAN_STATES } from "@/lib/india";
 import { createClient } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; ok?: boolean } | undefined;
@@ -16,8 +15,9 @@ function readProfileFields(formData: FormData) {
 
   if (full_name.length < 2) return { error: "Please enter your full name." } as const;
   if (!city) return { error: "Please enter your city." } as const;
-  if (!(INDIAN_STATES as readonly string[]).includes(state)) return { error: "Please choose your state." } as const;
-  if (pincode && !/^[1-9]\d{5}$/.test(pincode)) return { error: "PIN code should be 6 digits." } as const;
+  if (city.length > 80) return { error: "City name is too long." } as const;
+  if (!state || state.length > 80) return { error: "Please enter your state or region." } as const;
+  if (pincode && !/^[A-Za-z0-9][A-Za-z0-9 -]{1,9}$/.test(pincode)) return { error: "Please check your postal code." } as const;
   // UPI is only on the form for authors; leave it unchanged when the field isn't there
   const upiField = formData.get("payout_upi");
   const payout_upi = upiField === null ? undefined : String(upiField).trim();

@@ -3,7 +3,7 @@
 import {
   BookOpen,
   ClipboardCheck,
-  IndianRupee,
+  Wallet,
   LayoutDashboard,
   Package,
   Printer,
@@ -19,7 +19,7 @@ const ICONS = {
   dashboard: LayoutDashboard,
   books: BookOpen,
   review: ClipboardCheck,
-  money: IndianRupee,
+  money: Wallet,
   orders: Package,
   printer: Printer,
   settings: Settings,
@@ -45,11 +45,11 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-[1.25rem] text-[0.7rem] font-semibold transition ${
-                  active ? "bg-primary text-on-primary" : "text-muted"
+                className={`flex min-h-14 flex-col items-center justify-center gap-1 text-[0.68rem] font-medium transition ${
+                  active ? "text-fg" : "text-muted"
                 }`}
               >
-                <Icon className="h-5 w-5" aria-hidden />
+                <Icon className="h-[1.35rem] w-[1.35rem]" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
                 {item.label}
               </Link>
             </li>
@@ -60,7 +60,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
   }
 
   return (
-    <ul className="mt-2 space-y-1">
+    <ul className="mt-2 space-y-0.5">
       {items.map((item) => {
         const Icon = ICONS[item.icon];
         const active = isActive(item);
@@ -69,11 +69,11 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-11 items-center gap-3 rounded-2xl px-3 font-semibold transition ${
-                active ? "bg-primary text-on-primary shadow-soft" : "text-muted hover:bg-surface-2 hover:text-fg"
+              className={`flex h-9 items-center gap-2.5 rounded-lg px-2 text-[0.9375rem] transition ${
+                active ? "bg-surface font-medium text-fg shadow-soft ring-1 ring-line" : "text-muted hover:bg-line hover:text-fg"
               }`}
             >
-              <Icon className="h-5 w-5" aria-hidden />
+              <Icon className="h-[1.1rem] w-[1.1rem]" aria-hidden />
               {item.label}
             </Link>
           </li>

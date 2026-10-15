@@ -41,7 +41,7 @@ export function AdvanceForm({ orderId, status }: { orderId: string; status: Orde
         </>
       )}
       <FormMessage state={state} />
-      <button type="submit" className="btn-accent w-full" disabled={pending}>
+      <button type="submit" className="btn-primary w-full" disabled={pending}>
         {pending ? "Saving…" : next.label}
       </button>
     </form>

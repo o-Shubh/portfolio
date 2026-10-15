@@ -3,12 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { cleanIndianMobile, formatPhone, toE164 } from "@/lib/phone";
+import { ChevronDown } from "lucide-react";
+import { COUNTRIES, countryByIso, DEFAULT_COUNTRY, formatPhone, toInternational } from "@/lib/phone";
 
 export function LoginForm({ next }: { next: string }) {
   const router = useRouter();
   const [step, setStep] = useState<"phone" | "code">("phone");
+  const [country, setCountry] = useState<string>(DEFAULT_COUNTRY);
   const [phone, setPhone] = useState("");
+  const [e164, setE164] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,19 +19,19 @@ export function LoginForm({ next }: { next: string }) {
   async function sendCode(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const mobile = cleanIndianMobile(phone);
-    if (!mobile) {
-      setError("Enter a valid 10-digit Indian mobile number.");
+    const full = toInternational(country, phone);
+    if (!full) {
+      setError(country === "IN" ? "Enter a valid 10-digit mobile number." : "Enter a valid mobile number for the selected country.");
       return;
     }
     setBusy(true);
-    const { error } = await createClient().auth.signInWithOtp({ phone: toE164(mobile) });
+    const { error } = await createClient().auth.signInWithOtp({ phone: full });
     setBusy(false);
     if (error) {
       setError(friendly(error.message));
       return;
     }
-    setPhone(mobile);
+    setE164(full);
     setStep("code");
   }
 
@@ -40,7 +43,7 @@ export function LoginForm({ next }: { next: string }) {
       return;
     }
     setBusy(true);
-    const { error } = await createClient().auth.verifyOtp({ phone: toE164(phone), token: code, type: "sms" });
+    const { error } = await createClient().auth.verifyOtp({ phone: e164, token: code, type: "sms" });
     if (error) {
       setBusy(false);
       setError(friendly(error.message));
@@ -58,17 +61,37 @@ export function LoginForm({ next }: { next: string }) {
             Mobile number
           </label>
           <div className="flex gap-2">
-            <span className="field flex w-auto shrink-0 items-center font-semibold" aria-hidden="true">
-              🇮🇳 +91
-            </span>
+            {/* The real select sits invisibly on top of a compact "IN +91" label */}
+            <div className="relative shrink-0">
+              <span className="field flex w-auto items-center gap-1.5 pr-2.5 tabular-nums" aria-hidden="true">
+                <span className="text-xs font-medium text-muted">{country}</span>+{countryByIso(country).dial}
+                <ChevronDown className="h-4 w-4 text-muted" />
+              </span>
+              <label htmlFor="country" className="sr-only">
+                Country
+              </label>
+              <select
+                id="country"
+                name="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="absolute inset-0 cursor-pointer opacity-0"
+              >
+                {COUNTRIES.map((c) => (
+                  <option key={c.iso} value={c.iso}>
+                    {c.name} (+{c.dial})
+                  </option>
+                ))}
+              </select>
+            </div>
             <input
               id="phone"
               name="phone"
               type="tel"
-              inputMode="numeric"
+              inputMode="tel"
               autoComplete="tel-national"
-              placeholder="98765 43210"
-              maxLength={14}
+              placeholder={country === "IN" ? "98765 43210" : "Mobile number"}
+              maxLength={20}
               className="field"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -89,10 +112,10 @@ export function LoginForm({ next }: { next: string }) {
   return (
     <form onSubmit={verifyCode} className="mt-6 space-y-4" noValidate>
       <p className="text-sm text-muted">
-        Code sent to <span className="font-semibold text-fg">{formatPhone(phone)}</span>.{" "}
+        Code sent to <span className="font-medium text-fg">{formatPhone(e164)}</span>.{" "}
         <button
           type="button"
-          className="font-semibold text-fg underline"
+          className="font-medium text-fg underline underline-offset-2"
           onClick={() => {
             setStep("phone");
             setCode("");
@@ -114,7 +137,7 @@ export function LoginForm({ next }: { next: string }) {
           autoComplete="one-time-code"
           pattern="\d{6}"
           maxLength={6}
-          className="field min-h-14 text-center text-2xl font-semibold tracking-[0.6em]"
+          className="field min-h-14 text-center font-mono text-2xl tracking-[0.5em]"
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
           aria-invalid={Boolean(error)}
@@ -123,7 +146,7 @@ export function LoginForm({ next }: { next: string }) {
         />
       </div>
       {error && <ErrorText>{error}</ErrorText>}
-      <button type="submit" className="btn-accent w-full" disabled={busy}>
+      <button type="submit" className="btn-primary w-full" disabled={busy}>
         {busy ? "Checking…" : "Verify and continue"}
       </button>
     </form>

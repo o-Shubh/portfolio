@@ -30,10 +30,10 @@ export default async function PayoutsPage() {
       />
       <div className="card mb-6">
         <p className="text-sm text-muted">Total owed to authors</p>
-        <p className="font-heading text-3xl font-semibold">{rupees(Math.round(owed * 100) / 100)}</p>
+        <p className="font-heading text-3xl tracking-tight">{rupees(Math.round(owed * 100) / 100)}</p>
       </div>
 
-      <h2 className="mb-3 text-xl font-semibold">Balances</h2>
+      <h2 className="mb-3 text-xl">Balances</h2>
       {!balances?.length ? (
         <div className="card text-muted">No authors yet.</div>
       ) : (
@@ -42,14 +42,14 @@ export default async function PayoutsPage() {
             <li key={b.author_id} className="card">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="font-heading text-lg font-semibold">{b.full_name ?? "Unnamed author"}</p>
+                  <p className="font-medium">{b.full_name ?? "Unnamed author"}</p>
                   <p className="text-sm text-muted">
                     {formatPhone(b.phone)} · UPI: {b.payout_upi ?? <span className="text-danger">not added yet</span>}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted">Balance</p>
-                  <p className="font-heading text-2xl font-semibold tabular-nums">{rupees(Number(b.balance))}</p>
+                  <p className="font-heading text-2xl tracking-tight tabular-nums">{rupees(Number(b.balance))}</p>
                 </div>
               </div>
               <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
@@ -77,11 +77,11 @@ export default async function PayoutsPage() {
         </ul>
       )}
 
-      <h2 className="mb-3 mt-10 text-xl font-semibold">Recent payouts</h2>
+      <h2 className="mb-3 mt-10 text-xl">Recent payouts</h2>
       {!history?.length ? (
         <div className="card text-muted">No payouts yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded-3xl bg-surface shadow-soft ring-1 ring-line">
+        <div className="overflow-x-auto rounded-xl bg-surface shadow-soft ring-1 ring-line">
           <table className="w-full min-w-[520px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>

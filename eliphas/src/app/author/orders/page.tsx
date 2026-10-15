@@ -26,7 +26,7 @@ export default async function AuthorOrders({ searchParams }: PageProps<"/author/
       {rows.length === 0 ? (
         <div className="card text-center text-muted">No orders yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded-3xl bg-surface shadow-soft ring-1 ring-line">
+        <div className="overflow-x-auto rounded-xl bg-surface shadow-soft ring-1 ring-line">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>

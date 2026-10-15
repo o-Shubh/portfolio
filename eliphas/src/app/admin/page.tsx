@@ -53,7 +53,7 @@ export default async function AdminHome() {
           const inner = (
             <>
               <dt className="text-sm text-muted">{s.label}</dt>
-              <dd className={`mt-1 font-heading text-3xl font-semibold tabular-nums ${s.alert ? "text-marigold" : ""}`}>{s.value}</dd>
+              <dd className={`mt-1 font-heading text-3xl tracking-tight tabular-nums ${s.alert ? "text-accent-fg" : ""}`}>{s.value}</dd>
             </>
           );
           return s.href ? (
@@ -70,7 +70,7 @@ export default async function AdminHome() {
 
       <section className="card">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">Next in the review queue</h2>
+          <h2 className="text-lg">Next in the review queue</h2>
           <Link href="/admin/review" className="text-sm font-semibold underline">
             See all
           </Link>

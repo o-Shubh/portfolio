@@ -1,8 +1,8 @@
-import { Truck } from "lucide-react";
+import { PackageCheck, Printer, Truck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookGrid } from "@/components/BookCard";
+import { BookShelf } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
 import { coverUrl, getPublishedBook, LANGUAGE_LABEL, moreByAuthor } from "@/lib/books";
 import { rupees } from "@/lib/pricing";
@@ -53,58 +53,86 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="container-x py-8 md:py-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <Link href="/books" className="hover:text-fg hover:underline">
+        <Link href="/books" className="hover:text-fg">
           Bookstore
-        </Link>{" "}
-        / <span lang={book.language}>{book.title}</span>
+        </Link>
+        <span className="mx-2" aria-hidden>
+          /
+        </span>
+        <span lang={book.language} className="text-fg">
+          {book.title}
+        </span>
       </nav>
 
-      <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12">
-        <div className="mx-auto w-2/3 max-w-xs md:w-full">
-          <BookCover title={book.title} author={book.author_name} slug={book.slug} src={cover} size="lg" priority />
+      <div className="mt-6 grid gap-10 md:mt-10 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-20">
+        <div className="md:sticky md:top-24 md:self-start">
+          <div className="rounded-2xl bg-surface-2 px-[26%] py-[10%] md:px-[18%] md:py-[12%]">
+            <BookCover title={book.title} author={book.author_name} slug={book.slug} src={cover} size="lg" priority />
+          </div>
         </div>
 
         <div lang={book.language}>
-          <h1 className="text-3xl font-semibold md:text-4xl">{book.title}</h1>
-          {book.subtitle && <p className="mt-1 text-lg text-muted">{book.subtitle}</p>}
-          <p className="mt-3 font-medium">
-            <span lang="en">by</span> {book.author_name}
+          {book.genre && (
+            <p className="eyebrow" lang="en">
+              {book.genre}
+            </p>
+          )}
+          <h1 className="mt-3 text-4xl md:text-6xl">{book.title}</h1>
+          {book.subtitle && <p className="mt-3 font-heading text-xl text-muted italic md:text-2xl">{book.subtitle}</p>}
+          <p className="mt-4 text-lg">
+            <span lang="en" className="text-muted">
+              by
+            </span>{" "}
+            {book.author_name}
           </p>
 
-          <div className="card mt-6" lang="en">
-            <p className="font-heading text-3xl font-semibold">{rupees(Number(book.mrp))}</p>
-            <p className="text-sm text-muted">MRP, inclusive of taxes</p>
-            <Link href={`/checkout/${book.slug}`} className="btn-accent mt-4 w-full sm:w-auto">
-              Buy now
-            </Link>
-            <p className="mt-4 flex items-start gap-2 text-sm">
-              <Truck className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
-              <span>
-                Printed when you order and shipped across India. Shipping {rupees(shipping.flat)}, free on orders of{" "}
-                {rupees(shipping.free_above)} or more.
-              </span>
-            </p>
+          <div className="mt-8 rounded-xl border border-line p-5 md:p-6" lang="en">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="font-heading text-4xl tracking-tight">{rupees(Number(book.mrp))}</p>
+                <p className="mt-1 text-sm text-muted">{label(rates.binding, book.binding)} · inclusive of taxes</p>
+              </div>
+              <Link href={`/checkout/${book.slug}`} className="btn-primary min-h-12 w-full px-8 sm:w-auto">
+                Buy now
+              </Link>
+            </div>
+            <ul className="mt-5 space-y-2.5 border-t border-line pt-5 text-sm">
+              <li className="flex items-start gap-2.5">
+                <Printer className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
+                Printed fresh for you when you order
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
+                <span>
+                  Shipping {rupees(shipping.flat)} · free on orders of {rupees(shipping.free_above)} or more
+                </span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <PackageCheck className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
+                Track your order from print to delivery
+              </li>
+            </ul>
           </div>
 
           {book.description && (
-            <section className="mt-8">
-              <h2 className="text-xl font-semibold" lang="en">
+            <section className="mt-12">
+              <h2 className="font-sans text-sm font-medium tracking-[0.12em] text-muted uppercase" lang="en">
                 About this book
               </h2>
-              <p className="mt-2 whitespace-pre-line leading-relaxed">{book.description}</p>
+              <p className="mt-4 text-lg leading-relaxed whitespace-pre-line">{book.description}</p>
             </section>
           )}
 
-          <section className="mt-8" lang="en">
-            <h2 className="text-xl font-semibold">Details</h2>
-            <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+          <section className="mt-12" lang="en">
+            <h2 className="font-sans text-sm font-medium tracking-[0.12em] text-muted uppercase">Details</h2>
+            <dl className="mt-4 divide-y divide-line border-y border-line">
               {details.map((d) => (
-                <div key={d.term}>
-                  <dt className="text-sm text-muted">{d.term}</dt>
-                  <dd className="font-medium">{d.value}</dd>
+                <div key={d.term} className="flex justify-between gap-6 py-3">
+                  <dt className="text-muted">{d.term}</dt>
+                  <dd className="text-right font-medium">{d.value}</dd>
                 </div>
               ))}
             </dl>
@@ -113,10 +141,10 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
       </div>
 
       {more.length > 0 && (
-        <section className="mt-14">
-          <h2 className="text-2xl font-semibold">More by {book.author_name}</h2>
-          <div className="mt-5">
-            <BookGrid books={more} />
+        <section className="mt-24">
+          <h2 className="text-3xl md:text-4xl">More by {book.author_name}</h2>
+          <div className="mt-8">
+            <BookShelf books={more} />
           </div>
         </section>
       )}

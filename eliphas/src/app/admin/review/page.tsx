@@ -51,7 +51,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
             href={`/admin/review?status=${f.value}`}
             aria-current={status === f.value ? "true" : undefined}
             className={`inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-sm font-semibold ${
-              status === f.value ? "bg-marigold text-on-marigold" : "bg-surface-2 text-fg"
+              status === f.value ? "bg-accent text-on-accent" : "bg-surface-2 text-fg"
             }`}
           >
             {f.label}
@@ -81,7 +81,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
                   <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size="xs" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-heading text-lg font-semibold">{b.title}</p>
+                  <p className="truncate font-medium">{b.title}</p>
                   <p className="truncate text-sm text-muted">
                     {b.author_name} · {LANGUAGE_LABEL[b.language]}
                     {b.page_count ? ` · ${b.page_count} pages` : ""}

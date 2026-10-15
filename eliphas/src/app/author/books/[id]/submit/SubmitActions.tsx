@@ -42,12 +42,12 @@ export function SubmitActions({
     <div className="space-y-4">
       {(status === "draft" || status === "changes_requested" || status === "unpublished") && (
         <>
-          <h2 className="text-xl font-semibold">{status === "draft" ? "Send for review" : "Send for review again"}</h2>
+          <h2 className="text-xl">{status === "draft" ? "Send for review" : "Send for review again"}</h2>
           <p className="text-muted">
             Our team checks your files for print quality. Editing is locked while we review. You&apos;ll see the result
             here.
           </p>
-          <button type="button" className="btn-accent" disabled={!ready || pending} onClick={run(submitForReview)}>
+          <button type="button" className="btn-primary" disabled={!ready || pending} onClick={run(submitForReview)}>
             {pending ? "Sending…" : "Send for review"}
           </button>
           {!ready && <p className="text-sm text-muted">Finish the checklist first.</p>}
@@ -56,7 +56,7 @@ export function SubmitActions({
 
       {status === "in_review" && (
         <>
-          <h2 className="text-xl font-semibold">Waiting for review</h2>
+          <h2 className="text-xl">Waiting for review</h2>
           <p className="text-muted">Need to change something? Withdraw it, edit, and send it again.</p>
           <button type="button" className="btn-ghost" disabled={pending} onClick={run(withdrawFromReview)}>
             Withdraw from review
@@ -66,8 +66,8 @@ export function SubmitActions({
 
       {status === "published" && (
         <>
-          <h2 className="text-xl font-semibold">Your book is live</h2>
-          <Link href={`/books/${slug}`} className="btn-accent">
+          <h2 className="text-xl">Your book is live</h2>
+          <Link href={`/books/${slug}`} className="btn-primary">
             View in bookstore
           </Link>
           <p className="text-muted">To make changes, unpublish it first. It will be hidden until approved again.</p>

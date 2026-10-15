@@ -55,7 +55,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
         title={`Welcome, ${profile.full_name?.split(" ")[0]}`}
         intro="Your sales, earnings and books."
         action={
-          <Link href="/author/books/new" className="btn-accent">
+          <Link href="/author/books/new" className="btn-primary">
             <Plus className="h-5 w-5" aria-hidden /> New book
           </Link>
         }
@@ -63,7 +63,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
 
       {needsAction.length > 0 && (
         <div className="card mb-6 ring-2 ring-danger/40">
-          <h2 className="text-lg font-semibold">Needs your attention</h2>
+          <h2 className="text-lg">Needs your attention</h2>
           <ul className="mt-2 space-y-1">
             {needsAction.map((b) => (
               <li key={b.id}>
@@ -113,7 +113,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
 
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <section className="card min-w-0">
-          <h3 className="font-sans text-base font-semibold">Copies sold by month</h3>
+          <h3 className="font-sans text-base">Copies sold by month</h3>
           <p className="mb-4 text-sm text-muted">
             {copiesText(rangeCopies)} in the last {range.months} months. Tap a bar for earnings.
           </p>
@@ -135,7 +135,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
         </section>
 
         <section className="card min-w-0">
-          <h3 className="font-sans text-base font-semibold">Where your readers are</h3>
+          <h3 className="font-sans text-base">Where your readers are</h3>
           <p className="mb-4 text-sm text-muted">Copies by delivery city, last {range.months} months.</p>
           {cityRows.length === 0 ? (
             <EmptyChart text="Cities appear here after your first sale." />
@@ -156,12 +156,12 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
         {books.length === 0 ? (
           <div className="card text-center">
             <p className="font-semibold">No books yet.</p>
-            <Link href="/author/books/new" className="btn-accent mt-4">
+            <Link href="/author/books/new" className="btn-primary mt-4">
               Start your first book
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-3xl bg-surface shadow-soft ring-1 ring-line">
+          <div className="overflow-x-auto rounded-xl bg-surface shadow-soft ring-1 ring-line">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">Copies sold and earnings per book, all time</caption>
               <thead className="border-b border-line text-muted">
@@ -252,7 +252,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
             </ul>
           )}
           {!totals.upi && (
-            <Link href="/account/profile" className="mt-4 flex items-center justify-between rounded-2xl bg-marigold/10 p-3 text-sm font-semibold ring-1 ring-marigold/30">
+            <Link href="/account/profile" className="mt-4 flex items-center justify-between rounded-xl bg-accent/10 p-3 text-sm font-semibold ring-1 ring-accent/30">
               Add your UPI ID to get paid <ChevronRight className="h-4 w-4" aria-hidden />
             </Link>
           )}
@@ -280,12 +280,12 @@ function Tile({
   highlight?: boolean;
 }) {
   return (
-    <div className={`card ${highlight ? "bg-ink text-paper ring-0 dark:bg-surface-2" : ""}`}>
-      <dt className={`text-sm ${highlight ? "text-paper/70" : "text-muted"}`}>{label}</dt>
-      <dd className="mt-1 font-sans text-3xl font-semibold tracking-tight md:text-4xl">{value}</dd>
-      <dd className={`mt-1 truncate text-sm ${highlight ? "text-paper/70" : "text-muted"}`}>
+    <div className={`card ${highlight ? "bg-accent text-on-accent ring-0" : ""}`}>
+      <dt className={`text-sm ${highlight ? "opacity-75" : "text-muted"}`}>{label}</dt>
+      <dd className="mt-2 font-heading text-4xl tracking-tight tabular-nums md:text-[2.75rem]">{value}</dd>
+      <dd className={`mt-1 truncate text-sm ${highlight ? "opacity-80" : "text-muted"}`}>
         {subHref ? (
-          <Link href={subHref} className="font-semibold text-marigold underline">
+          <Link href={subHref} className="font-medium underline underline-offset-2">
             {sub}
           </Link>
         ) : (
@@ -297,5 +297,5 @@ function Tile({
 }
 
 function EmptyChart({ text }: { text: string }) {
-  return <p className="grid min-h-40 place-items-center rounded-2xl bg-surface-2 p-6 text-center text-sm text-muted">{text}</p>;
+  return <p className="grid min-h-40 place-items-center rounded-xl bg-surface-2 p-6 text-center text-sm text-muted">{text}</p>;
 }

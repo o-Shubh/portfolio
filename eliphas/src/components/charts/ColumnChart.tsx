@@ -118,7 +118,7 @@ export function ColumnChart({
                   onPointerDown={() => setActive(i)}
                   onFocus={() => setActive(i)}
                   onBlur={() => setActive(null)}
-                  className="cursor-pointer outline-none focus-visible:stroke-marigold focus-visible:stroke-2"
+                  className="cursor-pointer outline-none focus-visible:stroke-accent focus-visible:stroke-2"
                 />
               </g>
             );

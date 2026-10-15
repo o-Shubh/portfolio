@@ -287,6 +287,10 @@ spine = pages × paper's `spine_mm_per_page` (sample values: ask your printer).
 
 - Built for phones first; tablet and desktop get a sidebar. Light and dark mode follow
   the device, or tap the theme button (device → light → dark).
-- Brand: ink `#17214A`, marigold `#C98200` (text on it `#2E1E00`), deodar `#2E6150`,
-  paper `#F3F4F7`. Headings in Literata, body in Mukta (which also covers Hindi).
+- Brand: white / near-black `#0A0A0A` base with one accent, signal orange `#FF5A1F`
+  (black text on it; `#C2410C` when the accent is used as text on white). Headlines in
+  Newsreader (serif), everything else in Geist; Noto Sans Devanagari covers Hindi text.
+  Colours and building blocks (`btn-primary`, `card`, `field`…) live in `src/app/globals.css`.
+- Login works with mobile numbers from many countries (country picker, default India).
+  Payments are still in rupees and delivery is within India for now.
 - Capacitor: see "Later: Play Store / App Store with Capacitor" above.

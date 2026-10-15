@@ -13,21 +13,21 @@
   }
 }
 
-/* ---------- Brand colours (fixed) ---------- */
+/* ---------- Brand ----------
+   One strong accent (signal orange) on a white / near-black base. */
 @theme {
-  --color-ink: #17214a;
-  --color-marigold: #c98200;
-  --color-on-marigold: #2e1e00;
-  --color-deodar: #2e6150;
-  --color-paper: #f3f4f7;
+  --color-ink: #0a0a0a;
+  --color-paper: #fafaf9;
+  --color-accent: #ff5a1f;
+  --color-on-accent: #0a0a0a;
 
-  --font-heading: var(--font-literata), var(--font-mukta), Georgia, serif;
-  --font-sans: var(--font-mukta), system-ui, sans-serif;
+  --font-heading: var(--font-display), var(--font-devanagari), Georgia, serif;
+  --font-sans: var(--font-geist), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ---------- Semantic colours (change in dark mode) ----------
    Use these in components: bg-bg, bg-surface, text-fg, text-muted,
-   border-line, bg-primary text-on-primary, text-success, text-danger */
+   border-line, bg-primary text-on-primary, text-accent-fg, text-success, text-danger */
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -35,8 +35,10 @@
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --color-primary: var(--primary);
   --color-on-primary: var(--on-primary);
+  --color-accent-fg: var(--accent-fg);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-chart: var(--chart);
@@ -44,33 +46,37 @@
 
 :root {
   color-scheme: light;
-  --bg: #f3f4f7;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #eceef4;
-  --fg: #17214a;
-  --muted: #5a6386;
-  --line: rgb(23 33 74 / 0.09);
-  --primary: #17214a;
+  --surface-2: #f5f5f4;
+  --fg: #0a0a0a;
+  --muted: #57534e;
+  --line: rgb(10 10 10 / 0.09);
+  --line-strong: rgb(10 10 10 / 0.18);
+  --primary: #0a0a0a;
   --on-primary: #ffffff;
-  --success: #2e6150;
-  --danger: #b42318;
+  --accent-fg: #c2410c; /* accent for text on white: passes AA */
+  --success: #15803d;
+  --danger: #b91c1c;
   --chart: #1f7a55; /* chart bars: passes contrast and chroma checks on white */
-  --shadow-color: 23 33 74;
+  --shadow-color: 10 10 10;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0a0f26;
-    --surface: #121a3b;
-    --surface-2: #1b2452;
-    --fg: #f3f4f7;
-    --muted: #a9b0cc;
-    --line: rgb(255 255 255 / 0.08);
-    --primary: #f3f4f7;
-    --on-primary: #17214a;
-    --success: #7cc4a8;
-    --danger: #ff9a8f;
+    --bg: #0a0a0a;
+    --surface: #131313;
+    --surface-2: #1c1c1c;
+    --fg: #fafaf9;
+    --muted: #a8a29e;
+    --line: rgb(255 255 255 / 0.09);
+    --line-strong: rgb(255 255 255 / 0.2);
+    --primary: #fafaf9;
+    --on-primary: #0a0a0a;
+    --accent-fg: #ff8a5c;
+    --success: #4ade80;
+    --danger: #f87171;
     --chart: #3a9d73;
     --shadow-color: 0 0 0;
   }
@@ -78,16 +84,18 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0a0f26;
-  --surface: #121a3b;
-  --surface-2: #1b2452;
-  --fg: #f3f4f7;
-  --muted: #a9b0cc;
-  --line: rgb(255 255 255 / 0.08);
-  --primary: #f3f4f7;
-  --on-primary: #17214a;
-  --success: #7cc4a8;
-  --danger: #ff9a8f;
+  --bg: #0a0a0a;
+  --surface: #131313;
+  --surface-2: #1c1c1c;
+  --fg: #fafaf9;
+  --muted: #a8a29e;
+  --line: rgb(255 255 255 / 0.09);
+  --line-strong: rgb(255 255 255 / 0.2);
+  --primary: #fafaf9;
+  --on-primary: #0a0a0a;
+  --accent-fg: #ff8a5c;
+  --success: #4ade80;
+  --danger: #f87171;
   --chart: #3a9d73;
   --shadow-color: 0 0 0;
 }
@@ -107,51 +115,58 @@ body {
   h3,
   h4 {
     font-family: var(--font-heading);
-    font-weight: 600;
-    line-height: 1.15;
-    letter-spacing: -0.025em;
+    font-weight: 450;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 }
 
 ::selection {
-  background: rgb(201 130 0 / 0.3);
+  background: rgb(255 90 31 / 0.25);
 }
 
 /* ---------- Shared building blocks ---------- */
 @utility shadow-soft {
-  box-shadow:
-    0 1px 2px rgb(var(--shadow-color) / 0.04),
-    0 10px 30px -12px rgb(var(--shadow-color) / 0.14);
+  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.05);
 }
 @utility shadow-lift {
   box-shadow:
-    0 2px 4px rgb(var(--shadow-color) / 0.05),
-    0 24px 48px -16px rgb(var(--shadow-color) / 0.25);
+    0 1px 2px rgb(var(--shadow-color) / 0.06),
+    0 16px 40px -12px rgb(var(--shadow-color) / 0.22);
 }
 @utility btn {
-  @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.95rem] font-semibold tracking-tight whitespace-nowrap transition duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[0.9375rem] font-medium whitespace-nowrap transition duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
 }
 @utility btn-primary {
-  @apply btn bg-primary text-on-primary shadow-soft hover:-translate-y-px hover:opacity-90;
+  @apply btn bg-primary text-on-primary hover:opacity-85;
 }
 @utility btn-accent {
-  @apply btn bg-marigold text-on-marigold shadow-[0_8px_24px_-8px_rgb(201_130_0/0.7)] hover:-translate-y-px hover:brightness-105;
+  @apply btn bg-accent text-on-accent hover:brightness-110;
 }
 @utility btn-ghost {
-  @apply btn bg-surface text-fg ring-1 ring-line ring-inset hover:bg-surface-2;
+  @apply btn bg-surface text-fg ring-1 ring-line-strong ring-inset hover:bg-surface-2;
 }
 @utility card {
-  @apply rounded-3xl bg-surface p-5 shadow-soft ring-1 ring-line md:p-6;
+  @apply rounded-xl bg-surface p-5 ring-1 ring-line md:p-6;
 }
 @utility field {
-  @apply block min-h-12 w-full rounded-2xl bg-surface-2 px-4 text-base text-fg ring-1 ring-transparent transition outline-none ring-inset placeholder:text-muted/80 hover:ring-line focus:bg-surface focus:ring-2 focus:ring-marigold disabled:opacity-70;
+  @apply block min-h-11 w-full rounded-lg bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted/70 hover:ring-fg/30 focus:ring-2 focus:ring-fg disabled:opacity-60;
 }
 @utility label {
-  @apply mb-2 block text-sm font-semibold text-fg;
+  @apply mb-1.5 block text-sm font-medium text-fg;
 }
 @utility eyebrow {
-  @apply inline-flex items-center gap-2 rounded-full bg-marigold/15 px-3 py-1 text-xs font-bold tracking-[0.14em] text-[#8a5900] uppercase dark:text-marigold;
+  @apply inline-flex items-center gap-2 text-xs font-medium tracking-[0.12em] text-muted uppercase;
+}
+@utility container-x {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Room for the phone's home bar / notch in the installed app */

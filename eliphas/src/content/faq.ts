@@ -14,11 +14,11 @@ export const FAQ: FaqGroup[] = [
       },
       {
         q: "What do I need to get started?",
-        a: "Your manuscript as a print-ready PDF and a cover (PDF or image). Log in with your mobile number, fill in the book details, upload both files, choose size and paper, set your price, and send it for review.",
+        a: "A print-ready PDF of your manuscript and a cover image (plus a full print-cover PDF if you have one). Log in with your mobile number, add the book details, upload your files, choose size and paper, set your price and send it for review.",
       },
       {
-        q: "Can I publish in Hindi?",
-        a: "Yes. We publish in Hindi and English. Make sure fonts are embedded in your PDF so Devanagari prints correctly.",
+        q: "Which languages can I publish in?",
+        a: "English and Hindi today, with more languages planned. Make sure all fonts are embedded in your PDF so every script prints correctly.",
       },
       {
         q: "How long does review take?",
@@ -30,7 +30,7 @@ export const FAQ: FaqGroup[] = [
       },
       {
         q: "Do I need an ISBN?",
-        a: "No, it is optional. If you want one, ISBNs in India are issued free of charge by the Raja Rammohun Roy National Agency for ISBN (isbn.gov.in). Add it to your book details.",
+        a: "No, it is optional. If you want one, get it from your country's ISBN agency (in India, ISBNs are free at isbn.gov.in) and add it to your book details.",
       },
     ],
   },
@@ -60,7 +60,7 @@ export const FAQ: FaqGroup[] = [
       },
       {
         q: "How long does delivery take?",
-        a: "Books are printed by our partner presses in India and usually reach readers within 5–9 working days, depending on the city.",
+        a: "Books are printed by our partner presses and usually reach readers within 5–9 working days. We currently deliver within India; international shipping is on the way.",
       },
       {
         q: "Can I order copies for myself?",
