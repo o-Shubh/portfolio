@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { timeAgo } from "@/lib/admin";
 import { requireRole } from "@/lib/auth";
 import { rupees } from "@/lib/pricing";
+import { getBusiness, getPricingSettings, missingBusiness } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin" };
@@ -34,6 +35,26 @@ export default async function AdminHome() {
       .order("submitted_at", { ascending: true })
       .limit(5),
   ]);
+  const [business, pricing] = await Promise.all([getBusiness(), getPricingSettings()]);
+  const keyId = process.env.RAZORPAY_KEY_ID ?? "";
+  const missing = missingBusiness(business);
+  const checklist = [
+    {
+      done: missing.length === 0,
+      label: "Business details added",
+      hint: missing.length ? `Missing: ${missing.join(", ")}` : undefined,
+      href: "/admin/settings#business",
+    },
+    { done: !pricing.rates.is_sample, label: "Real print rates set (untick “sample rates”)", href: "/admin/settings" },
+    { done: printers > 0, label: "At least one active printer", href: "/admin/printers" },
+    {
+      done: keyId.startsWith("rzp_live_"),
+      label: "Razorpay live keys",
+      hint: keyId.startsWith("rzp_test_") ? "Test keys are set: payments are not real yet." : keyId ? undefined : "No keys yet: payments are pretend.",
+    },
+    { done: Boolean(process.env.RAZORPAY_WEBHOOK_SECRET), label: "Razorpay webhook secret set" },
+    { done: Boolean(process.env.NEXT_PUBLIC_SITE_URL), label: "Website address (NEXT_PUBLIC_SITE_URL) set" },
+  ];
   const owed = (balances.data ?? []).reduce((s, b) => s + Math.max(0, Number(b.balance)), 0);
 
   const stats = [
@@ -48,12 +69,54 @@ export default async function AdminHome() {
   return (
     <>
       <PageHeader title="Admin overview" />
+      {checklist.some((c) => !c.done) && (
+        <section className="card mb-8" aria-labelledby="launch-heading">
+          <h2 id="launch-heading" className="text-2xl">
+            Launch checklist
+          </h2>
+          <p className="mt-1 text-sm text-muted">
+            {checklist.filter((c) => c.done).length} of {checklist.length} done. Finish these before taking real orders.
+          </p>
+          <ul className="mt-4 divide-y divide-line border-y border-line">
+            {checklist.map((c) => {
+              const body = (
+                <>
+                  <span
+                    aria-hidden
+                    className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[0.7rem] ${c.done ? "bg-success text-bg" : "ring-1 ring-line-strong"}`}
+                  >
+                    {c.done ? "✓" : ""}
+                  </span>
+                  <span className="min-w-0">
+                    <span className={`block ${c.done ? "text-muted line-through" : "font-medium"}`}>
+                      <span className="sr-only">{c.done ? "Done: " : "To do: "}</span>
+                      {c.label}
+                    </span>
+                    {!c.done && c.hint && <span className="block text-sm text-muted">{c.hint}</span>}
+                  </span>
+                </>
+              );
+              return (
+                <li key={c.label}>
+                  {c.href && !c.done ? (
+                    <Link href={c.href} className="flex items-start gap-3 py-3 hover:bg-surface-2">
+                      {body}
+                    </Link>
+                  ) : (
+                    <div className="flex items-start gap-3 py-3">{body}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
       <dl className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-3">
         {stats.map((s) => {
           const inner = (
             <>
               <dt className="text-sm text-muted">{s.label}</dt>
-              <dd className={`mt-1 font-heading text-3xl font-semibold tabular-nums ${s.alert ? "text-marigold" : ""}`}>{s.value}</dd>
+              <dd className={`mt-1 font-heading text-3xl tracking-tight tabular-nums ${s.alert ? "text-accent-fg" : ""}`}>{s.value}</dd>
             </>
           );
           return s.href ? (
@@ -70,7 +133,7 @@ export default async function AdminHome() {
 
       <section className="card">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">Next in the review queue</h2>
+          <h2 className="text-lg">Next in the review queue</h2>
           <Link href="/admin/review" className="text-sm font-semibold underline">
             See all
           </Link>

@@ -12,7 +12,7 @@ export const GENRES = [
 
 export const STATUS: Record<BookStatus, { label: string; tone: string; help: string }> = {
   draft: { label: "Draft", tone: "bg-surface-2 text-fg", help: "Only you can see this book." },
-  in_review: { label: "In review", tone: "bg-marigold/20 text-fg", help: "Our team is checking your files." },
+  in_review: { label: "In review", tone: "bg-accent/20 text-fg", help: "Our team is checking your files." },
   changes_requested: { label: "Changes needed", tone: "bg-danger/15 text-danger", help: "See the note from our team." },
   published: { label: "Live", tone: "bg-success/15 text-success", help: "Readers can buy this book." },
   unpublished: { label: "Unpublished", tone: "bg-surface-2 text-muted", help: "Hidden from the bookstore." },

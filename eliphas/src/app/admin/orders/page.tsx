@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/auth";
 import type { OrderStatus } from "@/lib/order-status";
 import { rupees } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
+import { CancelForm, RetryRefund } from "./CancelForm";
 import { ReassignForm } from "./ReassignForm";
 
 export const metadata: Metadata = { title: "Orders" };
@@ -27,7 +28,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
   const supabase = await createClient();
   let query = supabase
     .from("orders")
-    .select("id, order_number, status, total, paid_at, created_at, ship_city, ship_state, ship_name, printer_id, printers(name), order_items(quantity, books(title))")
+    .select("id, order_number, status, total, paid_at, created_at, ship_city, ship_state, ship_name, printer_id, cancel_reason, cancelled_by, refund_status, refund_id, razorpay_payment_id, printers(name), order_items(quantity, books(title))")
     .order("created_at", { ascending: false })
     .limit(100);
   query = q ? query.ilike("order_number", `%${q}%`) : query.in("status", filter.statuses);
@@ -69,7 +70,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
             <li key={o.id} className="card">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-heading text-lg font-semibold">{o.order_items.map((i) => `${i.books?.title} × ${i.quantity}`).join(", ")}</p>
+                  <p className="font-medium">{o.order_items.map((i) => `${i.books?.title} × ${i.quantity}`).join(", ")}</p>
                   <p className="text-sm text-muted">
                     {o.order_number} · {o.ship_name}, {o.ship_city} ({o.ship_state}) ·{" "}
                     {new Date(o.paid_at ?? o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
@@ -88,6 +89,26 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
                   <ReassignForm orderId={o.id} current={o.printer_id} printers={printers ?? []} />
                 )}
               </div>
+              {["pending_payment", "paid", "printing", "printed"].includes(o.status) && (
+                <div className="mt-3 border-t border-line pt-3">
+                  <CancelForm orderId={o.id} paid={o.status !== "pending_payment"} />
+                </div>
+              )}
+              {o.status === "cancelled" && (
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3 text-sm">
+                  <span className="text-muted">
+                    Cancelled by {o.cancelled_by ?? "—"}
+                    {o.cancel_reason && `: ${o.cancel_reason}`}
+                    {" · "}
+                    Refund:{" "}
+                    <span className={`font-medium ${o.refund_status === "failed" ? "text-danger" : "text-fg"}`}>
+                      {o.razorpay_payment_id ? (o.refund_status ?? "not started") : "not needed"}
+                    </span>
+                    {o.refund_id && <span className="ml-1 tabular-nums">({o.refund_id})</span>}
+                  </span>
+                  {o.razorpay_payment_id && (o.refund_status === "failed" || !o.refund_status) && <RetryRefund orderId={o.id} />}
+                </div>
+              )}
             </li>
           ))}
         </ul>

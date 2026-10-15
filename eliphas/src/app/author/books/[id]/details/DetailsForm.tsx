@@ -86,7 +86,7 @@ export function DetailsForm({ book, disabled }: { book: Book; disabled: boolean 
       <FormMessage state={state} />
       {!disabled && (
         <div className="flex flex-wrap gap-3">
-          <button type="submit" name="next" value="1" className="btn-accent" disabled={pending}>
+          <button type="submit" name="next" value="1" className="btn-primary" disabled={pending}>
             {pending ? "Saving…" : "Save and continue"}
           </button>
           <button type="submit" className="btn-ghost" disabled={pending}>

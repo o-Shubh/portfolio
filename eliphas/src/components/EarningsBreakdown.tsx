@@ -7,7 +7,7 @@ export function EarningsBreakdown({ e }: { e: Earnings }) {
     { label: "Printing", value: e.printCost, className: "bg-fg/80" },
     { label: "Platform fee", value: e.platformFee, className: "bg-muted" },
     { label: "Payment charges", value: e.paymentFee, className: "bg-line" },
-    { label: "You earn", value: Math.max(0, e.authorEarning), className: "bg-marigold" },
+    { label: "You earn", value: Math.max(0, e.authorEarning), className: "bg-accent" },
   ];
   return (
     <div>

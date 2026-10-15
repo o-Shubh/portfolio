@@ -11,6 +11,7 @@ import { ORDER_STATUS } from "@/lib/order-status";
 import { formatPhone } from "@/lib/phone";
 import { rupees } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
+import { CancelOrder } from "./CancelOrder";
 
 export const metadata: Metadata = { title: "Order" };
 
@@ -39,7 +40,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
         <div role="status" className="card mt-3 flex items-center gap-3 ring-2 ring-success/40">
           <CheckCircle2 className="h-7 w-7 shrink-0 text-success" aria-hidden />
           <div>
-            <p className="font-heading text-xl font-semibold">Thank you! Your order is confirmed.</p>
+            <p className="font-heading text-2xl">Thank you! Your order is confirmed.</p>
             <p className="text-muted">We&apos;ll print your copy fresh and send it to you.</p>
           </div>
         </div>
@@ -51,13 +52,33 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
       </div>
       <p className="mt-1 text-muted">{ORDER_STATUS[o.status].reader}</p>
 
+      {o.status === "cancelled" && (
+        <div className="card mt-6 space-y-1 text-sm">
+          {o.cancel_reason && o.cancelled_by === "admin" && (
+            <p>
+              <span className="text-muted">Reason:</span> {o.cancel_reason}
+            </p>
+          )}
+          {o.refund_status && (
+            <p>
+              <span className="text-muted">Refund of {rupees(Number(o.refund_amount ?? o.total))}:</span>{" "}
+              {o.refund_status === "processed"
+                ? "sent to your original payment method. Banks usually show it within 5–7 working days."
+                : o.refund_status === "pending"
+                  ? "in progress. It usually reaches you within 5–7 working days."
+                  : "being processed by our team. We'll contact you if we need anything."}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <section className="card">
             <h2 className="mb-5 text-xl">Tracking</h2>
             <OrderTimeline order={o} />
             {o.tracking_number && (
-              <p className="mt-6 flex items-center gap-2 rounded-2xl bg-surface-2 p-3 text-sm">
+              <p className="mt-6 flex items-center gap-2 rounded-xl bg-surface-2 p-3 text-sm">
                 <Truck className="h-4 w-4 shrink-0" aria-hidden />
                 {o.courier}: <span className="font-semibold tabular-nums select-all">{o.tracking_number}</span>
               </p>
@@ -97,6 +118,12 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
               </div>
             </dl>
           </section>
+          {o.status === "paid" && (
+            <section className="space-y-2">
+              <CancelOrder orderId={o.id} />
+              <p className="text-xs text-muted">Free cancellation until the printer starts on your copy.</p>
+            </section>
+          )}
           <section className="card text-sm">
             <h2 className="mb-2 text-lg">Delivering to</h2>
             <p className="font-semibold">{o.ship_name}</p>

@@ -35,22 +35,24 @@ export default async function PricingPage() {
   const example = exampleCost === null ? null : earnings(299, exampleCost, fees);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
-      <span className="eyebrow">Pricing</span>
-      <h1 className="mt-3 text-4xl font-semibold md:text-6xl">Free to publish. You set the price.</h1>
-      <p className="mt-3 max-w-2xl text-lg text-muted">
+    <div className="container-x py-12 md:py-20">
+      <div className="mx-auto max-w-3xl text-center">
+      <p className="eyebrow">Pricing</p>
+      <h1 className="mt-4 text-5xl md:text-7xl">Free to publish. You set the price.</h1>
+      <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
         No setup fee, no stock to buy, no yearly charges. When a copy sells, three things come out of the MRP and the
         rest is your earning.
       </p>
+      </div>
 
       {rates.is_sample && (
-        <p role="note" className="mt-6 rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 px-4 py-3 text-sm">
+        <p role="note" className="mx-auto mt-8 max-w-3xl rounded-xl border border-line bg-surface-2 px-4 py-3 text-center text-sm">
           <strong>Sample rates.</strong> Print costs below are indicative and will be updated once printer rates are
           final. Your dashboard always shows the current rate.
         </p>
       )}
 
-      <section className="mt-10 grid gap-4 md:grid-cols-3">
+      <section className="mt-14 grid overflow-hidden rounded-2xl border border-line md:grid-cols-3 md:divide-x md:divide-line">
         <FeeCard title="Printing" value="Per copy" text="Depends on pages, size, binding and colour. See the table below." />
         <FeeCard
           title="Platform fee"
@@ -65,10 +67,11 @@ export default async function PricingPage() {
       </section>
 
       {example && (
-        <section className="mt-12 grid gap-8 md:grid-cols-2 md:items-center">
+        <section className="mt-24 grid gap-10 md:grid-cols-2 md:items-center lg:gap-16">
           <div>
-            <h2 className="text-2xl font-semibold">A worked example</h2>
-            <p className="mt-2 text-muted">
+            <p className="eyebrow">Example</p>
+            <h2 className="mt-3 text-4xl md:text-5xl">A worked example</h2>
+            <p className="mt-4 text-lg text-muted">
               A 200-page paperback novel, 5 × 8 inches, black & white, priced at {rupees(299)}.
             </p>
             <p className="mt-4 text-muted">
@@ -76,29 +79,31 @@ export default async function PricingPage() {
               You see this calculation live when you set your price.
             </p>
           </div>
-          <div className="card">
+          <div className="card shadow-lift">
             <EarningsBreakdown e={example} />
           </div>
         </section>
       )}
 
-      <section className="mt-14" aria-labelledby="calc-heading">
-        <h2 id="calc-heading" className="text-2xl font-semibold">
+      <section className="mt-24" id="calculator" aria-labelledby="calc-heading">
+        <p className="eyebrow">Calculator</p>
+        <h2 id="calc-heading" className="mt-3 text-4xl md:text-5xl">
           Earnings calculator
         </h2>
-        <p className="mt-1 text-muted">Try your own book. Change any option and see your earning per copy.</p>
-        <div className="mt-5">
+        <p className="mt-3 text-muted">Try your own book. Change any option and see your earning per copy.</p>
+        <div className="mt-8">
           <PrintCalculator rates={rates} fees={fees} initial={{ ...BASE, page_count: 200, mrp: 299 }} />
         </div>
       </section>
 
-      <section className="mt-14">
-        <h2 className="text-2xl font-semibold">Print cost per copy</h2>
-        <p className="mt-1 text-muted">Matte cover. The lowest MRP is where your earning is just above zero.</p>
-        <div className="mt-5 overflow-x-auto rounded-3xl bg-surface shadow-soft ring-1 ring-line">
+      <section className="mt-24">
+        <p className="eyebrow">Print costs</p>
+        <h2 className="mt-3 text-4xl md:text-5xl">Print cost per copy</h2>
+        <p className="mt-3 text-muted">Matte cover. The lowest MRP is where your earning is just above zero.</p>
+        <div className="mt-8 overflow-x-auto rounded-xl border border-line">
           <table className="w-full min-w-[560px] text-left">
             <caption className="sr-only">Print cost per copy by format and page count</caption>
-            <thead className="border-b border-line text-sm text-muted">
+            <thead className="border-b border-line bg-surface-2 text-sm text-muted">
               <tr>
                 <th scope="col" className="p-4 font-medium">
                   Format
@@ -124,7 +129,7 @@ export default async function PricingPage() {
                           "—"
                         ) : (
                           <>
-                            <span className="font-semibold">{rupees(c)}</span>
+                            <span className="font-medium">{rupees(c)}</span>
                             <span className="block text-xs text-muted">lowest MRP {rupees(minimumMrp(c, fees, 1))}</span>
                           </>
                         )}
@@ -138,9 +143,9 @@ export default async function PricingPage() {
         </div>
       </section>
 
-      <section className="mt-14 grid gap-4 md:grid-cols-2">
+      <section className="mt-16 grid gap-4 md:grid-cols-2">
         <div className="card">
-          <h2 className="text-xl font-semibold">Rate card</h2>
+          <h2 className="text-2xl">Rate card</h2>
           <dl className="mt-3 space-y-2 text-sm">
             {sortedOptions(rates.binding).map(([k, b]) => (
               <RateRow key={k} label={`${b.label} binding and cover`} value={rupees(b.base)} />
@@ -162,13 +167,13 @@ export default async function PricingPage() {
             .
           </p>
         </div>
-        <div className="card">
-          <h2 className="text-xl font-semibold">For readers</h2>
-          <p className="mt-3 text-muted">
+        <div className="card bg-ink text-paper ring-0">
+          <h2 className="text-2xl">For readers</h2>
+          <p className="mt-3 text-paper/70">
             Readers pay the MRP you set, plus shipping of {rupees(shipping.flat)} per order. Shipping is free when the
             order is {rupees(shipping.free_above)} or more.
           </p>
-          <Link href="/login?next=/author" className="btn-accent mt-6">
+          <Link href="/login?next=/author" className="btn mt-6 bg-paper text-ink hover:opacity-90">
             Start publishing
           </Link>
         </div>
@@ -179,10 +184,10 @@ export default async function PricingPage() {
 
 function FeeCard({ title, value, text }: { title: string; value: string; text: string }) {
   return (
-    <div className="card">
-      <h2 className="font-sans text-xs font-bold tracking-[0.14em] text-muted uppercase">{title}</h2>
-      <p className="mt-2 font-heading text-3xl font-semibold">{value}</p>
-      <p className="mt-2 text-muted">{text}</p>
+    <div className="border-b border-line p-6 last:border-b-0 md:border-b-0 md:p-8">
+      <h2 className="font-sans text-sm font-medium tracking-normal text-muted">{title}</h2>
+      <p className="mt-3 font-heading text-5xl tracking-tight">{value}</p>
+      <p className="mt-3 text-muted">{text}</p>
     </div>
   );
 }

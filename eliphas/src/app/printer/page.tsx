@@ -29,7 +29,7 @@ export default async function PrinterHome({ searchParams }: PageProps<"/printer"
     return (
       <>
         <PageHeader title="Print jobs" />
-        <div className="card ring-2 ring-marigold/50">
+        <div className="card ring-2 ring-accent/50">
           {profile.role === "admin"
             ? "You're an admin. Use Admin → Orders to see every printer's jobs."
             : "Your login isn't linked to a print shop yet. Ask the admin to add your phone number in the printer list."}
@@ -69,7 +69,7 @@ export default async function PrinterHome({ searchParams }: PageProps<"/printer"
               }`}
             >
               {t.label}
-              {n > 0 && <span className="rounded-full bg-marigold px-2 text-xs text-on-marigold">{n}</span>}
+              {n > 0 && <span className="rounded-full bg-accent px-2 text-xs text-on-accent">{n}</span>}
             </Link>
           );
         })}
@@ -85,7 +85,7 @@ export default async function PrinterHome({ searchParams }: PageProps<"/printer"
               <li key={o.id}>
                 <Link href={`/printer/orders/${o.id}`} className="card flex items-center gap-4 transition hover:-translate-y-0.5 hover:shadow-lift">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-heading text-lg font-semibold">
+                    <p className="truncate font-medium">
                       {o.order_items.map((i) => i.books?.title).join(", ")}
                     </p>
                     <p className="text-sm text-muted">

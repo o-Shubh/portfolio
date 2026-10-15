@@ -5,8 +5,8 @@ export type OrderStatus = Database["public"]["Enums"]["order_status"];
 
 export const ORDER_STATUS: Record<OrderStatus, { label: string; tone: string; reader: string }> = {
   pending_payment: { label: "Awaiting payment", tone: "bg-surface-2 text-muted", reader: "Payment not completed." },
-  paid: { label: "Paid", tone: "bg-marigold/20 text-fg", reader: "Order confirmed. Sent to the printer." },
-  printing: { label: "Printing", tone: "bg-marigold/20 text-fg", reader: "Your book is being printed." },
+  paid: { label: "Paid", tone: "bg-accent/20 text-fg", reader: "Order confirmed. Sent to the printer." },
+  printing: { label: "Printing", tone: "bg-accent/20 text-fg", reader: "Your book is being printed." },
   printed: { label: "Printed", tone: "bg-success/15 text-success", reader: "Printed and packed. Handing to courier." },
   shipped: { label: "Shipped", tone: "bg-success/15 text-success", reader: "On its way." },
   delivered: { label: "Delivered", tone: "bg-success/15 text-success", reader: "Delivered. Happy reading!" },

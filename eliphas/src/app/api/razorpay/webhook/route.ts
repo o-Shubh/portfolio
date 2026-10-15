@@ -1,12 +1,13 @@
 import { markOrderPaid } from "@/lib/orders";
 import { verifyWebhookSignature } from "@/lib/razorpay-signature";
+import { applyRefundEvent } from "@/lib/refunds";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * Razorpay calls this when a payment is captured, so an order is confirmed even
  * if the buyer closed the app before returning. Set it up in Razorpay Dashboard →
- * Webhooks: URL https://<your-site>/api/razorpay/webhook, event "payment.captured",
- * and the same secret as RAZORPAY_WEBHOOK_SECRET.
+ * Webhooks: URL https://<your-site>/api/razorpay/webhook, events "payment.captured",
+ * "refund.processed" and "refund.failed", and the same secret as RAZORPAY_WEBHOOK_SECRET.
  */
 export async function POST(request: Request) {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -18,8 +19,16 @@ export async function POST(request: Request) {
 
   const event = JSON.parse(raw) as {
     event: string;
-    payload?: { payment?: { entity?: { id: string; order_id: string; amount: number } } };
+    payload?: {
+      payment?: { entity?: { id: string; order_id: string; amount: number } };
+      refund?: { entity?: { id: string } };
+    };
   };
+  if (event.event === "refund.processed" || event.event === "refund.failed") {
+    const refundId = event.payload?.refund?.entity?.id;
+    if (refundId) await applyRefundEvent(refundId, event.event === "refund.processed" ? "processed" : "failed");
+    return Response.json({ ok: true });
+  }
   if (event.event !== "payment.captured") return Response.json({ ignored: event.event });
 
   const payment = event.payload?.payment?.entity;

@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmPayment, startCheckout, type CheckoutResult } from "@/app/actions/checkout";
@@ -95,7 +96,7 @@ export function CheckoutForm({
       name: "Eliphas Indicus",
       description: `Order ${result.orderNumber}`,
       prefill: { name: result.name, contact: `+91${result.phone}` },
-      theme: { color: "#17214A" },
+      theme: { color: "#0A0A0A" },
       handler: (r: RazorpayResponse) => finish(result, r.razorpay_payment_id, r.razorpay_signature),
       modal: {
         ondismiss: () => {
@@ -153,7 +154,7 @@ export function CheckoutForm({
             <div className="flex gap-4">
               <div className="w-20 shrink-0">{book.cover}</div>
               <div className="min-w-0">
-                <p className="font-heading text-lg font-semibold leading-snug">{book.title}</p>
+                <p className="font-medium leading-snug">{book.title}</p>
                 <p className="text-sm text-muted">{book.author}</p>
                 <p className="mt-1 font-semibold">{rupees(book.mrp)}</p>
               </div>
@@ -197,12 +198,23 @@ export function CheckoutForm({
                 {error}
               </p>
             )}
-            <button type="submit" className="btn-accent w-full" disabled={busy}>
+            <button type="submit" className="btn-primary w-full" disabled={busy}>
               {busy ? "Opening payment…" : `Pay ${rupees(total)}`}
             </button>
             <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
               <ShieldCheck className="h-4 w-4" aria-hidden />
               {mode === "mock" ? "Test mode: no real money is taken." : "Printed fresh and shipped in 5–9 working days."}
+            </p>
+            <p className="text-center text-xs text-muted">
+              By paying you agree to our{" "}
+              <Link href="/terms" className="underline underline-offset-2">
+                terms
+              </Link>{" "}
+              and{" "}
+              <Link href="/refunds" className="underline underline-offset-2">
+                refund policy
+              </Link>
+              . Free cancellation until printing starts.
             </p>
           </div>
         </aside>
@@ -220,7 +232,7 @@ export function CheckoutForm({
             </p>
             <button
               type="button"
-              className="btn-accent w-full"
+              className="btn-primary w-full"
               onClick={() => finish(mockOrder, `mock_pay_${Date.now()}`, "mock")}
             >
               Pay successfully

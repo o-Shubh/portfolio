@@ -24,7 +24,7 @@ export default async function PrintersPage({ searchParams }: PageProps<"/admin/p
         title="Printers"
         intro="Print partners who receive orders. Each logs in with the phone number listed here."
         action={
-          <Link href="/admin/printers/new" className="btn-accent">
+          <Link href="/admin/printers/new" className="btn-primary">
             <Plus className="h-5 w-5" aria-hidden /> Add printer
           </Link>
         }
@@ -42,7 +42,7 @@ export default async function PrintersPage({ searchParams }: PageProps<"/admin/p
             <li key={p.id}>
               <Link href={`/admin/printers/${p.id}`} className={`card block transition hover:-translate-y-0.5 hover:shadow-lift ${p.active ? "" : "opacity-60"}`}>
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-heading text-lg font-semibold">{p.name}</p>
+                  <p className="font-medium">{p.name}</p>
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                       p.active ? "bg-success/15 text-success" : "bg-surface-2 text-muted"

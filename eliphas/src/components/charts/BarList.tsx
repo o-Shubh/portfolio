@@ -27,7 +27,7 @@ export function BarList({ rows, caption }: { rows: BarRow[]; caption: string }) 
             onPointerLeave={() => setActive(null)}
             onFocus={() => setActive(r.key)}
             onBlur={() => setActive(null)}
-            className="grid grid-cols-[minmax(0,8.5rem)_1fr] items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-marigold sm:grid-cols-[minmax(0,11rem)_1fr]"
+            className="grid grid-cols-[minmax(0,8.5rem)_1fr] items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-accent sm:grid-cols-[minmax(0,11rem)_1fr]"
           >
             <span className="min-w-0 truncate text-sm">
               <span className="font-semibold">{r.label}</span>

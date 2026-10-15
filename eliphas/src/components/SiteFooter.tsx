@@ -1,62 +1,74 @@
 import Link from "next/link";
-import { LogoMark } from "./Logo";
+import { Logo } from "./Logo";
+
+const COLUMNS = [
+  {
+    title: "Read",
+    links: [
+      { href: "/books", label: "Bookstore" },
+      { href: "/books?lang=en", label: "English books" },
+      { href: "/books?lang=hi", label: "Hindi books" },
+    ],
+  },
+  {
+    title: "Publish",
+    links: [
+      { href: "/login?next=/author", label: "Start publishing" },
+      { href: "/pricing", label: "Pricing and royalties" },
+      { href: "/faq", label: "Help and FAQ" },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      { href: "/login", label: "Log in" },
+      { href: "/account", label: "My orders" },
+      { href: "/account/profile", label: "Profile" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { href: "/contact", label: "Contact us" },
+      { href: "/terms", label: "Terms of use" },
+      { href: "/privacy", label: "Privacy policy" },
+      { href: "/refunds", label: "Refunds and cancellations" },
+      { href: "/shipping", label: "Shipping and delivery" },
+    ],
+  },
+];
 
 export function SiteFooter() {
   return (
-    <footer className="px-3 pb-3">
-      <div className="relative mx-auto mt-20 max-w-6xl overflow-hidden rounded-[2rem] bg-ink text-paper">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-marigold/25 blur-3xl"
-        />
-        <div className="relative grid gap-10 px-6 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:px-10">
-          <div>
-            <div className="flex items-center gap-3">
-              <LogoMark className="h-10 w-10" />
-              <span className="font-heading text-xl font-semibold tracking-tight">Eliphas Indicus</span>
-            </div>
-            <p className="mt-4 max-w-xs text-paper/70">
-              Print-on-demand publishing for Indian authors. Hindi and English. Printed in India, delivered across India.
-            </p>
-          </div>
-          <FooterCol
-            title="Readers"
-            links={[
-              { href: "/books", label: "Bookstore" },
-              { href: "/books?lang=hi", label: "हिन्दी पुस्तकें" },
-              { href: "/books?lang=en", label: "English books" },
-            ]}
-          />
-          <FooterCol
-            title="Authors"
-            links={[
-              { href: "/login?next=/author", label: "Start publishing" },
-              { href: "/pricing", label: "Pricing and earnings" },
-              { href: "/faq", label: "Questions" },
-            ]}
-          />
+    <footer className="mt-24 border-t border-line">
+      <div className="container-x grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+        <div>
+          <Logo />
+          <p className="mt-5 max-w-xs font-heading text-2xl leading-snug tracking-tight">
+            Independent publishing, printed beautifully.
+          </p>
         </div>
-        <div className="safe-bottom relative border-t border-white/10 px-6 py-5 text-sm text-paper/50 md:px-10">
-          © {new Date().getFullYear()} Eliphas Indicus Publications
+        {COLUMNS.map((c) => (
+          <div key={c.title}>
+            <h2 className="font-sans text-sm font-medium text-fg">{c.title}</h2>
+            <ul className="mt-4 space-y-2.5">
+              {c.links.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-[0.9375rem] text-muted transition hover:text-fg">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="safe-bottom border-t border-line">
+        <div className="container-x flex flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted">
+          <span>© {new Date().getFullYear()} Eliphas Indicus Publications</span>
+          <span>Print on demand · No stock · No upfront cost</span>
         </div>
       </div>
     </footer>
-  );
-}
-
-function FooterCol({ title, links }: { title: string; links: { href: string; label: string }[] }) {
-  return (
-    <div>
-      <h2 className="font-sans text-xs font-bold tracking-[0.16em] text-marigold uppercase">{title}</h2>
-      <ul className="mt-4 space-y-1">
-        {links.map((l) => (
-          <li key={l.href}>
-            <Link href={l.href} className="inline-flex min-h-9 items-center text-paper/80 transition hover:text-paper">
-              {l.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

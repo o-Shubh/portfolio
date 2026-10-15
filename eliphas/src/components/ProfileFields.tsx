@@ -33,31 +33,34 @@ export function ProfileFields({ profile }: { profile: Profile }) {
         </div>
         <div>
           <label htmlFor="state" className="label">
-            State
+            State / region
           </label>
-          <select id="state" name="state" className="field" defaultValue={profile.state ?? ""} required>
-            <option value="" disabled>
-              Choose state
-            </option>
+          <input
+            id="state"
+            name="state"
+            className="field"
+            list="state-suggestions"
+            autoComplete="address-level1"
+            defaultValue={profile.state ?? ""}
+            required
+          />
+          <datalist id="state-suggestions">
             {INDIAN_STATES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
+              <option key={s} value={s} />
             ))}
-          </select>
+          </datalist>
         </div>
       </div>
       <div className="sm:w-1/2">
         <label htmlFor="pincode" className="label">
-          PIN code <span className="font-normal text-muted">(optional)</span>
+          Postal code <span className="font-normal text-muted">(optional)</span>
         </label>
         <input
           id="pincode"
           name="pincode"
           className="field"
-          inputMode="numeric"
           autoComplete="postal-code"
-          maxLength={6}
+          maxLength={10}
           defaultValue={profile.pincode ?? ""}
         />
       </div>

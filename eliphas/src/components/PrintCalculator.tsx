@@ -85,7 +85,7 @@ export function PrintCalculator({
 
         <OptionGroup label="Book size" name="trim_size" options={rates.trim_sizes} value={v.trim_size} onChange={(x) => set("trim_size", x)} />
         {warning && (
-          <p role="note" className="-mt-3 rounded-2xl bg-marigold/10 ring-1 ring-marigold/30 p-3 text-sm">
+          <p role="note" className="-mt-3 rounded-xl bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
             {warning}
           </p>
         )}
@@ -97,7 +97,7 @@ export function PrintCalculator({
 
       <aside className="lg:sticky lg:top-6 lg:self-start" aria-live="polite">
         <div className="card">
-          <h2 className="text-lg font-semibold">Your earnings per copy</h2>
+          <h2 className="text-lg">Your earnings per copy</h2>
           {cost === null ? (
             <p className="mt-3 text-muted">Enter a valid page count to see the print cost.</p>
           ) : result ? (
@@ -142,7 +142,7 @@ function OptionGroup({
         {sortedOptions(options).map(([key, o]) => (
           <label
             key={key}
-            className="flex min-h-11 cursor-pointer items-center gap-2 rounded-2xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line px-3 has-[:checked]:ring-2 has-[:checked]:ring-marigold has-[:checked]:bg-marigold/10 has-[:disabled]:cursor-not-allowed"
+            className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line px-3 has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/10 has-[:disabled]:cursor-not-allowed"
           >
             <input
               type="radio"
@@ -150,7 +150,7 @@ function OptionGroup({
               value={key}
               checked={value === key}
               onChange={() => onChange(key)}
-              className="h-4 w-4 accent-[#C98200]"
+              className="h-4 w-4 accent-fg"
             />
             <span className="font-medium">{o.label}</span>
           </label>

@@ -247,7 +247,10 @@ export type Database = {
       orders: {
         Row: {
           accepted_at: string | null;
-          buyer_id: string;
+          buyer_id: string | null;
+          cancel_reason: string | null;
+          cancelled_at: string | null;
+          cancelled_by: string | null;
           courier: string | null;
           created_at: string;
           delivered_at: string | null;
@@ -259,6 +262,10 @@ export type Database = {
           printer_id: string | null;
           razorpay_order_id: string | null;
           razorpay_payment_id: string | null;
+          refund_amount: number | null;
+          refund_id: string | null;
+          refund_status: string | null;
+          refunded_at: string | null;
           ship_city: string;
           ship_line1: string;
           ship_line2: string | null;
@@ -277,7 +284,10 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           accepted_at?: string | null;
-          buyer_id: string;
+          buyer_id?: string | null;
+          cancel_reason?: string | null;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
           courier?: string | null;
           created_at?: string;
           delivered_at?: string | null;
@@ -289,6 +299,10 @@ export type Database = {
           printer_id?: string | null;
           razorpay_order_id?: string | null;
           razorpay_payment_id?: string | null;
+          refund_amount?: number | null;
+          refund_id?: string | null;
+          refund_status?: string | null;
+          refunded_at?: string | null;
           ship_city: string;
           ship_line1: string;
           ship_line2?: string | null;
@@ -306,7 +320,10 @@ export type Database = {
         };
         Update: {
           accepted_at?: string | null;
-          buyer_id?: string;
+          buyer_id?: string | null;
+          cancel_reason?: string | null;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
           courier?: string | null;
           created_at?: string;
           delivered_at?: string | null;
@@ -318,6 +335,10 @@ export type Database = {
           printer_id?: string | null;
           razorpay_order_id?: string | null;
           razorpay_payment_id?: string | null;
+          refund_amount?: number | null;
+          refund_id?: string | null;
+          refund_status?: string | null;
+          refunded_at?: string | null;
           ship_city?: string;
           ship_line1?: string;
           ship_line2?: string | null;

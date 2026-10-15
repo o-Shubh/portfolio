@@ -1,30 +1,39 @@
 import type { Metadata, Viewport } from "next";
-import { Literata, Mukta } from "next/font/google";
+import { Geist, Newsreader, Noto_Sans_Devanagari } from "next/font/google";
 import { ServiceWorker } from "@/components/ServiceWorker";
 import "./globals.css";
 
-const literata = Literata({
-  variable: "--font-literata",
+// Editorial serif for headlines, a crisp sans for everything else.
+const display = Newsreader({
+  variable: "--font-display",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin"],
   display: "swap",
 });
 
-// Mukta covers Devanagari, so Hindi titles and text render properly.
-const mukta = Mukta({
-  variable: "--font-mukta",
-  subsets: ["latin", "devanagari"],
-  weight: ["400", "500", "600", "700"],
+// Used only when text contains Devanagari letters (Hindi titles and names).
+const devanagari = Noto_Sans_Devanagari({
+  variable: "--font-devanagari",
+  subsets: ["devanagari"],
+  weight: ["400", "500", "600"],
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
     default: "Eliphas Indicus Publications",
-    template: "%s · Eliphas Indicus",
+    template: "%s — Eliphas Indicus",
   },
   description:
-    "Publish your book in print across India. Print on demand, no stock, no upfront cost. For Hindi and English authors.",
+    "Self-publish your book in print. Print on demand, no stock, no upfront cost. You keep your rights and earn on every copy.",
   applicationName: "Eliphas Indicus",
   // iPhone home-screen app: full screen, with the status bar over the app's own colours
   appleWebApp: { capable: true, title: "Eliphas", statusBarStyle: "default" },
@@ -36,8 +45,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f4f7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d1330" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
 };
 
@@ -49,7 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${literata.variable} ${mukta.variable} h-full antialiased`}
+      className={`${display.variable} ${geist.variable} ${devanagari.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

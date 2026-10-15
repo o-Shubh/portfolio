@@ -1,17 +1,19 @@
 /* eslint-disable @next/next/no-img-element -- covers come from Supabase Storage at many sizes */
 
-// Brand-coloured backgrounds for books that don't have a cover image yet.
+// Typographic covers for books that don't have a cover image yet: flat colour, serif title.
 const PALETTES = [
-  { from: "#233070", to: "#17214A", fg: "#F3F4F7", accent: "#E0A12A" },
-  { from: "#3B7A65", to: "#244C3F", fg: "#F3F4F7", accent: "#F2CF7E" },
-  { from: "#DB9512", to: "#B87500", fg: "#2E1E00", accent: "#17214A" },
-  { from: "#FFFFFF", to: "#E4E7F0", fg: "#17214A", accent: "#2E6150" },
-  { from: "#7A3A34", to: "#4E2420", fg: "#F7EDE2", accent: "#E0A12A" },
+  { bg: "#FF5A1F", fg: "#0A0A0A", rule: "#0A0A0A" },
+  { bg: "#0A0A0A", fg: "#FAFAF9", rule: "#FF5A1F" },
+  { bg: "#EFE8DC", fg: "#1C1917", rule: "#C2410C" },
+  { bg: "#1F3B2F", fg: "#F2EEE3", rule: "#E9C46A" },
+  { bg: "#2440D8", fg: "#FFFFFF", rule: "#FFD166" },
+  { bg: "#F3C9BA", fg: "#2B1A14", rule: "#2B1A14" },
 ];
 
 function pick(seed: string) {
-  let h = 0;
-  for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  // FNV-1a: spreads similar slugs across the palette
+  let h = 2166136261;
+  for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
   return PALETTES[h % PALETTES.length];
 }
 
@@ -30,14 +32,14 @@ export function BookCover({
   size?: "xs" | "sm" | "md" | "lg";
   priority?: boolean;
 }) {
-  const radius = size === "xs" ? "rounded-md" : "rounded-l-md rounded-r-xl";
-  const shell = `relative aspect-[2/3] w-full overflow-hidden ${radius} shadow-[0_2px_4px_rgb(0_0_0/0.08),0_18px_32px_-14px_rgb(0_0_0/0.45)] ring-1 ring-black/5 dark:ring-white/10`;
-  // Light sheen + spine crease, so flat covers look like books
+  const radius = size === "xs" ? "rounded-[3px]" : "rounded-[4px]";
+  const shell = `relative aspect-[2/3] w-full overflow-hidden ${radius} shadow-[0_1px_2px_rgb(0_0_0/0.1),0_12px_28px_-12px_rgb(0_0_0/0.35)] ring-1 ring-black/5 dark:ring-white/10`;
+  // Spine crease and a soft sheen, so flat covers read as books
   const sheen = (
     <>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-[6%] bg-gradient-to-r from-black/25 to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 left-[6%] w-px bg-white/25" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/10" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-[5%] bg-gradient-to-r from-black/20 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-[5%] w-px bg-white/20" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10" />
     </>
   );
 
@@ -51,21 +53,21 @@ export function BookCover({
   }
 
   const p = pick(slug);
-  const titleSize =
-    size === "lg" ? "text-3xl" : size === "sm" ? "text-[1.05rem]" : size === "xs" ? "text-[0.55rem] leading-tight" : "text-xl";
+  // Text scales with the cover's own width (container query units), so it fits at every size
+  const titleSize = size === "xs" ? "text-[14cqw]" : "text-[13cqw]";
   return (
-    <div
-      className={shell}
-      style={{ background: `linear-gradient(160deg, ${p.from}, ${p.to})`, color: p.fg }}
-      role="img"
-      aria-label={`Cover of ${title}`}
-    >
-      <div className="flex h-full flex-col justify-between p-[10%] pl-[14%]">
-        <div className="h-1 w-[28%] rounded-full" style={{ background: p.accent }} />
-        <p className={`line-clamp-4 font-heading font-semibold leading-snug tracking-tight ${titleSize}`} style={{ overflowWrap: "break-word" }}>
+    <div className={`${shell} @container`} style={{ background: p.bg, color: p.fg }} role="img" aria-label={`Cover of ${title}`}>
+      <div className="flex h-full flex-col p-[11%] pl-[13%]">
+        {size !== "xs" && (
+          <p className="truncate text-[max(0.5rem,5.2cqw)] font-medium tracking-[0.18em] uppercase opacity-80">{author}</p>
+        )}
+        <p
+          className={`mt-auto line-clamp-4 font-heading leading-[1.02] tracking-[-0.02em] ${titleSize}`}
+          style={{ overflowWrap: "break-word" }}
+        >
           {title}
         </p>
-        {size === "xs" ? <span /> : <p className="text-[0.8rem] font-semibold opacity-80">{author}</p>}
+        <div className="mt-[9%] h-[3px] w-[30%]" style={{ background: p.rule }} />
       </div>
       {sheen}
     </div>

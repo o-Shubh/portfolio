@@ -59,15 +59,22 @@ with a real link. You only need a browser. Free plans are enough to start.
 
 **4. Razorpay** (dashboard.razorpay.com, **Test mode** switch on)
 - Account & Settings → API Keys → **Generate test key** → put them in Vercel (step 2).
-- Webhooks → **Add new webhook**: URL `https://<your-site>/api/razorpay/webhook`, event **payment.captured**,
-  secret = your `RAZORPAY_WEBHOOK_SECRET`.
+- Webhooks → **Add new webhook**: URL `https://<your-site>/api/razorpay/webhook`, events **payment.captured**,
+  **refund.processed** and **refund.failed**, secret = your `RAZORPAY_WEBHOOK_SECRET`.
 - Test cards and UPI: razorpay.com/docs/payments/payments/test-card-details. When you're ready for real money,
   complete Razorpay's KYC, generate **live** keys and replace the test ones in Vercel.
 
 After changing environment variables in Vercel, click **Redeploy** so they take effect.
 When a future change adds a database file in `supabase/migrations/`, run just that file in the SQL Editor.
+For a project set up before 15 October 2026, run
+[`supabase/migrations/20261015000008_launch.sql`](supabase/migrations/20261015000008_launch.sql) once.
 
 ### Launch checklist
+Admin → **Overview** shows a live checklist of the items it can check (business details, rates, printers,
+Razorpay keys, webhook, site address).
+- [ ] Business details in Admin → Settings (name, address, email, phone): they fill the Contact, Terms,
+      Privacy, Refunds and Shipping pages that Razorpay checks during KYC. Have the policies reviewed by
+      someone who knows Indian e-commerce law.
 - [ ] Real SMS provider with DLT approval; remove the test phone numbers
 - [ ] Real print rates in Admin → Settings, and untick "These are sample rates"
 - [ ] Ask the printer for paper thickness (spine) and update it in Settings
@@ -91,10 +98,28 @@ The site is a **Progressive Web App**: no app store needed.
 Files: `src/app/manifest.ts`, `public/sw.js`, `public/offline.html`, `public/icons/`,
 `src/components/InstallPrompt.tsx`, `src/components/ServiceWorker.tsx`.
 
-### Later: Play Store / App Store with Capacitor
+### Play Store (Android)
 
-The app is ready to be wrapped: it already uses safe-area spacing for notches, a phone-style tab bar,
-and no browser-only tricks. Capacitor loads the live website inside a native shell:
+The quickest route needs no coding: **PWABuilder** turns the live website into a Play Store app
+(a "Trusted Web Activity" that shows the site full-screen, always up to date).
+
+1. Make sure the live site works and is installable (Chrome shows *Install app*).
+2. Go to **pwabuilder.com**, enter your site address, click **Package for stores → Android**.
+   Keep the suggested package name (e.g. `app.vercel.eliphas.twa`) and download the zip.
+3. In **Play Console** (one-time $25 fee): create the app, upload the `.aab` file from the zip, and turn on
+   Play App Signing. Copy the **SHA-256 certificate fingerprint** from *Test and release → App integrity*.
+4. In Vercel, add `ANDROID_PACKAGE_NAME` (the package name) and `ANDROID_SHA256_CERT` (the fingerprint),
+   then **Redeploy**. Check `https://<your-site>/.well-known/assetlinks.json` shows them. Without this, the
+   app shows a browser address bar.
+5. Fill in the store listing. For *Data safety* and *Account deletion*, use your Privacy policy page and
+   `https://<your-site>/account/profile` (Profile → Delete account).
+
+iPhone users install from Safari (Share → Add to Home Screen). An App Store app needs a Mac and a native
+wrapper such as Capacitor (below); Apple often rejects apps that only show a website, so start with Android.
+
+### Later: native wrappers with Capacitor
+
+Capacitor loads the live website inside a native shell, for the App Store or for native features:
 
 ```sh
 cd eliphas
@@ -253,6 +278,16 @@ from database functions (`my_balance`, `my_sales_by_month`, `my_sales_by_city`, 
 The money split per copy (print cost, ₹15 fee, payment charges, author earning) is saved with each
 order, so later rate changes never alter past orders or payouts.
 
+**Cancellations and refunds.** A buyer can cancel from the order page until the printer accepts it.
+An admin can cancel any order that hasn't shipped (Admin → Orders → Cancel order, with a reason the buyer
+sees). Paid orders are refunded in full through Razorpay's refund API straight away; the order page shows
+the refund status, and a failed refund can be retried. Cancelled orders don't count towards author
+earnings. A payment that arrives after an order was cancelled is refunded automatically.
+
+**Account deletion** (needed for Play Store). Profile → Delete account. Readers can delete themselves once
+no order is on its way; their login and profile are removed and past orders are kept, unlinked, for tax
+records. Authors with books, printers and admins are asked to contact support.
+
 **Razorpay setup** (test mode first): Dashboard → Account & Settings → API Keys → generate test keys.
 Add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to `.env.local` (and Vercel). Then Dashboard →
 Webhooks → add `https://<your-site>/api/razorpay/webhook`, event `payment.captured`, with a secret you
@@ -287,6 +322,10 @@ spine = pages × paper's `spine_mm_per_page` (sample values: ask your printer).
 
 - Built for phones first; tablet and desktop get a sidebar. Light and dark mode follow
   the device, or tap the theme button (device → light → dark).
-- Brand: ink `#17214A`, marigold `#C98200` (text on it `#2E1E00`), deodar `#2E6150`,
-  paper `#F3F4F7`. Headings in Literata, body in Mukta (which also covers Hindi).
+- Brand: white / near-black `#0A0A0A` base with one accent, signal orange `#FF5A1F`
+  (black text on it; `#C2410C` when the accent is used as text on white). Headlines in
+  Newsreader (serif), everything else in Geist; Noto Sans Devanagari covers Hindi text.
+  Colours and building blocks (`btn-primary`, `card`, `field`…) live in `src/app/globals.css`.
+- Login works with mobile numbers from many countries (country picker, default India).
+  Payments are still in rupees and delivery is within India for now.
 - Capacitor: see "Later: Play Store / App Store with Capacitor" above.

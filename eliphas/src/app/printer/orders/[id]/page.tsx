@@ -63,7 +63,7 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
             <section key={it.id} className="card">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="text-2xl">{it.books?.title}</h2>
-                <span className="rounded-full bg-marigold px-3 py-1 text-sm font-bold text-on-marigold">
+                <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-on-accent">
                   {it.quantity} {it.quantity === 1 ? "copy" : "copies"}
                 </span>
               </div>
@@ -124,7 +124,7 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
             </p>
             <p className="mt-2 font-medium">{formatPhone(o.ship_phone)}</p>
             {o.tracking_number && (
-              <p className="mt-3 rounded-2xl bg-surface-2 p-3">
+              <p className="mt-3 rounded-xl bg-surface-2 p-3">
                 {o.courier}: <span className="font-semibold">{o.tracking_number}</span>
               </p>
             )}
