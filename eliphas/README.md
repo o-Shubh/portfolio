@@ -322,10 +322,12 @@ spine = pages × paper's `spine_mm_per_page` (sample values: ask your printer).
 
 - Built for phones first; tablet and desktop get a sidebar. Light and dark mode follow
   the device, or tap the theme button (device → light → dark).
-- Brand: white / near-black `#0A0A0A` base with one accent, signal orange `#FF5A1F`
-  (black text on it; `#C2410C` when the accent is used as text on white). Headlines in
-  Newsreader (serif), everything else in Geist; Noto Sans Devanagari covers Hindi text.
-  Colours and building blocks (`btn-primary`, `card`, `field`…) live in `src/app/globals.css`.
+- Brand: from the Eliphas Indicus logo. Navy `#13223C` for the header, footer and main buttons, gold
+  `#CB9436` for buy buttons and highlights (navy text on gold). One font, Poppins (Noto Sans Devanagari
+  fills in for Hindi). Marketplace layout: navy header with search, category tiles, product cards, and a
+  bottom tab bar on phones. Logo files are in `public/brand/` (`logo-full`, `logo-mark`, and `-light`
+  versions for dark backgrounds); colours and building blocks (`btn-primary`, `btn-accent`, `card`,
+  `field`…) live in `src/app/globals.css`.
 - Login works with mobile numbers from many countries (country picker, default India).
   Payments are still in rupees and delivery is within India for now.
 - Capacitor: see "Later: Play Store / App Store with Capacitor" above.

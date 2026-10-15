@@ -25,7 +25,7 @@ export function LegalPage({
       <div className="grid gap-12 lg:grid-cols-[1fr_2.2fr] lg:gap-20">
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <p className="eyebrow">Policies</p>
-          <h1 className="mt-4 text-5xl md:text-6xl">{title}</h1>
+          <h1 className="mt-4 text-3xl md:text-4xl">{title}</h1>
           <p className="mt-4 text-sm text-muted">Last updated {updated}</p>
           <nav aria-label="Policies" className="mt-8 hidden lg:block">
             <ul className="space-y-2">

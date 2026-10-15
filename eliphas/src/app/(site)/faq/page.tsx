@@ -22,7 +22,7 @@ export default function FaqPage() {
       <div className="grid gap-12 lg:grid-cols-[1fr_2fr] lg:gap-20">
         <div className="lg:sticky lg:top-24 lg:self-start">
           <p className="eyebrow">Help</p>
-          <h1 className="mt-4 text-5xl md:text-6xl">Questions and answers</h1>
+          <h1 className="mt-4 text-3xl md:text-4xl">Questions and answers</h1>
           <p className="mt-4 max-w-sm text-muted">Everything about publishing, royalties, printing and delivery.</p>
           <nav aria-label="Topics" className="mt-8 hidden lg:block">
             <ul className="space-y-2">
@@ -58,7 +58,7 @@ export default function FaqPage() {
           ))}
 
           <div className="flex flex-col items-start gap-4 rounded-2xl bg-surface-2 p-8 sm:flex-row sm:items-center sm:justify-between">
-            <p className="font-heading text-3xl">Ready when you are.</p>
+            <p className="text-2xl font-semibold">Ready when you are.</p>
             <Link href="/login?next=/author" className="btn-primary">
               Start publishing
             </Link>

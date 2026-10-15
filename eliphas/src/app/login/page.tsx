@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <AuthFrame>
-      <h1 className="text-5xl">Welcome</h1>
+      <h1 className="text-3xl">Welcome</h1>
       <p className="mt-3 text-muted">Log in or create an account with your mobile number. We&apos;ll text you a 6-digit code.</p>
       <LoginForm next={safeNext} />
       <p className="mt-8 text-center text-xs text-muted">

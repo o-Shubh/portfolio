@@ -8,7 +8,7 @@ export function AuthFrame({ children }: { children: React.ReactNode }) {
     <div className="grid min-h-dvh flex-1 lg:grid-cols-[1fr_1.05fr]">
       <div className="safe-top flex flex-col px-4 py-5 sm:px-8">
         <div className="flex items-center justify-between">
-          <Logo />
+          <Logo className="h-11" />
           <ThemeToggle />
         </div>
         <main className="flex flex-1 items-center justify-center py-12">
@@ -16,25 +16,23 @@ export function AuthFrame({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      <aside className="relative m-3 hidden overflow-hidden rounded-2xl bg-accent p-12 text-on-accent lg:flex lg:flex-col">
+      <aside className="relative m-3 hidden overflow-hidden rounded-2xl bg-navy p-12 text-white lg:flex lg:flex-col">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.12]"
-          style={{
-            backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 0)", backgroundSize: "18px 18px" }}
         />
-        <p className="relative text-xs font-medium tracking-[0.12em] uppercase opacity-70">Eliphas Indicus Publications</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static brand image */}
+        <img src="/brand/logo-full-light.png" alt="" className="relative h-16 w-auto self-start" />
         <div className="relative mt-auto">
-          <h2 className="max-w-lg text-6xl leading-[1] tracking-[-0.03em]">
-            Every story deserves a <em>printed</em> home.
+          <h2 className="max-w-lg text-5xl leading-[1.1] font-semibold">
+            Every story deserves a <span className="text-gold">printed</span> home.
           </h2>
-          <ul className="mt-10 space-y-3 text-lg">
+          <ul className="mt-10 space-y-3 text-lg text-white/85">
             {["Free to publish — pay only when a copy sells", "You keep every right to your work", "Printed on demand, never out of stock"].map(
               (t) => (
                 <li key={t} className="flex items-center gap-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-paper">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gold text-navy">
                     <Check className="h-3.5 w-3.5" aria-hidden />
                   </span>
                   {t}

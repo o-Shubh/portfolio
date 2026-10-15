@@ -96,7 +96,7 @@ export function CheckoutForm({
       name: "Eliphas Indicus",
       description: `Order ${result.orderNumber}`,
       prefill: { name: result.name, contact: `+91${result.phone}` },
-      theme: { color: "#0A0A0A" },
+      theme: { color: "#13223C" },
       handler: (r: RazorpayResponse) => finish(result, r.razorpay_payment_id, r.razorpay_signature),
       modal: {
         ondismiss: () => {

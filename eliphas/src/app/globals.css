@@ -13,16 +13,19 @@
   }
 }
 
-/* ---------- Brand ----------
-   One strong accent (signal orange) on a white / near-black base. */
+/* ---------- Brand (from the Eliphas Indicus logo) ----------
+   Navy and gold. Navy carries headers and main buttons; gold is the buy/highlight colour. */
 @theme {
-  --color-ink: #0a0a0a;
-  --color-paper: #fafaf9;
-  --color-accent: #ff5a1f;
-  --color-on-accent: #0a0a0a;
+  --color-ink: #13223c;
+  --color-paper: #ffffff;
+  --color-navy: #13223c;
+  --color-navy-2: #1d3157;
+  --color-gold: #cb9436;
+  --color-accent: #cb9436;
+  --color-on-accent: #13223c;
 
-  --font-heading: var(--font-display), var(--font-devanagari), Georgia, serif;
-  --font-sans: var(--font-geist), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-poppins), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-poppins), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ---------- Semantic colours (change in dark mode) ----------
@@ -39,6 +42,7 @@
   --color-primary: var(--primary);
   --color-on-primary: var(--on-primary);
   --color-accent-fg: var(--accent-fg);
+  --color-bar: var(--bar);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-chart: var(--chart);
@@ -46,35 +50,37 @@
 
 :root {
   color-scheme: light;
-  --bg: #ffffff;
+  --bg: #f1f3f6;
   --surface: #ffffff;
-  --surface-2: #f5f5f4;
-  --fg: #0a0a0a;
-  --muted: #57534e;
-  --line: rgb(10 10 10 / 0.09);
-  --line-strong: rgb(10 10 10 / 0.18);
-  --primary: #0a0a0a;
+  --surface-2: #f5f6f9;
+  --fg: #0f1a2e;
+  --muted: #5b6478;
+  --line: rgb(19 34 60 / 0.1);
+  --line-strong: rgb(19 34 60 / 0.2);
+  --primary: #13223c;
   --on-primary: #ffffff;
-  --accent-fg: #c2410c; /* accent for text on white: passes AA */
+  --accent-fg: #8a5f17; /* gold for text on white: passes AA */
+  --bar: #13223c; /* top bar and footer */
   --success: #15803d;
   --danger: #b91c1c;
   --chart: #1f7a55; /* chart bars: passes contrast and chroma checks on white */
-  --shadow-color: 10 10 10;
+  --shadow-color: 19 34 60;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0a0a0a;
-    --surface: #131313;
-    --surface-2: #1c1c1c;
-    --fg: #fafaf9;
-    --muted: #a8a29e;
+    --bg: #0a1222;
+    --surface: #111b30;
+    --surface-2: #18243c;
+    --fg: #f2f4f8;
+    --muted: #a3adc2;
     --line: rgb(255 255 255 / 0.09);
     --line-strong: rgb(255 255 255 / 0.2);
-    --primary: #fafaf9;
-    --on-primary: #0a0a0a;
-    --accent-fg: #ff8a5c;
+    --primary: #e0b25a;
+    --on-primary: #13223c;
+    --accent-fg: #e0b25a;
+    --bar: #0d1a33;
     --success: #4ade80;
     --danger: #f87171;
     --chart: #3a9d73;
@@ -84,16 +90,17 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0a0a0a;
-  --surface: #131313;
-  --surface-2: #1c1c1c;
-  --fg: #fafaf9;
-  --muted: #a8a29e;
+  --bg: #0a1222;
+  --surface: #111b30;
+  --surface-2: #18243c;
+  --fg: #f2f4f8;
+  --muted: #a3adc2;
   --line: rgb(255 255 255 / 0.09);
   --line-strong: rgb(255 255 255 / 0.2);
-  --primary: #fafaf9;
-  --on-primary: #0a0a0a;
-  --accent-fg: #ff8a5c;
+  --primary: #e0b25a;
+  --on-primary: #13223c;
+  --accent-fg: #e0b25a;
+  --bar: #0d1a33;
   --success: #4ade80;
   --danger: #f87171;
   --chart: #3a9d73;
@@ -115,20 +122,22 @@ body {
   h3,
   h4 {
     font-family: var(--font-heading);
-    font-weight: 450;
-    line-height: 1.08;
+    font-weight: 600;
+    line-height: 1.15;
     letter-spacing: -0.02em;
     text-wrap: balance;
   }
 }
 
 ::selection {
-  background: rgb(255 90 31 / 0.25);
+  background: rgb(203 148 54 / 0.3);
 }
 
 /* ---------- Shared building blocks ---------- */
 @utility shadow-soft {
-  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.05);
+  box-shadow:
+    0 1px 2px rgb(var(--shadow-color) / 0.06),
+    0 4px 12px -4px rgb(var(--shadow-color) / 0.08);
 }
 @utility shadow-lift {
   box-shadow:
@@ -136,28 +145,28 @@ body {
     0 16px 40px -12px rgb(var(--shadow-color) / 0.22);
 }
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[0.9375rem] font-medium whitespace-nowrap transition duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
 }
 @utility btn-primary {
-  @apply btn bg-primary text-on-primary hover:opacity-85;
+  @apply btn bg-primary text-on-primary hover:opacity-90;
 }
 @utility btn-accent {
-  @apply btn bg-accent text-on-accent hover:brightness-110;
+  @apply btn bg-gold text-navy hover:brightness-105;
 }
 @utility btn-ghost {
   @apply btn bg-surface text-fg ring-1 ring-line-strong ring-inset hover:bg-surface-2;
 }
 @utility card {
-  @apply rounded-xl bg-surface p-5 ring-1 ring-line md:p-6;
+  @apply rounded-xl bg-surface p-5 shadow-soft ring-1 ring-line md:p-6;
 }
 @utility field {
-  @apply block min-h-11 w-full rounded-lg bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted/70 hover:ring-fg/30 focus:ring-2 focus:ring-fg disabled:opacity-60;
+  @apply block min-h-11 w-full rounded-lg bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted/70 hover:ring-fg/30 focus:ring-2 focus:ring-gold disabled:opacity-60;
 }
 @utility label {
   @apply mb-1.5 block text-sm font-medium text-fg;
 }
 @utility eyebrow {
-  @apply inline-flex items-center gap-2 text-xs font-medium tracking-[0.12em] text-muted uppercase;
+  @apply inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-accent-fg uppercase;
 }
 @utility container-x {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
@@ -182,7 +191,7 @@ body {
   line-height: 1.7;
   & h2 {
     margin-top: 2.5rem;
-    font-size: 1.75rem;
+    font-size: 1.35rem;
   }
   & h2:first-child {
     margin-top: 0;

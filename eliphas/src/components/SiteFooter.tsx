@@ -38,35 +38,54 @@ const COLUMNS = [
   },
 ];
 
+const PROMISES = [
+  { title: "Printed fresh for you", text: "Every copy printed after you order" },
+  { title: "Delivered in 5–9 days", text: "Tracked shipping across India" },
+  { title: "Secure payments", text: "UPI, cards and net banking by Razorpay" },
+  { title: "Free cancellation", text: "Until printing starts" },
+];
+
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-line">
-      <div className="container-x grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
-        <div>
-          <Logo />
-          <p className="mt-5 max-w-xs font-heading text-2xl leading-snug tracking-tight">
-            Independent publishing, printed beautifully.
-          </p>
-        </div>
-        {COLUMNS.map((c) => (
-          <div key={c.title}>
-            <h2 className="font-sans text-sm font-medium text-fg">{c.title}</h2>
-            <ul className="mt-4 space-y-2.5">
-              {c.links.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-[0.9375rem] text-muted transition hover:text-fg">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+    <footer className="mt-16 pb-14 md:pb-0">
+      <div className="border-y border-line bg-surface">
+        <ul className="container-x grid grid-cols-2 gap-6 py-6 md:grid-cols-4">
+          {PROMISES.map((p) => (
+            <li key={p.title}>
+              <p className="text-sm font-semibold">{p.title}</p>
+              <p className="mt-0.5 text-xs text-muted">{p.text}</p>
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="safe-bottom border-t border-line">
-        <div className="container-x flex flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted">
-          <span>© {new Date().getFullYear()} Eliphas Indicus Publications</span>
-          <span>Print on demand · No stock · No upfront cost</span>
+      <div className="bg-bar text-white">
+        <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+          <div>
+            <Logo onDark className="h-14" />
+            <p className="mt-4 max-w-xs text-sm text-white/70">
+              Self-publishing and print on demand. Your book, printed beautifully and delivered to readers.
+            </p>
+          </div>
+          {COLUMNS.map((c) => (
+            <div key={c.title}>
+              <h2 className="text-sm font-semibold text-gold">{c.title}</h2>
+              <ul className="mt-4 space-y-2.5">
+                {c.links.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="text-sm text-white/75 transition hover:text-white">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="safe-bottom border-t border-white/10">
+          <div className="container-x flex flex-wrap items-center justify-between gap-2 py-5 text-xs text-white/60">
+            <span>© {new Date().getFullYear()} Eliphas Indicus Publications</span>
+            <span>Print on demand · No stock · No upfront cost</span>
+          </div>
         </div>
       </div>
     </footer>

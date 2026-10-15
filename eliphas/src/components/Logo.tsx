@@ -1,27 +1,34 @@
+/* eslint-disable @next/next/no-img-element -- small static brand images, sized by CSS */
 import Link from "next/link";
 
-/** Three stacked book spines that read as an "E". The middle spine carries the accent. */
-export function LogoMark({ className = "h-8 w-8", light = false }: { className?: string; light?: boolean }) {
-  // `light`: always the white version (for dark backgrounds)
-  const box = light ? "fill-paper" : "fill-ink dark:fill-paper";
-  const bar = light ? "fill-ink" : "fill-paper dark:fill-ink";
+/**
+ * The Eliphas Indicus logo (elephant + wordmark).
+ * `onDark`: always the white version, for the navy header and footer.
+ * Otherwise navy on light screens and white in dark mode.
+ */
+export function Logo({ href = "/", onDark = false, className = "h-10" }: { href?: string; onDark?: boolean; className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
-      <rect width="32" height="32" rx="8" className={box} />
-      <rect x="9" y="8" width="14" height="4" rx="1" className={bar} />
-      <rect x="9" y="14" width="10.5" height="4" rx="1" fill="#FF5A1F" />
-      <rect x="9" y="20" width="14" height="4" rx="1" className={bar} />
-    </svg>
+    <Link href={href} className="flex shrink-0 items-center" aria-label="Eliphas Indicus Publications, home">
+      {onDark ? (
+        <img src="/brand/logo-full-light.png" alt="" className={`w-auto ${className}`} />
+      ) : (
+        <>
+          <img src="/brand/logo-full.png" alt="" className={`w-auto dark:hidden ${className}`} />
+          <img src="/brand/logo-full-light.png" alt="" className={`hidden w-auto dark:block ${className}`} />
+        </>
+      )}
+    </Link>
   );
 }
 
-export function Logo({ href = "/", light = false }: { href?: string; light?: boolean }) {
-  return (
-    <Link href={href} className="flex items-center gap-2.5" aria-label="Eliphas Indicus Publications, home">
-      <LogoMark light={light} />
-      <span className={`font-heading text-[1.3rem] leading-none tracking-[-0.02em] ${light ? "text-paper" : ""}`}>
-        Eliphas<span className={`hidden sm:inline ${light ? "text-paper/60" : "text-muted"}`}> Indicus</span>
-      </span>
-    </Link>
+/** Just the elephant, for small spaces (install card, avatars). */
+export function LogoMark({ className = "h-8 w-8", onDark = false }: { className?: string; onDark?: boolean }) {
+  return onDark ? (
+    <img src="/brand/logo-mark-light.png" alt="" className={`object-contain ${className}`} />
+  ) : (
+    <>
+      <img src="/brand/logo-mark.png" alt="" className={`object-contain dark:hidden ${className}`} />
+      <img src="/brand/logo-mark-light.png" alt="" className={`hidden object-contain dark:block ${className}`} />
+    </>
   );
 }

@@ -46,7 +46,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-14 flex-col items-center justify-center gap-1 text-[0.68rem] font-medium transition ${
-                  active ? "text-fg" : "text-muted"
+                  active ? "text-accent-fg" : "text-muted"
                 }`}
               >
                 <Icon className="h-[1.35rem] w-[1.35rem]" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
@@ -69,8 +69,8 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex h-9 items-center gap-2.5 rounded-lg px-2 text-[0.9375rem] transition ${
-                active ? "bg-surface font-medium text-fg shadow-soft ring-1 ring-line" : "text-muted hover:bg-line hover:text-fg"
+              className={`flex h-10 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition ${
+                active ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-surface-2 hover:text-fg"
               }`}
             >
               <Icon className="h-[1.1rem] w-[1.1rem]" aria-hidden />

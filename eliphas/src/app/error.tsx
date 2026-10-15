@@ -12,7 +12,7 @@ export default function Error({ error, retry }: { error: Error & { digest?: stri
   return (
     <div className="container-x flex flex-1 flex-col items-start justify-center py-24">
       <p className="eyebrow">Something went wrong</p>
-      <h1 className="mt-4 max-w-xl text-5xl">This page didn&apos;t load.</h1>
+      <h1 className="mt-4 max-w-xl text-4xl">This page didn&apos;t load.</h1>
       <p className="mt-4 max-w-md text-muted">
         It&apos;s usually a brief connection problem. Try again, and if it keeps happening, let us know.
       </p>

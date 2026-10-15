@@ -1,31 +1,24 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "Eliphas Indicus Publications: self-publish your book in print";
+export const alt = "Eliphas Indicus Publications: books printed on demand";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /** The preview picture shown when someone shares a link to the site. */
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const logo = await readFile(join(process.cwd(), "public/brand/logo-full-light.png"));
+  const src = `data:image/png;base64,${logo.toString("base64")}`;
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", background: "#0a0a0a", color: "#fafaf9", padding: 72 }}>
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <div style={{ width: 64, height: 64, borderRadius: 16, background: "#fafaf9", display: "flex", flexDirection: "column", justifyContent: "center", gap: 6, paddingLeft: 18 }}>
-              <div style={{ width: 28, height: 8, borderRadius: 2, background: "#0a0a0a" }} />
-              <div style={{ width: 21, height: 8, borderRadius: 2, background: "#ff5a1f" }} />
-              <div style={{ width: 28, height: 8, borderRadius: 2, background: "#0a0a0a" }} />
-            </div>
-            <div style={{ fontSize: 36, fontFamily: "serif" }}>Eliphas Indicus</div>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 84, lineHeight: 1.02, fontFamily: "serif", letterSpacing: -2, maxWidth: 900 }}>
-              Publish the book you were meant to write.
-            </div>
-            <div style={{ marginTop: 28, fontSize: 30, color: "#a8a29e" }}>Print on demand · No stock · No upfront cost</div>
-          </div>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#13223c", color: "#ffffff", padding: 72 }}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text -- rendered to an image, not HTML */}
+        <img src={src} height={150} style={{ height: 150 }} />
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ fontSize: 68, lineHeight: 1.1, fontWeight: 600, maxWidth: 960 }}>Books printed fresh, just for you.</div>
+          <div style={{ marginTop: 24, fontSize: 30, color: "#cb9436" }}>Publish your book · Print on demand · Delivered to your door</div>
         </div>
-        <div style={{ width: 16, background: "#ff5a1f", borderRadius: 8, marginLeft: 48 }} />
       </div>
     ),
     size,
