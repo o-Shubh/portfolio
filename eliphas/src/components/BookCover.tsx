@@ -2,12 +2,12 @@
 
 // Typographic covers for books that don't have a cover image yet: flat colour, serif title.
 const PALETTES = [
-  { bg: "#FF5A1F", fg: "#0A0A0A", rule: "#0A0A0A" },
-  { bg: "#0A0A0A", fg: "#FAFAF9", rule: "#FF5A1F" },
-  { bg: "#EFE8DC", fg: "#1C1917", rule: "#C2410C" },
-  { bg: "#1F3B2F", fg: "#F2EEE3", rule: "#E9C46A" },
-  { bg: "#2440D8", fg: "#FFFFFF", rule: "#FFD166" },
-  { bg: "#F3C9BA", fg: "#2B1A14", rule: "#2B1A14" },
+  { bg: "#13223C", fg: "#FFFFFF", rule: "#CB9436" },
+  { bg: "#CB9436", fg: "#13223C", rule: "#13223C" },
+  { bg: "#0F5E5C", fg: "#F2F4F8", rule: "#E0B25A" },
+  { bg: "#7A2E3A", fg: "#F6EBDD", rule: "#E0B25A" },
+  { bg: "#F1E9DA", fg: "#13223C", rule: "#7A2E3A" },
+  { bg: "#2F5DA8", fg: "#FFFFFF", rule: "#F3D27A" },
 ];
 
 function pick(seed: string) {
@@ -54,7 +54,7 @@ export function BookCover({
 
   const p = pick(slug);
   // Text scales with the cover's own width (container query units), so it fits at every size
-  const titleSize = size === "xs" ? "text-[14cqw]" : "text-[13cqw]";
+  const titleSize = size === "xs" ? "text-[12cqw]" : "text-[11.5cqw]";
   return (
     <div className={`${shell} @container`} style={{ background: p.bg, color: p.fg }} role="img" aria-label={`Cover of ${title}`}>
       <div className="flex h-full flex-col p-[11%] pl-[13%]">
@@ -62,7 +62,7 @@ export function BookCover({
           <p className="truncate text-[max(0.5rem,5.2cqw)] font-medium tracking-[0.18em] uppercase opacity-80">{author}</p>
         )}
         <p
-          className={`mt-auto line-clamp-4 font-heading leading-[1.02] tracking-[-0.02em] ${titleSize}`}
+          className={`mt-auto line-clamp-4 font-heading leading-[1.08] font-semibold tracking-[-0.02em] ${titleSize}`}
           style={{ overflowWrap: "break-word" }}
         >
           {title}

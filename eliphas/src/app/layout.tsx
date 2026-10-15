@@ -1,19 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Newsreader, Noto_Sans_Devanagari } from "next/font/google";
+import { Noto_Sans_Devanagari, Poppins } from "next/font/google";
 import { ServiceWorker } from "@/components/ServiceWorker";
 import "./globals.css";
 
-// Editorial serif for headlines, a crisp sans for everything else.
-const display = Newsreader({
-  variable: "--font-display",
+// One clean, friendly sans for the whole app (marketplace style).
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -45,8 +39,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#13223c" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1a33" },
   ],
 };
 
@@ -58,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${display.variable} ${geist.variable} ${devanagari.variable} h-full antialiased`}
+      className={`${poppins.variable} ${devanagari.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

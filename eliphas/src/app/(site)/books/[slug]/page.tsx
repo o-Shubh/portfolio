@@ -1,4 +1,4 @@
-import { PackageCheck, Printer, Truck } from "lucide-react";
+import { PackageCheck, Printer, ShieldCheck, Truck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -31,6 +31,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
 
   const details = [
     { term: "Language", value: LANGUAGE_LABEL[book.language] },
+    { term: "Author", value: book.author_name },
     { term: "Pages", value: book.page_count },
     { term: "Size", value: label(rates.trim_sizes, book.trim_size) },
     { term: "Binding", value: label(rates.binding, book.binding) },
@@ -53,86 +54,105 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   };
 
   return (
-    <div className="container-x py-8 md:py-12">
+    <div className="container-x pt-4 pb-28 md:py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <nav aria-label="Breadcrumb" className="text-sm text-muted">
+      <nav aria-label="Breadcrumb" className="truncate text-sm text-muted">
+        <Link href="/" className="hover:text-fg">
+          Home
+        </Link>
+        <span className="mx-2" aria-hidden>
+          ›
+        </span>
         <Link href="/books" className="hover:text-fg">
           Bookstore
         </Link>
-        <span className="mx-2" aria-hidden>
-          /
-        </span>
-        <span lang={book.language} className="text-fg">
-          {book.title}
-        </span>
+        {book.genre && (
+          <>
+            <span className="mx-2" aria-hidden>
+              ›
+            </span>
+            <Link href={`/books?genre=${encodeURIComponent(book.genre)}`} className="hover:text-fg">
+              {book.genre}
+            </Link>
+          </>
+        )}
       </nav>
 
-      <div className="mt-6 grid gap-10 md:mt-10 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-20">
-        <div className="md:sticky md:top-24 md:self-start">
-          <div className="rounded-2xl bg-surface-2 px-[26%] py-[10%] md:px-[18%] md:py-[12%]">
+      <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-8">
+        <div className="md:sticky md:top-32 md:self-start">
+          <div className="rounded-xl bg-surface px-[24%] py-[9%] shadow-soft ring-1 ring-line md:px-[16%] md:py-[11%]">
             <BookCover title={book.title} author={book.author_name} slug={book.slug} src={cover} size="lg" priority />
           </div>
         </div>
 
-        <div lang={book.language}>
-          {book.genre && (
-            <p className="eyebrow" lang="en">
-              {book.genre}
+        <div className="space-y-4" lang={book.language}>
+          <div className="card">
+            <h1 className="text-2xl md:text-3xl">{book.title}</h1>
+            {book.subtitle && <p className="mt-1 text-muted md:text-lg">{book.subtitle}</p>}
+            <p className="mt-2 text-sm">
+              <span lang="en" className="text-muted">
+                by
+              </span>{" "}
+              <span className="font-medium text-accent-fg">{book.author_name}</span>
             </p>
-          )}
-          <h1 className="mt-3 text-4xl md:text-6xl">{book.title}</h1>
-          {book.subtitle && <p className="mt-3 font-heading text-xl text-muted italic md:text-2xl">{book.subtitle}</p>}
-          <p className="mt-4 text-lg">
-            <span lang="en" className="text-muted">
-              by
-            </span>{" "}
-            {book.author_name}
-          </p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs" lang="en">
+              {[LANGUAGE_LABEL[book.language], book.genre, label(rates.binding, book.binding)].filter(Boolean).map((t) => (
+                <span key={t} className="rounded-md bg-surface-2 px-2 py-1 text-muted">
+                  {t}
+                </span>
+              ))}
+            </div>
 
-          <div className="mt-8 rounded-xl border border-line p-5 md:p-6" lang="en">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="font-heading text-4xl tracking-tight">{rupees(Number(book.mrp))}</p>
-                <p className="mt-1 text-sm text-muted">{label(rates.binding, book.binding)} · inclusive of taxes</p>
-              </div>
-              <Link href={`/checkout/${book.slug}`} className="btn-primary min-h-12 w-full px-8 sm:w-auto">
+            <div className="mt-5 border-t border-line pt-5" lang="en">
+              <p className="text-3xl font-semibold tabular-nums">{rupees(Number(book.mrp))}</p>
+              <p className="mt-0.5 text-sm text-muted">Inclusive of all taxes</p>
+              <p className="mt-3 flex items-start gap-2 text-sm">
+                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
+                <span>
+                  {Number(book.mrp) >= shipping.free_above ? (
+                    <strong className="font-semibold text-success">Free delivery</strong>
+                  ) : (
+                    <>
+                      Delivery {rupees(shipping.flat)} · <strong className="font-semibold text-success">free above {rupees(shipping.free_above)}</strong>
+                    </>
+                  )}{" "}
+                  · arrives in 5–9 working days
+                </span>
+              </p>
+              <Link href={`/checkout/${book.slug}`} className="btn-accent mt-5 hidden min-h-12 w-full text-base md:flex">
                 Buy now
               </Link>
             </div>
-            <ul className="mt-5 space-y-2.5 border-t border-line pt-5 text-sm">
-              <li className="flex items-start gap-2.5">
-                <Printer className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
-                Printed fresh for you when you order
+
+            <ul className="mt-5 grid grid-cols-3 gap-2 border-t border-line pt-5 text-center text-xs text-muted" lang="en">
+              <li className="flex flex-col items-center gap-1.5">
+                <Printer className="h-5 w-5 text-fg" aria-hidden /> Printed fresh for you
               </li>
-              <li className="flex items-start gap-2.5">
-                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
-                <span>
-                  Shipping {rupees(shipping.flat)} · free on orders of {rupees(shipping.free_above)} or more
-                </span>
+              <li className="flex flex-col items-center gap-1.5">
+                <PackageCheck className="h-5 w-5 text-fg" aria-hidden /> Tracked delivery
               </li>
-              <li className="flex items-start gap-2.5">
-                <PackageCheck className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
-                Track your order from print to delivery
+              <li className="flex flex-col items-center gap-1.5">
+                <ShieldCheck className="h-5 w-5 text-fg" aria-hidden /> Secure payment
               </li>
             </ul>
           </div>
 
           {book.description && (
-            <section className="mt-12">
-              <h2 className="font-sans text-sm font-medium tracking-[0.12em] text-muted uppercase" lang="en">
+            <section className="card">
+              <h2 className="text-lg" lang="en">
                 About this book
               </h2>
-              <p className="mt-4 text-lg leading-relaxed whitespace-pre-line">{book.description}</p>
+              <p className="mt-3 leading-relaxed whitespace-pre-line text-fg/90">{book.description}</p>
             </section>
           )}
 
-          <section className="mt-12" lang="en">
-            <h2 className="font-sans text-sm font-medium tracking-[0.12em] text-muted uppercase">Details</h2>
-            <dl className="mt-4 divide-y divide-line border-y border-line">
+          <section className="card" lang="en">
+            <h2 className="text-lg">Product details</h2>
+            <dl className="mt-3 divide-y divide-line">
               {details.map((d) => (
-                <div key={d.term} className="flex justify-between gap-6 py-3">
+                <div key={d.term} className="grid grid-cols-[8rem_1fr] gap-4 py-2.5 text-sm">
                   <dt className="text-muted">{d.term}</dt>
-                  <dd className="text-right font-medium">{d.value}</dd>
+                  <dd className="font-medium">{d.value}</dd>
                 </div>
               ))}
             </dl>
@@ -141,13 +161,24 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
       </div>
 
       {more.length > 0 && (
-        <section className="mt-24">
-          <h2 className="text-3xl md:text-4xl">More by {book.author_name}</h2>
-          <div className="mt-8">
-            <BookShelf books={more} />
-          </div>
+        <section className="mt-10">
+          <h2 className="mb-3 text-lg sm:text-xl">More by {book.author_name}</h2>
+          <BookShelf books={more} />
         </section>
       )}
+
+      {/* Phone buy bar */}
+      <div className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface px-4 py-3 md:hidden" lang="en">
+        <div className="flex items-center gap-4">
+          <div className="min-w-0">
+            <p className="text-lg leading-tight font-semibold tabular-nums">{rupees(Number(book.mrp))}</p>
+            <p className="truncate text-xs text-muted">{book.title}</p>
+          </div>
+          <Link href={`/checkout/${book.slug}`} className="btn-accent ml-auto min-h-12 flex-1 text-base">
+            Buy now
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

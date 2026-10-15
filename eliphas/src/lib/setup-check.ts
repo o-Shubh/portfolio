@@ -25,10 +25,10 @@ export function setupPage(problems: SetupProblem[], extra?: string) {
   const items = problems.map((p) => `<li><code>${esc(p.name)}</code> — ${esc(p.problem)}</li>`).join("");
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Setup needed · Eliphas Indicus</title>
-<style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:#fafaf9;color:#0a0a0a;font:17px/1.6 system-ui,sans-serif;padding:24px;box-sizing:border-box}
+<style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:#f1f3f6;color:#13223c;font:17px/1.6 system-ui,sans-serif;padding:24px;box-sizing:border-box}
 main{max-width:34rem;background:#fff;border-radius:16px;padding:28px;border:1px solid rgb(10 10 10/.09)}
-h1{font:400 1.8rem/1.2 Georgia,serif;margin:0 0 8px}code{background:#f5f5f4;padding:2px 6px;border-radius:6px;font-size:.9em;word-break:break-all}
-li{margin:8px 0}ol{padding-left:1.2rem}.muted{color:#57534e}</style></head><body><main>
+h1{font:600 1.6rem/1.2 system-ui,sans-serif;margin:0 0 8px}code{background:#f5f5f4;padding:2px 6px;border-radius:6px;font-size:.9em;word-break:break-all}
+li{margin:8px 0}ol{padding-left:1.2rem}.muted{color:#5b6478}</style></head><body><main>
 <h1>Almost there: setup needed</h1>
 <p class="muted">The website is running, but some settings in Vercel are missing or wrong.</p>
 ${items ? `<ul>${items}</ul>` : ""}${extra ? `<p>${esc(extra)}</p>` : ""}

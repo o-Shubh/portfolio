@@ -2,7 +2,6 @@
 
 import { Download, Share, SquarePlus, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { LogoMark } from "./Logo";
 
 // Chrome / Android fire this event when the site can be installed
 type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: "accepted" | "dismissed" }> };
@@ -84,11 +83,12 @@ export function InstallPrompt({ aboveTabBar = false }: { aboveTabBar?: boolean }
     <div
       role="dialog"
       aria-labelledby="install-title"
-      className={`safe-bottom fixed inset-x-0 z-40 px-3 md:right-4 md:left-auto md:w-96 ${aboveTabBar ? "bottom-24 md:bottom-4" : "bottom-3"}`}
+      className={`safe-bottom fixed inset-x-0 z-40 px-3 md:right-4 md:left-auto md:w-96 ${aboveTabBar ? "bottom-20 md:bottom-4" : "bottom-3"}`}
     >
       <div className="rounded-xl bg-surface p-4 shadow-lift ring-1 ring-line">
         <div className="flex items-start gap-3">
-          <LogoMark className="h-12 w-12 shrink-0" />
+          {/* eslint-disable-next-line @next/next/no-img-element -- the app icon itself */}
+          <img src="/icons/icon-192.png" alt="" className="h-12 w-12 shrink-0 rounded-xl" />
           <div className="min-w-0 flex-1">
             <p id="install-title" className="font-medium">
               Get the Eliphas app
@@ -115,7 +115,7 @@ export function InstallPrompt({ aboveTabBar = false }: { aboveTabBar?: boolean }
           </ol>
         ) : (
           <div className="mt-3 flex gap-2">
-            <button type="button" onClick={install} className="btn-primary min-h-11 flex-1">
+            <button type="button" onClick={install} className="btn-accent min-h-11 flex-1">
               <Download className="h-4 w-4" aria-hidden /> Install app
             </button>
             <button type="button" onClick={dismiss} className="btn-ghost min-h-11">

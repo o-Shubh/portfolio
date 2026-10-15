@@ -38,7 +38,7 @@ export default async function PricingPage() {
     <div className="container-x py-12 md:py-20">
       <div className="mx-auto max-w-3xl text-center">
       <p className="eyebrow">Pricing</p>
-      <h1 className="mt-4 text-5xl md:text-7xl">Free to publish. You set the price.</h1>
+      <h1 className="mt-4 text-4xl md:text-5xl">Free to publish. You set the price.</h1>
       <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
         No setup fee, no stock to buy, no yearly charges. When a copy sells, three things come out of the MRP and the
         rest is your earning.
@@ -70,7 +70,7 @@ export default async function PricingPage() {
         <section className="mt-24 grid gap-10 md:grid-cols-2 md:items-center lg:gap-16">
           <div>
             <p className="eyebrow">Example</p>
-            <h2 className="mt-3 text-4xl md:text-5xl">A worked example</h2>
+            <h2 className="mt-3 text-2xl md:text-3xl">A worked example</h2>
             <p className="mt-4 text-lg text-muted">
               A 200-page paperback novel, 5 × 8 inches, black & white, priced at {rupees(299)}.
             </p>
@@ -87,7 +87,7 @@ export default async function PricingPage() {
 
       <section className="mt-24" id="calculator" aria-labelledby="calc-heading">
         <p className="eyebrow">Calculator</p>
-        <h2 id="calc-heading" className="mt-3 text-4xl md:text-5xl">
+        <h2 id="calc-heading" className="mt-3 text-2xl md:text-3xl">
           Earnings calculator
         </h2>
         <p className="mt-3 text-muted">Try your own book. Change any option and see your earning per copy.</p>
@@ -98,7 +98,7 @@ export default async function PricingPage() {
 
       <section className="mt-24">
         <p className="eyebrow">Print costs</p>
-        <h2 className="mt-3 text-4xl md:text-5xl">Print cost per copy</h2>
+        <h2 className="mt-3 text-2xl md:text-3xl">Print cost per copy</h2>
         <p className="mt-3 text-muted">Matte cover. The lowest MRP is where your earning is just above zero.</p>
         <div className="mt-8 overflow-x-auto rounded-xl border border-line">
           <table className="w-full min-w-[560px] text-left">
@@ -186,7 +186,7 @@ function FeeCard({ title, value, text }: { title: string; value: string; text: s
   return (
     <div className="border-b border-line p-6 last:border-b-0 md:border-b-0 md:p-8">
       <h2 className="font-sans text-sm font-medium tracking-normal text-muted">{title}</h2>
-      <p className="mt-3 font-heading text-5xl tracking-tight">{value}</p>
+      <p className="mt-3 text-4xl font-semibold tracking-tight">{value}</p>
       <p className="mt-3 text-muted">{text}</p>
     </div>
   );

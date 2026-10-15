@@ -34,17 +34,26 @@ export default async function BooksPage({ searchParams }: PageProps<"/books">) {
     return s ? `/books?${s}` : "/books";
   };
 
-  return (
-    <div className="container-x py-10 md:py-14">
-      <div className="flex flex-col gap-6 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="eyebrow">Bookstore</p>
-          <h1 className="mt-3 text-5xl md:text-6xl">Discover independent books</h1>
-          <p className="mt-3 max-w-xl text-muted">Every copy is printed fresh when you order it.</p>
-        </div>
+  const heading = genre ?? (lang === "hi" ? "Hindi books" : lang === "en" ? "English books" : "All books");
 
+  return (
+    <div className="container-x py-5 md:py-8">
+      <nav aria-label="Breadcrumb" className="text-sm text-muted">
+        <Link href="/" className="hover:text-fg">
+          Home
+        </Link>
+        <span className="mx-2" aria-hidden>
+          ›
+        </span>
+        <span className="text-fg">Bookstore</span>
+      </nav>
+      <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-2xl md:text-3xl">{q ? `Results for “${q}”` : heading}</h1>
+          <p className="mt-1 text-sm text-muted">Every copy printed fresh when you order.</p>
+        </div>
         {/* A plain GET form: works even before JavaScript loads */}
-        <form action="/books" role="search" className="flex w-full gap-2 md:max-w-md">
+        <form action="/books" role="search" className="flex w-full gap-2 md:max-w-sm">
           {lang && <input type="hidden" name="lang" value={lang} />}
           {genre && <input type="hidden" name="genre" value={genre} />}
           <label htmlFor="q" className="sr-only">
@@ -52,7 +61,7 @@ export default async function BooksPage({ searchParams }: PageProps<"/books">) {
           </label>
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute top-1/2 left-3.5 h-[1.1rem] w-[1.1rem] -translate-y-1/2 text-muted" aria-hidden />
-            <input id="q" name="q" type="search" defaultValue={q} placeholder="Search title or author" className="field rounded-full pl-10" />
+            <input id="q" name="q" type="search" defaultValue={q} placeholder="Search title or author" className="field pl-10" />
           </div>
           <button type="submit" className="btn-primary">
             Search
@@ -60,8 +69,8 @@ export default async function BooksPage({ searchParams }: PageProps<"/books">) {
         </form>
       </div>
 
-      <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center">
-        <div className="flex shrink-0 rounded-full bg-surface-2 p-1" aria-label="Language">
+      <div className="mt-5 flex flex-col gap-3 rounded-xl bg-surface p-3 shadow-soft ring-1 ring-line lg:flex-row lg:items-center">
+        <div className="flex shrink-0 rounded-lg bg-surface-2 p-1" aria-label="Language">
           {LANGS.map((l) => {
             const active = (lang ?? "") === l.value;
             return (
@@ -69,8 +78,8 @@ export default async function BooksPage({ searchParams }: PageProps<"/books">) {
                 key={l.value}
                 href={href({ lang: l.value || undefined, page: undefined })}
                 aria-current={active ? "true" : undefined}
-                className={`inline-flex h-8 items-center rounded-full px-4 text-sm transition ${
-                  active ? "bg-surface font-medium text-fg shadow-soft ring-1 ring-line" : "text-muted hover:text-fg"
+                className={`inline-flex h-8 items-center rounded-md px-4 text-sm transition ${
+                  active ? "bg-primary font-medium text-on-primary" : "text-muted hover:text-fg"
                 }`}
               >
                 {l.label}
@@ -89,17 +98,17 @@ export default async function BooksPage({ searchParams }: PageProps<"/books">) {
         )}
       </div>
 
-      <p className="mt-8 text-sm text-muted" aria-live="polite">
+      <p className="mt-5 text-sm text-muted" aria-live="polite">
         {total === 1 ? "1 book" : `${total} books`}
         {q && <> for “{q}”</>}
       </p>
 
-      <div className="mt-5">
+      <div className="mt-3">
         {books.length ? (
           <BookGrid books={books} />
         ) : (
-          <div className="rounded-xl border border-dashed border-line-strong px-6 py-16 text-center">
-            <p className="font-heading text-2xl">No books found</p>
+          <div className="rounded-xl bg-surface px-6 py-16 text-center shadow-soft ring-1 ring-line">
+            <p className="text-xl font-semibold">No books found</p>
             <p className="mt-2 text-muted">Try a different word, or clear the filters.</p>
             <Link href="/books" className="btn-ghost mt-6">
               Clear filters
@@ -135,7 +144,7 @@ function GenreChip({ href, active, label }: { href: string; active: boolean; lab
       href={href}
       aria-current={active ? "true" : undefined}
       className={`inline-flex h-9 shrink-0 items-center rounded-full border px-4 text-sm transition ${
-        active ? "border-fg bg-fg text-bg" : "border-line text-fg hover:border-fg"
+        active ? "border-gold bg-gold font-medium text-navy" : "border-line-strong text-fg hover:border-gold"
       }`}
     >
       {label}
