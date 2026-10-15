@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormAction } from "@/lib/use-form-action";
-import { saveRatesJson, saveSettingsForm } from "@/app/actions/admin";
+import { saveBusiness, saveRatesJson, saveSettingsForm } from "@/app/actions/admin";
 import { FormMessage } from "@/components/FormMessage";
 import { RATE_FIELDS, sortedOptions, type PricingSettings, type RateGroup } from "@/lib/pricing";
 
@@ -120,5 +120,41 @@ function Num({ name, label, value, step = "any" }: { name: string; label: string
       </label>
       <input id={name} name={name} type="number" inputMode="decimal" step={step} min="0" defaultValue={value} className="field" required />
     </div>
+  );
+}
+
+type BusinessField = { key: string; label: string; hint?: string; required?: boolean; multiline?: boolean };
+
+export function BusinessForm({ fields, values }: { fields: BusinessField[]; values: Record<string, string> }) {
+  const [state, onSubmit, pending] = useFormAction(saveBusiness);
+  return (
+    <form onSubmit={onSubmit} className="card space-y-4" id="business">
+      <div>
+        <h2 className="text-lg">Business details</h2>
+        <p className="mt-1 text-sm text-muted">
+          Shown on the Contact, Terms, Privacy, Refund and Shipping pages. Razorpay checks these before approving live
+          payments.
+        </p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {fields.map((f) => (
+          <div key={f.key} className={f.multiline ? "sm:col-span-2" : ""}>
+            <label htmlFor={`biz-${f.key}`} className="label">
+              {f.label} {!f.required && <span className="font-normal text-muted">(optional)</span>}
+            </label>
+            {f.multiline ? (
+              <textarea id={`biz-${f.key}`} name={f.key} rows={3} defaultValue={values[f.key]} className="field py-2.5" />
+            ) : (
+              <input id={`biz-${f.key}`} name={f.key} defaultValue={values[f.key]} className="field" />
+            )}
+            {f.hint && <p className="mt-1 text-xs text-muted">{f.hint}</p>}
+          </div>
+        ))}
+      </div>
+      <FormMessage state={state} />
+      <button type="submit" className="btn-primary" disabled={pending}>
+        {pending ? "Saving…" : "Save business details"}
+      </button>
+    </form>
   );
 }

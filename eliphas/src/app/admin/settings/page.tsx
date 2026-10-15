@@ -3,15 +3,15 @@ import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { requireRole } from "@/lib/auth";
 import { earnings, printCost, rupees } from "@/lib/pricing";
-import { getPricingSettings } from "@/lib/settings";
+import { BUSINESS_FIELDS, getBusiness, getPricingSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
-import { RatesJsonForm, SettingsForm } from "./SettingsForms";
+import { BusinessForm, RatesJsonForm, SettingsForm } from "./SettingsForms";
 
 export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   await requireRole(["admin"]);
-  const settings = await getPricingSettings();
+  const [settings, business] = await Promise.all([getPricingSettings(), getBusiness()]);
   const supabase = await createClient();
   const [{ data: live }, { data: meta }] = await Promise.all([
     supabase
@@ -33,8 +33,8 @@ export default async function SettingsPage() {
   return (
     <>
       <PageHeader
-        title="Print rates and fees"
-        intro="Changes apply straight away to the calculator, pricing page and new orders. Past orders keep their prices."
+        title="Settings"
+        intro="Business details, print rates and fees. Changes apply straight away; past orders keep their prices."
       />
       {meta?.updated_at && (
         <p className="-mt-4 mb-6 text-sm text-muted">
@@ -64,6 +64,10 @@ export default async function SettingsPage() {
           </ul>
         </div>
       )}
+
+      <div className="mb-8">
+        <BusinessForm fields={BUSINESS_FIELDS} values={business} />
+      </div>
 
       <SettingsForm settings={settings} />
 

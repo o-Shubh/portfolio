@@ -1,4 +1,5 @@
 import "server-only";
+import { refundOrder } from "@/lib/refunds";
 import { earnings, paymentFee, printCost, shippingFor, type PricingSettings } from "@/lib/pricing";
 import type { Book } from "@/lib/publishing";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -68,8 +69,18 @@ async function pickPrinter(state: string): Promise<string | null> {
  */
 export async function markOrderPaid(orderId: string, paymentId: string, mode: "razorpay" | "mock") {
   const admin = createAdminClient();
-  const { data: order } = await admin.from("orders").select("id, status, ship_state").eq("id", orderId).single();
+  const { data: order } = await admin
+    .from("orders")
+    .select("id, status, ship_state, razorpay_payment_id")
+    .eq("id", orderId)
+    .single();
   if (!order) return { ok: false as const, reason: "Order not found." };
+  // Paid after it was cancelled (e.g. an admin cancelled an unpaid order): record the payment and give it back
+  if (order.status === "cancelled" && !order.razorpay_payment_id) {
+    await admin.from("orders").update({ razorpay_payment_id: paymentId, payment_mode: mode }).eq("id", orderId);
+    await refundOrder(orderId);
+    return { ok: true as const, already: true };
+  }
   if (order.status !== "pending_payment") return { ok: true as const, already: true };
 
   const printerId = await pickPrinter(order.ship_state);

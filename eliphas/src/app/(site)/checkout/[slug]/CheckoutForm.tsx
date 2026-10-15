@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmPayment, startCheckout, type CheckoutResult } from "@/app/actions/checkout";
@@ -203,6 +204,17 @@ export function CheckoutForm({
             <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
               <ShieldCheck className="h-4 w-4" aria-hidden />
               {mode === "mock" ? "Test mode: no real money is taken." : "Printed fresh and shipped in 5–9 working days."}
+            </p>
+            <p className="text-center text-xs text-muted">
+              By paying you agree to our{" "}
+              <Link href="/terms" className="underline underline-offset-2">
+                terms
+              </Link>{" "}
+              and{" "}
+              <Link href="/refunds" className="underline underline-offset-2">
+                refund policy
+              </Link>
+              . Free cancellation until printing starts.
             </p>
           </div>
         </aside>

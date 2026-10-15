@@ -26,7 +26,8 @@ const FEATURES = [
   "Change price or details any time",
 ];
 
-export default async function Home() {
+export default async function Home({ searchParams }: PageProps<"/">) {
+  const { account } = await searchParams;
   const [{ books }, genres, { rates, fees }] = await Promise.all([
     listPublishedBooks({ page: 1 }),
     listGenres(),
@@ -39,6 +40,14 @@ export default async function Home() {
 
   return (
     <>
+      {account === "deleted" && (
+        <p role="status" className="container-x mt-6">
+          <span className="block rounded-xl border border-line bg-surface-2 px-4 py-3 text-sm">
+            Your account has been deleted. Thank you for reading with us.
+          </span>
+        </p>
+      )}
+
       {/* ---------- Hero ---------- */}
       <section className="container-x grid items-center gap-12 pt-12 pb-16 md:pt-20 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
         <div>

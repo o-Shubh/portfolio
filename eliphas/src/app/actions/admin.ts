@@ -16,7 +16,7 @@ import {
   type PrintRates,
   type Shipping,
 } from "@/lib/pricing";
-import { getPricingSettings } from "@/lib/settings";
+import { BUSINESS_FIELDS, getPricingSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionState = { error?: string; ok?: string } | undefined;
@@ -286,6 +286,24 @@ export async function saveRatesJson(_prev: ActionState, fd: FormData): Promise<A
   if (error) return { error: "Could not save." };
   revalidatePath("/", "layout");
   return { ok: "Print rates saved." };
+}
+
+/** Company details used on the Contact and policy pages. */
+export async function saveBusiness(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const { profile } = await admin();
+  const value: Record<string, string> = {};
+  for (const f of BUSINESS_FIELDS) {
+    const v = text(fd, f.key);
+    if (v.length > (f.multiline ? 400 : 120)) return { error: `${f.label} is too long.` };
+    value[f.key] = v;
+  }
+  if (value.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.email)) return { error: "Support email doesn't look right." };
+  if (value.gstin && !/^[0-9A-Z]{15}$/.test(value.gstin.toUpperCase())) return { error: "GSTIN should be 15 letters and digits." };
+  value.gstin = value.gstin.toUpperCase();
+  const { error } = await saveSetting("business", value, profile.id);
+  if (error) return { error: "Could not save." };
+  revalidatePath("/", "layout");
+  return { ok: "Saved. The Contact and policy pages now show these details." };
 }
 
 // ---------------------------------------------------------------------------

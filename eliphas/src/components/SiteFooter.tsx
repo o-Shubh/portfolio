@@ -26,12 +26,22 @@ const COLUMNS = [
       { href: "/account/profile", label: "Profile" },
     ],
   },
+  {
+    title: "Company",
+    links: [
+      { href: "/contact", label: "Contact us" },
+      { href: "/terms", label: "Terms of use" },
+      { href: "/privacy", label: "Privacy policy" },
+      { href: "/refunds", label: "Refunds and cancellations" },
+      { href: "/shipping", label: "Shipping and delivery" },
+    ],
+  },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-line">
-      <div className="container-x grid gap-12 py-16 md:grid-cols-[1.5fr_repeat(3,1fr)]">
+      <div className="container-x grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div>
           <Logo />
           <p className="mt-5 max-w-xs font-heading text-2xl leading-snug tracking-tight">
