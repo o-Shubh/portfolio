@@ -14,6 +14,7 @@ import { BookCover } from "@/components/BookCover";
 import { articlePath, parseArticleRef, readingMinutes, topicLabel } from "@/lib/article-format";
 import { articleCounts, bodyBlocks, coverUrl, getPublicArticle, listPublicArticles, publicComments, readerState } from "@/lib/articles";
 import { getCurrentProfile } from "@/lib/auth";
+import { sampleUrl } from "@/lib/book-sample";
 import { coverUrl as bookCoverUrl } from "@/lib/books";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -72,7 +73,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
     readerState(me?.id ?? null, a.id, a.author_id),
     listPublicArticles({ authorId: a.author_id, excludeId: a.id, limit: 3 }),
     a.related_book_id
-      ? admin.from("books").select("id, slug, title, author_name, cover_path, status").eq("id", a.related_book_id).eq("status", "published").maybeSingle().then((r) => r.data)
+      ? admin.from("books").select("id, slug, title, author_name, cover_path, status, sample_path").eq("id", a.related_book_id).eq("status", "published").maybeSingle().then((r) => r.data)
       : Promise.resolve(null),
   ]);
   const comments = await publicComments(a.id, state.blockedIds);
@@ -135,7 +136,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
           <p className="mt-3 text-lg text-muted md:text-xl">{a.excerpt}</p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3" lang="en">
-            <AuthorAvatar name={author.full_name} />
+            <AuthorAvatar name={author.full_name} path={author.avatar_path} />
             <div className="min-w-0 flex-1">
               <p className="font-semibold">{profileHref ? <Link href={profileHref} className="hover:underline hover:underline-offset-2">{name}</Link> : name}</p>
               <p className="text-sm text-muted">
@@ -192,16 +193,23 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
               <p className="text-xs font-semibold tracking-wide text-accent-fg uppercase">The book behind this article</p>
               <p className="mt-1 text-lg leading-snug font-semibold">{book.title}</p>
               <p className="text-sm text-muted">by {book.author_name}</p>
-              <a href={`/api/articles/${a.id}/book`} className="btn-primary mt-3 min-h-10 px-4 text-sm">
-                <BookOpen className="h-4 w-4" aria-hidden /> View book
-              </a>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a href={`/api/articles/${a.id}/book`} className="btn-primary min-h-10 px-4 text-sm">
+                  <BookOpen className="h-4 w-4" aria-hidden /> View book
+                </a>
+                {book.sample_path && (
+                  <a href={sampleUrl(book.sample_path)!} target="_blank" rel="noopener" className="btn-ghost min-h-10 px-4 text-sm" data-testid="article-read-sample">
+                    Read sample
+                  </a>
+                )}
+              </div>
             </div>
           </aside>
         )}
 
         <section aria-label="About the author" className="mt-8 rounded-xl bg-surface-2 p-5" lang="en">
           <div className="flex items-center gap-3">
-            <AuthorAvatar name={author.full_name} size="lg" />
+            <AuthorAvatar name={author.full_name} path={author.avatar_path} size="lg" />
             <div className="min-w-0">
               <p className="text-xs text-muted">Written by</p>
               <p className="text-lg font-semibold">{profileHref ? <Link href={profileHref} className="hover:underline hover:underline-offset-2">{name}</Link> : name}</p>
@@ -221,7 +229,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
             signedIn={Boolean(me)}
             canComment={!state.blockedWithAuthor && !state.restricted}
             intent={intent}
-            comments={comments.map((c) => ({ id: c.id, body: c.body, created_at: c.created_at, edited_at: c.edited_at, user_id: c.user_id, name: c.name, mine: c.user_id === me?.id }))}
+            comments={comments.map((c) => ({ id: c.id, body: c.body, created_at: c.created_at, edited_at: c.edited_at, user_id: c.user_id, name: c.name, avatar: c.avatar, mine: c.user_id === me?.id }))}
           />
         </div>
 

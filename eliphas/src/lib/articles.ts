@@ -1,6 +1,5 @@
 import "server-only";
 import { cookies } from "next/headers";
-import sharp from "sharp";
 import type { Database } from "@/lib/database.types";
 import type { Block } from "@/lib/article-format";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -61,35 +60,7 @@ export async function blockedBetween(a: string, b: string) {
   return (count ?? 0) > 0;
 }
 
-export const COVER_MAX_BYTES = 5 * 1024 * 1024;
-const SIGNATURES: { type: string; test: (b: Buffer) => boolean }[] = [
-  { type: "image/jpeg", test: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
-  { type: "image/png", test: (b) => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) },
-  { type: "image/webp", test: (b) => b.subarray(0, 4).toString("ascii") === "RIFF" && b.subarray(8, 12).toString("ascii") === "WEBP" },
-];
-
-/**
- * Checks a cover upload by its actual bytes (JPEG, PNG or WebP, at most 5 MB), then re-encodes it as WebP,
- * at most 1600 px, rotated upright. Re-encoding drops all metadata (EXIF, GPS, camera details).
- */
-export async function processCover(input: Buffer): Promise<{ data: Buffer; width: number; height: number } | { error: string }> {
-  if (input.length === 0) return { error: "The file is empty." };
-  if (input.length > COVER_MAX_BYTES) return { error: "Images can be up to 5 MB." };
-  if (!SIGNATURES.some((s) => s.test(input))) return { error: "Use a JPEG, PNG or WebP image." };
-  try {
-    const img = sharp(input, { limitInputPixels: 40_000_000, failOn: "error" });
-    const meta = await img.metadata();
-    if (!meta.width || !meta.height || meta.width < 300 || meta.height < 200) return { error: "The image is too small. Use one at least 300 × 200 pixels." };
-    const { data, info } = await img
-      .rotate()
-      .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 82 })
-      .toBuffer({ resolveWithObject: true });
-    return { data, width: info.width, height: info.height };
-  } catch {
-    return { error: "We couldn't read that image. Try exporting it again as JPEG or PNG." };
-  }
-}
+export { COVER_MAX_BYTES, processCover } from "@/lib/images";
 
 export const VIEWER_COOKIE = "eip_vid";
 /** Who is viewing, for de-duplicating views: the account, or a random id kept in a first-party cookie. */
@@ -146,8 +117,8 @@ export async function getPublicArticle(shortId: string) {
   const admin = createAdminClient();
   const { data: a } = await admin.from("articles").select("*").eq("short_id", shortId).eq("status", "published").eq("moderation", "visible").maybeSingle();
   if (!a) return null;
-  const { data: author } = await admin.from("profiles").select("id, full_name, handle, bio").eq("id", a.author_id).maybeSingle();
-  return { article: a, author: author ?? { id: a.author_id, full_name: null, handle: null, bio: null } };
+  const { data: author } = await admin.from("profiles").select("id, full_name, handle, bio, avatar_path").eq("id", a.author_id).maybeSingle();
+  return { article: a, author: author ?? { id: a.author_id, full_name: null, handle: null, bio: null, avatar_path: null } };
 }
 
 /** The signed-in reader's own like/save/follow state, and anyone either side has blocked. */
@@ -170,19 +141,22 @@ export async function publicComments(articleId: string, hideFrom: Set<string>) {
   const admin = createAdminClient();
   const { data } = await admin
     .from("article_comments")
-    .select("id, body, created_at, edited_at, user_id, who:profiles!article_comments_user_id_fkey(full_name)")
+    .select("id, body, created_at, edited_at, user_id, who:profiles!article_comments_user_id_fkey(full_name, avatar_path)")
     .eq("article_id", articleId)
     .eq("moderation", "visible")
     .order("created_at", { ascending: true })
     .limit(500);
   return (data ?? [])
     .filter((c) => !hideFrom.has(c.user_id))
-    .map((c) => ({ ...c, name: (c.who as { full_name: string | null } | null)?.full_name ?? "Reader" }));
+    .map((c) => {
+      const who = c.who as { full_name: string | null; avatar_path: string | null } | null;
+      return { ...c, name: who?.full_name ?? "Reader", avatar: who?.avatar_path ?? null };
+    });
 }
 
 /** A public author page: authors and admins with a handle (via the public_authors view's rules). */
 export async function getPublicAuthor(handle: string) {
   if (!/^[a-z0-9][a-z0-9-]{2,40}$/.test(handle)) return null;
-  const { data } = await createAdminClient().from("public_authors").select("id, handle, full_name, bio").eq("handle", handle).maybeSingle();
-  return data?.id && data.handle ? (data as { id: string; handle: string; full_name: string | null; bio: string | null }) : null;
+  const { data } = await createAdminClient().from("public_authors").select("id, handle, full_name, bio, avatar_path").eq("handle", handle).maybeSingle();
+  return data?.id && data.handle ? (data as { id: string; handle: string; full_name: string | null; bio: string | null; avatar_path: string | null }) : null;
 }

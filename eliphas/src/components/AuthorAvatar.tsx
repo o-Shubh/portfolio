@@ -1,5 +1,11 @@
-/** Initials in a navy circle (authors don't upload photos yet). */
-export function AuthorAvatar({ name, size = "md" }: { name: string | null; size?: "sm" | "md" | "lg" }) {
+/* eslint-disable @next/next/no-img-element -- photos come from Supabase Storage */
+import { avatarUrl } from "@/lib/avatars";
+
+/** Profile photo, or initials in a navy circle when there's no photo. Decorative: the name is always shown next to it. */
+export function AuthorAvatar({ name, path, size = "md" }: { name: string | null; path?: string | null; size?: "sm" | "md" | "lg" }) {
+  const dims = size === "sm" ? "h-8 w-8 text-xs" : size === "lg" ? "h-16 w-16 text-xl" : "h-11 w-11 text-sm";
+  const src = avatarUrl(path);
+  if (src) return <img src={src} alt="" width={64} height={64} loading="lazy" className={`shrink-0 rounded-full object-cover ring-2 ring-gold/40 ${dims}`} />;
   const initials =
     (name ?? "")
       .split(/\s+/)
@@ -7,7 +13,6 @@ export function AuthorAvatar({ name, size = "md" }: { name: string | null; size?
       .slice(0, 2)
       .map((w) => [...w][0]?.toUpperCase())
       .join("") || "?";
-  const dims = size === "sm" ? "h-8 w-8 text-xs" : size === "lg" ? "h-16 w-16 text-xl" : "h-11 w-11 text-sm";
   return (
     <span aria-hidden className={`grid shrink-0 place-items-center rounded-full bg-navy font-semibold text-gold ring-2 ring-gold/40 ${dims}`}>
       {initials}
