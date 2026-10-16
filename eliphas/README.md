@@ -321,6 +321,17 @@ authorised book excerpts. Articles are free to read at `/articles` and on each a
   them at `/admin/moderation` (hide, restore, remove, dismiss, each with a logged reason) and can restrict
   accounts from posting. Comments and reports are rate limited. No automated plagiarism or AI checks.
 
+### Profile photos and free samples
+
+- **Photos.** Anyone can add a profile photo in Account → Profile. It's checked by its bytes (JPEG, PNG or
+  WebP, up to 5 MB), cropped square to 400 × 400 and re-encoded as WebP, which removes EXIF/GPS. Photos show on
+  articles, author pages, comments and the app header; without one, initials are shown.
+- **Free sample ("Read sample").** On a book's **Free sample** step, the author picks a page range from their
+  own manuscript: at most 10% of the book and never more than 30 pages. The server copies only those pages into
+  a new PDF (manuscript metadata is not copied) in the public `book-samples` bucket; the manuscript stays
+  private. The sample appears on the book page and on articles that link to the book, once the book is
+  published. Authors can update or stop sharing it at any time.
+
 ### Orders and payments
 
 1. **Buy now** on a book → `/checkout/<book>`: copies (1–10) and delivery address. Or **Add to cart** on

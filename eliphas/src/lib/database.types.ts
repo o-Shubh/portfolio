@@ -96,6 +96,9 @@ export type Database = {
           language: string;
           manuscript_height_in: number | null;
           manuscript_path: string | null;
+          sample_path: string | null;
+          sample_from: number | null;
+          sample_to: number | null;
           manuscript_width_in: number | null;
           mrp: number | null;
           page_count: number | null;
@@ -132,6 +135,9 @@ export type Database = {
           language?: string;
           manuscript_height_in?: number | null;
           manuscript_path?: string | null;
+          sample_path?: string | null;
+          sample_from?: number | null;
+          sample_to?: number | null;
           manuscript_width_in?: number | null;
           mrp?: number | null;
           page_count?: number | null;
@@ -167,6 +173,9 @@ export type Database = {
           language?: string;
           manuscript_height_in?: number | null;
           manuscript_path?: string | null;
+          sample_path?: string | null;
+          sample_from?: number | null;
+          sample_to?: number | null;
           manuscript_width_in?: number | null;
           mrp?: number | null;
           page_count?: number | null;
@@ -1109,6 +1118,7 @@ export type Database = {
           bio: string | null
           handle: string | null
           notify_new_articles: boolean
+          avatar_path: string | null
         };
         ComputedFields: never;
         Insert: {
@@ -1127,6 +1137,7 @@ export type Database = {
           bio?: string | null
           handle?: string | null
           notify_new_articles?: boolean
+          avatar_path?: string | null
         };
         Update: {
           author_terms_accepted_at?: string | null;
@@ -1144,6 +1155,7 @@ export type Database = {
           bio?: string | null
           handle?: string | null
           notify_new_articles?: boolean
+          avatar_path?: string | null
         };
         Relationships: [];
       };
@@ -2365,14 +2377,14 @@ isOneToOne: false
       };
       "public_authors": {
                   Row: {
-                    "bio": string | null,"full_name": string | null,"handle": string | null,"id": string | null
+                    "avatar_path": string | null,"bio": string | null,"full_name": string | null,"handle": string | null,"id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                           "bio"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string | null
+                           "avatar_path"?: string | null,"bio"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string | null
                          }
                         Update: {
-                           "bio"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string | null
+                           "avatar_path"?: string | null,"bio"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string | null
                          }
                         Relationships: [
                     

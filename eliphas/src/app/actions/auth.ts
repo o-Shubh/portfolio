@@ -41,6 +41,7 @@ export async function deleteMyAccount(confirm: string): Promise<{ error?: string
     .update({ status: "cancelled", cancelled_at: new Date().toISOString(), cancelled_by: "buyer", cancel_reason: "Account deleted" })
     .eq("buyer_id", profile.id)
     .eq("status", "pending_payment");
+  if (profile.avatar_path) await admin.storage.from("avatars").remove([profile.avatar_path]);
   const { error } = await admin.auth.admin.deleteUser(profile.id);
   if (error) {
     console.error("Account deletion failed", profile.id, error);

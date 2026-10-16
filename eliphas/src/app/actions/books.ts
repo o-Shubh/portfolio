@@ -18,6 +18,7 @@ import {
   type Book,
 } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionState = { error?: string; ok?: string } | undefined;
@@ -267,6 +268,8 @@ export async function deleteDraft(bookId: string): Promise<ActionState> {
   const privateFiles = [book.manuscript_path, book.print_cover_path].filter((p): p is string => Boolean(p));
   if (privateFiles.length) await supabase.storage.from("manuscripts").remove(privateFiles);
   if (book.cover_path) await supabase.storage.from("covers").remove([book.cover_path]);
+  // The sample bucket is written only by the server, so remove its file with the admin client
+  if (book.sample_path) await createAdminClient().storage.from("book-samples").remove([book.sample_path]);
   const { error } = await supabase.from("books").delete().eq("id", bookId);
   if (error) return { error: "Could not delete. Please try again." };
 

@@ -3,10 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { addComment, deleteComment, editComment, setBlock } from "@/app/actions/community";
+import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { ReportForm } from "./ReportForm";
 import { useClearIntent, useGate } from "./useGate";
 
-export type PublicComment = { id: string; body: string; created_at: string; edited_at: string | null; user_id: string; name: string; mine: boolean };
+export type PublicComment = { id: string; body: string; created_at: string; edited_at: string | null; user_id: string; name: string; avatar: string | null; mine: boolean };
 
 const when = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
 
@@ -121,7 +122,8 @@ function Comment({ c, signedIn }: { c: PublicComment; signedIn: boolean }) {
 
   return (
     <li className="py-4" data-testid="comment">
-      <p className="text-sm">
+      <p className="flex items-center gap-2 text-sm">
+        <AuthorAvatar name={c.name} path={c.avatar} size="sm" />
         <span className="font-semibold">{c.name}</span>
         <span className="text-muted">
           {" · "}

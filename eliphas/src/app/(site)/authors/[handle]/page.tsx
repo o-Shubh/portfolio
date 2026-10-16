@@ -56,7 +56,7 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
   return (
     <div className="container-x py-5 md:py-8">
       <header className="flex flex-wrap items-center gap-4 rounded-xl bg-surface p-5 shadow-soft ring-1 ring-line md:p-6">
-        <AuthorAvatar name={author.full_name} size="lg" />
+        <AuthorAvatar name={author.full_name} path={author.avatar_path} size="lg" />
         <div className="min-w-0 flex-1">
           <p className="eyebrow">Author</p>
           <h1 className="mt-1 text-2xl md:text-3xl">{name}</h1>

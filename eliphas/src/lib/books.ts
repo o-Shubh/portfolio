@@ -6,12 +6,12 @@ export type Book = Database["public"]["Tables"]["books"]["Row"];
 
 /** Columns safe to show the public (no file paths of private manuscripts, no review notes). */
 const PUBLIC_COLUMNS =
-  "id, slug, title, subtitle, author_name, description, language, genre, isbn, page_count, trim_size, binding, interior, paper, cover_finish, mrp, cover_path, published_at, author_id";
+  "id, slug, title, subtitle, author_name, description, language, genre, isbn, page_count, trim_size, binding, interior, paper, cover_finish, mrp, cover_path, published_at, author_id, sample_path, sample_from, sample_to";
 export type PublicBook = Pick<
   Book,
   | "id" | "slug" | "title" | "subtitle" | "author_name" | "description" | "language" | "genre" | "isbn"
   | "page_count" | "trim_size" | "binding" | "interior" | "paper" | "cover_finish" | "mrp" | "cover_path"
-  | "published_at" | "author_id"
+  | "published_at" | "author_id" | "sample_path" | "sample_from" | "sample_to"
 >;
 
 export const PAGE_SIZE = 24;

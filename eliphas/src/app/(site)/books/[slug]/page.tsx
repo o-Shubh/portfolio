@@ -1,4 +1,5 @@
-import { PackageCheck, Printer, ShieldCheck, Truck } from "lucide-react";
+import { BookOpen, PackageCheck, Printer, ShieldCheck, Truck } from "lucide-react";
+import { sampleUrl } from "@/lib/book-sample";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/AddToCartButton";
@@ -28,6 +29,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
 
   const [more, { rates }, handle] = await Promise.all([moreByAuthor(book), getPricingSettings(), authorHandle(book.author_id)]);
   const cover = coverUrl(book.cover_path);
+  const sample = sampleUrl(book.sample_path);
   const label = (group: Record<string, { label: string }>, key: string) => group[key]?.label ?? key;
 
   const details = [
@@ -117,6 +119,11 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
                 <Truck className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
                 <span>Delivery across India · shipping for your PIN code is shown at checkout · usually arrives in 5–9 working days</span>
               </p>
+              {sample && (
+                <a href={sample} target="_blank" rel="noopener" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline underline-offset-2" data-testid="read-sample">
+                  <BookOpen className="h-4 w-4" aria-hidden /> Read a free sample (pages {book.sample_from}–{book.sample_to}, PDF)
+                </a>
+              )}
               <div className="mt-5 hidden gap-3 md:grid md:grid-cols-2">
                 <AddToCartButton bookId={book.id} className="min-h-12 text-base" />
                 <Link href={`/checkout/${book.slug}`} className="btn-accent min-h-12 text-base">

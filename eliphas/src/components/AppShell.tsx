@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element -- profile photos come from Supabase Storage */
 import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
 import { ROLE_LABEL, type Profile } from "@/lib/auth";
+import { avatarUrl } from "@/lib/avatars";
 import { formatPhone } from "@/lib/phone";
 import { InstallPrompt } from "./InstallPrompt";
 import { Logo } from "./Logo";
@@ -24,6 +26,7 @@ export function AppShell({
   nav: NavItem[];
   children: React.ReactNode;
 }) {
+  const photo = avatarUrl(profile.avatar_path);
   const initials = (profile.full_name ?? "?")
     .split(" ")
     .map((w) => w[0])
@@ -42,9 +45,13 @@ export function AppShell({
         <NavLinks items={nav} variant="sidebar" />
         <div className="mt-auto space-y-1 border-t border-line pt-3">
           <Link href="/account/profile" className="flex items-center gap-3 rounded-lg p-2 transition hover:bg-surface-2">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-xs font-semibold text-navy">
-              {initials}
-            </span>
+            {photo ? (
+              <img src={photo} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
+            ) : (
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-xs font-semibold text-navy">
+                {initials}
+              </span>
+            )}
             <span className="min-w-0">
               <span className="block truncate text-sm font-medium">{profile.full_name}</span>
               <span className="block truncate text-xs text-muted">
@@ -84,7 +91,7 @@ export function AppShell({
               className="ml-1 grid h-8 w-8 place-items-center rounded-full bg-gold text-xs font-semibold text-navy"
               aria-label="My profile"
             >
-              {initials || <UserRound className="h-4 w-4" />}
+              {photo ? <img src={photo} alt="" className="h-8 w-8 rounded-full object-cover" /> : initials || <UserRound className="h-4 w-4" />}
             </Link>
           </div>
         </div>
