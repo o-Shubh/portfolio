@@ -9,6 +9,7 @@ import {
   declineQuote,
   payServiceQuote,
   recordRequirementFile,
+  requestBundleUpgrade,
   requestExtraWork,
   requestRevision,
   saveRequirements,
@@ -195,5 +196,33 @@ export function CancelService({ orderId, paid }: { orderId: string; paid: boolea
     <button type="button" className="text-sm text-danger underline" onClick={() => setConfirming(true)}>
       Cancel request
     </button>
+  );
+}
+
+/** Replaces this request (and the book's other cover/formatting/launch kit requests) with one bundle request. */
+export function UpgradeToBundle({ orderId }: { orderId: string }) {
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <>
+      <button
+        type="button"
+        className="btn-primary w-full"
+        disabled={pending}
+        onClick={() =>
+          start(async () => {
+            const res = await requestBundleUpgrade(orderId);
+            setError(res?.error ?? null);
+          })
+        }
+      >
+        {pending ? "Requesting…" : "Request bundle upgrade"}
+      </button>
+      {error && (
+        <p role="alert" className="text-sm font-medium text-danger">
+          {error}
+        </p>
+      )}
+    </>
   );
 }

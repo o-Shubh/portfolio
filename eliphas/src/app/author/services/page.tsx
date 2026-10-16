@@ -3,9 +3,9 @@ import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { ServiceStatusBadge } from "@/components/ServiceStatusBadge";
 import { requireRole } from "@/lib/auth";
-import { formatPaise, withGst } from "@/lib/commission";
 import { proStatus } from "@/lib/plans";
-import { AUTHOR_ACTION_STATUSES } from "@/lib/services";
+import { ServiceCard } from "@/components/ServiceCard";
+import { AUTHOR_ACTION_STATUSES, BUNDLE_CODE, BUNDLE_PARTS, OPEN_SERVICE_STATUSES, type CatalogItem } from "@/lib/services";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { StartService } from "./StartService";
 
@@ -16,7 +16,7 @@ export default async function ServicesPage() {
   const admin = createAdminClient();
   const [{ data: catalog }, { data: orders }, pro] = await Promise.all([
     admin.from("current_service_catalog").select("*").eq("active", true).order("sort"),
-    admin.from("service_orders").select("id, order_number, kind, status, created_at, requirements, service_catalog(name)").eq("author_id", profile.id).order("created_at", { ascending: false }),
+    admin.from("service_orders").select("id, order_number, kind, status, created_at, requirements, service_catalog(name, code)").eq("author_id", profile.id).order("created_at", { ascending: false }),
     proStatus(profile.id),
   ]);
 
@@ -67,41 +67,32 @@ export default async function ServicesPage() {
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         {(catalog ?? []).map((c) => {
-          const price =
-            c.pricing === "fixed"
-              ? `${formatPaise(c.price_paise!)} + GST (${formatPaise(withGst(c.price_paise!, Number(c.gst_percent)).totalPaise)} total)`
-              : `${formatPaise(c.min_paise!)}–${formatPaise(c.max_paise!)} + GST · fixed quote after review`;
+          const existing = (orders ?? []).find((o) => o.service_catalog?.code === c.code && OPEN_SERVICE_STATUSES.includes(o.status));
+          const hasPart = (orders ?? []).some((o) => BUNDLE_PARTS.includes(o.service_catalog?.code ?? "") && !["cancelled", "refunded"].includes(o.status));
           return (
-            <section key={c.id} className="card flex flex-col">
-              <h2 className="text-lg">{c.name}</h2>
-              <p className="mt-1 font-semibold">{price}</p>
-              <p className="mt-3 text-sm text-muted">{c.scope}</p>
-              <h3 className="mt-4 text-sm font-semibold">Included</h3>
-              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
-                {(c.deliverables ?? []).map((d) => (
-                  <li key={d}>{d}</li>
-                ))}
-                <li>
-                  {c.revision_rounds} revision round{c.revision_rounds === 1 ? "" : "s"}
-                </li>
-              </ul>
-              {(c.exclusions ?? []).length > 0 && (
+            <ServiceCard
+              key={c.id}
+              item={c as CatalogItem}
+              headingLevel={2}
+              actions={
                 <>
-                  <h3 className="mt-4 text-sm font-semibold">Not included</h3>
-                  <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted">
-                    {c.exclusions!.map((d) => (
-                      <li key={d}>{d}</li>
-                    ))}
-                  </ul>
+                  <StartService code={c.code!} label="Start request" />
+                  {existing && (
+                    <Link href={`/author/services/${existing.id}`} className="btn-ghost">
+                      View existing request
+                    </Link>
+                  )}
+                  <p className="w-full text-xs text-muted">
+                    No payment now. We review your files and send a fixed quote first.
+                    {c.code === BUNDLE_CODE &&
+                      hasPart &&
+                      " Already requested a cover, formatting or launch kit? Open that request and choose Upgrade to the bundle, so you aren't charged twice."}
+                  </p>
                 </>
-              )}
-              <div className="mt-auto pt-5">
-                <StartService code={c.code!} label="Start request" />
-                <p className="mt-2 text-xs text-muted">No payment now. We review your files and send a fixed quote first.</p>
-              </div>
-            </section>
+              }
+            />
           );
         })}
       </div>

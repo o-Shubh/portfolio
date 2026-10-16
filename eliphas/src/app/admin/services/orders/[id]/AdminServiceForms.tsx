@@ -20,10 +20,13 @@ export function QuoteForm({
   orderId,
   kind,
   defaults,
+  priors = [],
 }: {
   orderId: string;
   kind: "initial" | "additional";
   defaults: { price: string; gst: number; revisions: number; deliverables: string[]; hint: string };
+  /** Bundle upgrade: earlier requests and what was paid for each (before GST) */
+  priors?: { id: string; label: string; paidPaise: number }[];
 }) {
   const [state, onSubmit, pending] = useFormAction(issueQuote.bind(null, orderId));
   return (
@@ -31,7 +34,7 @@ export function QuoteForm({
       <input type="hidden" name="kind" value={kind} />
       <p className="text-sm text-muted">{defaults.hint}</p>
       <div className="grid gap-3 sm:grid-cols-4">
-        <L label="Price (₹, before GST)">
+        <L label={priors.length ? "Bundle price before credits (₹, before GST)" : "Price (₹, before GST)"}>
           <input name="price" defaultValue={defaults.price} className="field" inputMode="decimal" />
         </L>
         <L label="GST %">
@@ -44,6 +47,17 @@ export function QuoteForm({
           <input name="delivery_by" type="date" className="field" />
         </L>
       </div>
+      {priors.length > 0 && (
+        <fieldset className="space-y-2 rounded-xl bg-surface-2 p-3">
+          <legend className="px-1 text-sm font-semibold">Credits for earlier requests (₹, before GST)</legend>
+          <p className="text-xs text-muted">Leave empty for no credit. A credit can&apos;t be more than what was paid. The author sees each line.</p>
+          {priors.map((p) => (
+            <L key={p.id} label={`${p.label} · ${p.paidPaise ? `paid ₹${p.paidPaise / 100}` : "not paid (no credit possible)"}`}>
+              <input name={`credit_${p.id}`} className="field" inputMode="decimal" disabled={!p.paidPaise} placeholder="0" />
+            </L>
+          ))}
+        </fieldset>
+      )}
       <L label="Deliverables (one per line)">
         <textarea name="deliverables" rows={4} defaultValue={defaults.deliverables.join("\n")} className="field py-2.5" />
       </L>

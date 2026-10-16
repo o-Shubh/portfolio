@@ -6,8 +6,8 @@ import { refundPaymentRecord } from "@/lib/billing";
 import { percentOf } from "@/lib/commission";
 import type { Json } from "@/lib/database.types";
 import { logAudit } from "@/lib/plans";
-import { QC_ITEMS } from "@/lib/services";
-import { cancelService, moveService, noteService } from "@/lib/services-server";
+import { QC_ITEMS, upgradeQuoteLines, type QuoteLine } from "@/lib/services";
+import { cancelService, moveService, noteService, openUpgradeFor, upgradePriors } from "@/lib/services-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type AdminMoneyState = { error?: string; ok?: string } | undefined;
@@ -155,8 +155,12 @@ export async function issueQuote(orderId: string, _prev: AdminMoneyState, fd: Fo
   const kind = text(fd, "kind") === "additional" ? "additional" : "initial";
   const allowedFrom = kind === "initial" ? ["scope_review"] : ["author_review", "completed"];
   if (!allowedFrom.includes(order.status)) return { error: kind === "initial" ? "Quotes are issued during scope review." : "Additional work is quoted after delivery." };
+  const replacedBy = await openUpgradeFor(order.id);
+  if (replacedBy) return { error: `This request is being replaced by bundle upgrade ${replacedBy.order_number}. Quote the bundle instead, so nothing is charged twice.` };
 
-  const base = rupeesToPaise(text(fd, "price"));
+  const price = rupeesToPaise(text(fd, "price"));
+  let base = price;
+  let lineItems: QuoteLine[] | null = null;
   const gstPercent = num(text(fd, "gst_percent"));
   const revisions = num(text(fd, "revisions"));
   const deliveryBy = text(fd, "delivery_by");
@@ -165,7 +169,20 @@ export async function issueQuote(orderId: string, _prev: AdminMoneyState, fd: Fo
     .split("\n")
     .map((s) => s.trim())
     .filter(Boolean);
-  if (!(base > 0)) return { error: "Enter the price before GST." };
+  if (!(price > 0)) return { error: "Enter the price before GST." };
+  // Bundle upgrade: bundle price minus the credits admin chooses for earlier paid requests (none by default)
+  if (kind === "initial" && order.upgrade_from?.length) {
+    const priors = await upgradePriors(order);
+    const credits: Record<string, number> = {};
+    for (const p of priors) {
+      const v = text(fd, `credit_${p.id}`);
+      credits[p.id] = v === "" ? 0 : rupeesToPaise(v);
+    }
+    const lines = upgradeQuoteLines(order.service_catalog?.name ?? "Bundle", price, priors.map((p) => ({ id: p.id, label: `${p.name} ${p.orderNumber}`, paidPaise: p.paidPaise })), credits);
+    if ("error" in lines) return { error: lines.error };
+    base = lines.basePaise;
+    lineItems = lines.lines;
+  }
   if (!Number.isFinite(gstPercent) || gstPercent < 0 || gstPercent > 40) return { error: "GST must be 0–40%." };
   if (!Number.isInteger(revisions) || revisions < 0 || revisions > 10) return { error: "Revisions must be 0–10." };
   if (!deliverables.length) return { error: "List the deliverables." };
@@ -176,7 +193,7 @@ export async function issueQuote(orderId: string, _prev: AdminMoneyState, fd: Fo
   const cat = order.service_catalog;
   if (kind === "initial" && cat) {
     const outOfRange =
-      cat.pricing === "fixed" ? base !== cat.price_paise : base < (cat.min_paise ?? 0) || base > (cat.max_paise ?? Infinity);
+      cat.pricing === "fixed" ? price !== cat.price_paise : price < (cat.min_paise ?? 0) || price > (cat.max_paise ?? Infinity);
     if (outOfRange && notes.length < 20) {
       return { error: "This price differs from the catalogue. Explain the revised scope in the notes (the author sees it)." };
     }
@@ -196,6 +213,7 @@ export async function issueQuote(orderId: string, _prev: AdminMoneyState, fd: Fo
       revisions,
       delivery_by: deliveryBy,
       notes: notes || null,
+      line_items: lineItems as unknown as Json,
       issued_by: profile.id,
     })
     .select("id")
@@ -203,7 +221,7 @@ export async function issueQuote(orderId: string, _prev: AdminMoneyState, fd: Fo
   if (error) return { error: "Could not save the quote." };
   const moved = await moveService(order, "quote_awaiting_acceptance", profile.id, `Quote issued: ₹${(base + gstPaise) / 100} incl. GST, delivery by ${deliveryBy}`);
   if (!moved) return { error: "The order changed while you were quoting. Refresh." };
-  await logAudit(profile.id, "service_quote.issued", "service_quote", q.id, { order: order.id, kind, base, gstPercent, revisions, deliveryBy });
+  await logAudit(profile.id, "service_quote.issued", "service_quote", q.id, { order: order.id, kind, base, gstPercent, revisions, deliveryBy, lineItems });
   refresh(order.id);
   return { ok: "Quote sent to the author." };
 }

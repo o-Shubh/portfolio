@@ -2,13 +2,16 @@ import { ArrowLeft, FileText } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SampleGallery } from "@/components/SampleGallery";
 import { ServiceStatusBadge } from "@/components/ServiceStatusBadge";
 import { requireRole } from "@/lib/auth";
 import { formatPaise } from "@/lib/commission";
-import { REQUIREMENT_FIELDS, SERVICE_STATUS } from "@/lib/services";
+import { SAMPLE_LABEL, SERVICE_PORTFOLIO } from "@/lib/service-portfolio";
+import { BUNDLE_PARTS, REQUIREMENT_FIELDS, SERVICE_STATUS, type QuoteLine } from "@/lib/services";
+import { openUpgradeFor, upgradePriors } from "@/lib/services-server";
 import { serviceFilesWithLinks } from "@/lib/service-files";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { CancelService, QuoteActions, RequirementsForm, RequirementUploads, ReviewActions } from "./AuthorServiceForms";
+import { CancelService, QuoteActions, RequirementsForm, RequirementUploads, ReviewActions, UpgradeToBundle } from "./AuthorServiceForms";
 
 export const metadata: Metadata = { title: "Service request" };
 
@@ -22,11 +25,15 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
   const { data: order } = await admin.from("service_orders").select("*, service_catalog(*), books(id, title)").eq("id", id).maybeSingle();
   if (!order || order.author_id !== profile.id) notFound(); // only the author's own orders
 
-  const [files, { data: quotes }, { data: events }] = await Promise.all([
+  const [files, { data: quotes }, { data: events }, priors, replacedBy] = await Promise.all([
     serviceFilesWithLinks(order.id),
     admin.from("service_quotes").select("*").eq("service_order_id", order.id).order("issued_at", { ascending: false }),
     admin.from("service_events").select("*").eq("service_order_id", order.id).order("created_at", { ascending: false }),
+    upgradePriors(order),
+    openUpgradeFor(order.id),
   ]);
+  const portfolio = order.service_catalog ? SERVICE_PORTFOLIO[order.service_catalog.code] : undefined;
+  const canUpgrade = Boolean(order.service_catalog && BUNDLE_PARTS.includes(order.service_catalog.code)) && !replacedBy && !["cancelled", "refunded"].includes(order.status);
   const cat = order.service_catalog;
   const reqs = order.requirements as Record<string, string>;
   const openQuote = (quotes ?? []).find((q) => q.status === "issued" || q.status === "accepted");
@@ -57,6 +64,31 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
           {cat && ["formatting", "bundle"].includes(cat.code) && ". We use the manuscript you uploaded for it."}
         </p>
       )}
+      {replacedBy && (
+        <p className="mt-3 rounded-lg bg-accent/15 px-3 py-2 text-sm">
+          This request is part of your bundle upgrade{" "}
+          <Link href={`/author/services/${replacedBy.id}`} className="font-semibold underline">
+            {replacedBy.order_number}
+          </Link>
+          . It won&apos;t be charged separately; if it was never paid, it closes when you pay the bundle.
+        </p>
+      )}
+      {priors.length > 0 && (
+        <div className="mt-3 rounded-lg bg-surface-2 px-3 py-2 text-sm">
+          <p className="font-semibold">Bundle upgrade. Replaces:</p>
+          <ul className="mt-1 space-y-0.5">
+            {priors.map((p) => (
+              <li key={p.id}>
+                <Link href={`/author/services/${p.id}`} className="underline">
+                  {p.name} · {p.orderNumber}
+                </Link>{" "}
+                <span className="text-muted">({SERVICE_STATUS[p.status].label.toLowerCase()})</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-muted">We review what you&apos;ve paid and what&apos;s done, then send an itemised quote. Nothing is charged twice.</p>
+        </div>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
@@ -79,7 +111,10 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
                 {openQuote.kind === "additional" ? "Quote for additional work" : "Your quote"}
               </h2>
               <dl className="mt-3 space-y-1 text-sm">
-                <Row k="Price" v={formatPaise(openQuote.base_paise)} />
+                {((openQuote.line_items as QuoteLine[] | null) ?? []).map((l) => (
+                  <Row key={l.label} k={l.label} v={l.amount_paise < 0 ? `− ${formatPaise(-l.amount_paise)}` : formatPaise(l.amount_paise)} />
+                ))}
+                <Row k={openQuote.line_items ? "Price after credits" : "Price"} v={formatPaise(openQuote.base_paise)} />
                 <Row k={`GST (${Number(openQuote.gst_percent)}%)`} v={formatPaise(openQuote.gst_paise)} />
                 <Row k="Total to pay" v={formatPaise(openQuote.total_paise)} strong />
                 <Row k="Revisions included" v={String(openQuote.revisions)} />
@@ -137,6 +172,23 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
         </div>
 
         <aside className="space-y-6">
+          {portfolio && (
+            <section className="card space-y-2">
+              <h2 className="text-lg">Sample work</h2>
+              <SampleGallery title={name} samples={portfolio.samples} />
+              <p className="text-xs text-muted">{SAMPLE_LABEL}</p>
+            </section>
+          )}
+          {canUpgrade && (
+            <section className="card space-y-2">
+              <h2 className="text-lg">Want the full bundle?</h2>
+              <p className="text-sm text-muted">
+                Upgrade to the Book Design & Launch Bundle (cover, formatting and launch kit). We review what you&apos;ve paid for and what&apos;s done, then send an
+                itemised quote for the difference.
+              </p>
+              <UpgradeToBundle orderId={order.id} />
+            </section>
+          )}
           <section className="card text-sm">
             <h2 className="mb-2 text-lg">Details</h2>
             <dl className="space-y-1">

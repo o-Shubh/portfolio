@@ -72,6 +72,9 @@ For a project set up before the plans and services update, run these two files *
 this order** (the first adds order steps the second uses; Postgres needs them committed first):
 [`20261016000009_order_steps.sql`](supabase/migrations/20261016000009_order_steps.sql), then
 [`20261016000010_monetisation.sql`](supabase/migrations/20261016000010_monetisation.sql).
+Then, for the service portfolio update, run
+[`20261017000011_service_portfolio.sql`](supabase/migrations/20261017000011_service_portfolio.sql) **before**
+deploying that code (it adds new catalogue versions with the same prices and the bundle-upgrade columns).
 Back up the database first (Supabase → Database → Backups). Existing authors keep their original
 ₹15-per-copy terms until they accept the new terms themselves; past orders are not changed.
 
@@ -318,7 +321,17 @@ rollover. Paid services (cover, formatting, launch kit, bundle) are separate fro
 quote the author accepts before paying. On a book's **Files** and **Submit** steps, authors can tick services
 as add-ons for that book ("Need help with this book?"): the requests are created in one go, pre-filled from the
 book (title, trim, pages, paper, blurb), formatting and the bundle use the book's uploaded manuscript, and the
-bundle can't be combined with the services it already includes. All payments go through `payments` with a receipt number; the
+bundle can't be combined with the services it already includes.
+
+**Service portfolio.** Each service card (pricing page, Author → Services, a book's add-ons) shows the price with
+GST, sample work in a gallery (zoom, previous/next, keyboard), deliverables, revisions, exclusions and "Delivery
+timeline is confirmed after reviewing your requirements." Samples live in `public/samples/` (WebP previews and
+the formatting before/after PDFs) and are described in `src/lib/service-portfolio.ts`; they are a fictional,
+AI-assisted book and author, labelled as such, and never added to the bookstore. **Bundle upgrades:** if an author
+already requested a cover, formatting or launch kit for a book, they can request a bundle upgrade instead of a new
+bundle. Admin sees what was paid and done, enters a credit per earlier request (capped at what was paid, none by
+default) and sends an itemised quote. While an upgrade is open the earlier requests can't be quoted or paid on
+their own; when the bundle is paid, unpaid earlier requests close automatically. All payments go through `payments` with a receipt number; the
 webhook and the in-app confirmation both call the same idempotent database functions, so a payment is never
 applied twice.
 

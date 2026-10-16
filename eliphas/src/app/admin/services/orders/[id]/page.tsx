@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/auth";
 import { formatPaise } from "@/lib/commission";
 import { REQUIREMENT_FIELDS, SERVICE_STATUS } from "@/lib/services";
 import { serviceFilesWithLinks } from "@/lib/service-files";
+import { openUpgradeFor, upgradePriors } from "@/lib/services-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AdminCancel, Deliver, NoteForm, QuoteForm, SendBack, StartWork } from "./AdminServiceForms";
 
@@ -23,10 +24,12 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
     .eq("id", id)
     .maybeSingle();
   if (!o) notFound();
-  const [files, { data: quotes }, { data: events }] = await Promise.all([
+  const [files, { data: quotes }, { data: events }, priors, replacedBy] = await Promise.all([
     serviceFilesWithLinks(o.id),
     db.from("service_quotes").select("*").eq("service_order_id", o.id).order("issued_at", { ascending: false }),
     db.from("service_events").select("*").eq("service_order_id", o.id).order("created_at", { ascending: false }),
+    upgradePriors(o),
+    openUpgradeFor(o.id),
   ]);
   const cat = o.service_catalog;
   const reqs = o.requirements as Record<string, string>;
@@ -63,8 +66,42 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
         </p>
       )}
 
+      {replacedBy && (
+        <p className="mt-2 rounded-lg bg-accent/15 px-3 py-2 text-sm">
+          Being replaced by bundle upgrade{" "}
+          <Link href={`/admin/services/orders/${replacedBy.id}`} className="font-semibold underline">
+            {replacedBy.order_number}
+          </Link>
+          . Don&apos;t quote or charge this request separately.
+        </p>
+      )}
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
+          {priors.length > 0 && (
+            <section className="card" aria-labelledby="upgrade-heading">
+              <h2 id="upgrade-heading" className="text-lg">
+                Bundle upgrade: requests it replaces
+              </h2>
+              <p className="mt-1 text-sm text-muted">
+                Review what was paid and what&apos;s already delivered. Credit paid work only as far as it&apos;s useful to the bundle; nothing is credited
+                automatically. Unpaid requests close when the bundle is paid.
+              </p>
+              <ul className="mt-3 divide-y divide-line text-sm">
+                {priors.map((p) => (
+                  <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                    <Link href={`/admin/services/orders/${p.id}`} className="font-medium underline-offset-2 hover:underline">
+                      {p.name} · {p.orderNumber}
+                    </Link>
+                    <span className="flex items-center gap-2">
+                      <span className="tabular-nums text-muted">{p.paidPaise ? `paid ${formatPaise(p.paidPaise)} + GST` : "not paid"}</span>
+                      <ServiceStatusBadge status={p.status} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
           {o.status === "scope_review" && (
             <section className="card space-y-6">
               <h2 className="text-lg">Issue a fixed quote</h2>
@@ -78,6 +115,7 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
                   deliverables: cat?.deliverables ?? [],
                   hint,
                 }}
+                priors={priors.map((p) => ({ id: p.id, label: `${p.name} ${p.orderNumber}`, paidPaise: p.paidPaise }))}
               />
               <SendBack orderId={o.id} />
             </section>

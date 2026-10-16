@@ -6,9 +6,9 @@ import { requireRole } from "@/lib/auth";
 import { confirmPaymentRecord, startQuotePayment, type PaymentStart } from "@/lib/billing";
 import { logAudit } from "@/lib/plans";
 import { bookRequirements } from "@/lib/book-services";
-import { checkAddOns, missingRequirements, NEEDS_MANUSCRIPT, OPEN_SERVICE_STATUSES, REQUIREMENT_FIELDS, type ServiceOrder } from "@/lib/services";
+import { BUNDLE_CODE, BUNDLE_PARTS, checkAddOns, missingRequirements, NEEDS_MANUSCRIPT, OPEN_SERVICE_STATUSES, REQUIREMENT_FIELDS, type ServiceOrder } from "@/lib/services";
 import { getPricingSettings } from "@/lib/settings";
-import { cancelService, moveService } from "@/lib/services-server";
+import { cancelService, moveService, openUpgradeFor } from "@/lib/services-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ServiceActionState = { error?: string; ok?: string } | undefined;
@@ -62,9 +62,10 @@ export async function requestBookServices(bookId: string, _prev: ServiceActionSt
     .select("status, service_catalog(code)")
     .eq("book_id", book.id)
     .eq("kind", "service")
-    .in("status", OPEN_SERVICE_STATUSES);
-  const open = new Set((existing ?? []).map((o) => o.service_catalog?.code).filter((c): c is string => Boolean(c)));
-  const checked = checkAddOns(fd.getAll("service").map(String), open);
+    .in("status", [...OPEN_SERVICE_STATUSES, "completed"]);
+  const codesWith = (done: boolean) =>
+    new Set((existing ?? []).filter((o) => (o.status === "completed") === done).map((o) => o.service_catalog?.code).filter((c): c is string => Boolean(c)));
+  const checked = checkAddOns(fd.getAll("service").map(String), codesWith(false), codesWith(true));
   if ("error" in checked) return { error: checked.error };
 
   const { data: catalog } = await admin.from("current_service_catalog").select("*").in("code", checked.ok);
@@ -110,6 +111,70 @@ export async function requestBookServices(bookId: string, _prev: ServiceActionSt
   if (submitted.length) parts.push(`${submitted.join(", ")}: sent for review. You'll get a fixed quote before paying.`);
   if (needDetails.length) parts.push(`${needDetails.join(", ")}: add a few more details on the Services page to get a quote.`);
   return { ok: `Requested. ${parts.join(" ")}` };
+}
+
+/**
+ * Replaces earlier requests for parts of the bundle (cover, formatting, launch kit) with one bundle request.
+ * Every such request for the same book is included. Admin reviews what was paid and what's done, then
+ * sends an itemised quote; requests that were never paid are closed when the bundle is paid.
+ */
+export async function requestBundleUpgrade(fromOrderId: string): Promise<ServiceActionState> {
+  const profile = await requireRole(["author", "admin"]);
+  const admin = createAdminClient();
+  const { data: from } = await admin.from("service_orders").select("*, service_catalog(code)").eq("id", fromOrderId).maybeSingle();
+  if (!from || from.author_id !== profile.id) return { error: "Request not found." };
+  const isPart = (code?: string | null) => Boolean(code && BUNDLE_PARTS.includes(code));
+  if (!isPart(from.service_catalog?.code) || ["cancelled", "refunded"].includes(from.status)) {
+    return { error: "Only an active cover, formatting or launch kit request can be upgraded to the bundle." };
+  }
+  let priors = [from];
+  if (from.book_id) {
+    const { data: siblings } = await admin
+      .from("service_orders")
+      .select("*, service_catalog(code)")
+      .eq("author_id", profile.id)
+      .eq("book_id", from.book_id)
+      .eq("kind", "service")
+      .not("status", "in", "(cancelled,refunded)");
+    const all = siblings ?? [];
+    if (all.some((o) => o.service_catalog?.code === BUNDLE_CODE && OPEN_SERVICE_STATUSES.includes(o.status))) {
+      return { error: "A bundle is already requested for this book." };
+    }
+    priors = all.filter((o) => isPart(o.service_catalog?.code));
+  }
+  for (const p of priors) {
+    const up = await openUpgradeFor(p.id);
+    if (up) return { error: `This request is already part of bundle upgrade ${up.order_number}.` };
+  }
+  const { data: bundle } = await admin.from("current_service_catalog").select("*").eq("code", BUNDLE_CODE).maybeSingle();
+  if (!bundle?.active || !bundle.id) return { error: "The bundle isn't available right now." };
+
+  const requirements = Object.assign({}, ...priors.map((p) => p.requirements as Record<string, string>));
+  const { data: order, error } = await admin
+    .from("service_orders")
+    .insert({
+      author_id: profile.id,
+      kind: "service",
+      catalog_id: bundle.id,
+      book_id: from.book_id,
+      requirements,
+      rights_confirmed: priors.every((p) => p.rights_confirmed),
+      status: "scope_review",
+      submitted_at: new Date().toISOString(),
+      upgrade_from: priors.map((p) => p.id),
+    })
+    .select("id, order_number")
+    .single();
+  if (error || !order) return { error: "Could not request the upgrade. Please try again." };
+  const list = priors.map((p) => p.order_number).join(", ");
+  await admin.from("service_events").insert([
+    { service_order_id: order.id, actor_id: profile.id, to_status: "scope_review", note: `Bundle upgrade requested. Replaces ${list}. We'll review what's paid and done, then send an itemised quote.` },
+    ...priors.map((p) => ({ service_order_id: p.id, actor_id: profile.id, to_status: p.status, from_status: p.status, note: `Bundle upgrade ${order.order_number} requested. Until it's settled, this request can't be paid separately.` })),
+  ]);
+  await logAudit(profile.id, "service.bundle_upgrade_requested", "service_order", order.id, { replaces: priors.map((p) => p.id) });
+  priors.forEach((p) => refresh(p.id));
+  if (from.book_id) revalidatePath(`/author/books/${from.book_id}`, "layout");
+  redirect(`/author/services/${order.id}`);
 }
 
 /** Saves requirement fields while the order is collecting requirements. */
@@ -187,6 +252,8 @@ export async function acceptQuote(quoteId: string): Promise<ServiceActionState> 
   const order = q?.service_orders;
   if (!q || !order || order.author_id !== profile.id) return { error: "Quote not found." };
   if (q.status !== "issued" || order.status !== "quote_awaiting_acceptance") return { error: "This quote is no longer open." };
+  const upgrade = await openUpgradeFor(order.id);
+  if (upgrade) return { error: `This request is part of bundle upgrade ${upgrade.order_number}. Accept the bundle quote instead, so you aren't charged twice.` };
   const { data: updated } = await admin
     .from("service_quotes")
     .update({ status: "accepted", accepted_at: new Date().toISOString() })
