@@ -315,7 +315,10 @@ Order steps: Paid → Accepted → Printing → Packed → Shipped → Delivered
 **Pro and services.** Pro is ₹299 + 18% GST = ₹352.82 for one month, prepaid; it doesn't renew
 automatically (buying again extends it). Each paid month grants 3 template creatives (1 revision each), no
 rollover. Paid services (cover, formatting, launch kit, bundle) are separate from Pro credits and use a fixed
-quote the author accepts before paying. All payments go through `payments` with a receipt number; the
+quote the author accepts before paying. On a book's **Files** and **Submit** steps, authors can tick services
+as add-ons for that book ("Need help with this book?"): the requests are created in one go, pre-filled from the
+book (title, trim, pages, paper, blurb), formatting and the bundle use the book's uploaded manuscript, and the
+bundle can't be combined with the services it already includes. All payments go through `payments` with a receipt number; the
 webhook and the in-app confirmation both call the same idempotent database functions, so a payment is never
 applied twice.
 

@@ -19,7 +19,7 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
   const db = createAdminClient();
   const { data: o } = await db
     .from("service_orders")
-    .select("*, service_catalog(*), profiles!service_orders_author_id_fkey(full_name, phone)")
+    .select("*, service_catalog(*), profiles!service_orders_author_id_fkey(full_name, phone), books(id, title, status, page_count, manuscript_path)")
     .eq("id", id)
     .maybeSingle();
   if (!o) notFound();
@@ -52,6 +52,16 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
         {o.order_number} · {o.profiles?.full_name} · catalogue v{cat?.version ?? "—"} · revisions {o.revisions_used}/{o.revisions_allowed}
         {paidPaise > 0 && ` · paid ${formatPaise(paidPaise)}`}
       </p>
+      {o.books && (
+        <p className="mt-2 rounded-lg bg-surface-2 px-3 py-2 text-sm">
+          For the book{" "}
+          <Link href={`/admin/books/${o.books.id}`} className="font-semibold underline">
+            {o.books.title}
+          </Link>
+          {o.books.page_count ? ` · ${o.books.page_count} pages` : ""}
+          {o.books.manuscript_path ? " · manuscript uploaded (download it from the book page)" : " · no manuscript uploaded yet"}
+        </p>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
