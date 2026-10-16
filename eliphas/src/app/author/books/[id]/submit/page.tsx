@@ -12,6 +12,7 @@ import { gatewayPercent, printCost } from "@/lib/pricing";
 import { submitChecklist } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
 import { AcceptTerms } from "@/components/AcceptTerms";
+import { BookServicesCard } from "@/components/BookServicesCard";
 import { SubmitActions } from "./SubmitActions";
 
 export const metadata: Metadata = { title: "Submit for review" };
@@ -77,6 +78,8 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
         <section className="card">
           <SubmitActions bookId={book.id} status={book.status} ready={ready} slug={book.slug} />
         </section>
+
+        <BookServicesCard bookId={book.id} authorId={book.author_id} />
       </div>
 
       <aside className="space-y-6">

@@ -5,6 +5,7 @@ import { coverUrl } from "@/lib/books";
 import { coverSizeMatches, fullCoverSize, isEditable, pageSizeMatches } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
+import { BookServicesCard } from "@/components/BookServicesCard";
 import { FileUploader } from "./FileUploader";
 
 export const metadata: Metadata = { title: "Manuscript and cover" };
@@ -140,6 +141,10 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
           </p>
         )}
       </section>
+
+      <div className="lg:col-span-3">
+        <BookServicesCard bookId={book.id} authorId={book.author_id} />
+      </div>
 
       {!disabled && (
         <div className="lg:col-span-3">

@@ -103,3 +103,38 @@ export function missingRequirements(required: string[], reqs: Record<string, unk
 
 /** Services that can't be quoted without the manuscript file. */
 export const NEEDS_MANUSCRIPT = new Set(["formatting", "bundle"]);
+
+/** What the Complete Publishing Bundle already covers, so it isn't requested twice for one book. */
+export const BUNDLE_CODE = "bundle";
+export const BUNDLE_PARTS = ["basic_cover", "formatting", "launch_kit"];
+
+/**
+ * Why a service can't be added for this book, or null if it can.
+ * `open` = services already requested for the book and not finished; `selected` = what's ticked now.
+ */
+export function addOnBlocked(code: string, open: Set<string>, selected: Set<string> = new Set()): string | null {
+  if (open.has(code)) return "Already requested for this book";
+  if (code === BUNDLE_CODE) {
+    if (BUNDLE_PARTS.some((p) => open.has(p))) return "Part of the bundle is already requested for this book";
+    return null;
+  }
+  if (BUNDLE_PARTS.includes(code)) {
+    if (open.has(BUNDLE_CODE)) return "Included in the bundle you requested";
+    if (selected.has(BUNDLE_CODE)) return "Included in the bundle";
+  }
+  return null;
+}
+
+/** Validates a set of ticked add-ons together: no duplicates of open requests and no overlap with the bundle. */
+export function checkAddOns(codes: string[], open: Set<string>): { ok: string[] } | { error: string } {
+  const unique = [...new Set(codes)];
+  if (!unique.length) return { error: "Tick at least one service." };
+  if (unique.includes(BUNDLE_CODE) && unique.some((c) => BUNDLE_PARTS.includes(c))) {
+    return { error: "The bundle already includes the cover, formatting and launch kit. Choose the bundle or the separate services." };
+  }
+  for (const c of unique) {
+    const why = addOnBlocked(c, open);
+    if (why) return { error: `${why}.` };
+  }
+  return { ok: unique };
+}

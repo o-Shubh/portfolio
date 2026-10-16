@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { confirmPaymentRecord, startQuotePayment, type PaymentStart } from "@/lib/billing";
 import { logAudit } from "@/lib/plans";
-import { missingRequirements, NEEDS_MANUSCRIPT, REQUIREMENT_FIELDS, type ServiceOrder } from "@/lib/services";
+import { bookRequirements } from "@/lib/book-services";
+import { checkAddOns, missingRequirements, NEEDS_MANUSCRIPT, OPEN_SERVICE_STATUSES, REQUIREMENT_FIELDS, type ServiceOrder } from "@/lib/services";
+import { getPricingSettings } from "@/lib/settings";
 import { cancelService, moveService } from "@/lib/services-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -41,6 +43,73 @@ export async function createServiceOrder(code: string): Promise<ServiceActionSta
   if (error || !order) return { error: "Could not start the order. Please try again." };
   await admin.from("service_events").insert({ service_order_id: order.id, actor_id: profile.id, to_status: "requirements_pending", note: `Started: ${item.name}` });
   redirect(`/author/services/${order.id}`);
+}
+
+/**
+ * Requests one or more services for one of the author's books in a single step ("add-ons").
+ * Each request is pre-filled from the book. Ones with nothing missing go straight to scope review;
+ * the author fills in the rest for the others. Nothing is charged: a fixed quote comes first.
+ */
+export async function requestBookServices(bookId: string, _prev: ServiceActionState, fd: FormData): Promise<ServiceActionState> {
+  const profile = await requireRole(["author", "admin"]);
+  if (fd.get("rights") !== "on") return { error: "Please confirm you have the rights to this book's text and any images you provide." };
+  const admin = createAdminClient();
+  const { data: book } = await admin.from("books").select("*").eq("id", bookId).maybeSingle();
+  if (!book || book.author_id !== profile.id) return { error: "Book not found." };
+
+  const { data: existing } = await admin
+    .from("service_orders")
+    .select("status, service_catalog(code)")
+    .eq("book_id", book.id)
+    .eq("kind", "service")
+    .in("status", OPEN_SERVICE_STATUSES);
+  const open = new Set((existing ?? []).map((o) => o.service_catalog?.code).filter((c): c is string => Boolean(c)));
+  const checked = checkAddOns(fd.getAll("service").map(String), open);
+  if ("error" in checked) return { error: checked.error };
+
+  const { data: catalog } = await admin.from("current_service_catalog").select("*").in("code", checked.ok);
+  const items = checked.ok.map((code) => catalog?.find((c) => c.code === code && c.active && c.id));
+  if (items.some((i) => !i)) return { error: "One of these services isn't available right now. Refresh the page." };
+
+  const { rates } = await getPricingSettings();
+  const reqs = bookRequirements(book, rates, profile.full_name);
+  const now = new Date().toISOString();
+  const submitted: string[] = [];
+  const needDetails: string[] = [];
+  for (const item of items as NonNullable<(typeof items)[number]>[]) {
+    // The book's own manuscript counts as the file we need to check length before quoting
+    const ready = missingRequirements(item.requires ?? ["title", "author_name"], reqs).length === 0 && (!NEEDS_MANUSCRIPT.has(item.code!) || Boolean(book.manuscript_path));
+    const { data: order, error } = await admin
+      .from("service_orders")
+      .insert({
+        author_id: profile.id,
+        kind: "service",
+        catalog_id: item.id!,
+        book_id: book.id,
+        requirements: reqs,
+        rights_confirmed: true,
+        status: ready ? "scope_review" : "requirements_pending",
+        submitted_at: ready ? now : null,
+      })
+      .select("id")
+      .single();
+    if (error || !order) return { error: "Could not save your request. Please try again." };
+    await admin.from("service_events").insert({
+      service_order_id: order.id,
+      actor_id: profile.id,
+      to_status: ready ? "scope_review" : "requirements_pending",
+      note: `Requested for “${book.title}”: ${item.name}${ready ? " (details taken from the book)" : ""}`,
+    });
+    (ready ? submitted : needDetails).push(item.name!);
+  }
+  await logAudit(profile.id, "service.add_ons_requested", "book", book.id, { codes: checked.ok });
+  revalidatePath(`/author/books/${book.id}`, "layout");
+  revalidatePath("/author/services");
+  revalidatePath("/admin/services", "layout");
+  const parts = [];
+  if (submitted.length) parts.push(`${submitted.join(", ")}: sent for review. You'll get a fixed quote before paying.`);
+  if (needDetails.length) parts.push(`${needDetails.join(", ")}: add a few more details on the Services page to get a quote.`);
+  return { ok: `Requested. ${parts.join(" ")}` };
 }
 
 /** Saves requirement fields while the order is collecting requirements. */
@@ -100,7 +169,9 @@ async function submitRequirements(orderId: string, actorId: string): Promise<Ser
   if (!order.rights_confirmed) return { error: "Please confirm you have the rights to the content you uploaded." };
   if (order.service_catalog && NEEDS_MANUSCRIPT.has(order.service_catalog.code)) {
     const { count } = await admin.from("service_files").select("*", { count: "exact", head: true }).eq("service_order_id", orderId).eq("kind", "requirement");
-    if (!count) return { error: "Please upload your manuscript so we can check length and complexity before quoting." };
+    // A request made for a book can use that book's uploaded manuscript
+    const { data: book } = order.book_id ? await admin.from("books").select("manuscript_path").eq("id", order.book_id).maybeSingle() : { data: null };
+    if (!count && !book?.manuscript_path) return { error: "Please upload your manuscript so we can check length and complexity before quoting." };
   }
   const moved = await moveService(order, "scope_review", actorId, "Requirements submitted", { submitted_at: new Date().toISOString() });
   if (!moved) return { error: "This order has already moved on. Refresh the page." };

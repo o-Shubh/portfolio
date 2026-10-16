@@ -24,7 +24,7 @@ export default async function ServicesPage() {
     <>
       <PageHeader
         title="Author services"
-        intro="Optional, one-time help from our team. You never need these to publish. Prices exclude GST; you see the full total before paying."
+        intro="Optional, one-time help from our team. You never need these to publish. Prices exclude GST; you see the full total before paying. For a book you’re already setting up, add services from its Files or Submit step and we’ll use its details and files."
       />
 
       {orders && orders.length > 0 && (

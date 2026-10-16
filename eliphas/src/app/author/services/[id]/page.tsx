@@ -19,7 +19,7 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const admin = createAdminClient();
-  const { data: order } = await admin.from("service_orders").select("*, service_catalog(*)").eq("id", id).maybeSingle();
+  const { data: order } = await admin.from("service_orders").select("*, service_catalog(*), books(id, title)").eq("id", id).maybeSingle();
   if (!order || order.author_id !== profile.id) notFound(); // only the author's own orders
 
   const [files, { data: quotes }, { data: events }] = await Promise.all([
@@ -48,6 +48,15 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
       <p className="mt-1 text-muted">
         {order.order_number} · {SERVICE_STATUS[order.status].author}
       </p>
+      {order.books && (
+        <p className="mt-1 text-sm">
+          For your book{" "}
+          <Link href={`/author/books/${order.books.id}/files`} className="font-semibold underline">
+            {order.books.title}
+          </Link>
+          {cat && ["formatting", "bundle"].includes(cat.code) && ". We use the manuscript you uploaded for it."}
+        </p>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
