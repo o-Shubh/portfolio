@@ -108,6 +108,15 @@ export async function startQuotePayment(authorId: string, quoteId: string) {
   const so = q?.service_orders;
   if (!q || !so || so.author_id !== authorId) return { error: "Quote not found." };
   if (q.status !== "accepted" || so.status !== "payment_pending") return { error: "This quote isn't waiting for payment." };
+  // A request being replaced by a bundle upgrade is settled through the bundle quote, never paid on its own
+  const { data: upgrade } = await admin
+    .from("service_orders")
+    .select("order_number")
+    .contains("upgrade_from", [so.id])
+    .not("status", "in", "(completed,cancelled,refunded)")
+    .limit(1)
+    .maybeSingle();
+  if (upgrade) return { error: `This request is part of bundle upgrade ${upgrade.order_number}. Pay the bundle quote instead.` };
   // Reuse an unpaid payment for the same quote (e.g. the window was closed)
   if (q.payment_id) {
     const { data: existing } = await admin.from("payments").select("*").eq("id", q.payment_id).single();

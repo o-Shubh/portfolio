@@ -1376,6 +1376,7 @@ export type Database = {
           status: Database["public"]["Enums"]["service_status"];
           submitted_at: string | null;
           updated_at: string;
+          upgrade_from: string[] | null
         };
         ComputedFields: never;
         Insert: {
@@ -1399,6 +1400,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["service_status"];
           submitted_at?: string | null;
           updated_at?: string;
+          upgrade_from?: string[] | null
         };
         Update: {
           author_id?: string;
@@ -1421,6 +1423,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["service_status"];
           submitted_at?: string | null;
           updated_at?: string;
+          upgrade_from?: string[] | null
         };
         Relationships: [
           {
@@ -1485,6 +1488,7 @@ export type Database = {
           service_order_id: string;
           status: string;
           total_paise: number;
+          line_items: Json | null
         };
         ComputedFields: never;
         Insert: {
@@ -1504,6 +1508,7 @@ export type Database = {
           service_order_id: string;
           status?: string;
           total_paise: number;
+          line_items?: Json | null
         };
         Update: {
           accepted_at?: string | null;
@@ -1522,6 +1527,7 @@ export type Database = {
           service_order_id?: string;
           status?: string;
           total_paise?: number;
+          line_items?: Json | null
         };
         Relationships: [
           {

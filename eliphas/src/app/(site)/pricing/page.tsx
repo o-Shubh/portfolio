@@ -1,6 +1,8 @@
 import { Check, X } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ServiceCard } from "@/components/ServiceCard";
+import type { CatalogItem } from "@/lib/services";
 import { PrintCalculator } from "@/components/PrintCalculator";
 import { calculatorPlans } from "@/lib/calculator-plans";
 import { estimateCopy, formatPaise, minimumPriceRupees, ruleFromPlanVersion, withGst } from "@/lib/commission";
@@ -164,24 +166,17 @@ export default async function PricingPage() {
             For Free and Pro authors alike; no subscription needed. Prices exclude GST. We review your files and confirm a fixed quote with deliverables,
             revisions and a delivery date before you pay. No surprise charges.
           </p>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
             {services.map((c) => (
-              <div key={c.id} className="card">
-                <h3 className="text-lg">{c.name}</h3>
-                <p className="mt-1 font-semibold">
-                  {c.pricing === "fixed" ? formatPaise(c.price_paise!) : `${formatPaise(c.min_paise!)}–${formatPaise(c.max_paise!)}`}{" "}
-                  <span className="text-sm font-normal text-muted">
-                    + {Number(c.gst_percent)}% GST
-                    {c.pricing === "fixed" && ` = ${formatPaise(withGst(c.price_paise!, Number(c.gst_percent)).totalPaise)}`}
-                  </span>
-                </p>
-                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
-                  {(c.deliverables ?? []).map((d) => (
-                    <li key={d}>{d}</li>
-                  ))}
-                </ul>
-                {(c.exclusions ?? []).length > 0 && <p className="mt-3 text-xs text-muted">Not included: {c.exclusions!.join("; ")}.</p>}
-              </div>
+              <ServiceCard
+                key={c.id}
+                item={c as CatalogItem}
+                actions={
+                  <Link href="/login?next=/author/services" className="btn-primary">
+                    Request this service
+                  </Link>
+                }
+              />
             ))}
           </div>
           <p className="mt-4 text-sm text-muted">

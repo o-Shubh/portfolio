@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { requestBookServices } from "@/app/actions/services";
+import { useState, useTransition } from "react";
+import { requestBookServices, requestBundleUpgrade } from "@/app/actions/services";
 import type { AddOnOption, BookServiceRequest } from "@/lib/book-services";
-import { addOnBlocked } from "@/lib/services";
+import { SERVICE_PORTFOLIO } from "@/lib/service-portfolio";
+import { addOnBlocked, BUNDLE_CODE, BUNDLE_OVERLAP, BUNDLE_PARTS } from "@/lib/services";
+import { SampleGallery } from "./SampleGallery";
 import { useFormAction } from "@/lib/use-form-action";
 import { FormMessage } from "./FormMessage";
 import { ServiceStatusBadge } from "./ServiceStatusBadge";
@@ -17,6 +19,11 @@ export function BookAddOns({ bookId, options, requests }: { bookId: string; opti
   const [state, onSubmit, pending] = useFormAction(requestBookServices.bind(null, bookId));
   const [ticked, setSelected] = useState<Set<string>>(new Set());
   const open = new Set(requests.filter((r) => r.open).map((r) => r.code));
+  const done = new Set(requests.filter((r) => r.status === "completed").map((r) => r.code));
+  // An active cover, formatting or launch kit request for this book can be upgraded to the bundle
+  const upgradable = requests.find((r) => BUNDLE_PARTS.includes(r.code) && (r.open || r.status === "completed"));
+  const [upgrading, startUpgrade] = useTransition();
+  const [upgradeError, setUpgradeError] = useState<string | null>(null);
   // Once a request goes through, its tick no longer counts (it's listed above instead)
   const selected = new Set([...ticked].filter((c) => !open.has(c)));
 
@@ -26,7 +33,7 @@ export function BookAddOns({ bookId, options, requests }: { bookId: string; opti
       if (on) next.add(code);
       else next.delete(code);
       // Ticking the bundle replaces the separate services it includes
-      if (code === "bundle" && on) for (const c of [...next]) if (addOnBlocked(c, open, next)) next.delete(c);
+      if (code === BUNDLE_CODE && on) for (const c of [...next]) if (addOnBlocked(c, open, next, done)) next.delete(c);
       return next;
     });
 
@@ -57,34 +64,69 @@ export function BookAddOns({ bookId, options, requests }: { bookId: string; opti
         <fieldset className="space-y-2">
           <legend className="sr-only">Services to add</legend>
           {options.map((o) => {
-            const blocked = addOnBlocked(o.code, open, selected);
+            const blocked = addOnBlocked(o.code, open, selected, done);
             const checked = selected.has(o.code);
+            const existing = requests.find((r) => r.code === o.code && r.open);
+            const samples = SERVICE_PORTFOLIO[o.code]?.samples ?? [];
+            const offerUpgrade = o.code === BUNDLE_CODE && blocked === BUNDLE_OVERLAP && upgradable;
             return (
-              <label
-                key={o.code}
-                className={`flex gap-3 rounded-xl border p-3 ${checked ? "border-accent bg-accent/10" : "border-line"} ${blocked ? "opacity-60" : "cursor-pointer"}`}
-              >
-                <input
-                  type="checkbox"
-                  name="service"
-                  value={o.code}
-                  checked={checked}
-                  disabled={Boolean(blocked) && !checked}
-                  onChange={(e) => toggle(o.code, e.target.checked)}
-                  className="mt-1 h-5 w-5 shrink-0 accent-fg"
-                />
-                <span className="min-w-0">
-                  <span className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="font-semibold">{o.name}</span>
-                    <span className="text-sm tabular-nums text-muted">{o.price}</span>
+              <div key={o.code} className={`rounded-xl border p-3 ${checked ? "border-accent bg-accent/10" : "border-line"}`}>
+                <label className={`flex gap-3 ${blocked ? "" : "cursor-pointer"}`}>
+                  <input
+                    type="checkbox"
+                    name="service"
+                    value={o.code}
+                    checked={checked}
+                    disabled={Boolean(blocked) && !checked}
+                    onChange={(e) => toggle(o.code, e.target.checked)}
+                    className="mt-1 h-5 w-5 shrink-0 accent-fg"
+                  />
+                  <span className={`min-w-0 ${blocked ? "opacity-70" : ""}`}>
+                    <span className="flex flex-wrap items-baseline gap-x-2">
+                      <span className="font-semibold">{o.name}</span>
+                      <span className="text-sm tabular-nums text-muted">{o.price}</span>
+                    </span>
+                    {blocked ? (
+                      <span className="mt-0.5 block text-xs font-medium">{blocked}</span>
+                    ) : (
+                      <span className="mt-0.5 block text-xs text-muted">{o.deliverables.join(" · ")}</span>
+                    )}
                   </span>
-                  {blocked ? (
-                    <span className="mt-0.5 block text-xs font-medium">{blocked}</span>
-                  ) : (
-                    <span className="mt-0.5 block text-xs text-muted">{o.deliverables.join(" · ")}</span>
+                </label>
+                <div className="mt-1 flex flex-wrap items-center gap-x-4 pl-8">
+                  {samples.length > 0 && <SampleGallery title={o.name} samples={samples} compact />}
+                  {existing && (
+                    <Link href={`/author/services/${existing.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold underline underline-offset-2">
+                      View existing request
+                    </Link>
                   )}
-                </span>
-              </label>
+                  {offerUpgrade && (
+                    <button
+                      type="button"
+                      className="btn-ghost min-h-10 px-3 text-sm"
+                      disabled={upgrading}
+                      onClick={() =>
+                        startUpgrade(async () => {
+                          const res = await requestBundleUpgrade(upgradable.id);
+                          setUpgradeError(res?.error ?? null);
+                        })
+                      }
+                    >
+                      {upgrading ? "Requesting…" : "Request bundle upgrade"}
+                    </button>
+                  )}
+                </div>
+                {offerUpgrade && (
+                  <p className="mt-1 pl-8 text-xs text-muted">
+                    We review what you&apos;ve already paid for and what&apos;s done, then send an itemised quote for the difference. Nothing is charged twice.
+                  </p>
+                )}
+                {offerUpgrade && upgradeError && (
+                  <p role="alert" className="mt-1 pl-8 text-sm font-medium text-danger">
+                    {upgradeError}
+                  </p>
+                )}
+              </div>
             );
           })}
         </fieldset>

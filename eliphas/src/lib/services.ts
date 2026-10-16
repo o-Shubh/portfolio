@@ -104,18 +104,22 @@ export function missingRequirements(required: string[], reqs: Record<string, unk
 /** Services that can't be quoted without the manuscript file. */
 export const NEEDS_MANUSCRIPT = new Set(["formatting", "bundle"]);
 
-/** What the Complete Publishing Bundle already covers, so it isn't requested twice for one book. */
+/** What the Book Design & Launch Bundle already covers, so it isn't requested twice for one book. */
 export const BUNDLE_CODE = "bundle";
 export const BUNDLE_PARTS = ["basic_cover", "formatting", "launch_kit"];
 
+/** Shown when the bundle overlaps something already requested; the card offers an upgrade instead. */
+export const BUNDLE_OVERLAP = "Part of the bundle is already requested for this book. Request a bundle upgrade instead.";
+
 /**
  * Why a service can't be added for this book, or null if it can.
- * `open` = services already requested for the book and not finished; `selected` = what's ticked now.
+ * `open` = services already requested for the book and not finished; `selected` = what's ticked now;
+ * `done` = services completed for the book (they still overlap the bundle, so it would charge twice).
  */
-export function addOnBlocked(code: string, open: Set<string>, selected: Set<string> = new Set()): string | null {
+export function addOnBlocked(code: string, open: Set<string>, selected: Set<string> = new Set(), done: Set<string> = new Set()): string | null {
   if (open.has(code)) return "Already requested for this book";
   if (code === BUNDLE_CODE) {
-    if (BUNDLE_PARTS.some((p) => open.has(p))) return "Part of the bundle is already requested for this book";
+    if (BUNDLE_PARTS.some((p) => open.has(p) || done.has(p))) return BUNDLE_OVERLAP;
     return null;
   }
   if (BUNDLE_PARTS.includes(code)) {
@@ -126,15 +130,46 @@ export function addOnBlocked(code: string, open: Set<string>, selected: Set<stri
 }
 
 /** Validates a set of ticked add-ons together: no duplicates of open requests and no overlap with the bundle. */
-export function checkAddOns(codes: string[], open: Set<string>): { ok: string[] } | { error: string } {
+export function checkAddOns(codes: string[], open: Set<string>, done: Set<string> = new Set()): { ok: string[] } | { error: string } {
   const unique = [...new Set(codes)];
   if (!unique.length) return { error: "Tick at least one service." };
   if (unique.includes(BUNDLE_CODE) && unique.some((c) => BUNDLE_PARTS.includes(c))) {
     return { error: "The bundle already includes the cover, formatting and launch kit. Choose the bundle or the separate services." };
   }
   for (const c of unique) {
-    const why = addOnBlocked(c, open);
-    if (why) return { error: `${why}.` };
+    const why = addOnBlocked(c, open, new Set(), done);
+    if (why) return { error: why.endsWith(".") ? why : `${why}.` };
   }
   return { ok: unique };
+}
+
+/** An earlier request a bundle upgrade replaces, with what the author actually paid for it (before GST). */
+export type UpgradePrior = { id: string; label: string; paidPaise: number };
+export type QuoteLine = { label: string; amount_paise: number };
+
+/**
+ * Itemised upgrade quote: the bundle price, minus a credit for each earlier request that admin chooses.
+ * A credit can't exceed what was paid for that request, and the total must stay above zero.
+ * Nothing is credited automatically.
+ */
+export function upgradeQuoteLines(
+  bundleName: string,
+  bundlePricePaise: number,
+  priors: UpgradePrior[],
+  credits: Record<string, number>,
+): { lines: QuoteLine[]; basePaise: number } | { error: string } {
+  if (!Number.isInteger(bundlePricePaise) || bundlePricePaise <= 0) return { error: "Enter the bundle price before GST." };
+  const lines: QuoteLine[] = [{ label: bundleName, amount_paise: bundlePricePaise }];
+  let base = bundlePricePaise;
+  for (const p of priors) {
+    const credit = credits[p.id] ?? 0;
+    if (!Number.isInteger(credit) || credit < 0) return { error: `Enter a valid credit for ${p.label}.` };
+    if (credit > p.paidPaise) return { error: `The credit for ${p.label} can't be more than what was paid for it.` };
+    if (credit > 0) {
+      lines.push({ label: `Credit: ${p.label}`, amount_paise: -credit });
+      base -= credit;
+    }
+  }
+  if (base <= 0) return { error: "Credits can't cover the whole bundle. Reduce them so the author pays something." };
+  return { lines, basePaise: base };
 }

@@ -2,7 +2,7 @@ import "server-only";
 import { refundPaymentRecord } from "@/lib/billing";
 import type { Database } from "@/lib/database.types";
 import { logAudit } from "@/lib/plans";
-import { canMove, type ServiceOrder, type ServiceStatus } from "@/lib/services";
+import { canMove, OPEN_SERVICE_STATUSES, type ServiceOrder, type ServiceStatus } from "@/lib/services";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type Patch = Database["public"]["Tables"]["service_orders"]["Update"];
@@ -94,4 +94,34 @@ export async function cancelService(
   }
   await logAudit(by.id, "service_order.cancelled", "service_order", order.id, { from: order.status, refund_paise: toRefund, reason });
   return { ok: true, refundedPaise: toRefund };
+}
+
+/** An open bundle upgrade that replaces this request, if any (its own quote can't be paid meanwhile). */
+export async function openUpgradeFor(orderId: string) {
+  const { data } = await createAdminClient()
+    .from("service_orders")
+    .select("id, order_number, status")
+    .contains("upgrade_from", [orderId])
+    .in("status", OPEN_SERVICE_STATUSES)
+    .limit(1)
+    .maybeSingle();
+  return data;
+}
+
+/** The earlier requests a bundle upgrade replaces, with status and what was paid for each (before GST). */
+export async function upgradePriors(order: Pick<ServiceOrder, "upgrade_from">) {
+  if (!order.upgrade_from?.length) return [];
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("service_orders")
+    .select("id, order_number, status, revisions_used, completed_at, service_catalog(name), service_quotes(status, base_paise)")
+    .in("id", order.upgrade_from);
+  return (data ?? []).map((o) => ({
+    id: o.id,
+    orderNumber: o.order_number,
+    name: o.service_catalog?.name ?? "Service",
+    status: o.status,
+    completed: o.status === "completed",
+    paidPaise: (o.service_quotes ?? []).filter((q) => q.status === "paid").reduce((a, q) => a + q.base_paise, 0),
+  }));
 }
