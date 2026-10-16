@@ -43,13 +43,16 @@ export function LoginForm({ next }: { next: string }) {
       return;
     }
     setBusy(true);
-    const { error } = await createClient().auth.verifyOtp({ phone: e164, token: code, type: "sms" });
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.verifyOtp({ phone: e164, token: code, type: "sms" });
     if (error) {
       setBusy(false);
       setError(friendly(error.message));
       return;
     }
-    router.replace(next);
+    // New accounts set up their name first, then carry on to where they were going (e.g. liking an article)
+    const { data: profile } = data.user ? await supabase.from("profiles").select("full_name").eq("id", data.user.id).maybeSingle() : { data: null };
+    router.replace(!profile?.full_name && next !== "/dashboard" ? `/onboarding?next=${encodeURIComponent(next)}` : next);
     router.refresh();
   }
 

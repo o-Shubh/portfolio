@@ -17,6 +17,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 5 | Razorpay checkout, orders, printer portal | ✅ Done |
 | 6 | Author dashboard: earnings, sales by month and city | ✅ Done |
 | 7 | Install prompt (PWA) and deploy to Vercel | ✅ Done (deploy steps below) |
+| 8 | Author articles, follows, notifications, moderation | ✅ Done |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -287,6 +288,38 @@ Every money change made by an admin is written to `audit_log`.
 Only paid orders count. Authors never see buyers' names, phones or addresses: the numbers come
 from database functions (`my_balance`, `my_sales_by_month`, `my_sales_by_city`, `my_sales_by_book`,
 `my_book_orders`) that return the caller's own sales and only the city and status of each order.
+
+### Author articles
+
+Authors (Free and Pro) write articles at `/author/articles`: essays, reflections, writing advice and
+authorised book excerpts. Articles are free to read at `/articles` and on each author's public page
+(`/authors/{handle}?tab=articles`). They are separate from books and their updates.
+
+- **Writing.** A small, safe text format (`## heading`, `**bold**`, `*italic*`, `> quote`, `- list`,
+  `1. list`, `[link](https://…)`) with a toolbar and Preview. The server parses it into structured
+  blocks (`articles.body`) that pages render as plain React elements: author HTML is never rendered
+  and only http(s) links become links. Drafts autosave two seconds after typing stops; a copy is kept
+  in the browser if saving fails and offered back after a reload. Publishing is always an explicit,
+  confirmed step and needs a title, excerpt, topic, 30+ words, cover alt text (if there's a cover) and
+  the rights confirmation. A published article changes only when the author presses Update.
+- **Covers** go through `/api/articles/[id]/cover`: JPEG/PNG/WebP checked by their bytes, at most 5 MB,
+  re-encoded to WebP (max 1600 px), which strips EXIF/GPS. Stored in the public `article-covers` bucket.
+- **Links** are `/articles/{short_id}-{slug}`. The short id never changes, so links survive title
+  changes (old slugs redirect). Only published, visible articles appear in the sitemap and metadata;
+  editors and account pages are `noindex`.
+- **Readers** can read without logging in. Like (once per account), private Save ("Saved articles"),
+  comment (flat; edit/delete your own), share, report, follow and block need OTP login, and the reader
+  comes back to the same action afterwards (`?intent=`).
+- **Notifications.** Followers get one in-app notification when an article is first published (never on
+  edits or republishing; the database refuses duplicates), unless they turned it off in
+  `/account/notifications`. No SMS.
+- **Analytics.** Every author sees views, likes and comments. Pro authors also see views per day and
+  related-book clicks. A view counts once per signed-in reader, or per browser, per article per day
+  (the author's own visits don't count); they aren't unique people. Book clicks show interest, not sales.
+  Authors never see who liked, saved or viewed.
+- **Moderation.** Articles go live without pre-review. Readers report articles or comments; admins review
+  them at `/admin/moderation` (hide, restore, remove, dismiss, each with a logged reason) and can restrict
+  accounts from posting. Comments and reports are rate limited. No automated plagiarism or AI checks.
 
 ### Orders and payments
 

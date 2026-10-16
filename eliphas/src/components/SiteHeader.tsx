@@ -5,10 +5,12 @@ import { listGenres } from "@/lib/books";
 import { cartBadgeCount } from "@/lib/cart";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
+import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "./ThemeToggle";
 
 export const SITE_LINKS = [
   { href: "/books", label: "Bookstore" },
+  { href: "/articles", label: "Articles" },
   { href: "/pricing", label: "Pricing" },
   { href: "/faq", label: "Help" },
 ];
@@ -70,6 +72,7 @@ export async function SiteHeader() {
               Publish your book
             </Link>
           )}
+          {profile && <NotificationBell userId={profile.id} className="hover:bg-white/10" />}
           <Link
             href="/cart"
             className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-white/10"

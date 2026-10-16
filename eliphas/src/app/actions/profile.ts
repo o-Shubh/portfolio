@@ -54,7 +54,8 @@ export async function completeOnboarding(_prev: FormState, formData: FormData): 
   if (error) return { error: "Could not save. Please try again." };
 
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  const next = String(formData.get("next") ?? "");
+  redirect(next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard");
 }
 
 /** Edit name, city etc. later from the profile page. */
@@ -65,8 +66,16 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   const parsed = readProfileFields(formData);
   if ("error" in parsed) return { error: parsed.error };
 
+  // Bio is only on the form for authors; leave it unchanged when the field isn't there
+  const bioField = formData.get("bio");
+  const bio = bioField === null || !["author", "admin"].includes(profile.role) ? undefined : String(bioField).trim();
+  if (bio && bio.length > 600) return { error: "Keep your bio under 600 characters." };
+
   const supabase = await createClient();
-  const { error } = await supabase.from("profiles").update(parsed.values).eq("id", profile.id);
+  const { error } = await supabase
+    .from("profiles")
+    .update({ ...parsed.values, ...(bio !== undefined ? { bio: bio || null } : {}) })
+    .eq("id", profile.id);
   if (error) return { error: "Could not save. Please try again." };
 
   revalidatePath("/", "layout");

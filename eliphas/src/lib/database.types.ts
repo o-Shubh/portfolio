@@ -1106,6 +1106,9 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"];
           state: string | null;
           updated_at: string;
+          bio: string | null
+          handle: string | null
+          notify_new_articles: boolean
         };
         ComputedFields: never;
         Insert: {
@@ -1121,6 +1124,9 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"];
           state?: string | null;
           updated_at?: string;
+          bio?: string | null
+          handle?: string | null
+          notify_new_articles?: boolean
         };
         Update: {
           author_terms_accepted_at?: string | null;
@@ -1135,6 +1141,9 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"];
           state?: string | null;
           updated_at?: string;
+          bio?: string | null
+          handle?: string | null
+          notify_new_articles?: boolean
         };
         Relationships: [];
       };
@@ -1791,6 +1800,504 @@ export type Database = {
           },
         ];
       };
+      "account_restrictions": {
+                  Row: {
+                    "created_at": string,"created_by": string | null,"reason": string,"until": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by"?: string | null,"reason": string,"until"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string | null,"reason"?: string,"until"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "account_restrictions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "account_restrictions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "account_restrictions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "account_restrictions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "account_restrictions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "account_restrictions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "article_book_clicks": {
+                  Row: {
+                    "article_id": string,"book_id": string | null,"day": string,"viewer_key": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "article_id": string,"book_id"?: string | null,"day"?: string,"viewer_key": string
+                  }
+                  Update: {
+                    "article_id"?: string,"book_id"?: string | null,"day"?: string,"viewer_key"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "article_book_clicks_article_id_fkey"
+      columns: ["article_id"]
+isOneToOne: false
+      referencedRelation: "articles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "article_book_clicks_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "books"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "article_bookmarks": {
+                  Row: {
+                    "article_id": string,"created_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "article_id": string,"created_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "article_id"?: string,"created_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "article_bookmarks_article_id_fkey"
+      columns: ["article_id"]
+isOneToOne: false
+      referencedRelation: "articles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "article_bookmarks_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "article_bookmarks_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "article_bookmarks_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "article_comments": {
+                  Row: {
+                    "article_id": string,"body": string,"created_at": string,"edited_at": string | null,"id": string,"moderation": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "article_id": string,"body": string,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"moderation"?: string,"user_id": string
+                  }
+                  Update: {
+                    "article_id"?: string,"body"?: string,"created_at"?: string,"edited_at"?: string | null,"id"?: string,"moderation"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "article_comments_article_id_fkey"
+      columns: ["article_id"]
+isOneToOne: false
+      referencedRelation: "articles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "article_comments_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "article_comments_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "article_comments_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "article_likes": {
+                  Row: {
+                    "article_id": string,"created_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "article_id": string,"created_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "article_id"?: string,"created_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "article_likes_article_id_fkey"
+      columns: ["article_id"]
+isOneToOne: false
+      referencedRelation: "articles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "article_likes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "article_likes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "article_likes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "article_views": {
+                  Row: {
+                    "article_id": string,"day": string,"viewer_key": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "article_id": string,"day"?: string,"viewer_key": string
+                  }
+                  Update: {
+                    "article_id"?: string,"day"?: string,"viewer_key"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "article_views_article_id_fkey"
+      columns: ["article_id"]
+isOneToOne: false
+      referencedRelation: "articles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "articles": {
+                  Row: {
+                    "author_id": string,"body": NonNullable<Json>,"body_md": string,"content_updated_at": string | null,"cover_alt": string | null,"cover_path": string | null,"created_at": string,"excerpt": string,"first_published_at": string | null,"id": string,"language": string,"moderation": string,"moderation_reason": string | null,"published_at": string | null,"related_book_id": string | null,"rights_confirmed_at": string | null,"short_id": string,"slug": string,"status": string,"tags": (string)[],"title": string,"topic": string | null,"updated_at": string,"word_count": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"body"?: NonNullable<Json>,"body_md"?: string,"content_updated_at"?: string | null,"cover_alt"?: string | null,"cover_path"?: string | null,"created_at"?: string,"excerpt"?: string,"first_published_at"?: string | null,"id"?: string,"language"?: string,"moderation"?: string,"moderation_reason"?: string | null,"published_at"?: string | null,"related_book_id"?: string | null,"rights_confirmed_at"?: string | null,"short_id"?: string,"slug"?: string,"status"?: string,"tags"?: (string)[],"title"?: string,"topic"?: string | null,"updated_at"?: string,"word_count"?: number
+                  }
+                  Update: {
+                    "author_id"?: string,"body"?: NonNullable<Json>,"body_md"?: string,"content_updated_at"?: string | null,"cover_alt"?: string | null,"cover_path"?: string | null,"created_at"?: string,"excerpt"?: string,"first_published_at"?: string | null,"id"?: string,"language"?: string,"moderation"?: string,"moderation_reason"?: string | null,"published_at"?: string | null,"related_book_id"?: string | null,"rights_confirmed_at"?: string | null,"short_id"?: string,"slug"?: string,"status"?: string,"tags"?: (string)[],"title"?: string,"topic"?: string | null,"updated_at"?: string,"word_count"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "articles_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "articles_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "articles_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "articles_related_book_id_fkey"
+      columns: ["related_book_id"]
+isOneToOne: false
+      referencedRelation: "books"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "content_reports": {
+                  Row: {
+                    "created_at": string,"details": string | null,"id": string,"reason": string,"reporter_id": string,"resolved_at": string | null,"resolved_by": string | null,"status": string,"target_id": string,"target_type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"details"?: string | null,"id"?: string,"reason": string,"reporter_id": string,"resolved_at"?: string | null,"resolved_by"?: string | null,"status"?: string,"target_id": string,"target_type": string
+                  }
+                  Update: {
+                    "created_at"?: string,"details"?: string | null,"id"?: string,"reason"?: string,"reporter_id"?: string,"resolved_at"?: string | null,"resolved_by"?: string | null,"status"?: string,"target_id"?: string,"target_type"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "content_reports_reporter_id_fkey"
+      columns: ["reporter_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "content_reports_reporter_id_fkey"
+      columns: ["reporter_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "content_reports_reporter_id_fkey"
+      columns: ["reporter_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "content_reports_resolved_by_fkey"
+      columns: ["resolved_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "content_reports_resolved_by_fkey"
+      columns: ["resolved_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "content_reports_resolved_by_fkey"
+      columns: ["resolved_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "follows": {
+                  Row: {
+                    "author_id": string,"created_at": string,"follower_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"created_at"?: string,"follower_id": string
+                  }
+                  Update: {
+                    "author_id"?: string,"created_at"?: string,"follower_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "follows_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "follows_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "follows_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "follows_follower_id_fkey"
+      columns: ["follower_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "follows_follower_id_fkey"
+      columns: ["follower_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "follows_follower_id_fkey"
+      columns: ["follower_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "moderation_actions": {
+                  Row: {
+                    "action": string,"actor_id": string | null,"created_at": string,"id": string,"reason": string,"target_id": string,"target_type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"actor_id"?: string | null,"created_at"?: string,"id"?: string,"reason": string,"target_id": string,"target_type": string
+                  }
+                  Update: {
+                    "action"?: string,"actor_id"?: string | null,"created_at"?: string,"id"?: string,"reason"?: string,"target_id"?: string,"target_type"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "moderation_actions_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "moderation_actions_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "moderation_actions_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "notifications": {
+                  Row: {
+                    "actor_id": string | null,"article_id": string | null,"created_at": string,"id": string,"kind": string,"link": string,"read_at": string | null,"title": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_id"?: string | null,"article_id"?: string | null,"created_at"?: string,"id"?: string,"kind": string,"link": string,"read_at"?: string | null,"title": string,"user_id": string
+                  }
+                  Update: {
+                    "actor_id"?: string | null,"article_id"?: string | null,"created_at"?: string,"id"?: string,"kind"?: string,"link"?: string,"read_at"?: string | null,"title"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "notifications_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "notifications_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "notifications_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "notifications_article_id_fkey"
+      columns: ["article_id"]
+isOneToOne: false
+      referencedRelation: "articles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "notifications_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "notifications_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "notifications_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
+      "user_blocks": {
+                  Row: {
+                    "blocked_id": string,"blocker_id": string,"created_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "blocked_id": string,"blocker_id": string,"created_at"?: string
+                  }
+                  Update: {
+                    "blocked_id"?: string,"blocker_id"?: string,"created_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "user_blocks_blocked_id_fkey"
+      columns: ["blocked_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "user_blocks_blocked_id_fkey"
+      columns: ["blocked_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "user_blocks_blocked_id_fkey"
+      columns: ["blocked_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "user_blocks_blocker_id_fkey"
+      columns: ["blocker_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "user_blocks_blocker_id_fkey"
+      columns: ["blocker_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "user_blocks_blocker_id_fkey"
+      columns: ["blocker_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
     };
     Views: {
       author_balances: {
@@ -1856,6 +2363,21 @@ export type Database = {
         ComputedFields: never;
         Relationships: [];
       };
+      "public_authors": {
+                  Row: {
+                    "bio": string | null,"full_name": string | null,"handle": string | null,"id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                           "bio"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string | null
+                         }
+                        Update: {
+                           "bio"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string | null
+                         }
+                        Relationships: [
+                    
+                  ]
+                }
     };
     Functions: {
       activate_subscription: {
@@ -2090,6 +2612,14 @@ export type Database = {
         Args: { p_author: string; p_service_order: string };
         Returns: string;
       };
+      "article_is_public":
+{ Args: { "p_article": string }; Returns: boolean
+                           }
+      "publish_article":
+{ Args: { "p_article": string,"p_author": string }; Returns: {
+              "first_time": boolean,"notified": number
+            }[]
+                           }
     };
     Enums: {
       app_role: "reader" | "author" | "printer" | "admin";

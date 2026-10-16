@@ -6,6 +6,7 @@ import { formatPhone } from "@/lib/phone";
 import { InstallPrompt } from "./InstallPrompt";
 import { Logo } from "./Logo";
 import { NavLinks, type NavItem } from "./NavLinks";
+import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "./ThemeToggle";
 
 /**
@@ -53,6 +54,7 @@ export function AppShell({
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />
+            <NotificationBell userId={profile.id} className="text-muted hover:bg-surface-2 hover:text-fg" />
             <form action={signOut} className="flex-1">
               <button
                 className="flex h-10 w-full items-center gap-2 rounded-lg px-3 text-sm text-muted transition hover:bg-surface-2 hover:text-fg"
@@ -70,6 +72,7 @@ export function AppShell({
         <div className="flex h-14 items-center justify-between pr-2 pl-4">
           <Logo href="/" onDark className="h-9" />
           <div className="flex items-center">
+            <NotificationBell userId={profile.id} className="h-11 w-11 hover:bg-white/10" />
             <ThemeToggle />
             <form action={signOut}>
               <button className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10" type="submit" aria-label="Log out">

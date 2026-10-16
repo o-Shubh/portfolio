@@ -16,6 +16,10 @@ import {
   Crown,
   AlertTriangle,
   Receipt,
+  Newspaper,
+  Bookmark,
+  Bell,
+  ShieldAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,6 +41,10 @@ const ICONS = {
   plan: Crown,
   issues: AlertTriangle,
   finance: Receipt,
+  articles: Newspaper,
+  saved: Bookmark,
+  notifications: Bell,
+  moderation: ShieldAlert,
 };
 
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; exact?: boolean; /** hide from the phone tab bar (sidebar only) */ sidebarOnly?: boolean };

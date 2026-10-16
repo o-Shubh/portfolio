@@ -5,6 +5,7 @@ import type { Role } from "@/lib/auth";
 export const AUTHOR_NAV: NavItem[] = [
   { href: "/author", label: "Dashboard", icon: "dashboard", exact: true },
   { href: "/author/books", label: "My books", icon: "books" },
+  { href: "/author/articles", label: "Articles", icon: "articles", sidebarOnly: true },
   { href: "/author/orders", label: "Orders", icon: "orders" },
   { href: "/author/services", label: "Services", icon: "services" },
   { href: "/author/plan", label: "Plan", icon: "plan" },
@@ -28,6 +29,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/finance", label: "Finance", icon: "finance", sidebarOnly: true },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: "plan", sidebarOnly: true },
   { href: "/admin/issues", label: "Issues", icon: "issues", sidebarOnly: true },
+  { href: "/admin/moderation", label: "Moderation", icon: "moderation", sidebarOnly: true },
   { href: "/admin/shipping", label: "Shipping", icon: "shipping", sidebarOnly: true },
   { href: "/admin/plans", label: "Plans", icon: "plan", sidebarOnly: true },
   { href: "/admin/settings", label: "Settings", icon: "settings", sidebarOnly: true },
@@ -38,6 +40,8 @@ export function accountNav(role: Role): NavItem[] {
   const items: NavItem[] = [
     { href: "/account", label: "My orders", icon: "shop", exact: true },
     { href: "/account/profile", label: "Profile", icon: "profile" },
+    { href: "/account/saved", label: "Saved articles", icon: "saved" },
+    { href: "/account/notifications", label: "Notifications", icon: "notifications" },
   ];
   const workspace: Record<Role, NavItem | null> = {
     reader: null,
