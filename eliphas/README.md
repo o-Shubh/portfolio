@@ -287,7 +287,11 @@ from database functions (`my_balance`, `my_sales_by_month`, `my_sales_by_city`, 
 
 ### Orders and payments
 
-1. **Buy now** on a book → `/checkout/<book>`: copies (1–10) and delivery address. The total is
+1. **Buy now** on a book → `/checkout/<book>`: copies (1–10) and delivery address. Or **Add to cart** on
+   several books → `/cart` (change copies, remove) → `/checkout`: one order, one payment, one parcel
+   from one printer, shipping priced on the combined weight. The cart lives in a cookie (works before
+   login, up to 10 books × 10 copies); books just paid for are removed from it, and a book that can't be
+   sold any more stays in the cart marked unavailable and is left out of checkout. The total is
    worked out again on the server from the database; the browser's numbers are never trusted.
 2. The order is saved as *Awaiting payment* and Razorpay Checkout opens (UPI, cards, net banking, wallets).
 3. On success the server checks Razorpay's signature, marks the order **Paid** and sends it to a

@@ -1,6 +1,7 @@
 import { PackageCheck, Printer, ShieldCheck, Truck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AddToCartButton } from "@/components/AddToCartButton";
 import { notFound } from "next/navigation";
 import { BookShelf } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
@@ -110,9 +111,12 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
                 <Truck className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
                 <span>Delivery across India · shipping for your PIN code is shown at checkout · usually arrives in 5–9 working days</span>
               </p>
-              <Link href={`/checkout/${book.slug}`} className="btn-accent mt-5 hidden min-h-12 w-full text-base md:flex">
-                Buy now
-              </Link>
+              <div className="mt-5 hidden gap-3 md:grid md:grid-cols-2">
+                <AddToCartButton bookId={book.id} className="min-h-12 text-base" />
+                <Link href={`/checkout/${book.slug}`} className="btn-accent min-h-12 text-base">
+                  Buy now
+                </Link>
+              </div>
             </div>
 
             <ul className="mt-5 grid grid-cols-3 gap-2 border-t border-line pt-5 text-center text-xs text-muted" lang="en">
@@ -160,14 +164,14 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
 
       {/* Phone buy bar */}
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface px-4 py-3 md:hidden" lang="en">
-        <div className="flex items-center gap-4">
-          <div className="min-w-0">
-            <p className="text-lg leading-tight font-semibold tabular-nums">{rupees(Number(book.mrp))}</p>
-            <p className="truncate text-xs text-muted">{book.title}</p>
+        <div className="flex items-center gap-3">
+          <p className="shrink-0 text-lg leading-tight font-semibold tabular-nums">{rupees(Number(book.mrp))}</p>
+          <div className="ml-auto flex flex-1 flex-wrap justify-end gap-2">
+            <AddToCartButton bookId={book.id} className="min-h-12 flex-1 px-3 text-sm" />
+            <Link href={`/checkout/${book.slug}`} className="btn-accent min-h-12 flex-1 px-3 text-base">
+              Buy now
+            </Link>
           </div>
-          <Link href={`/checkout/${book.slug}`} className="btn-accent ml-auto min-h-12 flex-1 text-base">
-            Buy now
-          </Link>
         </div>
       </div>
     </div>

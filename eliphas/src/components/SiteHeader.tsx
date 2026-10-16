@@ -1,7 +1,8 @@
-import { Search, UserRound } from "lucide-react";
+import { Search, ShoppingCart, UserRound } from "lucide-react";
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth";
 import { listGenres } from "@/lib/books";
+import { cartBadgeCount } from "@/lib/cart";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import { ThemeToggle } from "./ThemeToggle";
@@ -39,7 +40,7 @@ function SearchBar({ id, className = "" }: { id: string; className?: string }) {
 
 /** Marketplace header: navy bar with logo and a big search box, and a genre strip on larger screens. */
 export async function SiteHeader() {
-  const [profile, genres] = await Promise.all([getCurrentProfile(), listGenres()]);
+  const [profile, genres, inCart] = await Promise.all([getCurrentProfile(), listGenres(), cartBadgeCount()]);
   const account = profile ? { href: "/dashboard", label: "My account" } : { href: "/login", label: "Log in" };
 
   return (
@@ -69,6 +70,18 @@ export async function SiteHeader() {
               Publish your book
             </Link>
           )}
+          <Link
+            href="/cart"
+            className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-white/10"
+            aria-label={inCart ? `Cart, ${inCart} ${inCart === 1 ? "copy" : "copies"}` : "Cart"}
+          >
+            <ShoppingCart className="h-5 w-5" aria-hidden />
+            {inCart > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[0.7rem] font-bold text-navy tabular-nums" aria-hidden>
+                {inCart}
+              </span>
+            )}
+          </Link>
           <Link href={account.href} className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10 md:hidden" aria-label={account.label}>
             <UserRound className="h-5 w-5" />
           </Link>
