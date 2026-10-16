@@ -5,7 +5,7 @@ import { AddToCartButton } from "@/components/AddToCartButton";
 import { notFound } from "next/navigation";
 import { BookShelf } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
-import { coverUrl, getPublishedBook, LANGUAGE_LABEL, moreByAuthor } from "@/lib/books";
+import { authorHandle, coverUrl, getPublishedBook, LANGUAGE_LABEL, moreByAuthor } from "@/lib/books";
 import { rupees } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 
@@ -26,7 +26,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   const book = await getPublishedBook(slug);
   if (!book) notFound();
 
-  const [more, { rates }] = await Promise.all([moreByAuthor(book), getPricingSettings()]);
+  const [more, { rates }, handle] = await Promise.all([moreByAuthor(book), getPricingSettings(), authorHandle(book.author_id)]);
   const cover = coverUrl(book.cover_path);
   const label = (group: Record<string, { label: string }>, key: string) => group[key]?.label ?? key;
 
@@ -94,7 +94,13 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
               <span lang="en" className="text-muted">
                 by
               </span>{" "}
-              <span className="font-medium text-accent-fg">{book.author_name}</span>
+              {handle ? (
+                <Link href={`/authors/${handle}`} className="font-medium text-accent-fg hover:underline hover:underline-offset-2">
+                  {book.author_name}
+                </Link>
+              ) : (
+                <span className="font-medium text-accent-fg">{book.author_name}</span>
+              )}
             </p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs" lang="en">
               {[LANGUAGE_LABEL[book.language], book.genre, label(rates.binding, book.binding)].filter(Boolean).map((t) => (

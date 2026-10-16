@@ -88,3 +88,10 @@ export function coverUrl(path: string | null): string | null {
 }
 
 export const LANGUAGE_LABEL: Record<string, string> = { hi: "Hindi", en: "English" };
+
+/** The author's public page handle, if they have one (for linking their name). */
+export async function authorHandle(authorId: string): Promise<string | null> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("public_authors").select("handle").eq("id", authorId).maybeSingle();
+  return data?.handle ?? null;
+}

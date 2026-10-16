@@ -10,6 +10,17 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   return (
     <form onSubmit={onSubmit} className="card space-y-4">
       <ProfileFields profile={profile} />
+      {(profile.role === "author" || profile.role === "admin") && (
+        <div>
+          <label htmlFor="bio" className="label">
+            Author bio
+          </label>
+          <textarea id="bio" name="bio" rows={4} maxLength={600} defaultValue={profile.bio ?? ""} className="field" aria-describedby="bio-help" />
+          <p id="bio-help" className="mt-1 text-xs text-muted">
+            Shown on your public author page and under your articles. Up to 600 characters. Don&apos;t include phone numbers or addresses.
+          </p>
+        </div>
+      )}
       {state?.error && (
         <p role="alert" className="text-sm font-medium text-danger">
           {state.error}
