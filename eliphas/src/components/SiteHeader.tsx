@@ -2,8 +2,7 @@ import { Search, ShoppingCart, UserRound } from "lucide-react";
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth";
 import { listGenres } from "@/lib/books";
-import { readCart } from "@/lib/cart";
-import { cartCount } from "@/lib/cart-codec";
+import { cartBadgeCount } from "@/lib/cart";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import { ThemeToggle } from "./ThemeToggle";
@@ -41,8 +40,7 @@ function SearchBar({ id, className = "" }: { id: string; className?: string }) {
 
 /** Marketplace header: navy bar with logo and a big search box, and a genre strip on larger screens. */
 export async function SiteHeader() {
-  const [profile, genres, cart] = await Promise.all([getCurrentProfile(), listGenres(), readCart()]);
-  const inCart = cartCount(cart);
+  const [profile, genres, inCart] = await Promise.all([getCurrentProfile(), listGenres(), cartBadgeCount()]);
   const account = profile ? { href: "/dashboard", label: "My account" } : { href: "/login", label: "Log in" };
 
   return (
