@@ -354,6 +354,43 @@ same for direct action calls; file uploads show a percentage (`src/lib/upload.ts
 ring for keyboard users, a "Skip to content" link, and animations are switched off for people who ask for
 reduced motion.
 
+### Community updates, file versions and reviews
+
+- **Community** (`/community`, author workspace → Community): authors post short updates (up to 1,000
+  characters, one image with alt text, one of their published books), save drafts, edit, unpublish and
+  delete. Readers get **Discover** (everyone, newest first) and **Following** feeds, like (once per account),
+  reply, share, report and block. Followers get one in-app notification on first publication, if they keep
+  "Community updates" on in Notifications; edits and republishing never notify again. Reports go to
+  Admin → Moderation (hide, restore, remove, with reasons). Replies are rate limited.
+- **File versions**: every manuscript, print cover and cover upload is stored as its own file and listed in
+  `book_file_versions` (Files step → File versions). Approving a book pins the exact versions in
+  `books.approved_files`; each order records them in `order_items.file_snapshot`, and printers download
+  those approved files (shown as "approved vN"). Older books fall back to their current files.
+- **Preview step** (Details → Files → Pricing → Preview → Submit): authors see the bookstore page, open
+  each file, and confirm the versions they are submitting. Uploading again clears the confirmation.
+- **Earnings & payouts** (`/author/earnings`): totals, money on delivered orders not yet paid, pending
+  orders, payouts, and each order line's stored breakdown (selling price, printing, commission, GST on
+  commission, payment charge marked "estimated" when it is). Nothing is recalculated with today's rates.
+- **Authors** (`/authors`) lists authors with a live book or article. Book pages have **Follow** and
+  **Reader reviews**: only readers whose order with that book was delivered can review (one review per
+  book, editable, reportable). No rating is shown until real reviews exist.
+
+### Release checklist (decisions and configuration still needed)
+
+Built and tested locally in test mode; not production-ready until these are done:
+- **Tax**: Pro is ₹299 + 18% GST (₹352.82) and commission GST is 18%, as configured in Admin → Plans.
+  These are proposed settings; have your accountant confirm GST registration, rates and any TDS/TCS duty
+  before going live. No withholding is applied today.
+- **Payments**: Razorpay live keys and webhook secret (Vercel env); Pro is prepaid monthly with manual
+  renewal (no recurring billing is configured). Payment success is verified on the server and webhooks are
+  idempotent.
+- **SMS/OTP**: a production SMS provider with DLT approval; remove the test phone numbers.
+- **Shipping**: real zones and weight rates in Admin → Shipping (seeded rates are samples); no live courier
+  API is connected, so quotes come from these admin rates.
+- **Policies**: business details, refund/cancellation and service terms reviewed by a lawyer.
+- **Not built in this release**: paid AI review, tips, direct messages, international delivery, email or
+  push notifications (in-app only), automated copyright or manuscript checks.
+
 ### Orders and payments
 
 1. **Buy now** on a book → `/checkout/<book>`: copies (1–10) and delivery address. Or **Add to cart** on
