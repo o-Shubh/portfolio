@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { articleDate } from "@/components/ArticleCard";
-import { ArticleNotificationToggle, MarkAllRead, Unblock } from "@/components/articles/AccountControls";
+import { ArticleNotificationToggle, MarkAllRead, PostNotificationToggle, Unblock } from "@/components/articles/AccountControls";
 import { PageHeader } from "@/components/PageHeader";
 import { requireRole } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -14,7 +14,7 @@ export default async function NotificationsPage() {
   const [{ data: items }, { data: blocks }, { data: follows }] = await Promise.all([
     admin
       .from("notifications")
-      .select("id, title, link, read_at, created_at, article:articles(status, moderation), actor:profiles!notifications_actor_id_fkey(full_name)")
+      .select("id, kind, title, link, read_at, created_at, article:articles(status, moderation), post:posts(status, moderation), actor:profiles!notifications_actor_id_fkey(full_name)")
       .eq("user_id", me.id)
       .order("created_at", { ascending: false })
       .limit(100),
@@ -32,7 +32,7 @@ export default async function NotificationsPage() {
         ) : (
           <ul className="card divide-y divide-line p-0">
             {(items ?? []).map((n) => {
-              const art = n.article as { status: string; moderation: string } | null;
+              const art = (n.kind === "new_post" ? n.post : n.article) as { status: string; moderation: string } | null;
               const live = art?.status === "published" && art.moderation === "visible";
               const actor = (n.actor as { full_name: string | null } | null)?.full_name ?? "An author";
               return (
@@ -41,7 +41,7 @@ export default async function NotificationsPage() {
                   <div className="min-w-0">
                     <p className="text-sm">
                       {!n.read_at && <span className="sr-only">Unread: </span>}
-                      <span className="font-semibold">{actor}</span> published a new article
+                      <span className="font-semibold">{actor}</span> {n.kind === "new_post" ? "posted an update" : "published a new article"}
                     </p>
                     {live ? (
                       <Link href={n.link} className="font-medium underline-offset-2 hover:underline">
@@ -61,6 +61,7 @@ export default async function NotificationsPage() {
         <section className="card space-y-4">
           <h2 className="text-lg">Settings</h2>
           <ArticleNotificationToggle on={me.notify_new_articles} />
+          <PostNotificationToggle on={me.notify_new_posts} />
         </section>
 
         <section className="card">

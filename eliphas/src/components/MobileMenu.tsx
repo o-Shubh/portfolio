@@ -3,7 +3,8 @@
 import { ChevronRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDialogFocus } from "@/lib/use-dialog-focus";
 import { createPortal } from "react-dom";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -12,6 +13,7 @@ type L = { href: string; label: string };
 const MORE: L[] = [
   { href: "/books?lang=en", label: "English books" },
   { href: "/books?lang=hi", label: "Hindi books" },
+  { href: "/faq", label: "Help and FAQ" },
   { href: "/contact", label: "Contact us" },
   { href: "/refunds", label: "Refunds and cancellations" },
 ];
@@ -28,15 +30,15 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
     setOpen(false);
   }
 
+  const sheet = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useDialogFocus(open, sheet, close);
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
     };
   }, [open]);
 
@@ -68,7 +70,7 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
 
       {open &&
         createPortal(
-          <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden">
+          <div id="mobile-menu" ref={sheet} role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden">
             <div className="safe-top border-b border-line bg-surface text-fg">
               <div className="flex h-16 items-center justify-between px-4">
                 <span className="text-lg font-semibold">Menu</span>

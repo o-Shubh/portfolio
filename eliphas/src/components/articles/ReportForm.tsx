@@ -14,8 +14,11 @@ const REASONS = [
   { value: "other", label: "Something else" },
 ] as const;
 
+const NOUN: Record<string, string> = { article: "article", comment: "comment", post: "update", post_comment: "comment", review: "review" };
+
 /** Inline report form. Reports go to the Eliphas team; the author never sees who reported. */
-export function ReportForm({ targetType, targetId, onDone, intent }: { targetType: "article" | "comment"; targetId: string; onDone: () => void; intent: string }) {
+export function ReportForm({ targetType, targetId, onDone, intent }: { targetType: "article" | "comment" | "post" | "post_comment" | "review"; targetId: string; onDone: () => void; intent: string }) {
+  const noun = NOUN[targetType];
   const gate = useGate();
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
@@ -38,7 +41,7 @@ export function ReportForm({ targetType, targetId, onDone, intent }: { targetTyp
   return (
     <form
       className="space-y-3 rounded-lg bg-surface-2 p-3 text-sm"
-      aria-label={`Report this ${targetType}`}
+      aria-label={`Report this ${noun}`}
       onSubmit={(e) => {
         e.preventDefault();
         if (!reason) return setError("Choose a reason.");
@@ -52,7 +55,7 @@ export function ReportForm({ targetType, targetId, onDone, intent }: { targetTyp
       }}
     >
       <fieldset>
-        <legend className="font-semibold">Why are you reporting this {targetType}?</legend>
+        <legend className="font-semibold">Why are you reporting this {noun}?</legend>
         <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
           {REASONS.map((r) => (
             <label key={r.value} className="flex min-h-10 cursor-pointer items-center gap-2">

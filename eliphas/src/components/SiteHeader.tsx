@@ -9,9 +9,10 @@ import { ThemeToggle } from "./ThemeToggle";
 
 export const SITE_LINKS = [
   { href: "/books", label: "Bookstore" },
+  { href: "/authors", label: "Authors" },
+  { href: "/community", label: "Community" },
   { href: "/articles", label: "Articles" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/faq", label: "Help" },
+  { href: "/pricing", label: "Publish a book" },
 ];
 
 /** Search form used in the header. A plain GET form: works before JavaScript loads. */

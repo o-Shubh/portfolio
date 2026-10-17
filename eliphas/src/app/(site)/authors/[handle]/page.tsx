@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleGrid } from "@/components/ArticleCard";
+import { PostCard } from "@/components/community/PostCard";
+import { listPosts } from "@/lib/posts";
 import { FollowButton } from "@/components/articles/FollowButton";
 import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { BookGrid } from "@/components/BookCard";
@@ -27,7 +29,7 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
   const sp = await searchParams;
   const author = await getPublicAuthor(handle);
   if (!author) notFound();
-  const tab = sp.tab === "articles" ? "articles" : "books";
+  const tab = sp.tab === "articles" ? "articles" : sp.tab === "updates" ? "updates" : "books";
   const page = Math.max(1, Math.min(500, Number(sp.page) || 1));
   const name = author.full_name ?? "Author";
 
@@ -44,13 +46,17 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
     listPublicArticles({ authorId: author.id, page: tab === "articles" ? page : 1 }),
   ]);
   const books = (booksRes.data ?? []) as PublicBook[];
-  const state = await readerState(me?.id ?? null, "00000000-0000-0000-0000-000000000000", author.id);
+  const [state, updates] = await Promise.all([
+    readerState(me?.id ?? null, "00000000-0000-0000-0000-000000000000", author.id),
+    listPosts({ authorId: author.id, userId: me?.id ?? null, page: tab === "updates" ? page : 1 }),
+  ]);
   const pages = Math.max(1, Math.ceil(articles.total / PAGE_SIZE));
   const intent = typeof sp.intent === "string" ? sp.intent : null;
 
   const tabs = [
     { key: "books", label: "Books", count: booksRes.count ?? books.length, href: `/authors/${author.handle}` },
     { key: "articles", label: "Articles", count: articles.total, href: `/authors/${author.handle}?tab=articles` },
+    { key: "updates", label: "Updates", count: updates.total, href: `/authors/${author.handle}?tab=updates` },
   ];
 
   return (
@@ -65,7 +71,7 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
         {me?.id !== author.id && !state.blockedWithAuthor && <FollowButton authorId={author.id} authorName={name} following={state.following} intent={intent} />}
       </header>
 
-      <nav aria-label="Author sections" className="mt-6 flex gap-1 border-b border-line">
+      <nav aria-label="Author sections" className="no-scrollbar mt-6 flex gap-1 overflow-x-auto border-b border-line">
         {tabs.map((t) => (
           <Link
             key={t.key}
@@ -84,6 +90,16 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
             <BookGrid books={books} />
           ) : (
             <p className="rounded-xl bg-surface px-6 py-12 text-center text-muted shadow-soft ring-1 ring-line">No published books yet.</p>
+          )
+        ) : tab === "updates" ? (
+          updates.posts.length ? (
+            <div className="mx-auto max-w-2xl space-y-4">
+              {updates.posts.map((p) => (
+                <PostCard key={p.id} post={p} />
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-xl bg-surface px-6 py-12 text-center text-muted shadow-soft ring-1 ring-line">No updates yet.</p>
           )
         ) : articles.articles.length ? (
           <ArticleGrid articles={articles.articles} showAuthor={false} />

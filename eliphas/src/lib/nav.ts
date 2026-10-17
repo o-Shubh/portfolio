@@ -3,15 +3,17 @@ import type { Role } from "@/lib/auth";
 
 // Navigation for each logged-in area. Later milestones add items here.
 export const AUTHOR_NAV: NavItem[] = [
-  { href: "/author", label: "Dashboard", icon: "dashboard", exact: true },
+  { href: "/author", label: "Overview", icon: "dashboard", exact: true },
   { href: "/author/books", label: "My books", icon: "books" },
-  { href: "/author/articles", label: "Articles", icon: "articles", sidebarOnly: true },
+  { href: "/author/earnings", label: "Earnings & payouts", icon: "money" },
   { href: "/author/orders", label: "Orders", icon: "orders" },
-  { href: "/author/services", label: "Services", icon: "services" },
-  { href: "/author/plan", label: "Plan", icon: "plan" },
+  { href: "/author/community", label: "Community", icon: "community", sidebarOnly: true },
+  { href: "/author/articles", label: "My articles", icon: "articles", sidebarOnly: true },
+  { href: "/author/services", label: "Services", icon: "services", sidebarOnly: true },
+  { href: "/author/plan", label: "Pro membership", icon: "plan", sidebarOnly: true },
   { href: "/author/analytics", label: "Analytics", icon: "analytics", sidebarOnly: true },
-  { href: "/author/payments", label: "Payments", icon: "finance", sidebarOnly: true },
-  { href: "/account", label: "Account", icon: "profile", sidebarOnly: true },
+  { href: "/author/payments", label: "Service payments", icon: "finance", sidebarOnly: true },
+  { href: "/account/profile", label: "Settings & help", icon: "settings", sidebarOnly: true },
 ];
 
 export const PRINTER_NAV: NavItem[] = [

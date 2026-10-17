@@ -123,7 +123,7 @@ export async function deleteComment(commentId: string): Promise<CommunityResult>
 const REASONS = ["spam", "abuse", "hate", "copyright", "private-info", "other"] as const;
 
 /** Report an article or comment to our team. One open report per person per item. */
-export async function reportContent(targetType: "article" | "comment", targetId: string, reason: string, details: string): Promise<CommunityResult> {
+export async function reportContent(targetType: "article" | "comment" | "post" | "post_comment" | "review", targetId: string, reason: string, details: string): Promise<CommunityResult> {
   const me = await getCurrentProfile();
   if (!me) return LOGIN;
   if (!me.full_name) return ONBOARD;
@@ -131,12 +131,16 @@ export async function reportContent(targetType: "article" | "comment", targetId:
   if (!/^[0-9a-f-]{36}$/i.test(targetId)) return { error: "Not found." };
   if (await overLimit("content_reports", "reporter_id", me.id, 10, 86400)) return { error: "You've sent a lot of reports today. Our team will review them." };
   const admin = createAdminClient();
-  if (targetType === "article") {
-    if (!(await publicArticle(targetId))) return { error: "This article isn't available." };
-  } else {
-    const { data: c } = await admin.from("article_comments").select("id").eq("id", targetId).eq("moderation", "visible").maybeSingle();
-    if (!c) return { error: "This comment isn't available." };
-  }
+  const visible = async (table: "article_comments" | "post_comments" | "book_reviews" | "posts") =>
+    Boolean((await admin.from(table).select("id").eq("id", targetId).eq("moderation", "visible").maybeSingle()).data);
+  const exists =
+    targetType === "article" ? Boolean(await publicArticle(targetId))
+    : targetType === "comment" ? await visible("article_comments")
+    : targetType === "post" ? await visible("posts")
+    : targetType === "post_comment" ? await visible("post_comments")
+    : targetType === "review" ? await visible("book_reviews")
+    : false;
+  if (!exists) return { error: "This item isn't available." };
   const { error } = await admin
     .from("content_reports")
     .insert({ reporter_id: me.id, target_type: targetType, target_id: targetId, reason, details: String(details ?? "").trim().slice(0, 1000) || null });

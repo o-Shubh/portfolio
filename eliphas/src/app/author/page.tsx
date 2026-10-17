@@ -1,5 +1,6 @@
 import { AlertCircle, BookOpen, ChevronRight, Plus } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
+import { ProBadge } from "@/components/ProBadge";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BarList } from "@/components/charts/BarList";
@@ -67,6 +68,14 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
     ...(!totals.upi && totals.balance > 0 ? [{ key: "upi", text: <>Add your UPI ID so we can pay your earnings.</>, href: "/account/profile", action: "Add UPI ID" }] : []),
   ];
 
+  const draft = books[0];
+  const startSteps = [
+    { label: "Complete your profile (name, city, UPI ID for payouts)", done: Boolean(profile.full_name && profile.city && totals.upi), href: "/account/profile" },
+    { label: "Upload your first book", done: Boolean(draft), href: draft ? `/author/books/${draft.id}/files` : "/author/books/new" },
+    { label: "Set your price", done: Boolean(draft && draft.mrp !== null), href: draft ? `/author/books/${draft.id}/print` : "/author/books/new" },
+    { label: "Preview and submit for review", done: Boolean(draft && draft.status !== "draft"), href: draft ? `/author/books/${draft.id}/preview` : "/author/books/new" },
+  ];
+
   return (
     <>
       <PageHeader
@@ -78,6 +87,33 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
           </Link>
         }
       />
+
+      {/* New authors: the four steps to a first book, from real data */}
+      {!books.some((b) => b.status === "published" || b.status === "in_review") && (
+        <section aria-labelledby="start-h" className="card mb-8">
+          <h2 id="start-h" className="text-lg">
+            Get your first book live
+          </h2>
+          <ol className="mt-3 divide-y divide-line">
+            {startSteps.map((st, i) => (
+              <li key={st.label} className="flex items-center gap-3 py-3">
+                <span aria-hidden className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-semibold ${st.done ? "bg-success/15 text-success" : "bg-surface-2"}`}>
+                  {st.done ? "✓" : i + 1}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className={st.done ? "text-muted line-through" : "font-medium"}>{st.label}</span>
+                  <span className="sr-only">{st.done ? " (done)" : " (to do)"}</span>
+                </span>
+                {!st.done && (
+                  <Link href={st.href} className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-fg">
+                    Start <ChevronRight className="h-4 w-4" aria-hidden />
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       {todo.length > 0 && (
         <section aria-labelledby="todo-h" className="mb-8 rounded-[var(--radius-card)] bg-surface ring-2 ring-accent/30">
@@ -119,6 +155,9 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
         )}
         Earnings are your share after printing, platform commission (+ GST) and payment charges; what readers pay is not shown as income. No tax is withheld at present; any TDS will be shown here separately. Shipping is paid by readers and never deducted.
       </p>
+      <Link href="/author/earnings" className="mt-1 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-fg">
+        Earnings by order and payouts <ChevronRight className="h-4 w-4" aria-hidden />
+      </Link>
 
       {/* Book status comes before charts: it's what authors act on */}
       <section className="mt-10" aria-labelledby="books-h">
@@ -306,7 +345,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
       <section className="card mt-10 flex flex-wrap items-center justify-between gap-4" aria-label="Plan">
         <div>
           <p className="text-sm text-muted">Your plan</p>
-          <p className="text-lg font-semibold">{pro.active ? "Author Pro" : profile.author_terms_accepted_at ? "Free" : "Original terms"}</p>
+          <p className="flex items-center gap-2 text-lg font-semibold">{pro.active ? <>Author Pro <ProBadge /></> : profile.author_terms_accepted_at ? "Free" : "Original terms"}</p>
           <p className="text-sm text-muted">
             {pro.active
               ? `Paid until ${new Date(pro.accessUntil!).toLocaleDateString("en-IN", { dateStyle: "medium" })} · ${pro.credits} creative credit${pro.credits === 1 ? "" : "s"} left · renews only if you pay again`

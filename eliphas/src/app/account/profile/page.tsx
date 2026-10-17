@@ -5,7 +5,8 @@ import { ProfileForm } from "@/components/ProfileForm";
 import { avatarUrl } from "@/lib/avatars";
 import { requireRole, ROLE_LABEL } from "@/lib/auth";
 import { formatPhone } from "@/lib/phone";
-import { LogOut } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
+import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DeleteAccount } from "./DeleteAccount";
@@ -17,7 +18,7 @@ export default async function ProfilePage() {
   return (
     <>
       <PageHeader
-        title="Profile"
+        title="Settings & help"
         intro={`${formatPhone(profile.phone)} · ${ROLE_LABEL[profile.role]} account`}
       />
       <div className="max-w-xl space-y-8">
@@ -36,6 +37,24 @@ export default async function ProfilePage() {
               <LogOut className="h-4 w-4" aria-hidden /> Log out
             </button>
           </form>
+        </section>
+        <section className="card py-1" aria-labelledby="help-h">
+          <h2 id="help-h" className="pt-3 text-lg">Help</h2>
+          <ul className="divide-y divide-line">
+            {[
+              { href: "/faq", label: "Help and FAQ" },
+              { href: "/contact", label: "Contact support" },
+              { href: "/refunds", label: "Refunds and cancellations" },
+              { href: "/terms", label: "Terms of use" },
+              { href: "/privacy", label: "Privacy policy" },
+            ].map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="flex min-h-12 items-center justify-between">
+                  {l.label} <ChevronRight className="h-4 w-4 text-muted" aria-hidden />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
         <DeleteAccount />
       </div>

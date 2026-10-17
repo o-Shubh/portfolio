@@ -20,7 +20,12 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
   const supabase = await createClient();
   const signed = async (path: string | null) =>
     path ? ((await supabase.storage.from("manuscripts").createSignedUrl(path, 600)).data?.signedUrl ?? null) : null;
-  const [manuscriptLink, printCoverLink] = await Promise.all([signed(book.manuscript_path), signed(book.print_cover_path)]);
+  const [manuscriptLink, printCoverLink, { data: versions }] = await Promise.all([
+    signed(book.manuscript_path),
+    signed(book.print_cover_path),
+    supabase.from("book_file_versions").select("id, kind, version, page_count, created_at, path").eq("book_id", book.id).order("version", { ascending: false }),
+  ]);
+  const approved = (book.approved_files ?? {}) as Record<string, { id?: string | null } | null>;
 
   const trim = rates.trim_sizes[book.trim_size];
   const pageWarning =
@@ -142,6 +147,45 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
         )}
       </section>
 
+      {(versions ?? []).length > 0 && (
+        <section className="card lg:col-span-3" aria-labelledby="versions-h">
+          <h2 id="versions-h" className="text-lg">
+            File versions
+          </h2>
+          <p className="mt-1 text-sm text-muted">Every upload is kept. Our team approves specific versions, and printers only receive the approved ones.</p>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-muted">
+                <tr>
+                  <th scope="col" className="py-2 pr-4 font-medium">File</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Version</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Uploaded</th>
+                  <th scope="col" className="py-2 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {(versions ?? []).map((v) => {
+                  const current = v.path === (v.kind === "manuscript" ? book.manuscript_path : v.kind === "print_cover" ? book.print_cover_path : book.cover_path);
+                  return (
+                    <tr key={v.id}>
+                      <td className="py-2 pr-4">{v.kind === "manuscript" ? "Manuscript" : v.kind === "print_cover" ? "Print cover" : "Front cover image"}</td>
+                      <td className="py-2 pr-4 tabular-nums">
+                        v{v.version}
+                        {v.page_count ? ` · ${v.page_count} pages` : ""}
+                      </td>
+                      <td className="py-2 pr-4 tabular-nums">{new Date(v.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</td>
+                      <td className="py-2">
+                        {approved[v.kind]?.id === v.id ? <span className="badge bg-success/15 text-success">Approved</span> : current ? <span className="badge bg-surface-2">Current</span> : <span className="text-muted">Earlier</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       <div className="lg:col-span-3">
         <BookServicesCard bookId={book.id} authorId={book.author_id} />
       </div>
@@ -149,7 +193,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
       {!disabled && (
         <div className="lg:col-span-3">
           <Link href={`/author/books/${book.id}/print`} className="btn-primary">
-            Continue to print & price
+            Continue to pricing
           </Link>
         </div>
       )}

@@ -3,6 +3,11 @@ import { sampleUrl } from "@/lib/book-sample";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { FollowButton } from "@/components/articles/FollowButton";
+import { BookReviews } from "@/components/reviews/BookReviews";
+import { readerState } from "@/lib/articles";
+import { getCurrentProfile } from "@/lib/auth";
+import { hasDeliveredCopy, listReviews } from "@/lib/reviews";
 import { notFound } from "next/navigation";
 import { BookShelf } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
@@ -27,7 +32,12 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   const book = await getPublishedBook(slug);
   if (!book) notFound();
 
-  const [more, { rates }, handle] = await Promise.all([moreByAuthor(book), getPricingSettings(), authorHandle(book.author_id)]);
+  const [more, { rates }, handle, me, { reviews, average }] = await Promise.all([moreByAuthor(book), getPricingSettings(), authorHandle(book.author_id), getCurrentProfile(), listReviews(book.id)]);
+  const [following, canReview] = await Promise.all([
+    me ? readerState(me.id, "00000000-0000-0000-0000-000000000000", book.author_id).then((s) => s.following) : Promise.resolve(false),
+    me ? hasDeliveredCopy(me.id, book.id) : Promise.resolve(false),
+  ]);
+  const myReview = me ? reviews.find((r) => r.user_id === me.id) : undefined;
   const cover = coverUrl(book.cover_path);
   const sample = sampleUrl(book.sample_path);
   const label = (group: Record<string, { label: string }>, key: string) => group[key]?.label ?? key;
@@ -54,6 +64,8 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
     isbn: book.isbn ?? undefined,
     image: cover ?? undefined,
     offers: { "@type": "Offer", price: Number(book.mrp), priceCurrency: "INR", availability: "https://schema.org/InStock" },
+    // Only real reviews from verified buyers, and only when there are some
+    ...(average !== null ? { aggregateRating: { "@type": "AggregateRating", ratingValue: Number(average.toFixed(1)), reviewCount: reviews.length } } : {}),
   };
 
   return (
@@ -104,6 +116,11 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
                 <span className="font-medium text-accent-fg">{book.author_name}</span>
               )}
             </p>
+            {handle && me?.id !== book.author_id && (
+              <div className="mt-3" lang="en">
+                <FollowButton authorId={book.author_id} authorName={book.author_name} following={following} />
+              </div>
+            )}
             <div className="mt-3 flex flex-wrap gap-2 text-xs" lang="en">
               {[LANGUAGE_LABEL[book.language], book.genre, label(rates.binding, book.binding)].filter(Boolean).map((t) => (
                 <span key={t} className="rounded-md bg-surface-2 px-2 py-1 text-muted">
@@ -153,6 +170,10 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
               <p className="mt-3 leading-relaxed whitespace-pre-line text-fg/90">{book.description}</p>
             </section>
           )}
+
+          <div lang="en">
+            <BookReviews bookId={book.id} slug={book.slug} reviews={reviews} average={average} me={me?.id ?? null} canReview={canReview} mine={myReview ? { rating: myReview.rating, body: myReview.body ?? "" } : null} />
+          </div>
 
           <section className="card" lang="en">
             <h2 className="text-lg">Product details</h2>

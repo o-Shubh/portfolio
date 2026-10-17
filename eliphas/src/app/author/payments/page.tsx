@@ -17,7 +17,7 @@ export default async function PaymentsPage() {
     <>
       <PageHeader
         title="Payments"
-        intro="What you've paid us for Pro and author services. Book royalties and payouts are on your dashboard; we never take these payments out of your royalties."
+        intro="What you've paid us for Pro and author services. Book royalties and payouts are under Earnings & payouts; we never take these payments out of your royalties."
       />
       {!payments?.length ? (
         <div className="card text-muted">No payments yet.</div>

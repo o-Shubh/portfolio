@@ -7,7 +7,7 @@ import { useFormAction } from "@/lib/use-form-action";
 const LABELS: Record<string, string> = { hide: "Hide", restore: "Restore", remove: "Remove", dismiss: "Dismiss reports" };
 
 /** One decision on an article or comment: pick an action, give a reason, confirm. */
-export function ModerateForm({ targetType, targetId, actions }: { targetType: "article" | "comment"; targetId: string; actions: ("hide" | "restore" | "remove" | "dismiss")[] }) {
+export function ModerateForm({ targetType, targetId, actions }: { targetType: "article" | "comment" | "post" | "post_comment" | "review"; targetId: string; actions: ("hide" | "restore" | "remove" | "dismiss")[] }) {
   const [state, onSubmit, pending] = useFormAction(moderate);
   const [action, setAction] = useState<string | null>(null);
   const id = `mod-${targetId}`;

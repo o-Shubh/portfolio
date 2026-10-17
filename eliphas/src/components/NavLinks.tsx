@@ -21,10 +21,12 @@ import {
   Bell,
   ShieldAlert,
   MoreHorizontal,
+  MessagesSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useDialogFocus } from "@/lib/use-dialog-focus";
 
 // Icons are referenced by name so server layouts can pass plain data.
 const ICONS = {
@@ -47,6 +49,7 @@ const ICONS = {
   saved: Bookmark,
   notifications: Bell,
   moderation: ShieldAlert,
+  community: MessagesSquare,
 };
 
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; exact?: boolean; /** hide from the phone tab bar (sidebar only) */ sidebarOnly?: boolean };
@@ -118,12 +121,9 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
     setLastPath(pathname);
     setOpen(false);
   }
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  const sheet = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useDialogFocus(open, sheet, close);
   return (
     <>
       <button type="button" className={className} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(true)}>
@@ -131,7 +131,7 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
         More
       </button>
       {open && (
-        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
+        <div ref={sheet} className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
           <button type="button" className="absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
           <div className="safe-bottom absolute inset-x-0 bottom-0 rounded-t-[var(--radius-sheet)] bg-surface pt-2 shadow-lift">
             <div className="mx-auto mb-1 h-1 w-10 rounded-full bg-line-strong" aria-hidden />
