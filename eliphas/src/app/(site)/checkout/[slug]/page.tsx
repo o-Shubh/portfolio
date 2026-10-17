@@ -8,7 +8,7 @@ import { coverUrl } from "@/lib/books";
 import { canSell, MAX_QTY } from "@/lib/order-pricing";
 import { paymentMode } from "@/lib/payments";
 import { getPricingSettings } from "@/lib/settings";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { addressDefaults } from "../address";
 import { CheckoutForm } from "../CheckoutForm";
 
@@ -20,8 +20,7 @@ export default async function CheckoutPage({ params }: PageProps<"/checkout/[slu
   if (!profile) redirect(`/login?next=/checkout/${slug}`);
   if (!profile.full_name) redirect("/onboarding");
 
-  const supabase = await createClient();
-  const { data: book } = await supabase.from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
+  const { data: book } = await createAdminClient().from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
   if (!book) notFound();
   const settings = await getPricingSettings();
   const sellable = await canSell(book, settings);

@@ -39,8 +39,8 @@ export type ShippingQuoteResult =
 
 /** The published books for the order, in the order given. Every book must still be on sale. */
 async function orderLines(items: CheckoutItem[]): Promise<{ lines: { book: Book; quantity: number }[] } | { error: string }> {
-  const supabase = await createClient();
-  const { data: books } = await supabase
+  // Server read: the order needs the approved file pins, which aren't public
+  const { data: books } = await createAdminClient()
     .from("books")
     .select("*")
     .in(

@@ -14,6 +14,7 @@ import { formatPhone } from "@/lib/phone";
 import { gatewayPercent, printCost } from "@/lib/pricing";
 import { coverSizeMatches, fullCoverSize, pageSizeMatches, submitChecklist } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewActions } from "./ReviewActions";
 
@@ -25,7 +26,7 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 
   const supabase = await createClient();
-  const { data: book } = await supabase.from("books").select("*").eq("id", id).maybeSingle();
+  const { data: book } = await createAdminClient().from("books").select("*").eq("id", id).maybeSingle();
   if (!book) notFound();
   const [{ data: author }, settings, links] = await Promise.all([
     supabase.from("profiles").select("full_name, phone, city, state").eq("id", book.author_id).single(),

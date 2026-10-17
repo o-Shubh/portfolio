@@ -183,7 +183,14 @@ function Composer({ postId, parentId, signedIn, intent, onDone, autoFocus = fals
             Cancel
           </button>
         )}
-        {!parentId && <span className="text-xs text-muted">Be kind. Comments are public and can be reported.</span>}
+        {!parentId && (
+          <span className="text-xs text-muted">
+            Be kind. Comments are public and can be reported.{" "}
+            <Link href="/community-guidelines" className="underline underline-offset-2 hover:text-fg">
+              Guidelines
+            </Link>
+          </span>
+        )}
       </div>
       {error && (
         <p role="alert" className="text-sm font-medium text-danger">

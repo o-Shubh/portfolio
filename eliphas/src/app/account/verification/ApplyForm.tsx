@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { applyForVerification } from "@/app/actions/verification";
 import { FormMessage } from "@/components/FormMessage";
 import { useFormAction } from "@/lib/use-form-action";
@@ -36,7 +37,7 @@ export function ApplyForm({ initial }: { initial: { pen_name: string; bio: strin
           How can we confirm you&apos;re the author?
         </label>
         <textarea id="v-evidence" name="evidence" rows={4} maxLength={2000} className="field py-3" defaultValue={initial.evidence} required />
-        <p className="hint">Links to your published books, ISBNs, a publisher or magazine page, or the manuscript you&apos;re publishing here. Please don&apos;t send ID documents or numbers.</p>
+        <p className="hint">Links to your published books, ISBNs, a publisher or magazine page, or the manuscript you&apos;re publishing here. Please don&apos;t send ID documents or numbers. <Link href="/community-guidelines" className="underline underline-offset-2">How verification works</Link></p>
       </div>
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? "Sending…" : "Send application"}

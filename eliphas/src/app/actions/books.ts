@@ -19,7 +19,8 @@ const text = (fd: FormData, key: string) => String(fd.get(key) ?? "").trim();
 async function ownBook(bookId: string) {
   const profile = await requireRole(["author", "admin"]);
   const supabase = await createClient();
-  const { data: book } = await supabase
+  // Full row (incl. private file paths) is read on the server; the author_id filter is the ownership check
+  const { data: book } = await createAdminClient()
     .from("books")
     .select("*")
     .eq("id", bookId)
