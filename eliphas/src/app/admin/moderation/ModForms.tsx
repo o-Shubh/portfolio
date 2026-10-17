@@ -20,7 +20,7 @@ export function ModerateForm({ targetType, targetId, actions }: { targetType: "a
             type="button"
             onClick={() => setAction(action === a ? null : a)}
             aria-expanded={action === a}
-            className={`${a === "remove" ? "btn-ghost text-danger" : "btn-ghost"} min-h-9 px-3 text-sm ${action === a ? "ring-2 ring-gold" : ""}`}
+            className={`${a === "remove" ? "btn-ghost text-danger" : "btn-ghost"} min-h-9 px-3 text-sm ${action === a ? "ring-2 ring-accent/30" : ""}`}
           >
             {LABELS[a]}
           </button>

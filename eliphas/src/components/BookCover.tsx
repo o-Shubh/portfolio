@@ -62,7 +62,7 @@ export function BookCover({
           <p className="truncate text-[max(0.5rem,5.2cqw)] font-medium tracking-[0.18em] uppercase opacity-80">{author}</p>
         )}
         <p
-          className={`mt-auto line-clamp-4 font-heading leading-[1.08] font-semibold tracking-[-0.02em] ${titleSize}`}
+          className={`mt-auto line-clamp-4 font-serif leading-[1.08] font-semibold tracking-[-0.01em] ${titleSize}`}
           style={{ overflowWrap: "break-word" }}
         >
           {title}

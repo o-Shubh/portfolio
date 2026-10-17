@@ -48,7 +48,7 @@ export function AppShell({
             {photo ? (
               <img src={photo} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
             ) : (
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-xs font-semibold text-navy">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-semibold text-accent-fg ring-1 ring-line">
                 {initials}
               </span>
             )}
@@ -75,16 +75,16 @@ export function AppShell({
       </aside>
 
       {/* Top bar (phones) */}
-      <header className="safe-top sticky top-0 z-20 bg-bar text-white md:hidden [&_button]:text-white">
+      <header className="safe-top sticky top-0 z-20 border-b border-line bg-surface/90 text-fg backdrop-blur-md md:hidden">
         <div className="flex h-14 items-center justify-between pr-2 pl-4">
-          <Logo href="/" onDark className="h-9" />
+          <Logo href="/" className="h-9" />
           <div className="flex items-center">
-            <NotificationBell userId={profile.id} className="h-11 w-11 hover:bg-white/10" />
-            <Link href="/account/profile" className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10" aria-label="My profile and settings">
+            <NotificationBell userId={profile.id} className="h-11 w-11 text-fg hover:bg-surface-2" />
+            <Link href="/account/profile" className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface-2" aria-label="My profile and settings">
               {photo ? (
                 <img src={photo} alt="" className="h-8 w-8 rounded-full object-cover" />
               ) : (
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-gold text-xs font-semibold text-navy">{initials || <UserRound className="h-4 w-4" />}</span>
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-surface-2 text-xs font-semibold text-accent-fg ring-1 ring-line">{initials || <UserRound className="h-4 w-4" />}</span>
               )}
             </Link>
           </div>

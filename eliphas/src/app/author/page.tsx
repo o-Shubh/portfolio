@@ -80,7 +80,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
       />
 
       {todo.length > 0 && (
-        <section aria-labelledby="todo-h" className="mb-8 rounded-[var(--radius-card)] bg-surface ring-2 ring-gold">
+        <section aria-labelledby="todo-h" className="mb-8 rounded-[var(--radius-card)] bg-surface ring-2 ring-accent/30">
           <h2 id="todo-h" className="flex items-center gap-2 px-5 pt-4 font-sans text-base font-semibold">
             <AlertCircle className="h-5 w-5 text-accent-fg" aria-hidden /> Needs your attention
           </h2>
@@ -348,7 +348,7 @@ function Tile({
   highlight?: boolean;
 }) {
   return (
-    <div className={`card p-4 md:p-5 ${highlight ? "ring-2 ring-gold" : ""}`}>
+    <div className={`card p-4 md:p-5 ${highlight ? "ring-2 ring-accent/30" : ""}`}>
       <dt className="text-sm text-muted">{label}</dt>
       <dd className="mt-1.5 font-heading text-[1.85rem] leading-tight font-semibold tabular-nums md:text-[2.25rem]">{value}</dd>
       <dd className="mt-1 truncate text-sm text-muted">

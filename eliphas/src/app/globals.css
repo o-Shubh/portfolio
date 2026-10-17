@@ -15,28 +15,32 @@
 
 /* =====================================================================
    Eliphas design system
-   Calm and clear: ink navy for text and main actions, warm white paper,
-   marigold used sparingly for the one thing that matters most (buy, highlight).
-   Every colour pair used for text meets WCAG AA (checked in scripts/contrast).
+   Quiet and neutral: white and soft-grey surfaces, system sans-serif type,
+   hairline borders, gentle depth and one navy accent. Serif type is kept
+   for books and editorial reading (titles, articles), never for interface chrome.
+   Every colour pair used for text meets WCAG AA in light and dark mode.
    ===================================================================== */
 @theme {
   /* Brand */
-  --color-ink: #17214a;
+  --color-ink: #17214a; /* Eliphas navy (logo) */
   --color-navy: #17214a;
   --color-navy-2: #26326a;
-  --color-gold: #e9a31a; /* marigold: fills and rings only, never small text on white */
-  --color-accent: #e9a31a;
-  --color-on-accent: #17214a;
-  --color-paper: #fffdf9;
+  --color-paper: #ffffff;
+  /* The single accent. "gold" is kept as an alias so older class names use the accent too. */
+  --color-gold: var(--accent);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
 
-  /* Type: serif headings, sans interface text; Devanagari fonts take over for Hindi letters */
-  --font-heading: var(--font-serif), var(--font-serif-deva), ui-serif, Georgia, serif;
-  --font-sans: var(--font-inter), var(--font-sans-deva), ui-sans-serif, system-ui, sans-serif;
+  /* Type: the device's own sans-serif for the interface; a book serif for editorial content.
+     Hindi letters fall through to Noto Devanagari when the system font lacks them. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, var(--font-sans-deva), "Noto Sans Devanagari", sans-serif;
+  --font-heading: var(--font-sans);
+  --font-serif: var(--font-book-serif), var(--font-serif-deva), "Iowan Old Style", Georgia, serif;
 
-  /* Radii */
-  --radius-control: 0.75rem; /* buttons, fields, chips */
-  --radius-card: 1rem;
-  --radius-sheet: 1.25rem;
+  /* Radii: restrained */
+  --radius-control: 0.625rem; /* buttons, fields, chips: 10px */
+  --radius-card: 0.875rem; /* 14px */
+  --radius-sheet: 1.125rem;
 
   /* Motion: short and purposeful */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -69,69 +73,75 @@
 
 :root {
   color-scheme: light;
-  --bg: #faf7f2; /* warm white page */
-  --surface: #fffdf9; /* cards and sheets */
-  --surface-2: #f3eee5; /* quiet fills: chips, table heads, inputs on cards */
-  --fg: #17214a; /* ink navy body text: 13.9:1 on --bg */
-  --muted: #535a73; /* secondary text: 6.4:1 on --bg */
-  --line: rgb(23 33 74 / 0.11);
-  --line-strong: rgb(23 33 74 / 0.24);
-  --primary: #17214a;
+  --bg: #f5f5f7; /* soft grey page */
+  --surface: #ffffff; /* cards, sheets, header */
+  --surface-2: #f0f0f3; /* quiet fills: chips, table heads, segmented controls */
+  --fg: #1d1d1f; /* near-black text: 15.6:1 on --bg */
+  --muted: #5f5f66; /* secondary text: 5.9:1 on --bg */
+  --line: rgb(0 0 0 / 0.08);
+  --line-strong: rgb(0 0 0 / 0.16);
+  --primary: #17214a; /* Eliphas navy: main buttons */
   --on-primary: #ffffff;
-  --accent-fg: #8a5600; /* marigold for text on light backgrounds: 5.6:1 */
-  --bar: #17214a; /* top bar and footer */
-  --success: #17703a; /* 5.9:1 */
-  --danger: #b42318; /* 6.0:1 */
+  --accent: #17214a; /* the one accent: fills, rings, selected states */
+  --on-accent: #ffffff;
+  --accent-fg: #2b4192; /* navy for links and labels on light surfaces: 8.1:1 */
+  --bar: #ffffff;
+  --success: #1b7a3d;
+  --danger: #c0271d;
   --warning: #8a5600;
-  --info: #26508f;
-  --chart: #1f7a55;
-  --focus: #2457c5; /* focus ring: visible on paper, navy and marigold */
-  --shadow-color: 23 33 74;
+  --info: #2b4192;
+  --chart: #2b4192;
+  --focus: #2b4192;
+  --shadow-color: 0 0 0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0d1126;
-    --surface: #151a35;
-    --surface-2: #1d2343;
-    --fg: #f3f1ec;
-    --muted: #b0b5c9;
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --fg: #f5f5f7;
+    --muted: #a1a1a8;
     --line: rgb(255 255 255 / 0.1);
-    --line-strong: rgb(255 255 255 / 0.22);
-    --primary: #f2b544;
-    --on-primary: #17214a;
-    --accent-fg: #f2b544;
-    --bar: #10152e;
+    --line-strong: rgb(255 255 255 / 0.2);
+    --primary: #4a63c9; /* navy, lifted so it reads on black: white text 5.1:1 */
+    --on-primary: #ffffff;
+    --accent: #4a63c9;
+    --on-accent: #ffffff;
+    --accent-fg: #a9b9ff;
+    --bar: #1c1c1e;
     --success: #5fd38d;
     --danger: #ff8a7a;
     --warning: #f2b544;
-    --info: #9cbcff;
-    --chart: #3a9d73;
-    --focus: #9cbcff;
+    --info: #a9b9ff;
+    --chart: #8ea2f5;
+    --focus: #a9b9ff;
     --shadow-color: 0 0 0;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0d1126;
-  --surface: #151a35;
-  --surface-2: #1d2343;
-  --fg: #f3f1ec;
-  --muted: #b0b5c9;
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --fg: #f5f5f7;
+  --muted: #a1a1a8;
   --line: rgb(255 255 255 / 0.1);
-  --line-strong: rgb(255 255 255 / 0.22);
-  --primary: #f2b544;
-  --on-primary: #17214a;
-  --accent-fg: #f2b544;
-  --bar: #10152e;
+  --line-strong: rgb(255 255 255 / 0.2);
+  --primary: #4a63c9;
+  --on-primary: #ffffff;
+  --accent: #4a63c9;
+  --on-accent: #ffffff;
+  --accent-fg: #a9b9ff;
+  --bar: #1c1c1e;
   --success: #5fd38d;
   --danger: #ff8a7a;
   --warning: #f2b544;
-  --info: #9cbcff;
-  --chart: #3a9d73;
-  --focus: #9cbcff;
+  --info: #a9b9ff;
+  --chart: #8ea2f5;
+  --focus: #a9b9ff;
   --shadow-color: 0 0 0;
 }
 
@@ -154,9 +164,10 @@ body {
     font-family: var(--font-heading);
     font-weight: 600;
     line-height: 1.2;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
+  h1 { letter-spacing: -0.025em; }
   /* Devanagari needs room above and below the line */
   :lang(hi) h1, :lang(hi) h2, :lang(hi) h3, [lang="hi"] h1, [lang="hi"] h2, [lang="hi"] h3 {
     line-height: 1.4;
@@ -177,7 +188,7 @@ body {
 }
 
 ::selection {
-  background: rgb(233 163 26 / 0.3);
+  background: rgb(43 65 146 / 0.22);
 }
 
 /* Short transitions only, and none for people who ask for less motion */
@@ -192,21 +203,22 @@ body {
 
 /* ---------- Shared building blocks ---------- */
 @utility shadow-soft {
-  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.05), 0 2px 8px -2px rgb(var(--shadow-color) / 0.06);
+  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 1px 1px rgb(var(--shadow-color) / 0.02);
 }
 @utility shadow-lift {
-  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.06), 0 12px 32px -12px rgb(var(--shadow-color) / 0.2);
+  box-shadow: 0 2px 6px rgb(var(--shadow-color) / 0.06), 0 12px 28px -10px rgb(var(--shadow-color) / 0.16);
 }
 
 /* Buttons: one primary per task area; ghost for secondary; accent (marigold) only for buying */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition duration-150 select-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition-[background-color,opacity,box-shadow] duration-150 select-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55;
 }
 @utility btn-primary {
   @apply btn bg-primary text-on-primary hover:opacity-90;
 }
+/* Kept for buying actions; same navy accent as primary (one accent colour) */
 @utility btn-accent {
-  @apply btn bg-gold text-navy hover:brightness-105;
+  @apply btn bg-primary text-on-primary hover:opacity-90;
 }
 @utility btn-ghost {
   @apply btn bg-surface text-fg ring-1 ring-line-strong ring-inset hover:bg-surface-2;
@@ -219,7 +231,7 @@ body {
 }
 
 @utility card {
-  @apply rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line md:p-6;
+  @apply rounded-[var(--radius-card)] bg-surface p-5 shadow-soft ring-1 ring-line md:p-6;
 }
 @utility field {
   @apply block min-h-11 w-full rounded-[var(--radius-control)] bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted hover:ring-fg/35 focus:ring-2 focus:ring-focus disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-danger;
@@ -231,11 +243,11 @@ body {
   @apply mt-1.5 text-sm text-muted;
 }
 @utility eyebrow {
-  @apply inline-flex items-center gap-2 text-xs font-semibold tracking-[0.1em] text-accent-fg uppercase;
+  @apply inline-flex items-center gap-2 text-sm font-semibold text-accent-fg;
 }
 /* Filter chips and segmented tabs: 44 px tall on touch screens */
 @utility chip {
-  @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium ring-1 ring-line-strong ring-inset transition hover:bg-surface-2 md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
+  @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium ring-1 ring-line ring-inset transition hover:bg-surface-2 md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
 }
 @utility badge {
   @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
@@ -303,16 +315,17 @@ body {
 
 /* Article reading typography: comfortable measure and spacing; a little more line height for Hindi */
 .article-body {
-  font-size: 1.0625rem;
-  line-height: 1.75;
+  font-family: var(--font-serif);
+  font-size: 1.1875rem;
+  line-height: 1.7;
   overflow-wrap: anywhere;
 }
 .article-body:lang(hi), [lang="hi"] .article-body { line-height: 1.95; }
 .article-body > * + * { margin-top: 1.1em; }
-.article-body h2 { font-size: 1.5rem; line-height: 1.3; margin-top: 1.8em; text-wrap: balance; }
-.article-body h3 { font-size: 1.2rem; line-height: 1.35; margin-top: 1.5em; }
+.article-body h2 { font-family: var(--font-serif); font-size: 1.55rem; line-height: 1.3; margin-top: 1.8em; text-wrap: balance; }
+.article-body h3 { font-family: var(--font-serif); font-size: 1.25rem; line-height: 1.35; margin-top: 1.5em; }
 .article-body blockquote {
-  border-left: 3px solid var(--color-gold);
+  border-left: 3px solid var(--line-strong);
   padding-left: 1rem;
   font-style: italic;
   color: var(--color-muted);
@@ -320,5 +333,5 @@ body {
 .article-body ul { list-style: disc; padding-left: 1.4rem; }
 .article-body ol { list-style: decimal; padding-left: 1.4rem; }
 .article-body li + li { margin-top: 0.35em; }
-.article-body a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--color-gold); }
+.article-body a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent-fg); }
 .article-body strong { font-weight: 600; }

@@ -58,7 +58,7 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="grid h-11 w-11 place-items-center rounded-full text-white transition hover:bg-white/10"
+        className="grid h-11 w-11 place-items-center rounded-full text-fg transition hover:bg-surface-2"
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-label="Open menu"
@@ -69,13 +69,13 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
       {open &&
         createPortal(
           <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden">
-            <div className="safe-top bg-bar text-white">
+            <div className="safe-top border-b border-line bg-surface text-fg">
               <div className="flex h-16 items-center justify-between px-4">
                 <span className="text-lg font-semibold">Menu</span>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10"
+                  className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface-2"
                   aria-label="Close menu"
                 >
                   <X className="h-5 w-5" />
@@ -88,7 +88,7 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
               <ul className="divide-y divide-line bg-surface shadow-soft">{MORE.map((l) => row(l))}</ul>
               <div className="space-y-4 px-4 pt-6">
                 {showPublish && (
-                  <Link href="/login?next=/author" onClick={() => setOpen(false)} className="btn-accent w-full">
+                  <Link href="/login?next=/author" onClick={() => setOpen(false)} className="btn-primary w-full">
                     Publish your book
                   </Link>
                 )}

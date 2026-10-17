@@ -113,7 +113,7 @@ export function PrintCalculator({
           </div>
         ) : (
           results.map((r, i) => (
-            <div key={r.key} className={`card ${i === 0 ? "ring-2 ring-gold" : ""}`}>
+            <div key={r.key} className={`card ${i === 0 ? "ring-2 ring-accent/30" : ""}`}>
               <h2 className="text-base">{r.label}</h2>
               {r.note && <p className="mt-0.5 text-xs text-muted">{r.note}</p>}
               <div className="mt-4">

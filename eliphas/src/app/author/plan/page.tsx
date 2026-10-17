@@ -88,7 +88,7 @@ export default async function PlanPage() {
             </Li>
           </ul>
         </section>
-        <section className="card ring-2 ring-gold">
+        <section className="card ring-2 ring-accent/30">
           <h2 className="text-xl">Author Pro</h2>
           <p className="mt-1 text-3xl font-semibold">
             {formatPaise(proPrice.totalPaise)}

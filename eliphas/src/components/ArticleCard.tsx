@@ -9,10 +9,10 @@ export const articleDate = (iso: string | null) =>
 export function ArticleCard({ a, showAuthor = true }: { a: Card; showAuthor?: boolean }) {
   const cover = coverUrl(a.cover_path);
   return (
-    <article className="group flex w-full flex-col overflow-hidden rounded-xl bg-surface shadow-soft ring-1 ring-line transition hover:ring-gold" lang={a.language}>
+    <article className="group flex w-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-surface shadow-soft ring-1 ring-line transition-shadow hover:shadow-lift" lang={a.language}>
       {cover && (
         <Link href={articlePath(a)} tabIndex={-1} aria-hidden className="block aspect-[16/9] overflow-hidden bg-surface-2">
-          <img src={cover} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
+          <img src={cover} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
         </Link>
       )}
       <div className="flex flex-1 flex-col p-4">
@@ -20,7 +20,7 @@ export function ArticleCard({ a, showAuthor = true }: { a: Card; showAuthor?: bo
           {topicLabel(a.topic)}
           {a.language === "hi" && <span className="ml-2 rounded bg-surface-2 px-1.5 py-0.5 text-muted normal-case">हिन्दी</span>}
         </p>
-        <h3 className="mt-1.5 text-lg leading-snug">
+        <h3 className="mt-1.5 font-serif text-xl leading-snug tracking-[-0.01em]">
           <Link href={articlePath(a)} className="hover:underline hover:underline-offset-2">
             {a.title}
           </Link>
