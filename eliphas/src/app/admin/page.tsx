@@ -16,8 +16,8 @@ export default async function AdminHome() {
 
   const count = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0);
   const [waiting, live, printers, ordersThisMonth, toPrint, balances, queue, noSample, applications] = await Promise.all([
-    count(supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "in_review")),
-    count(supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "published")),
+    count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "in_review")),
+    count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "published")),
     count(supabase.from("printers").select("*", { count: "exact", head: true }).eq("active", true)),
     count(
       supabase
@@ -34,7 +34,7 @@ export default async function AdminHome() {
       .eq("status", "in_review")
       .order("submitted_at", { ascending: true })
       .limit(5),
-    count(supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "published").is("sample_path", null)),
+    count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "published").is("sample_path", null)),
     count(supabase.from("author_applications").select("*", { count: "exact", head: true }).eq("status", "pending")),
   ]);
   const [business, pricing] = await Promise.all([getBusiness(), getPricingSettings()]);

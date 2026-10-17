@@ -36,7 +36,7 @@ export default async function CommunityPage({ searchParams }: PageProps<"/commun
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-[1.75rem] md:text-[2.125rem]">Community</h1>
-          <p className="mt-1 text-muted">Readers and authors sharing views on books and writing, newest first. Long-form pieces by verified authors are in <Link href="/articles" className="font-medium text-accent-fg hover:underline">Articles</Link>.</p>
+          <p className="mt-1 text-muted">Readers and authors sharing views on books and writing, newest first. Long-form pieces by verified authors are in <Link href="/articles" className="font-medium text-accent-fg hover:underline">Articles</Link>. Please follow our <Link href="/community-guidelines" className="font-medium text-accent-fg hover:underline">community guidelines</Link>.</p>
         </div>
       </div>
 

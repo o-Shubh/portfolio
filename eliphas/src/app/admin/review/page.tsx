@@ -39,7 +39,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
   query = status === "in_review" ? query.order("submitted_at", { ascending: true }) : query.order("updated_at", { ascending: false });
   const [{ data: books }, { count: waiting }] = await Promise.all([
     query,
-    supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "in_review"),
+    supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "in_review"),
   ]);
 
   return (

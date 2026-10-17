@@ -410,6 +410,13 @@ reduced motion.
   cancelled or refunded, worked out every time the page loads. Averages use published reviews only. Authors
   can post one labelled public response, never delete reviews. Moderation (Admin → Moderation) is for abuse,
   not negative opinions; the policy is shown under the reviews.
+- **Community guidelines** (`/community-guidelines`, linked from the footer, Community, comments, reviews
+  and the verification form): what's welcome, what's removed, how reviews, verification, reporting and
+  blocking work. Draft wording: have it reviewed before launch.
+- **Private file locations** (migration 000016): the manuscript, print cover, sample draft and approved-file
+  columns on `books` can't be read through the public API by guests or members (column-level grants). The app
+  reads them on the server after checking the person is the book's author or an admin. When you add a new
+  column to `books` that should be public, grant it: `grant select (new_col) on public.books to anon, authenticated;`.
 
 ### Release checklist (decisions and configuration still needed)
 
@@ -424,7 +431,7 @@ Built and tested locally in test mode; not production-ready until these are done
 - **Shipping**: real zones and weight rates in Admin → Shipping (seeded rates are samples); no live courier
   API is connected, so quotes come from these admin rates.
 - **Policies**: business details, refund/cancellation and service terms reviewed by a lawyer; community
-  guidelines, review policy and the verification evidence you'll accept.
+  guidelines and review policy (drafted at `/community-guidelines`) and the verification evidence you'll accept.
 - **Verification**: review the existing authors in Admin → Authors → Existing authors to review.
 - **Not built in this release**: paid AI review, tips, direct messages, international delivery, email or
   push notifications (in-app only), automated copyright or manuscript checks.

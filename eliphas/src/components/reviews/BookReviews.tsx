@@ -132,6 +132,9 @@ export function BookReviews({
             <li>We remove reviews only for abuse, spam, hate, private information or copied content, never for being negative. Use Report if you see a problem.</li>
             <li>The average counts every published review.</li>
           </ul>
+          <Link href="/community-guidelines" className="mt-2 inline-flex min-h-11 items-center font-medium text-accent-fg hover:underline">
+            Community guidelines
+          </Link>
         </details>
       </div>
     </section>
