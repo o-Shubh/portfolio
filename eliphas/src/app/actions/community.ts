@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/lib/auth";
 import { articlePath } from "@/lib/article-format";
-import { blockedBetween, isRestricted, overLimit } from "@/lib/articles";
+import { blockedBetween, ensureHandle, isRestricted, overLimit } from "@/lib/articles";
+import { notify } from "@/lib/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type CommunityResult = { ok: true; on?: boolean } | { error: string; login?: boolean; onboarding?: boolean };
@@ -53,17 +54,22 @@ export async function setBookmark(articleId: string, on: boolean): Promise<Commu
 }
 
 /** Follow an author: you get an in-app notification when they publish a new article. */
+/** Follow anyone with a public profile (readers or authors). New followers notify once, per preference. */
 export async function setFollow(authorId: string, on: boolean): Promise<CommunityResult> {
   const me = await getCurrentProfile();
   if (!me) return LOGIN;
   if (!me.full_name) return ONBOARD;
   if (me.id === authorId) return { error: "You can't follow yourself." };
+  if (!/^[0-9a-f-]{36}$/i.test(authorId)) return { error: "Account not found." };
   const admin = createAdminClient();
   if (on) {
-    const { data: author } = await admin.from("profiles").select("id, role").eq("id", authorId).maybeSingle();
-    if (!author || !["author", "admin"].includes(author.role)) return { error: "Author not found." };
-    if (await blockedBetween(me.id, authorId)) return { error: "You can't follow this author." };
+    const { data: target } = await admin.from("profiles").select("id, handle, role").eq("id", authorId).maybeSingle();
+    if (!target || !target.handle || target.role === "printer") return { error: "Account not found." };
+    if (await blockedBetween(me.id, authorId)) return { error: "You can't follow this account." };
     await admin.from("follows").upsert({ follower_id: me.id, author_id: authorId }, { onConflict: "follower_id,author_id", ignoreDuplicates: true });
+    await ensureHandle(me);
+    const mine = (await admin.from("profiles").select("handle, role").eq("id", me.id).single()).data;
+    await notify({ userId: authorId, kind: "new_follower", actorId: me.id, refId: me.id, title: `${me.full_name} started following you`, link: mine?.handle ? (["author", "admin"].includes(mine.role) ? `/authors/${mine.handle}` : `/u/${mine.handle}`) : "/account/notifications" });
   } else {
     await admin.from("follows").delete().eq("follower_id", me.id).eq("author_id", authorId);
   }
@@ -85,7 +91,8 @@ export async function addComment(articleId: string, body: string): Promise<Commu
   if ((await overLimit("article_comments", "user_id", me.id, 5, 60)) || (await overLimit("article_comments", "user_id", me.id, 60, 86400))) {
     return { error: "You're commenting very quickly. Please wait a little and try again." };
   }
-  await createAdminClient().from("article_comments").insert({ article_id: a.id, user_id: me.id, body: text });
+  const { data: c } = await createAdminClient().from("article_comments").insert({ article_id: a.id, user_id: me.id, body: text }).select("id").single();
+  if (c) await notify({ userId: a.author_id, kind: "reply", actorId: me.id, refId: c.id, title: `${me.full_name} commented on your article`, link: articlePath(a) });
   revalidatePath(articlePath(a));
   return { ok: true };
 }
@@ -170,6 +177,17 @@ export async function setArticleNotifications(on: boolean): Promise<CommunityRes
   if (!me) return LOGIN;
   if (!me.full_name) return ONBOARD;
   await createAdminClient().from("profiles").update({ notify_new_articles: on }).eq("id", me.id);
+  revalidatePath("/account/notifications");
+  return { ok: true, on };
+}
+
+/** In-app notification preferences for new followers and replies to your posts, comments and reviews. */
+export async function setNotificationPref(field: "notify_followers" | "notify_replies", on: boolean): Promise<CommunityResult> {
+  const me = await getCurrentProfile();
+  if (!me) return LOGIN;
+  if (!me.full_name) return ONBOARD;
+  if (field !== "notify_followers" && field !== "notify_replies") return { error: "Unknown setting." };
+  await createAdminClient().from("profiles").update(field === "notify_followers" ? { notify_followers: Boolean(on) } : { notify_replies: Boolean(on) }).eq("id", me.id);
   revalidatePath("/account/notifications");
   return { ok: true, on };
 }

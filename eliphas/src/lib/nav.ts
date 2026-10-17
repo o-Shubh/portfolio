@@ -31,6 +31,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/finance", label: "Finance", icon: "finance", sidebarOnly: true },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: "plan", sidebarOnly: true },
   { href: "/admin/issues", label: "Issues", icon: "issues", sidebarOnly: true },
+  { href: "/admin/authors", label: "Authors", icon: "profile", sidebarOnly: true },
   { href: "/admin/moderation", label: "Moderation", icon: "moderation", sidebarOnly: true },
   { href: "/admin/shipping", label: "Shipping", icon: "shipping", sidebarOnly: true },
   { href: "/admin/plans", label: "Plans", icon: "plan", sidebarOnly: true },
@@ -42,8 +43,9 @@ export function accountNav(role: Role): NavItem[] {
   const items: NavItem[] = [
     { href: "/account", label: "My orders", icon: "shop", exact: true },
     { href: "/account/profile", label: "Profile", icon: "profile" },
-    { href: "/account/saved", label: "Saved articles", icon: "saved" },
+    { href: "/account/saved", label: "Saved", icon: "saved" },
     { href: "/account/notifications", label: "Notifications", icon: "notifications" },
+    { href: "/account/verification", label: "Author verification", icon: "review" },
   ];
   const workspace: Record<Role, NavItem | null> = {
     reader: null,

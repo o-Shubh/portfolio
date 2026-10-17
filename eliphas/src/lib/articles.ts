@@ -41,7 +41,7 @@ export async function isRestricted(userId: string) {
 }
 
 /** Simple rate limit: at most `max` rows by this user in the last `seconds` (counted on the table itself). */
-export async function overLimit(table: "article_comments" | "content_reports" | "articles" | "posts" | "post_comments", userCol: string, userId: string, max: number, seconds: number) {
+export async function overLimit(table: "article_comments" | "content_reports" | "articles" | "posts" | "post_comments" | "book_reviews", userCol: string, userId: string, max: number, seconds: number) {
   const since = new Date(Date.now() - seconds * 1000).toISOString();
   const { count } = await createAdminClient()
     .from(table)

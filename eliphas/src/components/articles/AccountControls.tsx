@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { markNotificationsRead, setArticleNotifications, setBlock, setBookmark } from "@/app/actions/community";
+import { markNotificationsRead, setArticleNotifications, setBlock, setBookmark, setNotificationPref } from "@/app/actions/community";
 import { setPostNotifications } from "@/app/actions/posts";
 import { offlineSafe } from "@/lib/use-form-action";
 
@@ -123,9 +123,44 @@ export function PostNotificationToggle({ on }: { on: boolean }) {
         }}
       />
       <span>
-        <span className="block font-semibold">Community updates from authors I follow</span>
+        <span className="block font-semibold">Community posts from people I follow</span>
         <span className="text-sm text-muted">
-          An in-app notification when an author you follow posts an update. Never by SMS or email.
+          An in-app notification when someone you follow posts in Community. Never by SMS or email.
+          {saved && <span role="status" className="ml-2 font-medium text-success">Saved.</span>}
+        </span>
+      </span>
+    </label>
+  );
+}
+
+/** On/off for a notification type (new followers, replies). In-app only. */
+export function PrefToggle({ field, on, label, hint }: { field: "notify_followers" | "notify_replies"; on: boolean; label: string; hint: string }) {
+  const [value, setValue] = useState(on);
+  const [saved, setSaved] = useState(false);
+  const [pending, start] = useTransition();
+  return (
+    <label className="flex cursor-pointer items-start gap-3">
+      <input
+        type="checkbox"
+        className="mt-1 h-5 w-5 accent-[var(--primary)]"
+        checked={value}
+        disabled={pending}
+        data-testid={`pref-${field}`}
+        onChange={(e) => {
+          const next = e.target.checked;
+          setValue(next);
+          setSaved(false);
+          start(async () => {
+            const res = await offlineSafe(setNotificationPref(field, next));
+            if ("ok" in res) setSaved(true);
+            else setValue(!next);
+          });
+        }}
+      />
+      <span>
+        <span className="block font-semibold">{label}</span>
+        <span className="text-sm text-muted">
+          {hint}
           {saved && <span role="status" className="ml-2 font-medium text-success">Saved.</span>}
         </span>
       </span>

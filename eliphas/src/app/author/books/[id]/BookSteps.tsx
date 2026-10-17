@@ -7,9 +7,9 @@ const STEPS = [
   { slug: "details", label: "Details" },
   { slug: "files", label: "Files" },
   { slug: "print", label: "Pricing" },
+  { slug: "sample", label: "Free sample" },
   { slug: "preview", label: "Preview" },
   { slug: "submit", label: "Submit" },
-  { slug: "sample", label: "Free sample" },
 ];
 
 export function BookSteps({ bookId }: { bookId: string }) {

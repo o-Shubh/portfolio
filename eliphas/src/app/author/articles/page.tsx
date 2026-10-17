@@ -12,6 +12,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { dateSty
 
 export default async function MyArticlesPage() {
   const profile = await requireRole(["author", "admin"]);
+  const verified = profile.role === "admin" || Boolean(profile.verified_author_at);
   const admin = createAdminClient();
   const { data: articles } = await admin
     .from("articles")
@@ -33,8 +34,19 @@ export default async function MyArticlesPage() {
       <PageHeader
         title="My articles"
         intro="Essays, reflections, writing advice and authorised excerpts from your books. Free to read. Articles go live when you publish them; readers can report problems and our team moderates."
-        action={<NewArticleButton />}
+        action={verified ? <NewArticleButton /> : undefined}
       />
+      {!verified && (
+        <div role="note" className="card mb-6 text-sm" data-testid="articles-verify">
+          <p className="font-semibold">Articles are for verified authors</p>
+          <p className="mt-1 text-muted">
+            Apply once and our team reviews your authorship. Articles you&apos;ve already published stay up, and you can post updates in Community at any time.
+          </p>
+          <Link href="/account/verification" className="btn-primary mt-3 inline-flex">
+            Apply for verification
+          </Link>
+        </div>
+      )}
       {!articles?.length ? (
         <div className="card text-center">
           <p className="text-lg">You haven&apos;t written an article yet.</p>

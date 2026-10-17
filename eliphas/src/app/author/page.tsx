@@ -63,6 +63,9 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
   // Everything that needs the author, in one place, each with the action to take
   const todo: { key: string; text: React.ReactNode; href: string; action: string }[] = [
     ...needsAction.map((b) => ({ key: b.id, text: <><span className="font-semibold">{b.title}</span>: our team asked for changes.</>, href: `/author/books/${b.id}`, action: "See note" })),
+    ...books
+      .filter((b) => b.status === "published" && !b.sample_path)
+      .map((b) => ({ key: `sample-${b.id}`, text: <><span className="font-semibold">{b.title}</span> shows &ldquo;Sample coming soon&rdquo;. Add a free sample so readers can try it.</>, href: `/author/books/${b.id}/sample`, action: "Add sample" })),
     ...(serviceActions ?? []).map((o) => ({ key: o.id, text: <>Service request <span className="font-semibold">{o.order_number}</span> is waiting for you.</>, href: `/author/services/${o.id}`, action: "Open" })),
     ...(!profile.author_terms_accepted_at ? [{ key: "terms", text: <>New author terms need your acceptance before you publish new books.</>, href: "/author/plan", action: "Review terms" }] : []),
     ...(!totals.upi && totals.balance > 0 ? [{ key: "upi", text: <>Add your UPI ID so we can pay your earnings.</>, href: "/account/profile", action: "Add UPI ID" }] : []),
@@ -73,6 +76,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
     { label: "Complete your profile (name, city, UPI ID for payouts)", done: Boolean(profile.full_name && profile.city && totals.upi), href: "/account/profile" },
     { label: "Upload your first book", done: Boolean(draft), href: draft ? `/author/books/${draft.id}/files` : "/author/books/new" },
     { label: "Set your price", done: Boolean(draft && draft.mrp !== null), href: draft ? `/author/books/${draft.id}/print` : "/author/books/new" },
+    { label: "Prepare a free sample", done: Boolean(draft?.sample_path), href: draft ? `/author/books/${draft.id}/sample` : "/author/books/new" },
     { label: "Preview and submit for review", done: Boolean(draft && draft.status !== "draft"), href: draft ? `/author/books/${draft.id}/preview` : "/author/books/new" },
   ];
 

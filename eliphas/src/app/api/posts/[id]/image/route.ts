@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 async function ownPost(id: string) {
   const me = await getCurrentProfile();
-  if (!me || !["author", "admin"].includes(me.role) || !/^[0-9a-f-]{36}$/i.test(id)) return null;
+  if (!me || !me.full_name || !/^[0-9a-f-]{36}$/i.test(id)) return null;
   const { data } = await createAdminClient().from("posts").select("id, author_id, image_path, moderation").eq("id", id).maybeSingle();
   return data && data.author_id === me.id ? { me, post: data } : null;
 }

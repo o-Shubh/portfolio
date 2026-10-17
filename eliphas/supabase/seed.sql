@@ -59,6 +59,9 @@ insert into auth.users (instance_id, id, aud, role, phone, phone_confirmed_at, c
 values ('00000000-0000-0000-0000-000000000000', '00000000-0000-4000-a000-000000000021', 'authenticated', 'authenticated',
   '919000000021', now(), now(), now(), '{"provider":"phone","providers":["phone"]}', '{}', '', '', '', '')
 on conflict (id) do nothing;
+-- Meera is a verified author (Sunita and Kabir are left for the admin's existing-author review)
+update public.profiles set verified_author_at = now() where id = '00000000-0000-4000-a000-000000000011';
+
 update public.profiles set full_name = 'Sample Reader', city = 'Mumbai', state = 'Maharashtra'
 where id = '00000000-0000-4000-a000-000000000021';
 

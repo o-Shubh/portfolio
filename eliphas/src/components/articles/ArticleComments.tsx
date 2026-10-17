@@ -197,7 +197,7 @@ function Comment({ c, signedIn }: { c: PublicComment; signedIn: boolean }) {
       {mode === "block" && (
         <div role="alertdialog" aria-label={`Block ${c.name}`} className="mt-2 space-y-2 rounded-lg bg-surface-2 p-3 text-sm">
           <p>
-            Block {c.name}? You won&apos;t see their comments, they can&apos;t comment on your articles or follow you, and any follows between you end. You can unblock them from your Notifications page.
+            Block {c.name}? You won&apos;t see their comments, they can&apos;t comment on your content or follow you, and any follows between you end. Public pages stay visible to logged-out visitors. You can unblock them from your Notifications page.
           </p>
           <div className="flex gap-2">
             <button type="button" className="btn-primary min-h-9" disabled={pending} onClick={() => act(() => setBlock(c.user_id, true), "comment")}>

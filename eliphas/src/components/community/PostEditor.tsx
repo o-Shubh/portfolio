@@ -16,6 +16,7 @@ export function PostEditor({
   initial,
   imageUrl,
   books,
+  canLinkBook = false,
   publicPath,
 }: {
   id: string;
@@ -24,6 +25,7 @@ export function PostEditor({
   initial: { body: string; image_alt: string; related_book_id: string };
   imageUrl: string | null;
   books: Book[];
+  canLinkBook?: boolean;
   publicPath: string;
 }) {
   const router = useRouter();
@@ -61,17 +63,17 @@ export function PostEditor({
       <form onSubmit={onSubmit} onChange={onChange} className="space-y-5">
         {moderated && (
           <p role="note" className="notice bg-danger/10 ring-danger/25">
-            Our team has {moderated === "removed" ? "removed" : "hidden"} this update. Contact support to discuss it.
+            Our team has {moderated === "removed" ? "removed" : "hidden"} this post. Contact support to discuss it.
           </p>
         )}
         <div>
           <div className="flex items-end justify-between">
             <label htmlFor="p-body" className="label">
-              Update
+              Post
             </label>
-            <span className={`mb-1.5 text-xs tabular-nums ${body.length > 1000 ? "text-danger" : "text-muted"}`}>{body.length}/1000</span>
+            <span className={`mb-1.5 text-xs tabular-nums ${body.length > 2900 ? "text-danger" : "text-muted"}`}>{body.length}/3000</span>
           </div>
-          <textarea id="p-body" name="body" rows={7} maxLength={1000} value={body} onChange={(e) => setBody(e.target.value)} className="field py-3" placeholder="What would you like to tell your readers?" />
+          <textarea id="p-body" name="body" rows={7} maxLength={3000} value={body} onChange={(e) => setBody(e.target.value)} className="field py-3" placeholder="What would you like to tell your readers?" />
         </div>
 
         <fieldset className="space-y-3">
@@ -105,20 +107,24 @@ export function PostEditor({
           )}
         </fieldset>
 
-        <div>
-          <label htmlFor="p-book" className="label">
-            Related book (optional)
-          </label>
-          <select id="p-book" name="related_book_id" defaultValue={initial.related_book_id} className="field">
-            <option value="">None</option>
-            {books.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.title}
-              </option>
-            ))}
-          </select>
-          {books.length === 0 && <p className="hint">Only your published books can be linked.</p>}
-        </div>
+        {canLinkBook ? (
+          <div>
+            <label htmlFor="p-book" className="label">
+              Related book (optional)
+            </label>
+            <select id="p-book" name="related_book_id" defaultValue={initial.related_book_id} className="field">
+              <option value="">None</option>
+              {books.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.title}
+                </option>
+              ))}
+            </select>
+            {books.length === 0 && <p className="hint">Only your published books can be linked.</p>}
+          </div>
+        ) : (
+          <input type="hidden" name="related_book_id" value="" />
+        )}
 
         <div className="flex flex-wrap gap-3">
           {live ? (
@@ -146,13 +152,13 @@ export function PostEditor({
         </p>
         {live && (
           <a href={publicPath} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-semibold text-accent-fg hover:underline">
-            View public update
+            View public post
           </a>
         )}
         {live &&
           (confirm === "unpublish" ? (
             <div className="space-y-2 rounded-[var(--radius-control)] bg-surface-2 p-3">
-              <p>Move this update back to drafts? It disappears from feeds. Publishing again won&apos;t notify followers again.</p>
+              <p>Move this post back to drafts? It disappears from feeds. Publishing again won&apos;t notify followers again.</p>
               <div className="flex gap-2">
                 <button type="button" className="btn-primary min-h-10 px-3 text-sm" disabled={busy} onClick={() => start(async () => { const r = await offlineSafe(unpublishPost(id)); setMsg(r); setConfirm(null); router.refresh(); })}>
                   Unpublish
@@ -169,7 +175,7 @@ export function PostEditor({
           ))}
         {confirm === "delete" ? (
           <div className="space-y-2 rounded-[var(--radius-control)] bg-danger/10 p-3">
-            <p>Delete this update for good, with its likes and replies?</p>
+            <p>Delete this post for good, with its likes and comments?</p>
             <div className="flex gap-2">
               <button type="button" className="btn-danger min-h-10 px-3 text-sm" disabled={busy} onClick={() => start(async () => { const r = await offlineSafe(deletePost(id)); if (r && "error" in r) setMsg(r); })}>
                 Delete
@@ -181,7 +187,7 @@ export function PostEditor({
           </div>
         ) : (
           <button type="button" className="min-h-11 text-sm font-medium text-danger underline" onClick={() => setConfirm("delete")}>
-            Delete update…
+            Delete post…
           </button>
         )}
         <FormMessage state={msg} />

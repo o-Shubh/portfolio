@@ -1,18 +1,19 @@
 "use client";
 
-import { Flag, Heart, MessageCircle, Share2 } from "lucide-react";
+import { Bookmark, Flag, Heart, MessageCircle, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { setPostLike } from "@/app/actions/posts";
+import { setPostBookmark, setPostLike } from "@/app/actions/posts";
 import { ReportForm } from "@/components/articles/ReportForm";
 import { useClearIntent, useGate } from "@/components/articles/useGate";
 import { offlineSafe } from "@/lib/use-form-action";
 
-/** Like (once per account), reply, share and report for one update. */
-export function PostActions({ postId, liked, likes, comments, url, intent, showReplyLink = true }: { postId: string; liked: boolean; likes: number; comments: number; url: string; intent?: string | null; showReplyLink?: boolean }) {
+/** Like (once per account), reply, private save, share and report for one post. */
+export function PostActions({ postId, liked, likes, saved, comments, url, intent, showReplyLink = true }: { postId: string; liked: boolean; likes: number; saved: boolean; comments: number; url: string; intent?: string | null; showReplyLink?: boolean }) {
   const gate = useGate();
   const clearIntent = useClearIntent();
   const [like, setLike] = useState({ on: liked, count: likes });
+  const [isSaved, setSaved] = useState(saved);
   const [reporting, setReporting] = useState(intent === "report");
   const [note, setNote] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -26,11 +27,20 @@ export function PostActions({ postId, liked, likes, comments, url, intent, showR
       if ("ok" in res) setLike((s) => (s.on === on ? s : { on, count: Math.max(0, s.count + (on ? 1 : -1)) }));
     });
 
+  const toggleSave = (on: boolean) =>
+    start(async () => {
+      const res = await offlineSafe(setPostBookmark(postId, on));
+      const msg = gate(res, "bookmark");
+      setNote(msg ?? ("ok" in res ? (on ? "Saved privately." : "Removed from Saved.") : null));
+      if ("ok" in res) setSaved(on);
+    });
+
   useEffect(() => {
     if (ran.current || !intent) return;
     ran.current = true;
     if (intent === "like" && !liked) toggle(true);
-    if (intent === "like" || intent === "report") clearIntent();
+    if (intent === "bookmark" && !saved) toggleSave(true);
+    if (["like", "bookmark", "report"].includes(intent)) clearIntent();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once when returning from login
   }, [intent]);
 
@@ -65,6 +75,9 @@ export function PostActions({ postId, liked, likes, comments, url, intent, showR
             <span className="sr-only">{comments === 1 ? "reply" : "replies"}</span>
           </Link>
         )}
+        <button type="button" className={`${btn} ${isSaved ? "text-fg" : ""}`} aria-pressed={isSaved} onClick={() => toggleSave(!isSaved)} disabled={pending} data-testid="post-save">
+          <Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} aria-hidden /> <span className="sr-only sm:not-sr-only">{isSaved ? "Saved" : "Save"}</span>
+        </button>
         <button type="button" className={btn} onClick={share}>
           <Share2 className="h-4 w-4" aria-hidden /> <span className="sr-only sm:not-sr-only">Share</span>
         </button>

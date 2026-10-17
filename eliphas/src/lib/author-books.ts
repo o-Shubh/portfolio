@@ -24,7 +24,7 @@ export async function listOwnBooks() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("books")
-    .select("id, title, author_name, slug, status, language, mrp, cover_path, updated_at, review_note")
+    .select("id, title, author_name, slug, status, language, mrp, cover_path, updated_at, review_note, sample_path")
     .eq("author_id", profile.id)
     .order("updated_at", { ascending: false });
   return data ?? [];

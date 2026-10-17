@@ -20,6 +20,10 @@ export type ArticleInput = {
   related_book_id: string;
   rights: boolean;
 };
+/** Long-form articles are for verified authors (admins too). Articles already published stay up. */
+const VERIFY_MSG = "Articles are for verified authors. Apply from Account → Author verification; you can keep posting updates in Community meanwhile.";
+const canWrite = (p: { role: string; verified_author_at: string | null }) => p.role === "admin" || Boolean(p.verified_author_at);
+
 export type SaveResult = { ok: true; savedAt: string; path: string } | { error: string };
 
 async function ownArticle(id: string) {
@@ -39,6 +43,7 @@ const refresh = (a: { id: string; short_id: string; slug: string; author_id: str
 /** Starts an empty draft and opens the editor. Free and Pro authors alike. */
 export async function createArticle(): Promise<{ error: string } | void> {
   const profile = await requireRole(["author", "admin"]);
+  if (!canWrite(profile)) return { error: VERIFY_MSG };
   if (await isRestricted(profile.id)) return { error: "Your account can't post right now. Contact support if you think this is a mistake." };
   if (await overLimit("articles", "author_id", profile.id, 20, 86400)) return { error: "You've started 20 articles today. Try again tomorrow." };
   await ensureHandle(profile);
@@ -109,6 +114,7 @@ export async function publishArticle(id: string, input: ArticleInput): Promise<S
   const { profile, article } = await ownArticle(id);
   if (!article) return { error: "Article not found." };
   if (article.moderation !== "visible") return { error: "This article is hidden by our team. Contact support to discuss it." };
+  if (!article.first_published_at && !canWrite(profile)) return { error: VERIFY_MSG };
   const problems = publishProblems(article, Boolean(article.rights_confirmed_at));
   if (problems.length) return { error: problems.join(" ") };
   const { data, error } = await createAdminClient().rpc("publish_article", { p_article: id, p_author: profile.id });

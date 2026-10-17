@@ -1,14 +1,16 @@
 import { MessagesSquare } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Composer } from "@/components/community/Composer";
 import { PostCard } from "@/components/community/PostCard";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { EmptyState } from "@/components/EmptyState";
 import { getCurrentProfile } from "@/lib/auth";
 import { FEED_PAGE, listPosts } from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "Community",
-  description: "Short updates from Eliphas Indicus authors: new books, events and work in progress.",
+  description: "Readers and authors on Eliphas Indicus sharing their views on books and writing.",
   alternates: { canonical: "/community" },
 };
 
@@ -19,7 +21,9 @@ export default async function CommunityPage({ searchParams }: PageProps<"/commun
   const page = Math.max(1, Math.min(200, Number(sp.page) || 1));
   const { posts, total } = await listPosts({ mode, userId: me?.id ?? null, page });
   const pages = Math.max(1, Math.ceil(total / FEED_PAGE));
-  const isAuthor = me && ["author", "admin"].includes(me.role);
+  const myBooks = me?.verified_author_at
+    ? ((await createAdminClient().from("books").select("id, title").eq("author_id", me.id).eq("status", "published").order("title")).data ?? [])
+    : [];
   const href = (changes: Record<string, string | undefined>) => {
     const p = new URLSearchParams();
     for (const [k, v] of Object.entries({ feed: mode === "following" ? "following" : undefined, ...changes })) if (v) p.set(k, v);
@@ -32,12 +36,20 @@ export default async function CommunityPage({ searchParams }: PageProps<"/commun
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-[1.75rem] md:text-[2.125rem]">Community</h1>
-          <p className="mt-1 text-muted">Short updates from our authors, newest first. Longer pieces are in <Link href="/articles" className="font-medium text-accent-fg hover:underline">Articles</Link>.</p>
+          <p className="mt-1 text-muted">Readers and authors sharing views on books and writing, newest first. Long-form pieces by verified authors are in <Link href="/articles" className="font-medium text-accent-fg hover:underline">Articles</Link>.</p>
         </div>
-        {isAuthor && (
-          <Link href="/author/community" className="btn-primary">
-            Post an update
-          </Link>
+      </div>
+
+      <div className="mt-5">
+        {me?.full_name ? (
+          <Composer name={me.full_name} books={myBooks} />
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line">
+            <p className="text-muted">Join the conversation. Reading is open to everyone.</p>
+            <Link href={`/login?next=${encodeURIComponent("/community")}`} className="btn-primary">
+              Log in to post
+            </Link>
+          </div>
         )}
       </div>
 
@@ -60,9 +72,9 @@ export default async function CommunityPage({ searchParams }: PageProps<"/commun
       <div className="mt-5 space-y-4">
         {posts.length === 0 ? (
           mode === "following" ? (
-            <EmptyState icon={MessagesSquare} title="Nothing from authors you follow yet" text="Follow authors from their profile, book or article pages to see their updates here." action={<Link href="/authors" className="btn-ghost">Find authors</Link>} />
+            <EmptyState icon={MessagesSquare} title="Nothing from people you follow yet" text="Follow authors and readers from their profiles to see their posts here." action={<Link href="/authors" className="btn-ghost">Find authors</Link>} />
           ) : (
-            <EmptyState icon={MessagesSquare} title="No updates yet" text="When authors share news about their books, it will appear here." />
+            <EmptyState icon={MessagesSquare} title="No posts yet" text="Be the first to share what you're reading or writing." />
           )
         ) : (
           posts.map((p) => <PostCard key={p.id} post={p} />)

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleGrid } from "@/components/ArticleCard";
+import { VERIFIED_NOTE, VerifiedBadge } from "@/components/VerifiedBadge";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { PostCard } from "@/components/community/PostCard";
 import { listPosts } from "@/lib/posts";
 import { FollowButton } from "@/components/articles/FollowButton";
@@ -32,6 +34,7 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
   const tab = sp.tab === "articles" ? "articles" : sp.tab === "updates" ? "updates" : "books";
   const page = Math.max(1, Math.min(500, Number(sp.page) || 1));
   const name = author.full_name ?? "Author";
+  const verified = Boolean((await createAdminClient().from("profiles").select("verified_author_at").eq("id", author.id).single()).data?.verified_author_at);
 
   const supabase = await createClient();
   const [me, booksRes, articles] = await Promise.all([
@@ -65,8 +68,11 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
         <AuthorAvatar name={author.full_name} path={author.avatar_path} size="lg" />
         <div className="min-w-0 flex-1">
           <p className="eyebrow">Author</p>
-          <h1 className="mt-1 text-2xl md:text-3xl">{name}</h1>
+          <h1 className="mt-1 flex flex-wrap items-center gap-2 text-2xl md:text-3xl">
+            {name} {verified && <VerifiedBadge />}
+          </h1>
           {author.bio && <p className="mt-2 max-w-2xl whitespace-pre-line text-fg/90">{author.bio}</p>}
+          {verified && <p className="mt-2 max-w-2xl text-xs text-muted">{VERIFIED_NOTE}</p>}
         </div>
         {me?.id !== author.id && !state.blockedWithAuthor && <FollowButton authorId={author.id} authorName={name} following={state.following} intent={intent} />}
       </header>

@@ -24,6 +24,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
   await requireRole(["admin"]);
   const sp = await searchParams;
   const status = (FILTERS.find((f) => f.value === sp.status)?.value ?? "in_review") as BookStatus | "all";
+  const noSample = sp.sample === "missing";
   const q = typeof sp.q === "string" ? sp.q.replace(/[,()*%\\:."']/g, " ").trim().slice(0, 80) : "";
 
   const supabase = await createClient();
@@ -32,6 +33,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
     .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp")
     .limit(100);
   if (status !== "all") query = query.eq("status", status);
+  if (noSample) query = query.is("sample_path", null);
   if (q) query = query.or(`title.ilike.%${q}%,author_name.ilike.%${q}%`);
   // Oldest submission first, so nobody waits too long
   query = status === "in_review" ? query.order("submitted_at", { ascending: true }) : query.order("updated_at", { ascending: false });
@@ -59,6 +61,22 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
           </Link>
         ))}
       </div>
+      {status === "published" && (
+        <p className="mb-4 text-sm">
+          {noSample ? (
+            <>
+              Showing live books without a free sample (readers see &ldquo;Sample coming soon&rdquo;).{" "}
+              <Link href="/admin/review?status=published" className="font-semibold underline underline-offset-2">
+                Show all live books
+              </Link>
+            </>
+          ) : (
+            <Link href="/admin/review?status=published&sample=missing" className="font-semibold underline underline-offset-2">
+              Only books without a free sample
+            </Link>
+          )}
+        </p>
+      )}
       <form action="/admin/review" className="mb-6 flex gap-2">
         <input type="hidden" name="status" value={status} />
         <label htmlFor="q" className="sr-only">

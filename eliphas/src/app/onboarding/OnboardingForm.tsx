@@ -13,13 +13,23 @@ export function OnboardingForm({ profile, next }: { profile: Profile; next: stri
       <ProfileFields profile={profile} />
       {next && <input type="hidden" name="next" value={next} />}
       {profile.role === "reader" && (
-        <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line p-4">
-          <input type="checkbox" name="publish" className="mt-1 h-5 w-5 accent-fg" />
-          <span>
-            <span className="block font-semibold">I want to publish my book</span>
-            <span className="text-sm text-muted">You can still buy books. You can also switch later.</span>
-          </span>
-        </label>
+        <fieldset className="space-y-2">
+          <legend className="label">I&apos;m joining as</legend>
+          <label className="flex cursor-pointer items-start gap-3 rounded-[var(--radius-control)] bg-surface p-4 ring-1 ring-line has-[:checked]:ring-2 has-[:checked]:ring-accent">
+            <input type="radio" name="publish" value="off" defaultChecked className="mt-1 h-5 w-5 accent-[var(--primary)]" />
+            <span>
+              <span className="block font-semibold">A reader</span>
+              <span className="text-sm text-muted">Buy books, read articles, follow authors and join the Community.</span>
+            </span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 rounded-[var(--radius-control)] bg-surface p-4 ring-1 ring-line has-[:checked]:ring-2 has-[:checked]:ring-accent">
+            <input type="radio" name="publish" value="on" className="mt-1 h-5 w-5 accent-[var(--primary)]" />
+            <span>
+              <span className="block font-semibold">An author</span>
+              <span className="text-sm text-muted">Publish your books, and apply for the Verified Author badge. You keep everything readers can do.</span>
+            </span>
+          </label>
+        </fieldset>
       )}
       {state?.error && (
         <p role="alert" className="text-sm font-medium text-danger">

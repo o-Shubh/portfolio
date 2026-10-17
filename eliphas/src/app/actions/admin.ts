@@ -38,6 +38,7 @@ export async function approveBook(bookId: string): Promise<ActionState> {
   const { data: book } = await supabase.from("books").select("*").eq("id", bookId).single();
   if (!book) return { error: "Book not found." };
   if (book.status !== "in_review") return { error: "Only books waiting for review can be approved." };
+  if (!book.published_at && !(book.sample_path && book.sample_approved_at)) return { error: "A new book needs an approved free sample before it goes live. Ask the author to add one." };
 
   const { rates } = await getPricingSettings();
   const cost = book.page_count

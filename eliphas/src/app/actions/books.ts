@@ -206,7 +206,7 @@ export async function savePrintOptions(bookId: string, _prev: ActionState, fd: F
   if (error) return { error: "Could not save. Please try again." };
 
   refresh(bookId);
-  if (fd.get("next") === "1") redirect(`/author/books/${bookId}/preview`);
+  if (fd.get("next") === "1") redirect(`/author/books/${bookId}/sample`);
   return { ok: "Saved." };
 }
 

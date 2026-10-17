@@ -40,7 +40,7 @@ export default async function MyPostsPage() {
               : { label: "Draft", tone: "bg-surface-2 text-fg" };
             return (
               <li key={p.id}>
-                <Link href={`/author/community/${p.id}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
+                <Link href={`/community/${p.id}/edit`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
                   <span className="min-w-0 flex-1">
                     <span className="line-clamp-2 font-medium">{p.body || "Empty draft"}</span>
                     <span className="text-sm text-muted tabular-nums">

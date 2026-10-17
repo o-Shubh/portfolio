@@ -91,7 +91,7 @@ export function coverSizeMatches(w: number, h: number, expected: { widthIn: numb
   return Math.abs(w - expected.widthIn) <= 0.15 && Math.abs(h - expected.heightIn) <= 0.15;
 }
 
-export type CheckItem = { ok: boolean; label: string; step: "details" | "files" | "print" | "preview" };
+export type CheckItem = { ok: boolean; label: string; step: "details" | "files" | "print" | "sample" | "preview" };
 
 /** Everything that must be done before a book can be sent for review. */
 export function submitChecklist(
@@ -134,6 +134,8 @@ export function submitChecklist(
     },
     { ok: earning !== null && earning >= 1, label: "Price set, with earnings above ₹0", step: "print" },
     ...(terms?.required ? [{ ok: terms.accepted, label: "Author terms accepted", step: "print" as const }] : []),
+    // New listings need an approved free sample; books already live keep selling while one is prepared
+    ...(book.published_at ? [] : [{ ok: Boolean(book.sample_path && book.sample_approved_at), label: "Free sample approved", step: "sample" as const }]),
     { ok: Boolean(book.files_confirmed_at), label: "Files checked and confirmed in Preview", step: "preview" },
   ];
 }
