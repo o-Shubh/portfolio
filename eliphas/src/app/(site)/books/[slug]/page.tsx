@@ -48,7 +48,16 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
     { term: "Binding", value: label(rates.binding, book.binding) },
     { term: "Interior", value: label(rates.interior, book.interior) },
     { term: "Genre", value: book.genre },
+    { term: "Edition", value: book.edition_label },
     { term: "ISBN", value: book.isbn },
+    {
+      term: "Eliphas Edition ID",
+      value: book.eeid ? (
+        <Link href={`/e/${book.eeid}`} className="font-mono underline-offset-2 hover:underline" data-testid="book-eeid">
+          {book.eeid}
+        </Link>
+      ) : null,
+    },
   ].filter((d) => d.value);
 
   // Structured data so search engines understand this is a book for sale

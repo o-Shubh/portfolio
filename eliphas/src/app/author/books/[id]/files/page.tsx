@@ -15,6 +15,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
   const { profile, book } = await getOwnBookOr404(id);
   const { rates } = await getPricingSettings();
   const disabled = !isEditable(book);
+  const liveRevision = book.status === "published" && !book.removed_at;
 
   // Short-lived private links so the author can check their uploaded PDFs
   const supabase = await createClient();
@@ -122,11 +123,18 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
             <p className="text-muted">Upload the manuscript (or enter pages on {printLink}) to see the exact size.</p>
           )}
         </div>
+        {liveRevision && (
+          <p role="note" className="mb-3 rounded-[var(--radius-control)] bg-surface-2 p-3 text-sm" data-testid="live-revision-note">
+            {book.print_review_requested_at
+              ? "Your revised print cover is waiting for our print review. Orders keep using the approved cover until it's approved."
+              : "Your book is live. You can upload a revised print cover (for example with your Edition ID QR label). It's saved as a new version and checked by our team before printing; the approved cover stays in use until then."}
+          </p>
+        )}
         <FileUploader
           kind="print_cover"
           bookId={book.id}
           authorId={profile.id}
-          disabled={disabled}
+          disabled={disabled && !liveRevision}
           current={
             book.print_cover_path
               ? {

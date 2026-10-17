@@ -19,6 +19,7 @@ import {
 import { BUSINESS_FIELDS, getPricingSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { ensureEditionId } from "@/lib/editions";
 
 export type ActionState = { error?: string; ok?: string } | undefined;
 const text = (fd: FormData, key: string) => String(fd.get(key) ?? "").trim();
@@ -39,6 +40,11 @@ export async function approveBook(bookId: string): Promise<ActionState> {
   if (!book) return { error: "Book not found." };
   if (book.status !== "in_review") return { error: "Only books waiting for review can be approved." };
   if (!book.published_at && !(book.sample_path && book.sample_approved_at)) return { error: "A new book needs an approved free sample before it goes live. Ask the author to add one." };
+  if (book.removed_at) return { error: "This edition was removed by our team. Restore it before approving." };
+
+  // Every approved edition gets its permanent Eliphas Edition ID first (kept if it already has one)
+  const assigned = await ensureEditionId(bookId, profile.id);
+  if ("error" in assigned) return { error: assigned.error };
 
   const { rates } = await getPricingSettings();
   const cost = book.page_count
@@ -79,7 +85,7 @@ export async function approveBook(bookId: string): Promise<ActionState> {
   if (error) return { error: "Could not approve. Please try again." };
 
   revalidatePath("/", "layout");
-  return { ok: "Approved. The book is now live in the bookstore." };
+  return { ok: `Approved with ${assigned.eeid}. The book is now live in the bookstore.` };
 }
 
 export async function sendBack(bookId: string, note: string): Promise<ActionState> {

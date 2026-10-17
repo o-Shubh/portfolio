@@ -43,7 +43,7 @@ export function ReviewActions({
           className="btn-primary w-full"
           disabled={pending}
           onClick={() => {
-            if (window.confirm("Approve and publish this book in the bookstore?")) run(() => approveBook(bookId));
+            if (window.confirm("Approve and publish this book? It gets its permanent Eliphas Edition ID now (or keeps the one it has).")) run(() => approveBook(bookId));
           }}
         >
           Approve and publish

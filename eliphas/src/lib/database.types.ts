@@ -565,14 +565,14 @@ isOneToOne: false
                   ]
                 },"books": {
                   Row: {
-                    "approved_files": Json | null,"approved_files_at": string | null,"author_id": string,"author_name": string,"binding": string,"cover_finish": string,"cover_path": string | null,"created_at": string,"description": string | null,"files_confirmed_at": string | null,"genre": string | null,"id": string,"interior": string,"isbn": string | null,"language": string,"manuscript_height_in": number | null,"manuscript_path": string | null,"manuscript_width_in": number | null,"mrp": number | null,"page_count": number | null,"paper": string,"print_cost": number | null,"print_cover_height_in": number | null,"print_cover_path": string | null,"print_cover_width_in": number | null,"published_at": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"sample_approved_at": string | null,"sample_draft_from": number | null,"sample_draft_path": string | null,"sample_draft_source": string | null,"sample_draft_to": number | null,"sample_from": number | null,"sample_manuscript_version": number | null,"sample_path": string | null,"sample_source": string | null,"sample_to": number | null,"slug": string,"status": Database["public"]['Enums']["book_status"],"submitted_at": string | null,"subtitle": string | null,"title": string,"trim_size": string,"updated_at": string
+                    "approved_files": Json | null,"approved_files_at": string | null,"author_id": string,"author_name": string,"binding": string,"cover_finish": string,"cover_path": string | null,"created_at": string,"description": string | null,"edition_label": string | null,"eeid": string | null,"eeid_assigned_at": string | null,"eeid_assigned_by": string | null,"files_confirmed_at": string | null,"genre": string | null,"id": string,"interior": string,"isbn": string | null,"language": string,"manuscript_height_in": number | null,"manuscript_path": string | null,"manuscript_width_in": number | null,"mrp": number | null,"page_count": number | null,"paper": string,"print_cost": number | null,"print_cover_height_in": number | null,"print_cover_path": string | null,"print_cover_width_in": number | null,"print_review_requested_at": string | null,"published_at": string | null,"removed_at": string | null,"removed_reason": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"sample_approved_at": string | null,"sample_draft_from": number | null,"sample_draft_path": string | null,"sample_draft_source": string | null,"sample_draft_to": number | null,"sample_from": number | null,"sample_manuscript_version": number | null,"sample_path": string | null,"sample_source": string | null,"sample_to": number | null,"slug": string,"status": Database["public"]['Enums']["book_status"],"submitted_at": string | null,"subtitle": string | null,"title": string,"trim_size": string,"updated_at": string,"work_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "approved_files"?: Json | null,"approved_files_at"?: string | null,"author_id": string,"author_name": string,"binding"?: string,"cover_finish"?: string,"cover_path"?: string | null,"created_at"?: string,"description"?: string | null,"files_confirmed_at"?: string | null,"genre"?: string | null,"id"?: string,"interior"?: string,"isbn"?: string | null,"language"?: string,"manuscript_height_in"?: number | null,"manuscript_path"?: string | null,"manuscript_width_in"?: number | null,"mrp"?: number | null,"page_count"?: number | null,"paper"?: string,"print_cost"?: number | null,"print_cover_height_in"?: number | null,"print_cover_path"?: string | null,"print_cover_width_in"?: number | null,"published_at"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"sample_approved_at"?: string | null,"sample_draft_from"?: number | null,"sample_draft_path"?: string | null,"sample_draft_source"?: string | null,"sample_draft_to"?: number | null,"sample_from"?: number | null,"sample_manuscript_version"?: number | null,"sample_path"?: string | null,"sample_source"?: string | null,"sample_to"?: number | null,"slug": string,"status"?: Database["public"]['Enums']["book_status"],"submitted_at"?: string | null,"subtitle"?: string | null,"title": string,"trim_size"?: string,"updated_at"?: string
+                    "approved_files"?: Json | null,"approved_files_at"?: string | null,"author_id": string,"author_name": string,"binding"?: string,"cover_finish"?: string,"cover_path"?: string | null,"created_at"?: string,"description"?: string | null,"edition_label"?: string | null,"eeid"?: string | null,"eeid_assigned_at"?: string | null,"eeid_assigned_by"?: string | null,"files_confirmed_at"?: string | null,"genre"?: string | null,"id"?: string,"interior"?: string,"isbn"?: string | null,"language"?: string,"manuscript_height_in"?: number | null,"manuscript_path"?: string | null,"manuscript_width_in"?: number | null,"mrp"?: number | null,"page_count"?: number | null,"paper"?: string,"print_cost"?: number | null,"print_cover_height_in"?: number | null,"print_cover_path"?: string | null,"print_cover_width_in"?: number | null,"print_review_requested_at"?: string | null,"published_at"?: string | null,"removed_at"?: string | null,"removed_reason"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"sample_approved_at"?: string | null,"sample_draft_from"?: number | null,"sample_draft_path"?: string | null,"sample_draft_source"?: string | null,"sample_draft_to"?: number | null,"sample_from"?: number | null,"sample_manuscript_version"?: number | null,"sample_path"?: string | null,"sample_source"?: string | null,"sample_to"?: number | null,"slug": string,"status"?: Database["public"]['Enums']["book_status"],"submitted_at"?: string | null,"subtitle"?: string | null,"title": string,"trim_size"?: string,"updated_at"?: string,"work_id"?: string
                   }
                   Update: {
-                    "approved_files"?: Json | null,"approved_files_at"?: string | null,"author_id"?: string,"author_name"?: string,"binding"?: string,"cover_finish"?: string,"cover_path"?: string | null,"created_at"?: string,"description"?: string | null,"files_confirmed_at"?: string | null,"genre"?: string | null,"id"?: string,"interior"?: string,"isbn"?: string | null,"language"?: string,"manuscript_height_in"?: number | null,"manuscript_path"?: string | null,"manuscript_width_in"?: number | null,"mrp"?: number | null,"page_count"?: number | null,"paper"?: string,"print_cost"?: number | null,"print_cover_height_in"?: number | null,"print_cover_path"?: string | null,"print_cover_width_in"?: number | null,"published_at"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"sample_approved_at"?: string | null,"sample_draft_from"?: number | null,"sample_draft_path"?: string | null,"sample_draft_source"?: string | null,"sample_draft_to"?: number | null,"sample_from"?: number | null,"sample_manuscript_version"?: number | null,"sample_path"?: string | null,"sample_source"?: string | null,"sample_to"?: number | null,"slug"?: string,"status"?: Database["public"]['Enums']["book_status"],"submitted_at"?: string | null,"subtitle"?: string | null,"title"?: string,"trim_size"?: string,"updated_at"?: string
+                    "approved_files"?: Json | null,"approved_files_at"?: string | null,"author_id"?: string,"author_name"?: string,"binding"?: string,"cover_finish"?: string,"cover_path"?: string | null,"created_at"?: string,"description"?: string | null,"edition_label"?: string | null,"eeid"?: string | null,"eeid_assigned_at"?: string | null,"eeid_assigned_by"?: string | null,"files_confirmed_at"?: string | null,"genre"?: string | null,"id"?: string,"interior"?: string,"isbn"?: string | null,"language"?: string,"manuscript_height_in"?: number | null,"manuscript_path"?: string | null,"manuscript_width_in"?: number | null,"mrp"?: number | null,"page_count"?: number | null,"paper"?: string,"print_cost"?: number | null,"print_cover_height_in"?: number | null,"print_cover_path"?: string | null,"print_cover_width_in"?: number | null,"print_review_requested_at"?: string | null,"published_at"?: string | null,"removed_at"?: string | null,"removed_reason"?: string | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"sample_approved_at"?: string | null,"sample_draft_from"?: number | null,"sample_draft_path"?: string | null,"sample_draft_source"?: string | null,"sample_draft_to"?: number | null,"sample_from"?: number | null,"sample_manuscript_version"?: number | null,"sample_path"?: string | null,"sample_source"?: string | null,"sample_to"?: number | null,"slug"?: string,"status"?: Database["public"]['Enums']["book_status"],"submitted_at"?: string | null,"subtitle"?: string | null,"title"?: string,"trim_size"?: string,"updated_at"?: string,"work_id"?: string
                   }
                   Relationships: [
                     {
@@ -596,6 +596,30 @@ isOneToOne: false
     },{
       foreignKeyName: "books_author_id_fkey"
       columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "books_eeid_assigned_by_fkey"
+      columns: ["eeid_assigned_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "books_eeid_assigned_by_fkey"
+      columns: ["eeid_assigned_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "books_eeid_assigned_by_fkey"
+      columns: ["eeid_assigned_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "books_eeid_assigned_by_fkey"
+      columns: ["eeid_assigned_by"]
 isOneToOne: false
       referencedRelation: "public_profiles"
       referencedColumns: ["id"]
@@ -748,6 +772,50 @@ isOneToOne: false
       columns: ["resolved_by"]
 isOneToOne: false
       referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"edition_ids": {
+                  Row: {
+                    "assigned_at": string,"assigned_by": string | null,"assigned_via": string,"book_id": string | null,"eeid": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "assigned_at"?: string,"assigned_by"?: string | null,"assigned_via": string,"book_id"?: string | null,"eeid": string
+                  }
+                  Update: {
+                    "assigned_at"?: string,"assigned_by"?: string | null,"assigned_via"?: string,"book_id"?: string | null,"eeid"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "edition_ids_assigned_by_fkey"
+      columns: ["assigned_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "edition_ids_assigned_by_fkey"
+      columns: ["assigned_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "edition_ids_assigned_by_fkey"
+      columns: ["assigned_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "edition_ids_assigned_by_fkey"
+      columns: ["assigned_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "edition_ids_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: true
+      referencedRelation: "books"
       referencedColumns: ["id"]
     }
                   ]
@@ -2208,6 +2276,9 @@ isOneToOne: false
                            },
 "article_is_public":
 { Args: { "p_article": string }; Returns: boolean
+                           },
+"assign_eeid":
+{ Args: { "p_admin": string,"p_book": string,"p_via"?: string }; Returns: string
                            },
 "author_commission_rule":
 { Args: { "p_at"?: string,"p_author": string }; Returns: {

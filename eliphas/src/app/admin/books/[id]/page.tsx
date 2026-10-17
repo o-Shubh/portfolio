@@ -16,6 +16,8 @@ import { coverSizeMatches, fullCoverSize, pageSizeMatches, submitChecklist } fro
 import { getPricingSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { EditionIdentity } from "@/components/editions/EditionIdentity";
+import { EditionActions } from "./EditionActions";
 import { ReviewActions } from "./ReviewActions";
 
 export const metadata: Metadata = { title: "Review book" };
@@ -153,6 +155,17 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
           <section className="card">
             <ReviewActions bookId={book.id} status={book.status} slug={book.slug} lastNote={book.review_note} />
           </section>
+          <section className="card">
+            <EditionActions
+              bookId={book.id}
+              status={book.status}
+              hasEeid={Boolean(book.eeid)}
+              revisedWaiting={Boolean(book.print_review_requested_at)}
+              removed={Boolean(book.removed_at)}
+              revisedLink={book.print_review_requested_at ? links.printCover : null}
+            />
+          </section>
+          <EditionIdentity book={book} viewer="admin" />
           {e && (
             <section className="card">
               <h2 className="mb-3 text-lg">Per copy at today&apos;s rates</h2>

@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { timeAgo } from "@/lib/admin";
 import { requireRole } from "@/lib/auth";
 import { coverUrl, LANGUAGE_LABEL } from "@/lib/books";
+import { isEeid } from "@/lib/eeid-format";
 import { STATUS, type BookStatus } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/server";
 
@@ -26,15 +27,17 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
   const status = (FILTERS.find((f) => f.value === sp.status)?.value ?? "in_review") as BookStatus | "all";
   const noSample = sp.sample === "missing";
   const q = typeof sp.q === "string" ? sp.q.replace(/[,()*%\\:."']/g, " ").trim().slice(0, 80) : "";
+  const eeidQ = isEeid(q.toUpperCase()) ? q.toUpperCase() : null; // exact Edition ID search, across every status
 
   const supabase = await createClient();
   let query = supabase
     .from("books")
-    .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp")
+    .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp, eeid")
     .limit(100);
-  if (status !== "all") query = query.eq("status", status);
+  if (status !== "all" && !eeidQ) query = query.eq("status", status);
   if (noSample) query = query.is("sample_path", null);
-  if (q) query = query.or(`title.ilike.%${q}%,author_name.ilike.%${q}%`);
+  if (eeidQ) query = query.eq("eeid", eeidQ);
+  else if (q) query = query.or(`title.ilike.%${q}%,author_name.ilike.%${q}%`);
   // Oldest submission first, so nobody waits too long
   query = status === "in_review" ? query.order("submitted_at", { ascending: true }) : query.order("updated_at", { ascending: false });
   const [{ data: books }, { count: waiting }] = await Promise.all([
@@ -80,9 +83,9 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
       <form action="/admin/review" className="mb-6 flex gap-2">
         <input type="hidden" name="status" value={status} />
         <label htmlFor="q" className="sr-only">
-          Search title or author
+          Search title, author or exact EEID
         </label>
-        <input id="q" name="q" type="search" defaultValue={q} placeholder="Search title or author" className="field" />
+        <input id="q" name="q" type="search" defaultValue={q} placeholder="Search title, author or EEID" className="field" />
         <button className="btn-ghost">Search</button>
       </form>
 
@@ -107,6 +110,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
                   <div className="mt-1 flex items-center gap-2">
                     <StatusBadge status={b.status} />
                     {b.status === "in_review" && <span className="text-xs text-muted">submitted {timeAgo(b.submitted_at)}</span>}
+                    {b.eeid && <span className="font-mono text-xs text-muted" data-testid="row-eeid">{b.eeid}</span>}
                   </div>
                 </div>
               </Link>
