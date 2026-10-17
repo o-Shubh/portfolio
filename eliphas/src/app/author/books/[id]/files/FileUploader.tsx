@@ -5,14 +5,7 @@ import { FileText, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { attachFile } from "@/app/actions/books";
-import {
-  COVER_TYPES,
-  coverPath,
-  manuscriptPath,
-  MAX_COVER_MB,
-  MAX_MANUSCRIPT_MB,
-  printCoverPath,
-} from "@/lib/publishing";
+import { COVER_TYPES, MAX_COVER_MB, MAX_MANUSCRIPT_MB, versionedPath } from "@/lib/publishing";
 import { uploadWithProgress } from "@/lib/upload";
 
 type Current = { name: string; href: string | null; detail?: string; preview?: string } | null;
@@ -74,12 +67,8 @@ export function FileUploader({
 
     setStatus("uploading");
     setProgress(0);
-    const path =
-      kind === "manuscript"
-        ? manuscriptPath(authorId, bookId)
-        : kind === "print_cover"
-          ? printCoverPath(authorId, bookId)
-          : coverPath(authorId, bookId, COVER_TYPES[file.type]);
+    // Each upload is saved as its own file, so earlier versions stay available
+    const path = versionedPath(authorId, bookId, kind, isPdf ? "pdf" : COVER_TYPES[file.type]);
     const bucket = isPdf ? "manuscripts" : "covers";
     const up = await uploadWithProgress(bucket, path, file, setProgress);
     if ("error" in up) {

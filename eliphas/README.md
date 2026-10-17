@@ -18,6 +18,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 6 | Author dashboard: earnings, sales by month and city | ✅ Done |
 | 7 | Install prompt (PWA) and deploy to Vercel | ✅ Done (deploy steps below) |
 | 8 | Author articles, follows, notifications, moderation | ✅ Done |
+| 9 | Author verification, community for everyone, samples on every book, open reviews | ✅ Done (migration 000015) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -223,8 +224,10 @@ eliphas/
 
 ### Roles
 
-- **Reader** – everyone starts here. Can buy books.
-- **Author** – a reader can switch to author themselves ("I want to publish").
+- **Reader** – the default at sign-up. Can buy books, post in Community, follow, comment, save and review.
+- **Author** – chosen at sign-up ("I'm joining as an author") or later from Account → Author verification.
+  It's the same account, so authors keep everything readers can do. Publishing books is self-service;
+  **Verified author** (below) is a separate, admin-given badge.
 - **Printer** and **Admin** – only given by an admin. Add the phone number to the
   `role_invites` table (or, from milestone 4, the printer list); when that person
   logs in for the first time they get the role.
@@ -326,11 +329,18 @@ authorised book excerpts. Articles are free to read at `/articles` and on each a
 - **Photos.** Anyone can add a profile photo in Account → Profile. It's checked by its bytes (JPEG, PNG or
   WebP, up to 5 MB), cropped square to 400 × 400 and re-encoded as WebP, which removes EXIF/GPS. Photos show on
   articles, author pages, comments and the app header; without one, initials are shown.
-- **Free sample ("Read sample").** On a book's **Free sample** step, the author picks a page range from their
-  own manuscript: at most 10% of the book and never more than 30 pages. The server copies only those pages into
-  a new PDF (manuscript metadata is not copied) in the public `book-samples` bucket; the manuscript stays
-  private. The sample appears on the book page and on articles that link to the book, once the book is
-  published. Authors can update or stop sharing it at any time.
+- **Free sample ("Read sample").** Every book page has a Read sample button next to Buy, or "Sample coming
+  soon". On the **Free sample** step (Details → Files → Pricing → Free sample → Preview → Submit) the author
+  either picks a page range from their manuscript (at most 10% of the book, never more than 30 pages) or
+  uploads their own sample PDF (same limit, up to 9 MB). That makes a **private draft** (manuscripts bucket);
+  the author previews it, then approves it, and only then is a separate copy (without the source file's
+  metadata) published in the public `book-samples` bucket. New books can't be submitted or approved without an
+  approved sample; books already live keep selling and show an author dashboard task and an admin filter
+  (Review queue → Live → "Only books without a free sample"). Replacing the manuscript never changes the
+  sample; the author is told it was made from an older version. Readers open it at `/books/<slug>/sample`, a
+  full-screen pdf.js reader (page buttons, swipe, zoom, close, Buy) that needs no login. The public sample can
+  be saved or screenshotted like any web page; only the full manuscript is protected. The pdf.js worker is
+  copied to `public/pdf.worker.min.mjs` by `npm install` (postinstall).
 
 ### Design system
 
@@ -353,6 +363,71 @@ into a clear "try again" message and can warn about unsaved changes (`warnUnsave
 same for direct action calls; file uploads show a percentage (`src/lib/upload.ts`). There's a visible focus
 ring for keyboard users, a "Skip to content" link, and animations are switched off for people who ask for
 reduced motion.
+
+### Community updates, file versions and reviews
+
+- **Community** (`/community`; see the 000015 section below for the current rules): posts (up to 3,000
+  characters, one image with alt text, one of their published books), save drafts, edit, unpublish and
+  delete. Readers get **Discover** (everyone, newest first) and **Following** feeds, like (once per account),
+  reply, share, report and block. Followers get one in-app notification on first publication, if they keep
+  "Community updates" on in Notifications; edits and republishing never notify again. Reports go to
+  Admin → Moderation (hide, restore, remove, with reasons). Replies are rate limited.
+- **File versions**: every manuscript, print cover and cover upload is stored as its own file and listed in
+  `book_file_versions` (Files step → File versions). Approving a book pins the exact versions in
+  `books.approved_files`; each order records them in `order_items.file_snapshot`, and printers download
+  those approved files (shown as "approved vN"). Older books fall back to their current files.
+- **Preview step** (Details → Files → Pricing → Free sample → Preview → Submit): authors see the bookstore page, open
+  each file, and confirm the versions they are submitting. Uploading again clears the confirmation.
+- **Earnings & payouts** (`/author/earnings`): totals, money on delivered orders not yet paid, pending
+  orders, payouts, and each order line's stored breakdown (selling price, printing, commission, GST on
+  commission, payment charge marked "estimated" when it is). Nothing is recalculated with today's rates.
+- **Authors** (`/authors`) lists authors with a live book or article. Book pages have **Follow** and
+  **Reader reviews** (see below). No rating is shown until real reviews exist.
+
+### Verification, community for everyone and reviews (migration 000015)
+
+- **Author verification.** Account → Author verification: pen name, short bio, writing language and
+  authorship evidence (links, ISBNs, publications). ID documents and Aadhaar-style numbers are refused.
+  Status: pending → approved / changes requested / not approved; an admin can later remove the badge.
+  Admin → Authors has Applications (with the private evidence), **Existing authors to review** (authors from
+  before this release are *not* verified automatically; verifying never touches their books), Verified, and
+  History. Every change records who, when and why (`author_verification_events`, audit log); only admins can
+  set `profiles.verified_author_at` (database trigger). The badge says it isn't an endorsement and is separate
+  from Pro. Verified authors can write **articles** (already-published articles stay up) and link their books
+  in posts.
+- **Community** is for every member: posts up to 3,000 characters with one image, edit/delete, likes,
+  comments with one level of replies (paginated), share, private bookmarks (Account → Saved → Community
+  posts), report and block. Discover (everyone, newest first) and Following feeds; profiles at `/authors/…`
+  or `/u/…` (name, bio, photo and posts only). Reading needs no login; actions send guests to log in and
+  then finish the action.
+- **Notifications** (in-app only, never SMS/email/push, one per event): new follower, comments and replies on
+  your content, an author's response to your review, new posts/articles from people you follow, and
+  verification decisions. Each type except verification can be turned off in Notifications.
+- **Blocking** hides each other's posts and comments, stops follows, comments and notifications both ways.
+  It can't hide public pages from logged-out visitors, and the block dialog says so.
+- **Reviews**: any logged-in member except the book's author can rate and review a book once (editable,
+  deletable). **Verified purchase** is shown only when an order of that book was delivered to them and not
+  cancelled or refunded, worked out every time the page loads. Averages use published reviews only. Authors
+  can post one labelled public response, never delete reviews. Moderation (Admin → Moderation) is for abuse,
+  not negative opinions; the policy is shown under the reviews.
+
+### Release checklist (decisions and configuration still needed)
+
+Built and tested locally in test mode; not production-ready until these are done:
+- **Tax**: Pro is ₹299 + 18% GST (₹352.82) and commission GST is 18%, as configured in Admin → Plans.
+  These are proposed settings; have your accountant confirm GST registration, rates and any TDS/TCS duty
+  before going live. No withholding is applied today.
+- **Payments**: Razorpay live keys and webhook secret (Vercel env); Pro is prepaid monthly with manual
+  renewal (no recurring billing is configured). Payment success is verified on the server and webhooks are
+  idempotent.
+- **SMS/OTP**: a production SMS provider with DLT approval; remove the test phone numbers.
+- **Shipping**: real zones and weight rates in Admin → Shipping (seeded rates are samples); no live courier
+  API is connected, so quotes come from these admin rates.
+- **Policies**: business details, refund/cancellation and service terms reviewed by a lawyer; community
+  guidelines, review policy and the verification evidence you'll accept.
+- **Verification**: review the existing authors in Admin → Authors → Existing authors to review.
+- **Not built in this release**: paid AI review, tips, direct messages, international delivery, email or
+  push notifications (in-app only), automated copyright or manuscript checks.
 
 ### Orders and payments
 

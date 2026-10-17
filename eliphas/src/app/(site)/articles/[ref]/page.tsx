@@ -14,7 +14,6 @@ import { BookCover } from "@/components/BookCover";
 import { articlePath, parseArticleRef, readingMinutes, topicLabel } from "@/lib/article-format";
 import { articleCounts, bodyBlocks, coverUrl, getPublicArticle, listPublicArticles, publicComments, readerState } from "@/lib/articles";
 import { getCurrentProfile } from "@/lib/auth";
-import { sampleUrl } from "@/lib/book-sample";
 import { coverUrl as bookCoverUrl } from "@/lib/books";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -198,9 +197,9 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
                   <BookOpen className="h-4 w-4" aria-hidden /> View book
                 </a>
                 {book.sample_path && (
-                  <a href={sampleUrl(book.sample_path)!} target="_blank" rel="noopener" className="btn-ghost min-h-10 px-4 text-sm" data-testid="article-read-sample">
+                  <Link href={`/books/${book.slug}/sample`} className="btn-ghost min-h-10 px-4 text-sm" data-testid="article-read-sample">
                     Read sample
-                  </a>
+                  </Link>
                 )}
               </div>
             </div>

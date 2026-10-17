@@ -142,7 +142,8 @@ export function orderItemRows(orderId: string, p: PricedOrder) {
         gst_percent: Number(v.commission_gst_percent),
       },
       sale_channel: "store",
-      file_snapshot: { manuscript_path: b.manuscript_path, print_cover_path: b.print_cover_path, cover_path: b.cover_path, book_updated_at: b.updated_at },
+      // The files our team approved (with their version numbers) are what the printer gets for this order
+      file_snapshot: approvedFileSnapshot(b),
     };
   });
 }
@@ -184,4 +185,18 @@ export async function applyActualGatewayFee(orderId: string, feePaise: number) {
       .eq("id", l.key);
   }
   await admin.from("orders").update({ gateway_fee: toRupees(feePaise), gateway_fee_source: "actual" }).eq("id", orderId);
+}
+
+type Approved = { id?: string | null; version?: number | null; path: string } | null;
+/** Paths (and versions) to print: the approved files if the book has them, otherwise its current files (older books). */
+export function approvedFileSnapshot(b: Pick<Book, "manuscript_path" | "print_cover_path" | "cover_path" | "updated_at"> & { approved_files?: unknown }) {
+  const af = (b.approved_files ?? {}) as { manuscript?: Approved; print_cover?: Approved; cover?: Approved };
+  return {
+    manuscript_path: af.manuscript?.path ?? b.manuscript_path,
+    manuscript_version: af.manuscript?.version ?? null,
+    print_cover_path: af.print_cover?.path ?? b.print_cover_path,
+    print_cover_version: af.print_cover?.version ?? null,
+    cover_path: af.cover?.path ?? b.cover_path,
+    book_updated_at: b.updated_at,
+  };
 }

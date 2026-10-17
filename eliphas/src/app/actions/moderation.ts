@@ -20,7 +20,7 @@ export async function moderate(_prev: ModState, fd: FormData): Promise<ModState>
   const targetId = String(fd.get("target_id"));
   const action = String(fd.get("action"));
   const reason = String(fd.get("reason") ?? "").trim();
-  if (targetType !== "article" && targetType !== "comment") return { error: "Unknown item." };
+  if (!["article", "comment", "post", "post_comment", "review"].includes(targetType)) return { error: "Unknown item." };
   if (!/^[0-9a-f-]{36}$/i.test(targetId)) return { error: "Unknown item." };
   if (!(action in ACTIONS) && action !== "dismiss") return { error: "Choose an action." };
   if (reason.length < 3 || reason.length > 500) return { error: "Write a reason (3–500 characters). It's kept in the moderation log." };
@@ -28,7 +28,21 @@ export async function moderate(_prev: ModState, fd: FormData): Promise<ModState>
   const admin = createAdminClient();
   if (action !== "dismiss") {
     const moderation = ACTIONS[action as keyof typeof ACTIONS];
-    if (targetType === "article") {
+    if (targetType === "post") {
+      const { data: p } = await admin.from("posts").update({ moderation, moderation_reason: moderation === "visible" ? null : reason }).eq("id", targetId).select("id").maybeSingle();
+      if (!p) return { error: "Update not found." };
+      revalidatePath("/community");
+      revalidatePath(`/community/${p.id}`);
+    } else if (targetType === "post_comment") {
+      const { data: c } = await admin.from("post_comments").update({ moderation }).eq("id", targetId).select("post_id").maybeSingle();
+      if (!c) return { error: "Comment not found." };
+      revalidatePath(`/community/${c.post_id}`);
+    } else if (targetType === "review") {
+      const { data: r } = await admin.from("book_reviews").update({ moderation }).eq("id", targetId).select("book_id").maybeSingle();
+      if (!r) return { error: "Review not found." };
+      const { data: b } = await admin.from("books").select("slug").eq("id", r.book_id).maybeSingle();
+      if (b) revalidatePath(`/books/${b.slug}`);
+    } else if (targetType === "article") {
       const { data: a } = await admin
         .from("articles")
         .update({ moderation, moderation_reason: moderation === "visible" ? null : reason })

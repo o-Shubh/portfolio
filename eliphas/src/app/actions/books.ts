@@ -6,17 +6,7 @@ import { requireRole } from "@/lib/auth";
 import { estimateCopy, ruleFromPlanVersion } from "@/lib/commission";
 import { authorRule, getCurrentPlans, termsRequirement } from "@/lib/plans";
 import { gatewayPercent, printCost } from "@/lib/pricing";
-import {
-  COVER_TYPES,
-  coverPath,
-  GENRES,
-  isEditable,
-  makeSlug,
-  manuscriptPath,
-  printCoverPath,
-  submitChecklist,
-  type Book,
-} from "@/lib/publishing";
+import { COVER_TYPES, GENRES, isBookFilePath, isEditable, makeSlug, submitChecklist, type Book } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -128,7 +118,7 @@ export async function attachFile(
   if (!isEditable(book)) return { error: LOCKED };
 
   if (kind === "manuscript") {
-    if (input.path !== manuscriptPath(profile.id, bookId)) return { error: "Unexpected file location." };
+    if (!isBookFilePath(input.path, profile.id, bookId, "manuscript", "pdf")) return { error: "Unexpected file location." };
     const pages = Number.isInteger(input.pageCount) && input.pageCount! > 0 ? input.pageCount! : null;
     const size = (n?: number) => (typeof n === "number" && n > 0 && n < 100 ? Math.round(n * 100) / 100 : null);
     const { error } = await supabase
@@ -143,7 +133,7 @@ export async function attachFile(
       .eq("id", bookId);
     if (error) return { error: error.message.includes("page_count") ? "The page count of this PDF isn't supported." : "Could not save the file." };
   } else if (kind === "print_cover") {
-    if (input.path !== printCoverPath(profile.id, bookId)) return { error: "Unexpected file location." };
+    if (!isBookFilePath(input.path, profile.id, bookId, "print_cover", "pdf")) return { error: "Unexpected file location." };
     const size = (n?: number) => (typeof n === "number" && n > 0 && n < 100 ? Math.round(n * 100) / 100 : null);
     const { error } = await supabase
       .from("books")
@@ -156,14 +146,26 @@ export async function attachFile(
     if (error) return { error: "Could not save the file." };
   } else {
     const ext = input.mime ? COVER_TYPES[input.mime] : undefined;
-    if (!ext || input.path !== coverPath(profile.id, bookId, ext)) return { error: "Unexpected file location." };
-    // Remove the old cover if it had a different file type (cover.jpg -> cover.png)
-    if (book.cover_path && book.cover_path !== input.path) {
-      await supabase.storage.from("covers").remove([book.cover_path]);
-    }
+    if (!ext || !isBookFilePath(input.path, profile.id, bookId, "cover", ext)) return { error: "Unexpected file location." };
     const { error } = await supabase.from("books").update({ cover_path: input.path }).eq("id", bookId);
     if (error) return { error: "Could not save the file." };
   }
+
+  // Keep this upload as a new version (earlier files stay available), and ask the author to check the files again
+  const admin = createAdminClient();
+  const { data: last } = await admin.from("book_file_versions").select("version").eq("book_id", bookId).eq("kind", kind).order("version", { ascending: false }).limit(1).maybeSingle();
+  const pages = kind === "manuscript" && Number.isInteger(input.pageCount) && input.pageCount! > 0 ? input.pageCount! : null;
+  await admin.from("book_file_versions").insert({
+    book_id: bookId,
+    kind,
+    version: (last?.version ?? 0) + 1,
+    path: input.path,
+    page_count: pages,
+    width_in: typeof input.widthIn === "number" && input.widthIn > 0 && input.widthIn < 100 ? Math.round(input.widthIn * 100) / 100 : null,
+    height_in: typeof input.heightIn === "number" && input.heightIn > 0 && input.heightIn < 100 ? Math.round(input.heightIn * 100) / 100 : null,
+    uploaded_by: profile.id,
+  });
+  await admin.from("books").update({ files_confirmed_at: null }).eq("id", bookId);
 
   refresh(bookId);
   return { ok: "Uploaded." };
@@ -204,7 +206,7 @@ export async function savePrintOptions(bookId: string, _prev: ActionState, fd: F
   if (error) return { error: "Could not save. Please try again." };
 
   refresh(bookId);
-  if (fd.get("next") === "1") redirect(`/author/books/${bookId}/submit`);
+  if (fd.get("next") === "1") redirect(`/author/books/${bookId}/sample`);
   return { ok: "Saved." };
 }
 
@@ -265,9 +267,11 @@ export async function deleteDraft(bookId: string): Promise<ActionState> {
   if (!book) return { error: "Book not found." };
   if (book.status !== "draft") return { error: "Only drafts can be deleted." };
 
-  const privateFiles = [book.manuscript_path, book.print_cover_path].filter((p): p is string => Boolean(p));
+  const { data: versions } = await createAdminClient().from("book_file_versions").select("kind, path").eq("book_id", bookId);
+  const privateFiles = [...new Set([book.manuscript_path, book.print_cover_path, ...(versions ?? []).filter((v) => v.kind !== "cover").map((v) => v.path)])].filter((p): p is string => Boolean(p));
+  const coverFiles = [...new Set([book.cover_path, ...(versions ?? []).filter((v) => v.kind === "cover").map((v) => v.path)])].filter((p): p is string => Boolean(p));
   if (privateFiles.length) await supabase.storage.from("manuscripts").remove(privateFiles);
-  if (book.cover_path) await supabase.storage.from("covers").remove([book.cover_path]);
+  if (coverFiles.length) await supabase.storage.from("covers").remove(coverFiles);
   // The sample bucket is written only by the server, so remove its file with the admin client
   if (book.sample_path) await createAdminClient().storage.from("book-samples").remove([book.sample_path]);
   const { error } = await supabase.from("books").delete().eq("id", bookId);
@@ -275,4 +279,21 @@ export async function deleteDraft(bookId: string): Promise<ActionState> {
 
   revalidatePath("/author", "layout");
   redirect("/author/books");
+}
+
+/**
+ * The author confirms, on the Preview step, that the current files are the ones to submit.
+ * Uploading any file again clears this, so the confirmation always matches the files sent for review.
+ */
+export async function confirmFiles(bookId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  const { supabase, book } = await ownBook(bookId);
+  if (!book) return { error: "Book not found." };
+  if (!isEditable(book)) return { error: LOCKED };
+  if (!book.manuscript_path || !book.print_cover_path || !book.cover_path) return { error: "Upload the manuscript, print cover and front cover image first." };
+  if (fd.get("confirm") !== "on") return { error: "Tick the box to confirm you've checked your files." };
+  const { error } = await supabase.from("books").update({ files_confirmed_at: new Date().toISOString() }).eq("id", bookId);
+  if (error) return { error: "Could not save. Please try again." };
+  refresh(bookId);
+  if (fd.get("next") === "1") redirect(`/author/books/${bookId}/submit`);
+  return { ok: "Files confirmed." };
 }

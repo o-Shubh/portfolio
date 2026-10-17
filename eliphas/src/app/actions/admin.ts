@@ -17,6 +17,7 @@ import {
   type Shipping,
 } from "@/lib/pricing";
 import { BUSINESS_FIELDS, getPricingSettings } from "@/lib/settings";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionState = { error?: string; ok?: string } | undefined;
@@ -37,6 +38,7 @@ export async function approveBook(bookId: string): Promise<ActionState> {
   const { data: book } = await supabase.from("books").select("*").eq("id", bookId).single();
   if (!book) return { error: "Book not found." };
   if (book.status !== "in_review") return { error: "Only books waiting for review can be approved." };
+  if (!book.published_at && !(book.sample_path && book.sample_approved_at)) return { error: "A new book needs an approved free sample before it goes live. Ask the author to add one." };
 
   const { rates } = await getPricingSettings();
   const cost = book.page_count
@@ -53,10 +55,19 @@ export async function approveBook(bookId: string): Promise<ActionState> {
       )
     : null;
 
+  // Pin the exact file versions our team approved; orders print these even if files change later
+  const { data: versions } = await createAdminClient().from("book_file_versions").select("id, kind, version, path").eq("book_id", bookId);
+  const pin = (kind: string, path: string | null) => {
+    if (!path) return null;
+    const v = (versions ?? []).find((x) => x.kind === kind && x.path === path);
+    return { id: v?.id ?? null, version: v?.version ?? null, path };
+  };
   const now = new Date().toISOString();
   const { error } = await supabase
     .from("books")
     .update({
+      approved_files: { manuscript: pin("manuscript", book.manuscript_path), print_cover: pin("print_cover", book.print_cover_path), cover: pin("cover", book.cover_path) },
+      approved_files_at: now,
       status: "published",
       published_at: book.published_at ?? now,
       reviewed_at: now,

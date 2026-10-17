@@ -30,6 +30,8 @@
   --color-gold: var(--accent);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
+  /* Restrained marigold: Pro badge, small highlights. Fill with navy text; use marigold-fg for text. */
+  --color-marigold: #c98200;
 
   /* Type: the device's own sans-serif for the interface; a book serif for editorial content.
      Hindi letters fall through to Noto Devanagari when the system font lacks them. */
@@ -69,6 +71,8 @@
   --color-info: var(--info);
   --color-chart: var(--chart);
   --color-focus: var(--focus);
+  --color-ivory: var(--ivory);
+  --color-marigold-fg: var(--marigold-fg);
 }
 
 :root {
@@ -77,7 +81,7 @@
   --surface: #ffffff; /* cards, sheets, header */
   --surface-2: #f0f0f3; /* quiet fills: chips, table heads, segmented controls */
   --fg: #1d1d1f; /* near-black text: 15.6:1 on --bg */
-  --muted: #5f5f66; /* secondary text: 5.9:1 on --bg */
+  --muted: #62626a; /* secondary text: 5.6:1 on --bg */
   --line: rgb(0 0 0 / 0.08);
   --line-strong: rgb(0 0 0 / 0.16);
   --primary: #17214a; /* Eliphas navy: main buttons */
@@ -92,6 +96,8 @@
   --info: #2b4192;
   --chart: #2b4192;
   --focus: #2b4192;
+  --ivory: #fbf8f2; /* warm paper for bookstore and reading pages only */
+  --marigold-fg: #8a5600; /* marigold for text on light surfaces: 6.0:1 */
   --shadow-color: 0 0 0;
 }
 
@@ -117,6 +123,8 @@
     --info: #a9b9ff;
     --chart: #8ea2f5;
     --focus: #a9b9ff;
+    --ivory: #12110e;
+    --marigold-fg: #f2b544;
     --shadow-color: 0 0 0;
   }
 }
@@ -142,6 +150,8 @@
   --info: #a9b9ff;
   --chart: #8ea2f5;
   --focus: #a9b9ff;
+  --ivory: #12110e;
+  --marigold-fg: #f2b544;
   --shadow-color: 0 0 0;
 }
 
@@ -254,6 +264,13 @@ body {
 }
 @utility notice {
   @apply flex gap-3 rounded-[var(--radius-card)] p-4 text-sm ring-1;
+}
+/* Warm ivory page background for editorial areas (bookstore, book pages, articles) */
+@utility editorial {
+  background: var(--ivory);
+}
+@utility tabular {
+  font-variant-numeric: tabular-nums;
 }
 @utility container-x {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;

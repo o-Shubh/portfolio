@@ -3,20 +3,24 @@ import Link from "next/link";
 import { articleDate } from "@/components/ArticleCard";
 import { RemoveSaved } from "@/components/articles/AccountControls";
 import { PageHeader } from "@/components/PageHeader";
+import { PostCard } from "@/components/community/PostCard";
 import { articlePath, readingMinutes } from "@/lib/article-format";
 import { requireRole } from "@/lib/auth";
+import { savedPosts } from "@/lib/posts";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export const metadata: Metadata = { title: "Saved articles", robots: { index: false } };
+export const metadata: Metadata = { title: "Saved", robots: { index: false } };
 
 type Row = {
   created_at: string;
   article: { id: string; short_id: string; slug: string; title: string; excerpt: string; status: string; moderation: string; published_at: string | null; word_count: number; author: { full_name: string | null } | null } | null;
 };
 
-export default async function SavedArticlesPage() {
+export default async function SavedPage({ searchParams }: PageProps<"/account/saved">) {
   const me = await requireRole(["reader", "author", "printer", "admin"]);
-  const { data } = await createAdminClient()
+  const tab = (await searchParams).tab === "posts" ? "posts" : "articles";
+  const posts = tab === "posts" ? await savedPosts(me.id) : [];
+  const { data } = tab === "posts" ? { data: [] } : await createAdminClient()
     .from("article_bookmarks")
     .select("created_at, article:articles(id, short_id, slug, title, excerpt, status, moderation, published_at, word_count, author:profiles!articles_author_id_fkey(full_name))")
     .eq("user_id", me.id)
@@ -26,8 +30,38 @@ export default async function SavedArticlesPage() {
 
   return (
     <>
-      <PageHeader title="Saved articles" intro="Only you can see what you've saved. Authors aren't told." />
-      {rows.length === 0 ? (
+      <PageHeader title="Saved" intro="Only you can see what you've saved. Nobody is told." />
+      <nav aria-label="Saved items" className="mb-5 flex gap-2">
+        {(["articles", "posts"] as const).map((t) => (
+          <Link
+            key={t}
+            href={t === "posts" ? "/account/saved?tab=posts" : "/account/saved"}
+            aria-current={tab === t ? "page" : undefined}
+            className={`inline-flex min-h-10 items-center rounded-full px-4 text-sm font-semibold ${tab === t ? "bg-accent text-on-accent" : "bg-surface-2 text-fg"}`}
+          >
+            {t === "posts" ? "Community posts" : "Articles"}
+          </Link>
+        ))}
+      </nav>
+      {tab === "posts" ? (
+        posts.length === 0 ? (
+          <div className="card text-center">
+            <p className="font-semibold">No saved posts</p>
+            <p className="mt-1 text-sm text-muted">Tap Save on a Community post to keep it here.</p>
+            <Link href="/community" className="btn-primary mt-4">
+              Go to Community
+            </Link>
+          </div>
+        ) : (
+          <ul className="max-w-2xl space-y-3">
+            {posts.map((p) => (
+              <li key={p.id} data-testid="saved-post">
+                <PostCard post={p} />
+              </li>
+            ))}
+          </ul>
+        )
+      ) : rows.length === 0 ? (
         <div className="card text-center">
           <p className="font-semibold">Nothing saved yet</p>
           <p className="mt-1 text-sm text-muted">Tap Save on any article to read it later.</p>

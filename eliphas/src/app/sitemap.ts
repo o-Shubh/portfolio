@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const pages: MetadataRoute.Sitemap = ["", "/books", "/articles", "/pricing", "/faq", "/contact", "/terms", "/privacy", "/refunds", "/shipping"].map((p) => ({ url: `${site}${p}` }));
+  const pages: MetadataRoute.Sitemap = ["", "/books", "/authors", "/community", "/articles", "/pricing", "/faq", "/contact", "/terms", "/privacy", "/refunds", "/shipping"].map((p) => ({ url: `${site}${p}` }));
 
   // Public client without cookies: only published books are visible to it.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

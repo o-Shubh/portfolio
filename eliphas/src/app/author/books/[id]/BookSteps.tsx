@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation";
 const STEPS = [
   { slug: "details", label: "Details" },
   { slug: "files", label: "Files" },
-  { slug: "print", label: "Print & price" },
-  { slug: "submit", label: "Submit" },
+  { slug: "print", label: "Pricing" },
   { slug: "sample", label: "Free sample" },
+  { slug: "preview", label: "Preview" },
+  { slug: "submit", label: "Submit" },
 ];
 
 export function BookSteps({ bookId }: { bookId: string }) {

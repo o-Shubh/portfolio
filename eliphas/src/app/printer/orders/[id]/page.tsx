@@ -23,7 +23,7 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
   const { data: o } = await admin
     .from("orders")
     .select(
-      "*, order_items(id, quantity, books(id, title, author_name, page_count, trim_size, binding, interior, paper, cover_finish, manuscript_path, print_cover_path, isbn))",
+      "*, order_items(id, quantity, file_snapshot, books(id, title, author_name, page_count, trim_size, binding, interior, paper, cover_finish, manuscript_path, print_cover_path, isbn))",
     )
     .eq("id", id)
     .maybeSingle();
@@ -41,8 +41,10 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
   const items = await Promise.all(
     o.order_items.map(async (it) => ({
       ...it,
-      manuscript: await sign(it.books?.manuscript_path ?? null),
-      printCover: await sign(it.books?.print_cover_path ?? null),
+      // Print the approved files recorded for this order; older orders fall back to the book's files
+      manuscript: await sign((it.file_snapshot as { manuscript_path?: string } | null)?.manuscript_path ?? it.books?.manuscript_path ?? null),
+      printCover: await sign((it.file_snapshot as { print_cover_path?: string } | null)?.print_cover_path ?? it.books?.print_cover_path ?? null),
+      versions: it.file_snapshot as { manuscript_version?: number | null; print_cover_version?: number | null } | null,
       cover: it.books ? fullCoverSize(it.books, rates) : null,
     })),
   );
@@ -90,12 +92,12 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
               <div className="mt-5 flex flex-wrap gap-3">
                 {it.manuscript && (
                   <a href={it.manuscript} target="_blank" rel="noreferrer" className="btn-ghost">
-                    <Download className="h-4 w-4" aria-hidden /> Inside pages PDF
+                    <Download className="h-4 w-4" aria-hidden /> Inside pages PDF{it.versions?.manuscript_version ? ` (approved v${it.versions.manuscript_version})` : ""}
                   </a>
                 )}
                 {it.printCover && (
                   <a href={it.printCover} target="_blank" rel="noreferrer" className="btn-ghost">
-                    <Download className="h-4 w-4" aria-hidden /> Cover PDF
+                    <Download className="h-4 w-4" aria-hidden /> Cover PDF{it.versions?.print_cover_version ? ` (approved v${it.versions.print_cover_version})` : ""}
                   </a>
                 )}
               </div>

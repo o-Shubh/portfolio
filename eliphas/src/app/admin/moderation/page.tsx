@@ -64,10 +64,11 @@ async function OpenReports() {
   if (!reports?.length) return <p className="card text-sm text-muted">No open reports.</p>;
 
   // Group reports by the item they're about
-  const groups = new Map<string, { type: "article" | "comment"; id: string; reports: typeof reports }>();
+  type TargetType = "article" | "comment" | "post" | "post_comment" | "review";
+  const groups = new Map<string, { type: TargetType; id: string; reports: typeof reports }>();
   for (const r of reports) {
     const key = `${r.target_type}:${r.target_id}`;
-    if (!groups.has(key)) groups.set(key, { type: r.target_type as "article" | "comment", id: r.target_id, reports: [] });
+    if (!groups.has(key)) groups.set(key, { type: r.target_type as TargetType, id: r.target_id, reports: [] });
     groups.get(key)!.reports.push(r);
   }
   const articleIds = [...groups.values()].filter((g) => g.type === "article").map((g) => g.id);
@@ -81,13 +82,30 @@ async function OpenReports() {
       : Promise.resolve({ data: [] as never[] }),
   ]);
 
+  // Community updates, their replies and book reviews share one simple preview
+  const idsOf = (t: TargetType) => [...groups.values()].filter((g) => g.type === t).map((g) => g.id);
+  const name = (w: unknown) => (w as { full_name: string | null } | null)?.full_name ?? "Account";
+  const [{ data: posts }, { data: replies }, { data: reviews }] = await Promise.all([
+    idsOf("post").length ? admin.from("posts").select("id, body, moderation, author_id, who:profiles!posts_author_id_fkey(full_name)").in("id", idsOf("post")) : Promise.resolve({ data: [] as never[] }),
+    idsOf("post_comment").length ? admin.from("post_comments").select("id, body, moderation, user_id, post_id, who:profiles!post_comments_user_id_fkey(full_name)").in("id", idsOf("post_comment")) : Promise.resolve({ data: [] as never[] }),
+    idsOf("review").length ? admin.from("book_reviews").select("id, body, rating, moderation, user_id, who:profiles!book_reviews_user_id_fkey(full_name), book:books(slug, title)").in("id", idsOf("review")) : Promise.resolve({ data: [] as never[] }),
+  ]);
+  const simple = new Map<string, { text: string; owner: { id: string; name: string }; link: string | null; moderation: string; label: string }>();
+  for (const p of posts ?? []) simple.set(p.id, { text: p.body, owner: { id: p.author_id, name: name(p.who) }, link: `/community/${p.id}`, moderation: p.moderation, label: "Community update" });
+  for (const r of replies ?? []) simple.set(r.id, { text: r.body, owner: { id: r.user_id, name: name(r.who) }, link: `/community/${r.post_id}`, moderation: r.moderation, label: "Reply to an update" });
+  for (const r of reviews ?? []) {
+    const b = r.book as { slug: string; title: string } | null;
+    simple.set(r.id, { text: `${r.rating}/5${r.body ? ` · ${r.body}` : ""}`, owner: { id: r.user_id, name: name(r.who) }, link: b ? `/books/${b.slug}` : null, moderation: r.moderation, label: `Review of ${b?.title ?? "a book"}` });
+  }
+
   return (
     <ul className="space-y-4">
       {[...groups.values()].map((g) => {
         const a = g.type === "article" ? articles?.find((x) => x.id === g.id) : null;
         const c = g.type === "comment" ? comments?.find((x) => x.id === g.id) : null;
-        const owner = a ? { id: a.author_id, name: (a.author as { full_name: string | null } | null)?.full_name ?? "Author" } : c ? { id: c.user_id, name: (c.who as { full_name: string | null } | null)?.full_name ?? "Reader" } : null;
-        const mod = a?.moderation ?? c?.moderation;
+        const x = simple.get(g.id) ?? null;
+        const owner = a ? { id: a.author_id, name: (a.author as { full_name: string | null } | null)?.full_name ?? "Author" } : c ? { id: c.user_id, name: (c.who as { full_name: string | null } | null)?.full_name ?? "Reader" } : x ? x.owner : null;
+        const mod = a?.moderation ?? c?.moderation ?? x?.moderation;
         return (
           <li key={`${g.type}:${g.id}`} className="card" data-testid="report-group" data-type={g.type}>
             <p className="text-xs font-semibold tracking-wide text-muted uppercase">
@@ -126,7 +144,24 @@ async function OpenReports() {
                 </p>
               </>
             )}
-            {!a && !c && <p className="mt-1 text-sm text-muted">This item was deleted by its author.</p>}
+            {x && (
+              <>
+                <p className="mt-1 text-sm text-muted">{x.label}</p>
+                <blockquote className="mt-1 border-l-2 border-line-strong pl-3 whitespace-pre-line">{x.text}</blockquote>
+                <p className="mt-1 text-sm">
+                  By {x.owner.name}
+                  {x.link && (
+                    <>
+                      {" · "}
+                      <Link href={x.link} className="underline" target="_blank">
+                        Open
+                      </Link>
+                    </>
+                  )}
+                </p>
+              </>
+            )}
+            {!a && !c && !x && <p className="mt-1 text-sm text-muted">This item was deleted by its author.</p>}
             <ul className="mt-3 space-y-1 text-sm">
               {g.reports.map((r) => (
                 <li key={r.id}>
@@ -136,8 +171,8 @@ async function OpenReports() {
                 </li>
               ))}
             </ul>
-            {(a || c) && <ModerateForm targetType={g.type} targetId={g.id} actions={mod === "visible" ? ["hide", "remove", "dismiss"] : ["restore", "remove", "dismiss"]} />}
-            {!(a || c) && <ModerateForm targetType={g.type} targetId={g.id} actions={["dismiss"]} />}
+            {(a || c || x) && <ModerateForm targetType={g.type} targetId={g.id} actions={mod === "visible" ? ["hide", "remove", "dismiss"] : ["restore", "remove", "dismiss"]} />}
+            {!(a || c || x) && <ModerateForm targetType={g.type} targetId={g.id} actions={["dismiss"]} />}
             {owner && (
               <div className="mt-3 border-t border-line pt-3">
                 <RestrictForm userId={owner.id} name={owner.name} />
@@ -152,13 +187,22 @@ async function OpenReports() {
 
 async function HiddenContent() {
   const admin = createAdminClient();
+  const { data: hiddenPosts } = await admin.from("posts").select("id, body, moderation, moderation_reason").neq("moderation", "visible").order("updated_at", { ascending: false }).limit(100);
   const [{ data: articles }, { data: comments }] = await Promise.all([
     admin.from("articles").select("id, title, moderation, moderation_reason, updated_at").neq("moderation", "visible").order("updated_at", { ascending: false }).limit(100),
     admin.from("article_comments").select("id, body, moderation, created_at").neq("moderation", "visible").order("created_at", { ascending: false }).limit(100),
   ]);
-  if (!articles?.length && !comments?.length) return <p className="card text-sm text-muted">Nothing is hidden or removed.</p>;
+  if (!articles?.length && !comments?.length && !hiddenPosts?.length) return <p className="card text-sm text-muted">Nothing is hidden or removed.</p>;
   return (
     <ul className="space-y-3">
+      {(hiddenPosts ?? []).map((p) => (
+        <li key={p.id} className="card">
+          <p className="text-xs font-semibold text-muted uppercase">Community update · {p.moderation}</p>
+          <p className="line-clamp-3 whitespace-pre-line">{p.body}</p>
+          {p.moderation_reason && <p className="text-sm text-muted">Reason: {p.moderation_reason}</p>}
+          <ModerateForm targetType="post" targetId={p.id} actions={p.moderation === "hidden" ? ["restore", "remove"] : ["restore"]} />
+        </li>
+      ))}
       {(articles ?? []).map((a) => (
         <li key={a.id} className="card">
           <p className="text-xs font-semibold text-muted uppercase">Article · {a.moderation}</p>

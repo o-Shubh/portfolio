@@ -37,7 +37,12 @@ export function makeSlug(title: string): string {
   return `${base || "book"}-${suffix}`;
 }
 
-/** Where files live in Storage. The first folder must be the author's id (security rule). */
+/**
+ * Where files live in Storage. The first folder must be the author's id (security rule).
+ * Every upload gets its own file name, so earlier versions are kept (see book_file_versions);
+ * the fixed names below are the original single-file locations, still accepted for old books.
+ */
+export { isBookFilePath, versionedPath, type FileKind } from "./file-paths";
 export const manuscriptPath = (authorId: string, bookId: string) => `${authorId}/${bookId}/manuscript.pdf`;
 export const coverPath = (authorId: string, bookId: string, ext: string) => `${authorId}/${bookId}/cover.${ext}`;
 export const printCoverPath = (authorId: string, bookId: string) => `${authorId}/${bookId}/print-cover.pdf`;
@@ -86,7 +91,7 @@ export function coverSizeMatches(w: number, h: number, expected: { widthIn: numb
   return Math.abs(w - expected.widthIn) <= 0.15 && Math.abs(h - expected.heightIn) <= 0.15;
 }
 
-export type CheckItem = { ok: boolean; label: string; step: "details" | "files" | "print" };
+export type CheckItem = { ok: boolean; label: string; step: "details" | "files" | "print" | "sample" | "preview" };
 
 /** Everything that must be done before a book can be sent for review. */
 export function submitChecklist(
@@ -129,5 +134,8 @@ export function submitChecklist(
     },
     { ok: earning !== null && earning >= 1, label: "Price set, with earnings above ₹0", step: "print" },
     ...(terms?.required ? [{ ok: terms.accepted, label: "Author terms accepted", step: "print" as const }] : []),
+    // New listings need an approved free sample; books already live keep selling while one is prepared
+    ...(book.published_at ? [] : [{ ok: Boolean(book.sample_path && book.sample_approved_at), label: "Free sample approved", step: "sample" as const }]),
+    { ok: Boolean(book.files_confirmed_at), label: "Files checked and confirmed in Preview", step: "preview" },
   ];
 }

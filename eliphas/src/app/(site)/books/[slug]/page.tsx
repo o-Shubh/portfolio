@@ -1,8 +1,12 @@
 import { BookOpen, PackageCheck, Printer, ShieldCheck, Truck } from "lucide-react";
-import { sampleUrl } from "@/lib/book-sample";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { FollowButton } from "@/components/articles/FollowButton";
+import { BookReviews } from "@/components/reviews/BookReviews";
+import { readerState } from "@/lib/articles";
+import { getCurrentProfile } from "@/lib/auth";
+import { listReviews } from "@/lib/reviews";
 import { notFound } from "next/navigation";
 import { BookShelf } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
@@ -27,9 +31,13 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   const book = await getPublishedBook(slug);
   if (!book) notFound();
 
-  const [more, { rates }, handle] = await Promise.all([moreByAuthor(book), getPricingSettings(), authorHandle(book.author_id)]);
+  const [more, { rates }, handle, me, { reviews, average, counts }] = await Promise.all([moreByAuthor(book), getPricingSettings(), authorHandle(book.author_id), getCurrentProfile(), listReviews(book.id)]);
+  const following = me ? (await readerState(me.id, "00000000-0000-0000-0000-000000000000", book.author_id)).following : false;
+  const isAuthor = me?.id === book.author_id;
+  const canReview = Boolean(me?.full_name) && !isAuthor;
+  const myReview = me ? reviews.find((r) => r.user_id === me.id) : undefined;
   const cover = coverUrl(book.cover_path);
-  const sample = sampleUrl(book.sample_path);
+  const sample = Boolean(book.sample_path);
   const label = (group: Record<string, { label: string }>, key: string) => group[key]?.label ?? key;
 
   const details = [
@@ -54,6 +62,8 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
     isbn: book.isbn ?? undefined,
     image: cover ?? undefined,
     offers: { "@type": "Offer", price: Number(book.mrp), priceCurrency: "INR", availability: "https://schema.org/InStock" },
+    // Only real reviews from verified buyers, and only when there are some
+    ...(average !== null ? { aggregateRating: { "@type": "AggregateRating", ratingValue: Number(average.toFixed(1)), reviewCount: reviews.length } } : {}),
   };
 
   return (
@@ -104,6 +114,11 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
                 <span className="font-medium text-accent-fg">{book.author_name}</span>
               )}
             </p>
+            {handle && me?.id !== book.author_id && (
+              <div className="mt-3" lang="en">
+                <FollowButton authorId={book.author_id} authorName={book.author_name} following={following} />
+              </div>
+            )}
             <div className="mt-3 flex flex-wrap gap-2 text-xs" lang="en">
               {[LANGUAGE_LABEL[book.language], book.genre, label(rates.binding, book.binding)].filter(Boolean).map((t) => (
                 <span key={t} className="rounded-md bg-surface-2 px-2 py-1 text-muted">
@@ -119,12 +134,17 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
                 <Truck className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
                 <span>Delivery across India · shipping for your PIN code is shown at checkout · usually arrives in 5–9 working days</span>
               </p>
-              {sample && (
-                <a href={sample} target="_blank" rel="noopener" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline underline-offset-2" data-testid="read-sample">
-                  <BookOpen className="h-4 w-4" aria-hidden /> Read a free sample (pages {book.sample_from}–{book.sample_to}, PDF)
-                </a>
+              {sample ? (
+                <Link href={`/books/${book.slug}/sample`} className="btn-ghost mt-5 w-full min-h-12 gap-2 text-base" data-testid="read-sample">
+                  <BookOpen className="h-5 w-5" aria-hidden /> Read sample
+                  <span className="text-sm font-normal text-muted">{book.sample_from && book.sample_to ? `· pages ${book.sample_from}–${book.sample_to}` : "· free"}</span>
+                </Link>
+              ) : (
+                <p className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-control)] border border-dashed border-line text-sm text-muted" data-testid="sample-soon">
+                  <BookOpen className="h-4 w-4" aria-hidden /> Sample coming soon
+                </p>
               )}
-              <div className="mt-5 hidden gap-3 md:grid md:grid-cols-2">
+              <div className="mt-3 hidden gap-3 md:grid md:grid-cols-2">
                 <AddToCartButton bookId={book.id} className="min-h-12 text-base" />
                 <Link href={`/checkout/${book.slug}`} className="btn-accent min-h-12 text-base">
                   Buy now
@@ -153,6 +173,10 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
               <p className="mt-3 leading-relaxed whitespace-pre-line text-fg/90">{book.description}</p>
             </section>
           )}
+
+          <div lang="en">
+            <BookReviews bookId={book.id} slug={book.slug} reviews={reviews} average={average} counts={counts} me={me?.id ?? null} isAuthor={isAuthor} canReview={canReview} mine={myReview ? { rating: myReview.rating, body: myReview.body ?? "" } : null} />
+          </div>
 
           <section className="card" lang="en">
             <h2 className="text-lg">Product details</h2>

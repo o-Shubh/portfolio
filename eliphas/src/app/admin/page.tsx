@@ -15,7 +15,7 @@ export default async function AdminHome() {
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
 
   const count = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0);
-  const [waiting, live, printers, ordersThisMonth, toPrint, balances, queue] = await Promise.all([
+  const [waiting, live, printers, ordersThisMonth, toPrint, balances, queue, noSample, applications] = await Promise.all([
     count(supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "in_review")),
     count(supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "published")),
     count(supabase.from("printers").select("*", { count: "exact", head: true }).eq("active", true)),
@@ -34,6 +34,8 @@ export default async function AdminHome() {
       .eq("status", "in_review")
       .order("submitted_at", { ascending: true })
       .limit(5),
+    count(supabase.from("books").select("*", { count: "exact", head: true }).eq("status", "published").is("sample_path", null)),
+    count(supabase.from("author_applications").select("*", { count: "exact", head: true }).eq("status", "pending")),
   ]);
   const [business, pricing] = await Promise.all([getBusiness(), getPricingSettings()]);
   const keyId = process.env.RAZORPAY_KEY_ID ?? "";
@@ -63,6 +65,8 @@ export default async function AdminHome() {
     { label: "Orders this month", value: ordersThisMonth },
     { label: "Orders not yet shipped", value: toPrint },
     { label: "Active printers", value: printers, href: "/admin/printers" },
+    { label: "Author applications", value: applications, href: "/admin/authors", alert: applications > 0 },
+    { label: "Live books without a sample", value: noSample, href: "/admin/review?status=published&sample=missing", alert: noSample > 0 },
     { label: "Owed to authors", value: rupees(Math.round(owed)), href: "/admin/payouts" },
   ];
 
