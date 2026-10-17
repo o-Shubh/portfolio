@@ -48,7 +48,7 @@ const PROMISES = [
 export function SiteFooter() {
   return (
     <footer className="mt-16 pb-14 md:pb-0">
-      <div className="border-y border-line bg-surface">
+      <div className="border-t border-line">
         <ul className="container-x grid grid-cols-2 gap-6 py-6 md:grid-cols-4">
           {PROMISES.map((p) => (
             <li key={p.title}>
@@ -58,21 +58,21 @@ export function SiteFooter() {
           ))}
         </ul>
       </div>
-      <div className="bg-bar text-white">
+      <div className="border-t border-line bg-surface text-fg">
         <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div>
-            <Logo onDark className="h-14" lazy />
-            <p className="mt-4 max-w-xs text-sm text-white/70">
+            <Logo className="h-12" lazy />
+            <p className="mt-4 max-w-xs text-sm text-muted">
               Self-publishing and print on demand. Your book, printed beautifully and delivered to readers.
             </p>
           </div>
           {COLUMNS.map((c) => (
             <div key={c.title}>
-              <h2 className="text-sm font-semibold text-gold">{c.title}</h2>
-              <ul className="mt-4 space-y-2.5">
+              <h2 className="text-sm font-semibold">{c.title}</h2>
+              <ul className="mt-3 space-y-0.5">
                 {c.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="text-sm text-white/75 transition hover:text-white">
+                    <Link href={l.href} className="inline-flex min-h-10 items-center text-sm text-muted transition hover:text-fg">
                       {l.label}
                     </Link>
                   </li>
@@ -81,8 +81,8 @@ export function SiteFooter() {
             </div>
           ))}
         </div>
-        <div className="safe-bottom border-t border-white/10">
-          <div className="container-x flex flex-wrap items-center justify-between gap-2 py-5 text-xs text-white/60">
+        <div className="safe-bottom border-t border-line">
+          <div className="container-x flex flex-wrap items-center justify-between gap-2 py-5 text-xs text-muted">
             <span>© {new Date().getFullYear()} Eliphas Indicus Publications</span>
             <span>Print on demand · No stock · No upfront cost</span>
           </div>

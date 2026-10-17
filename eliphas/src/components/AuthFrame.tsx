@@ -17,22 +17,17 @@ export function AuthFrame({ children }: { children: React.ReactNode }) {
       </div>
 
       <aside className="relative m-3 hidden overflow-hidden rounded-2xl bg-navy p-12 text-white lg:flex lg:flex-col">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 0)", backgroundSize: "18px 18px" }}
-        />
         {/* eslint-disable-next-line @next/next/no-img-element -- static brand image */}
         <img src="/brand/logo-full-light.png" alt="" className="relative h-16 w-auto self-start" />
         <div className="relative mt-auto">
           <h2 className="max-w-lg text-5xl leading-[1.1] font-semibold">
-            Every story deserves a <span className="text-gold">printed</span> home.
+            Every story deserves a printed home.
           </h2>
           <ul className="mt-10 space-y-3 text-lg text-white/85">
             {["Free to publish — pay only when a copy sells", "You keep every right to your work", "Printed on demand, never out of stock"].map(
               (t) => (
                 <li key={t} className="flex items-center gap-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gold text-navy">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15 text-white">
                     <Check className="h-3.5 w-3.5" aria-hidden />
                   </span>
                   {t}

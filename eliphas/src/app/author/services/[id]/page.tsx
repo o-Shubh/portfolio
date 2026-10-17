@@ -106,7 +106,7 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
           )}
 
           {openQuote && (
-            <section className="card ring-2 ring-gold" aria-labelledby="quote-heading">
+            <section className="card ring-2 ring-accent/30" aria-labelledby="quote-heading">
               <h2 id="quote-heading" className="text-lg">
                 {openQuote.kind === "additional" ? "Quote for additional work" : "Your quote"}
               </h2>

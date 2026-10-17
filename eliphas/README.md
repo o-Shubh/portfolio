@@ -334,10 +334,13 @@ authorised book excerpts. Articles are free to read at `/articles` and on each a
 
 ### Design system
 
-Tokens live in `src/app/globals.css`: ink navy `#17214A`, warm white paper, marigold used sparingly
-(main buy actions, highlights), plus semantic colours (success, danger, warning, info, focus) for light and
-dark mode. Every text colour pair meets WCAG AA. Headings use Source Serif 4, interface text uses Inter, and
-Hindi falls through to Noto Serif/Sans Devanagari with extra line height.
+Tokens live in `src/app/globals.css`. The look is neutral and quiet: white and soft-grey surfaces
+(`#FFFFFF` / `#F5F5F7`; black and `#1C1C1E` in dark mode), hairline borders, gentle shadows,
+restrained corners (10 px controls, 14 px cards) and one accent, Eliphas navy `#17214A` (lifted to
+`#4A63C9` on dark backgrounds). Every text colour pair meets WCAG AA. Interface text uses the device's
+own sans-serif (San Francisco, Roboto, Segoe UI) with Noto Sans Devanagari for Hindi. Source Serif 4
+(and Noto Serif Devanagari) is kept for books and editorial reading: book and article titles, article
+text and typographic covers. The header is white with a light blur; there are no other glass effects.
 
 Shared building blocks (utility classes): `btn-primary` (one per task area), `btn-ghost` (secondary),
 `btn-accent` (buying), `btn-quiet`, `btn-danger`, `field` (shows `aria-invalid`), `label`, `hint`, `card`,

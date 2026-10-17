@@ -125,7 +125,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <section className="overflow-hidden rounded-[var(--radius-sheet)] bg-navy text-white">
         <div className="grid gap-8 p-6 sm:p-8 md:p-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
           <div>
-            <p className="text-xs font-semibold tracking-[0.1em] text-gold uppercase">For authors</p>
+            <p className="text-sm font-semibold text-white/70">For authors</p>
             <h2 className="mt-3 text-3xl sm:text-4xl">Publish your book. Earn on every copy.</h2>
             <p className="mt-3 max-w-lg text-white/80">
               Free to publish, no stock to buy and you keep your rights. Upload your manuscript, set your price and we print and ship every order.
@@ -139,7 +139,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               ))}
             </ol>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/login?next=/author" className="btn-accent">
+              <Link href="/login?next=/author" className="btn bg-white text-navy hover:bg-white/90">
                 Start publishing <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link href="/pricing" className="btn bg-transparent text-white ring-1 ring-white/30 ring-inset hover:bg-white/10">
@@ -148,22 +148,22 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             </div>
           </div>
           {example && (
-            <div className="rounded-[var(--radius-card)] bg-paper p-6 text-ink">
-              <p className="text-sm text-[#535a73]">
+            <div className="rounded-[var(--radius-card)] bg-white p-6 text-[#1d1d1f]">
+              <p className="text-sm text-[#5f5f66]">
                 Example: {EXAMPLE.page_count}-page paperback sold at {rupees(EXAMPLE_MRP)}
               </p>
-              <p className="mt-1 font-heading text-4xl font-semibold text-[#17703a]">
+              <p className="mt-1 text-4xl font-semibold tracking-tight text-[#1b7a3d]">
                 {formatPaise(example.authorEarningPaise)}
-                <span className="ml-2 font-sans text-base font-medium text-[#535a73]">to you per copy</span>
+                <span className="ml-2 text-base font-medium text-[#5f5f66]">to you per copy</span>
               </p>
-              <dl className="mt-5 space-y-2 border-t border-ink/10 pt-4 text-sm">
+              <dl className="mt-5 space-y-2 border-t border-black/10 pt-4 text-sm">
                 {[
                   ["Printing", example.printCostPaise],
                   ["Commission (Free plan)", example.commissionPaise],
                   ["GST on commission", example.commissionGstPaise],
                   ["Payment charges (estimate)", example.gatewayPaise],
                 ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between text-[#535a73]">
+                  <div key={k} className="flex justify-between text-[#5f5f66]">
                     <dt>{k}</dt>
                     <dd className="tabular-nums">− {formatPaise(Number(v))}</dd>
                   </div>

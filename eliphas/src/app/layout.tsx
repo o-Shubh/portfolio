@@ -1,14 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Sans_Devanagari, Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
+import { Noto_Sans_Devanagari, Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
 import { ServiceWorker } from "@/components/ServiceWorker";
 import "./globals.css";
 
-// Interface text: Inter, a highly readable sans. Headings: Source Serif 4, a calm book serif.
-// Hindi letters fall through to the matching Noto Devanagari font, so mixed English/Hindi lines stay consistent.
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
-const serif = Source_Serif_4({ variable: "--font-serif", subsets: ["latin"], weight: ["500", "600", "700"], display: "swap" });
+// Interface text uses the device's own sans-serif (San Francisco, Roboto, Segoe UI), set in globals.css.
+// Source Serif 4 is only for books and editorial reading. Hindi falls through to the Noto Devanagari fonts.
+const serif = Source_Serif_4({ variable: "--font-book-serif", subsets: ["latin"], weight: ["400", "600"], display: "swap", preload: false });
 const sansDeva = Noto_Sans_Devanagari({ variable: "--font-sans-deva", subsets: ["devanagari"], weight: ["400", "500", "600"], display: "swap", preload: false });
-const serifDeva = Noto_Serif_Devanagari({ variable: "--font-serif-deva", subsets: ["devanagari"], weight: ["500", "600"], display: "swap", preload: false });
+const serifDeva = Noto_Serif_Devanagari({ variable: "--font-serif-deva", subsets: ["devanagari"], weight: ["400", "600"], display: "swap", preload: false });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
@@ -29,8 +28,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#17214a" },
-    { media: "(prefers-color-scheme: dark)", color: "#10152e" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#1c1c1e" },
   ],
 };
 
@@ -42,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${serif.variable} ${sansDeva.variable} ${serifDeva.variable} h-full antialiased`}
+      className={`${serif.variable} ${sansDeva.variable} ${serifDeva.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

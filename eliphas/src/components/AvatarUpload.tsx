@@ -42,7 +42,7 @@ export function AvatarUpload({ name, path, url }: { name: string | null; path: s
         Profile photo
       </h2>
       <div className="mt-3 flex flex-wrap items-center gap-4">
-        {src ? <img src={src} alt="Your profile photo" className="h-16 w-16 rounded-full object-cover ring-2 ring-gold/40" data-testid="avatar-preview" /> : <AuthorAvatar name={name} path={path} size="lg" />}
+        {src ? <img src={src} alt="Your profile photo" className="h-16 w-16 rounded-full object-cover ring-1 ring-line" data-testid="avatar-preview" /> : <AuthorAvatar name={name} path={path} size="lg" />}
         <div className="space-y-1">
           <label className="btn-ghost min-h-10 cursor-pointer px-4 text-sm">
             {busy ? "Uploading…" : src ? "Change photo" : "Upload photo"}

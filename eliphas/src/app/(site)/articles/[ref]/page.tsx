@@ -132,7 +132,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
           <p className="eyebrow" lang="en">
             {topicLabel(a.topic)}
           </p>
-          <h1 className="mt-2 text-3xl leading-tight break-words md:text-[2.6rem]">{a.title}</h1>
+          <h1 className="mt-2 font-serif text-[2rem] leading-tight font-semibold tracking-[-0.01em] break-words md:text-[2.75rem]">{a.title}</h1>
           <p className="mt-3 text-lg text-muted md:text-xl">{a.excerpt}</p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3" lang="en">

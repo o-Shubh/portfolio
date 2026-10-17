@@ -22,7 +22,7 @@ export default async function ShippingAdmin() {
         intro="Readers see the shipping charge for their PIN code before paying. The zone with the longest matching PIN prefix wins; PIN codes with no zone can't order. Enter your courier's real rates; no courier quotes are made up."
       />
       {zones?.some((z) => z.is_sample && z.active) && (
-        <p role="note" className="card mb-6 ring-2 ring-gold">
+        <p role="note" className="card mb-6 ring-2 ring-accent/30">
           Sample shipping rates are active. Replace them with your courier&apos;s rates before launch.
         </p>
       )}

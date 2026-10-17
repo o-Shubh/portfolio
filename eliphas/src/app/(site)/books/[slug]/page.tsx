@@ -90,7 +90,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
 
         <div className="space-y-4" lang={book.language}>
           <div className="card">
-            <h1 className="text-2xl md:text-3xl">{book.title}</h1>
+            <h1 className="font-serif text-[1.75rem] font-semibold tracking-[-0.01em] md:text-[2.125rem]">{book.title}</h1>
             {book.subtitle && <p className="mt-1 text-muted md:text-lg">{book.subtitle}</p>}
             <p className="mt-2 text-sm">
               <span lang="en" className="text-muted">

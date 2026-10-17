@@ -72,7 +72,7 @@ export default async function PricingPage() {
             Start publishing free
           </Link>
         </div>
-        <div className="card ring-2 ring-gold">
+        <div className="card ring-2 ring-accent/30">
           <h2 className="text-2xl">Author Pro</h2>
           <p className="mt-2 text-4xl font-semibold">
             {formatPaise(proPrice.totalPaise)}
@@ -246,9 +246,9 @@ export default async function PricingPage() {
         </dl>
       </section>
 
-      <section className="mt-16 card bg-navy text-white ring-0">
+      <section className="mt-16 card">
         <h2 className="text-2xl">For readers</h2>
-        <p className="mt-3 text-white/75">
+        <p className="mt-3 text-muted">
           Readers pay the price the author sets plus shipping, which depends on the delivery PIN code and parcel weight. The exact shipping charge and total
           are shown at checkout before payment. Commission never applies to shipping.
         </p>
