@@ -99,7 +99,7 @@ export function InstallPrompt({ aboveTabBar = false }: { aboveTabBar?: boolean }
                 : "Add it to your Home Screen to open it like an app:"}
             </p>
           </div>
-          <button type="button" onClick={dismiss} className="-mt-1 -mr-1 grid h-9 w-9 shrink-0 place-items-center rounded-full hover:bg-surface-2" aria-label="Close">
+          <button type="button" onClick={dismiss} className="-mt-1 -mr-1 grid h-11 w-11 shrink-0 place-items-center rounded-full hover:bg-surface-2" aria-label="Close">
             <X className="h-4 w-4" />
           </button>
         </div>

@@ -7,11 +7,11 @@ import { FormMessage } from "@/components/FormMessage";
 import { GENRES, type Book } from "@/lib/publishing";
 
 export function DetailsForm({ book, disabled }: { book: Book; disabled: boolean }) {
-  const [state, onSubmit, pending] = useFormAction(saveDetails.bind(null, book.id));
+  const [state, onSubmit, pending, { onChange }] = useFormAction(saveDetails.bind(null, book.id), { warnUnsaved: true });
   const [desc, setDesc] = useState(book.description ?? "");
 
   return (
-    <form onSubmit={onSubmit} className="max-w-2xl space-y-5">
+    <form onSubmit={onSubmit} onChange={onChange} className="max-w-2xl space-y-5">
       <fieldset disabled={disabled} className="space-y-5">
         <div>
           <label htmlFor="title" className="label">

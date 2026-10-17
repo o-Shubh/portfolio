@@ -4,6 +4,7 @@ import { Check, UserPlus } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { setFollow } from "@/app/actions/community";
 import { useClearIntent, useGate } from "./useGate";
+import { offlineSafe } from "@/lib/use-form-action";
 
 /** Follow an author to get an in-app notification when they publish a new article. */
 export function FollowButton({ authorId, authorName, following, intent, className = "" }: { authorId: string; authorName: string; following: boolean; intent?: string | null; className?: string }) {
@@ -16,7 +17,7 @@ export function FollowButton({ authorId, authorName, following, intent, classNam
 
   const run = (next: boolean) =>
     start(async () => {
-      const res = await setFollow(authorId, next);
+      const res = await offlineSafe(setFollow(authorId, next));
       const msg = gate(res, "follow");
       if ("ok" in res) setOn(next);
       setError(msg);

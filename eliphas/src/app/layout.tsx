@@ -1,24 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_Devanagari, Poppins } from "next/font/google";
+import { Inter, Noto_Sans_Devanagari, Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
 import { ServiceWorker } from "@/components/ServiceWorker";
 import "./globals.css";
 
-// One clean, friendly sans for the whole app (marketplace style).
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-// Used only when text contains Devanagari letters (Hindi titles and names).
-const devanagari = Noto_Sans_Devanagari({
-  variable: "--font-devanagari",
-  subsets: ["devanagari"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-  preload: false,
-});
+// Interface text: Inter, a highly readable sans. Headings: Source Serif 4, a calm book serif.
+// Hindi letters fall through to the matching Noto Devanagari font, so mixed English/Hindi lines stay consistent.
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
+const serif = Source_Serif_4({ variable: "--font-serif", subsets: ["latin"], weight: ["500", "600", "700"], display: "swap" });
+const sansDeva = Noto_Sans_Devanagari({ variable: "--font-sans-deva", subsets: ["devanagari"], weight: ["400", "500", "600"], display: "swap", preload: false });
+const serifDeva = Noto_Serif_Devanagari({ variable: "--font-serif-deva", subsets: ["devanagari"], weight: ["500", "600"], display: "swap", preload: false });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
@@ -39,8 +29,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#13223c" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d1a33" },
+    { media: "(prefers-color-scheme: light)", color: "#17214a" },
+    { media: "(prefers-color-scheme: dark)", color: "#10152e" },
   ],
 };
 
@@ -52,12 +42,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${poppins.variable} ${devanagari.variable} h-full antialiased`}
+      className={`${inter.variable} ${serif.variable} ${sansDeva.variable} ${serifDeva.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-full flex-col">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-[var(--radius-control)] focus:bg-surface focus:px-4 focus:py-3 focus:font-semibold focus:text-fg focus:shadow-lift">
+          Skip to content
+        </a>
         {children}
         <ServiceWorker />
       </body>

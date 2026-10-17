@@ -40,7 +40,7 @@ export default async function AdminServicesPage({ searchParams }: PageProps<"/ad
             key={t.key}
             href={`/admin/services?tab=${t.key}`}
             aria-current={t.key === tab.key ? "true" : undefined}
-            className={`rounded-lg px-3 py-1.5 text-sm ${t.key === tab.key ? "bg-primary text-on-primary" : "bg-surface ring-1 ring-line"}`}
+            className="chip bg-surface"
           >
             {t.label}
           </Link>

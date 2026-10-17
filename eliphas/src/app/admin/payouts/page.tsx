@@ -68,7 +68,7 @@ export default async function PayoutsPage() {
               </dl>
               {Number(b.balance) > 0 && b.author_id && (
                 <details className="mt-4 border-t border-line pt-3">
-                  <summary className="cursor-pointer font-semibold">Record a payout</summary>
+                  <summary className="flex min-h-11 cursor-pointer items-center font-semibold">Record a payout</summary>
                   <PayoutForm authorId={b.author_id} balance={Number(b.balance)} />
                 </details>
               )}

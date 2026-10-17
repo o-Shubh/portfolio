@@ -72,11 +72,11 @@ export default async function FinancePage({ searchParams }: PageProps<"/admin/fi
     <>
       <PageHeader title="Finance" intro="Each figure is kept separately. GST figures are as configured and need your accountant's review." />
       <nav aria-label="Month" className="mb-6 flex items-center gap-3 text-sm">
-        <Link href={`/admin/finance?month=${ym(prev)}`} className="btn-ghost min-h-9 px-3">
+        <Link href={`/admin/finance?month=${ym(prev)}`} className="btn-ghost px-3">
           ← {ym(prev)}
         </Link>
         <span className="font-semibold">{from.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}</span>
-        <Link href={`/admin/finance?month=${ym(next)}`} className="btn-ghost min-h-9 px-3">
+        <Link href={`/admin/finance?month=${ym(next)}`} className="btn-ghost px-3">
           {ym(next)} →
         </Link>
       </nav>

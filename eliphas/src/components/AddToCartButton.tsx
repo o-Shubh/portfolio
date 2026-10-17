@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { addToCart } from "@/app/actions/cart";
+import { offlineSafe } from "@/lib/use-form-action";
 
 /** Adds one copy to the cart, then offers a link to the cart. */
 export function AddToCartButton({ bookId, className = "" }: { bookId: string; className?: string }) {
@@ -27,7 +28,7 @@ export function AddToCartButton({ bookId, className = "" }: { bookId: string; cl
         disabled={pending}
         onClick={() =>
           start(async () => {
-            const res = await addToCart(bookId);
+            const res = await offlineSafe(addToCart(bookId));
             setState("error" in res ? res : { ok: true });
             router.refresh();
           })

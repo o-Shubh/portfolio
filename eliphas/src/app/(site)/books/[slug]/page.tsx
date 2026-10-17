@@ -60,13 +60,13 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
     <div className="container-x pt-4 pb-28 md:py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <nav aria-label="Breadcrumb" className="truncate text-sm text-muted">
-        <Link href="/" className="hover:text-fg">
+        <Link href="/" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
           Home
         </Link>
         <span className="mx-2" aria-hidden>
           ›
         </span>
-        <Link href="/books" className="hover:text-fg">
+        <Link href="/books" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
           Bookstore
         </Link>
         {book.genre && (
@@ -74,7 +74,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
             <span className="mx-2" aria-hidden>
               ›
             </span>
-            <Link href={`/books?genre=${encodeURIComponent(book.genre)}`} className="hover:text-fg">
+            <Link href={`/books?genre=${encodeURIComponent(book.genre)}`} className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
               {book.genre}
             </Link>
           </>

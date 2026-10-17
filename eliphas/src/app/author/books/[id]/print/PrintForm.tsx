@@ -24,7 +24,7 @@ export function PrintForm({
   disabled: boolean;
   pdfSize: { w: number; h: number } | null;
 }) {
-  const [state, onSubmit, pending] = useFormAction(savePrintOptions.bind(null, bookId));
+  const [state, onSubmit, pending, { onChange }] = useFormAction(savePrintOptions.bind(null, bookId), { warnUnsaved: true });
 
   const sizeWarning = (trimKey: string) => {
     const trim = rates.trim_sizes[trimKey];
@@ -33,7 +33,7 @@ export function PrintForm({
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} onChange={onChange} className="space-y-6">
       <PrintCalculator rates={rates} gatewayPercent={gatewayPercent} plans={plans} initial={initial} disabled={disabled} sizeWarning={sizeWarning} />
       <FormMessage state={state} />
       {!disabled && (

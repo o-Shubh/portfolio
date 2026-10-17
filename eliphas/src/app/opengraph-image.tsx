@@ -12,12 +12,12 @@ export default async function OpengraphImage() {
   const src = `data:image/png;base64,${logo.toString("base64")}`;
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#13223c", color: "#ffffff", padding: 72 }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#17214a", color: "#ffffff", padding: 72 }}>
         {/* eslint-disable-next-line jsx-a11y/alt-text -- rendered to an image, not HTML */}
         <img src={src} height={150} style={{ height: 150 }} />
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 68, lineHeight: 1.1, fontWeight: 600, maxWidth: 960 }}>Books printed fresh, just for you.</div>
-          <div style={{ marginTop: 24, fontSize: 30, color: "#cb9436" }}>Publish your book · Print on demand · Delivered to your door</div>
+          <div style={{ marginTop: 24, fontSize: 30, color: "#e9a31a" }}>Publish your book · Print on demand · Delivered to your door</div>
         </div>
       </div>
     ),

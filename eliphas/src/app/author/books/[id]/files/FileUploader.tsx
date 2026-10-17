@@ -13,7 +13,7 @@ import {
   MAX_MANUSCRIPT_MB,
   printCoverPath,
 } from "@/lib/publishing";
-import { createClient } from "@/lib/supabase/client";
+import { uploadWithProgress } from "@/lib/upload";
 
 type Current = { name: string; href: string | null; detail?: string; preview?: string } | null;
 
@@ -45,7 +45,8 @@ export function FileUploader({
 }) {
   const router = useRouter();
   const inputId = useId();
-  const [status, setStatus] = useState<"idle" | "checking" | "uploading">("idle");
+  const [status, setStatus] = useState<"idle" | "checking" | "uploading" | "saving">("idle");
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
 
@@ -60,9 +61,10 @@ export function FileUploader({
     setError(null);
     setDone(null);
 
-    if (file.size > maxMb * 1024 * 1024) return setError(`File is larger than ${maxMb} MB.`);
-    if (isPdf && file.type !== "application/pdf") return setError("Please choose a PDF file.");
-    if (kind === "cover" && !COVER_TYPES[file.type]) return setError("Please choose a JPG, PNG or WebP image.");
+    const mb = (file.size / 1024 / 1024).toFixed(1);
+    if (file.size > maxMb * 1024 * 1024) return setError(`This file is ${mb} MB. The limit is ${maxMb} MB${isPdf ? " — try exporting the PDF with compressed images" : ""}.`);
+    if (isPdf && file.type !== "application/pdf") return setError(`“${file.name}” isn't a PDF. Export your ${kind === "manuscript" ? "manuscript" : "print cover"} as a PDF and choose that file.`);
+    if (kind === "cover" && !COVER_TYPES[file.type]) return setError(`“${file.name}” isn't a JPG, PNG or WebP image.`);
 
     let info: Awaited<ReturnType<typeof inspectPdf>> = null;
     if (isPdf) {
@@ -71,6 +73,7 @@ export function FileUploader({
     }
 
     setStatus("uploading");
+    setProgress(0);
     const path =
       kind === "manuscript"
         ? manuscriptPath(authorId, bookId)
@@ -78,25 +81,20 @@ export function FileUploader({
           ? printCoverPath(authorId, bookId)
           : coverPath(authorId, bookId, COVER_TYPES[file.type]);
     const bucket = isPdf ? "manuscripts" : "covers";
-    const { error: upErr } = await createClient()
-      .storage.from(bucket)
-      .upload(path, file, { upsert: true, contentType: file.type, cacheControl: "60" });
-    if (upErr) {
+    const up = await uploadWithProgress(bucket, path, file, setProgress);
+    if ("error" in up) {
       setStatus("idle");
-      return setError(
-        upErr.message.toLowerCase().includes("row-level security")
-          ? "This book is locked for editing."
-          : `Upload failed: ${upErr.message}`,
-      );
+      return setError(up.error);
     }
 
+    setStatus("saving");
     const res = await attachFile(bookId, kind, {
       path,
       mime: file.type,
       pageCount: info?.pageCount,
       widthIn: info?.widthIn,
       heightIn: info?.heightIn,
-    });
+    }).catch(() => ({ error: "The file uploaded, but we couldn't save it to your book because the connection dropped. Choose the file again to retry." }));
     setStatus("idle");
     if (res?.error) return setError(res.error);
     setDone(
@@ -141,15 +139,22 @@ export function FileUploader({
             {status === "checking"
               ? "Reading PDF…"
               : status === "uploading"
-                ? "Uploading… keep this page open"
-                : current
-                  ? "Replace file"
-                  : kind === "cover"
-                    ? "Choose image"
-                    : "Choose PDF"}
+                ? `Uploading ${Math.round(progress * 100)}%… keep this page open`
+                : status === "saving"
+                  ? "Saving…"
+                  : current
+                    ? "Replace file"
+                    : kind === "cover"
+                      ? "Choose image"
+                      : "Choose PDF"}
           </label>
           <input id={inputId} type="file" accept={accept} className="sr-only" onChange={onPick} disabled={busy} />
         </>
+      )}
+      {status === "uploading" && (
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-label="Upload progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+          <div className="h-full rounded-full bg-primary transition-[width] duration-150" style={{ width: `${Math.max(2, progress * 100)}%` }} />
+        </div>
       )}
       <div aria-live="polite" className="mt-2 text-sm">
         {error && <p className="font-medium text-danger">{error}</p>}

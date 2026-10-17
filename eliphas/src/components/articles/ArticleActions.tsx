@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { setBookmark, setLike } from "@/app/actions/community";
 import { ReportForm } from "./ReportForm";
 import { useClearIntent, useGate } from "./useGate";
+import { offlineSafe } from "@/lib/use-form-action";
 
 /** Like, save, share and report for one article. Likes are once per account; saves are private. */
 export function ArticleActions({
@@ -36,13 +37,13 @@ export function ArticleActions({
 
   const toggleLike = (on: boolean) =>
     start(async () => {
-      const res = await setLike(articleId, on);
+      const res = await offlineSafe(setLike(articleId, on));
       setError(gate(res, "like"));
       if ("ok" in res) setLikeState((s) => (s.on === on ? s : { on, count: Math.max(0, s.count + (on ? 1 : -1)) }));
     });
   const toggleSave = (on: boolean) =>
     start(async () => {
-      const res = await setBookmark(articleId, on);
+      const res = await offlineSafe(setBookmark(articleId, on));
       setError(gate(res, "bookmark"));
       if ("ok" in res) {
         setSaved(on);

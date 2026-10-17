@@ -9,7 +9,7 @@ export async function NotificationBell({ userId, className = "" }: { userId: str
   return (
     <Link
       href="/account/notifications"
-      className={`relative grid h-10 w-10 place-items-center rounded-full ${className}`}
+      className={`relative grid h-11 w-11 place-items-center rounded-full ${className}`}
       aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}
       data-testid="bell"
     >

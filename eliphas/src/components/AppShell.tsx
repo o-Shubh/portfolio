@@ -64,7 +64,7 @@ export function AppShell({
             <NotificationBell userId={profile.id} className="text-muted hover:bg-surface-2 hover:text-fg" />
             <form action={signOut} className="flex-1">
               <button
-                className="flex h-10 w-full items-center gap-2 rounded-lg px-3 text-sm text-muted transition hover:bg-surface-2 hover:text-fg"
+                className="flex h-11 w-full items-center gap-2 rounded-lg px-3 text-sm text-muted transition hover:bg-surface-2 hover:text-fg"
                 type="submit"
               >
                 <LogOut className="h-4 w-4" /> Log out
@@ -75,29 +75,23 @@ export function AppShell({
       </aside>
 
       {/* Top bar (phones) */}
-      <header className="safe-top sticky top-0 z-20 bg-bar text-white shadow-soft md:hidden [&_button]:text-white">
+      <header className="safe-top sticky top-0 z-20 bg-bar text-white md:hidden [&_button]:text-white">
         <div className="flex h-14 items-center justify-between pr-2 pl-4">
           <Logo href="/" onDark className="h-9" />
           <div className="flex items-center">
             <NotificationBell userId={profile.id} className="h-11 w-11 hover:bg-white/10" />
-            <ThemeToggle />
-            <form action={signOut}>
-              <button className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10" type="submit" aria-label="Log out">
-                <LogOut className="h-5 w-5" />
-              </button>
-            </form>
-            <Link
-              href="/account/profile"
-              className="ml-1 grid h-8 w-8 place-items-center rounded-full bg-gold text-xs font-semibold text-navy"
-              aria-label="My profile"
-            >
-              {photo ? <img src={photo} alt="" className="h-8 w-8 rounded-full object-cover" /> : initials || <UserRound className="h-4 w-4" />}
+            <Link href="/account/profile" className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10" aria-label="My profile and settings">
+              {photo ? (
+                <img src={photo} alt="" className="h-8 w-8 rounded-full object-cover" />
+              ) : (
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-gold text-xs font-semibold text-navy">{initials || <UserRound className="h-4 w-4" />}</span>
+              )}
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="min-w-0 flex-1 px-4 pt-6 pb-28 md:px-10 md:pt-10 md:pb-16">
+      <main id="main" tabIndex={-1} className="min-w-0 flex-1 outline-none px-4 pt-6 pb-28 md:px-10 md:pt-10 md:pb-16">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
 

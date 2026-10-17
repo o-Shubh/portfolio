@@ -13,7 +13,7 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
           padding: 24,
           fontFamily: "system-ui, sans-serif",
           background: "#ffffff",
-          color: "#13223c",
+          color: "#17214a",
         }}
       >
         <title>Something went wrong — Eliphas Indicus</title>
@@ -24,7 +24,7 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
           <button
             type="button"
             onClick={() => retry()}
-            style={{ marginTop: 24, minHeight: 44, padding: "0 20px", border: 0, borderRadius: 999, background: "#13223c", color: "#fff", fontSize: 15, cursor: "pointer" }}
+            style={{ marginTop: 24, minHeight: 44, padding: "0 20px", border: 0, borderRadius: 999, background: "#17214a", color: "#fff", fontSize: 15, cursor: "pointer" }}
           >
             Try again
           </button>

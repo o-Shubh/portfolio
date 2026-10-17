@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 
 export default function NotFound() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+    <main id="main" className="flex flex-1 flex-col items-center justify-center px-4 py-16 text-center">
       <Logo className="h-14" />
       <h1 className="mt-10 text-3xl">Page not found</h1>
       <p className="mt-2 text-muted">This page may have moved, or the book is no longer available.</p>
