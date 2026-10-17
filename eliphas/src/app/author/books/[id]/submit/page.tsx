@@ -13,6 +13,7 @@ import { submitChecklist } from "@/lib/publishing";
 import { getPricingSettings } from "@/lib/settings";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { BookServicesCard } from "@/components/BookServicesCard";
+import { EditionIdentity } from "@/components/editions/EditionIdentity";
 import { SubmitActions } from "./SubmitActions";
 
 export const metadata: Metadata = { title: "Submit for review" };
@@ -48,6 +49,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
   return (
     <div className="grid max-w-4xl gap-6 md:grid-cols-[1fr_minmax(0,320px)]">
       <div className="space-y-6">
+        <EditionIdentity book={book} viewer="author" />
         <section className="card">
           <h2 className="text-xl">Checklist</h2>
           <ul className="mt-3 space-y-2">

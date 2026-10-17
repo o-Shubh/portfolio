@@ -6,7 +6,8 @@ import { saveDetails } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
 import { GENRES, type Book } from "@/lib/publishing";
 
-export function DetailsForm({ book, disabled }: { book: Book; disabled: boolean }) {
+export function DetailsForm({ book, disabled, others }: { book: Book; disabled: boolean; others: { id: string; title: string; binding: string; work_id: string }[] }) {
+  const linked = others.find((o) => o.work_id === book.work_id);
   const [state, onSubmit, pending, { onChange }] = useFormAction(saveDetails.bind(null, book.id), { warnUnsaved: true });
   const [desc, setDesc] = useState(book.description ?? "");
 
@@ -79,7 +80,31 @@ export function DetailsForm({ book, disabled }: { book: Book; disabled: boolean 
             ISBN <span className="font-normal text-muted">(optional)</span>
           </label>
           <input id="isbn" name="isbn" className="field" inputMode="numeric" defaultValue={book.isbn ?? ""} maxLength={17} />
-          <p className="mt-1 text-sm text-muted">Free from isbn.gov.in. You can add it later.</p>
+          <p className="mt-1 text-sm text-muted">Free from isbn.gov.in. You can add it later. Your Eliphas Edition ID is separate and assigned when the book is approved.</p>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="edition_label" className="label">
+              Edition <span className="font-normal text-muted">(optional)</span>
+            </label>
+            <input id="edition_label" name="edition_label" className="field" defaultValue={book.edition_label ?? ""} maxLength={60} placeholder="e.g. Second edition" />
+          </div>
+          {others.length > 0 && (
+            <div>
+              <label htmlFor="edition_of" className="label">
+                Another format or edition of
+              </label>
+              <select id="edition_of" name="edition_of" className="field" defaultValue={linked?.id ?? ""}>
+                <option value="">None (a new work)</option>
+                {others.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.title} ({o.binding})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-sm text-muted">Each format or edition gets its own Edition ID.</p>
+            </div>
+          )}
         </div>
       </fieldset>
 

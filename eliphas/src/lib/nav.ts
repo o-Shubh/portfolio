@@ -32,6 +32,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/subscriptions", label: "Subscriptions", icon: "plan", sidebarOnly: true },
   { href: "/admin/issues", label: "Issues", icon: "issues", sidebarOnly: true },
   { href: "/admin/authors", label: "Authors", icon: "profile", sidebarOnly: true },
+  { href: "/admin/editions", label: "Edition IDs", icon: "books", sidebarOnly: true },
   { href: "/admin/moderation", label: "Moderation", icon: "moderation", sidebarOnly: true },
   { href: "/admin/shipping", label: "Shipping", icon: "shipping", sidebarOnly: true },
   { href: "/admin/plans", label: "Plans", icon: "plan", sidebarOnly: true },

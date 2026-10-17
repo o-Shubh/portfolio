@@ -19,6 +19,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 7 | Install prompt (PWA) and deploy to Vercel | ✅ Done (deploy steps below) |
 | 8 | Author articles, follows, notifications, moderation | ✅ Done |
 | 9 | Author verification, community for everyone, samples on every book, open reviews | ✅ Done (migration 000015) |
+| 10 | Eliphas Edition IDs (EEID) and QR codes | ✅ Done (migration 000017) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -49,6 +50,7 @@ with a real link. You only need a browser. Free plans are enough to start.
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key |
    | `SUPABASE_SECRET_KEY` | Secret key (keep private) |
    | `NEXT_PUBLIC_SITE_URL` | Your Vercel address, e.g. `https://eliphas.vercel.app` |
+   | `PUBLIC_SITE_ORIGIN` | Your **production** domain for Edition ID QR codes, e.g. `https://your-domain.in` (Production environment only; leave unset on previews) |
    | `RAZORPAY_KEY_ID` | Razorpay test Key ID (`rzp_test_…`) |
    | `RAZORPAY_KEY_SECRET` | Razorpay test Key Secret |
    | `RAZORPAY_WEBHOOK_SECRET` | Any long random text; use the same in step 4 |
@@ -418,6 +420,40 @@ reduced motion.
   reads them on the server after checking the person is the book's author or an admin. When you add a new
   column to `books` that should be public, grant it: `grant select (new_col) on public.books to anon, authenticated;`.
 
+### Eliphas Edition IDs and QR codes (migration 000017)
+
+- **What it is.** Each approved edition/format (each `books` row: its own binding and language) gets a permanent
+  ID such as `EEID-2026-000123` and a public page at `/e/{EEID}`. It's our own identifier: not an ISBN (still the
+  separate `isbn` field), not a copyright registration, and not proof that a printed copy is genuine. Every copy
+  of an edition shares the same QR.
+- **Assignment.** On admin approval, before the book goes live, the database function `assign_eeid` takes the
+  next number from a sequence (`eeid_seq`), locks the book row and stores the ID. Repeated or simultaneous
+  approvals return the same ID; numbers are never reused (gaps are fine). The year is the year of assignment in
+  India. A trigger makes the ID immutable; books with an ID can't be deleted, and `edition_ids` keeps every ID
+  ever issued. Drafts and submissions get none. Price changes, corrections, reprints and unpublish/republish keep
+  the ID. Authors can mark a book as another format/edition of one of their works (Details → "Another format or
+  edition of"); it still gets its own ID.
+- **Workflow.** Submission → admin approval + EEID → (optional) final files → publication. In Admin → book, either
+  **Approve and publish** (assigns the ID and publishes) or **Approve, assign EEID and request final files** (assigns
+  the ID and sends it back so the author can add the QR label to the print cover; on resubmission the ID is kept).
+- **Revised print cover while live.** On a live book the author can upload a new print cover (Files step). It is
+  stored as a new version, flagged for print review, and orders keep printing the approved cover until an admin
+  approves it (Admin → book → "Approve revised files for printing" or "Keep the approved cover"). Orders already
+  placed never change. No PDF cover editor was built; authors place the downloadable label themselves.
+- **Author.** Book → Submit step → **Edition identity**: the EEID, status, QR preview, copy EEID/link, QR as PNG
+  (1200 px) or SVG, and a vector print-label PDF (50 × 46 mm, QR 30 mm with a 4-module quiet zone, EEID and "Scan
+  to explore this book"). Recommended printed size 25–30 mm. Authors can only see their own editions' assets.
+- **Admin.** The Edition identity card and actions on each book; exact EEID search in the review queue; **Admin →
+  Edition IDs** for the QR address status, recent assignments and the **backfill** (dry-run count first, then a
+  confirmed run; idempotent; uses the year it's run). Nothing is backfilled automatically. **Remove edition** takes
+  an edition down with a private reason; its page becomes a neutral "not available" notice and its ID stays reserved.
+- **Public page** `/e/{EEID}`: cover, title, author link, EEID, edition, format, language, ISBN (only if set),
+  publication date, Read sample and Buy. "Not yet available" before publication (no draft details), "isn't on
+  sale right now" when unpublished, a neutral notice when removed, and 404 for unknown IDs.
+- **QR address.** QR codes use `PUBLIC_SITE_ORIGIN` (validated: https, a real domain, no path; localhost, preview
+  and storage hosts are refused). Without it, previews are labelled "not for print" and downloads are off, with an
+  admin message explaining what to set.
+
 ### Release checklist (decisions and configuration still needed)
 
 Built and tested locally in test mode; not production-ready until these are done:
@@ -433,6 +469,8 @@ Built and tested locally in test mode; not production-ready until these are done
 - **Policies**: business details, refund/cancellation and service terms reviewed by a lawyer; community
   guidelines and review policy (drafted at `/community-guidelines`) and the verification evidence you'll accept.
 - **Verification**: review the existing authors in Admin → Authors → Existing authors to review.
+- **Edition IDs**: set `PUBLIC_SITE_ORIGIN` to the production domain, then run the backfill in Admin → Edition IDs
+  (dry run first) for books published before EEIDs.
 - **Not built in this release**: paid AI review, tips, direct messages, international delivery, email or
   push notifications (in-app only), automated copyright or manuscript checks.
 

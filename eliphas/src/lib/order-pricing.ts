@@ -191,12 +191,15 @@ type Approved = { id?: string | null; version?: number | null; path: string } | 
 /** Paths (and versions) to print: the approved files if the book has them, otherwise its current files (older books). */
 export function approvedFileSnapshot(b: Pick<Book, "manuscript_path" | "print_cover_path" | "cover_path" | "updated_at"> & { approved_files?: unknown }) {
   const af = (b.approved_files ?? {}) as { manuscript?: Approved; print_cover?: Approved; cover?: Approved };
+  // Once a file kind is pinned (even as "none"), only the pin counts: a newer upload waiting for print review
+  // must never reach an order. Books approved before pinning existed fall back to their current files.
+  const pick = (k: "manuscript" | "print_cover" | "cover", current: string | null) => (k in af ? (af[k]?.path ?? null) : current);
   return {
-    manuscript_path: af.manuscript?.path ?? b.manuscript_path,
+    manuscript_path: pick("manuscript", b.manuscript_path),
     manuscript_version: af.manuscript?.version ?? null,
-    print_cover_path: af.print_cover?.path ?? b.print_cover_path,
+    print_cover_path: pick("print_cover", b.print_cover_path),
     print_cover_version: af.print_cover?.version ?? null,
-    cover_path: af.cover?.path ?? b.cover_path,
+    cover_path: pick("cover", b.cover_path),
     book_updated_at: b.updated_at,
   };
 }

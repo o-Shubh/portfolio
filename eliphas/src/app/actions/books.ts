@@ -75,6 +75,8 @@ export async function saveDetails(bookId: string, _prev: ActionState, fd: FormDa
   const genre = text(fd, "genre");
   const description = text(fd, "description");
   const isbn = text(fd, "isbn").replace(/[-\s]/g, "");
+  const edition_label = text(fd, "edition_label");
+  const editionOf = text(fd, "edition_of");
 
   if (!title || title.length > 200) return { error: "Please enter a title (up to 200 characters)." };
   if (subtitle.length > 200) return { error: "Subtitle is too long." };
@@ -83,6 +85,19 @@ export async function saveDetails(bookId: string, _prev: ActionState, fd: FormDa
   if (genre && !(GENRES as readonly string[]).includes(genre)) return { error: "Please choose a genre from the list." };
   if (description.length > 4000) return { error: "Description is too long (4000 characters max)." };
   if (isbn && !/^(97[89]\d{10}|\d{9}[\dX])$/.test(isbn)) return { error: "ISBN should be 13 digits (or 10 for older ISBNs)." };
+  if (edition_label.length > 60) return { error: "Edition is too long (60 characters max)." };
+  // Link to another of the author's own books (same work); unlinking gives this edition its own work
+  let work_id: string | undefined;
+  if (fd.has("edition_of")) {
+    if (editionOf) {
+      const { data: other } = await createAdminClient().from("books").select("work_id, author_id").eq("id", /^[0-9a-f-]{36}$/i.test(editionOf) ? editionOf : "00000000-0000-0000-0000-000000000000").maybeSingle();
+      if (!other || other.author_id !== book.author_id) return { error: "Choose one of your own books." };
+      work_id = other.work_id;
+    } else {
+      const { count } = await createAdminClient().from("books").select("id", { count: "exact", head: true }).eq("work_id", book.work_id).neq("id", book.id);
+      if (count) work_id = crypto.randomUUID();
+    }
+  }
 
   const { error } = await supabase
     .from("books")
@@ -94,6 +109,8 @@ export async function saveDetails(bookId: string, _prev: ActionState, fd: FormDa
       genre: genre || null,
       description: description || null,
       isbn: isbn || null,
+      edition_label: edition_label || null,
+      ...(work_id ? { work_id } : {}),
       // Keep the web address in step with the title until the book has been published once
       ...(book.published_at === null && title !== book.title ? { slug: makeSlug(title) } : {}),
     })
@@ -116,9 +133,27 @@ export async function attachFile(
 ): Promise<ActionState> {
   const { profile, supabase, book } = await ownBook(bookId);
   if (!book) return { error: "Book not found." };
-  if (!isEditable(book)) return { error: LOCKED };
+  // A live book may take a revised print cover (e.g. with its EEID label). It is held for print review;
+  // orders keep printing the approved cover until our team approves the new one.
+  const liveRevision = kind === "print_cover" && book.status === "published" && !book.removed_at;
+  if (!isEditable(book) && !liveRevision) return { error: LOCKED };
 
-  if (kind === "manuscript") {
+  if (liveRevision) {
+    if (!isBookFilePath(input.path, profile.id, bookId, "print_cover", "pdf")) return { error: "Unexpected file location." };
+    const admin = createAdminClient();
+    // Books approved before file pinning: pin what's approved now, so the revision can't reach orders unreviewed
+    const af = (book.approved_files ?? {}) as { print_cover?: { path?: string } | null };
+    const pins = af.print_cover?.path
+      ? {}
+      : { approved_files: { ...(book.approved_files as object | null ?? {}), manuscript: book.manuscript_path ? { id: null, version: null, path: book.manuscript_path } : null, print_cover: book.print_cover_path ? { id: null, version: null, path: book.print_cover_path } : null, cover: book.cover_path ? { id: null, version: null, path: book.cover_path } : null }, approved_files_at: book.approved_files_at ?? new Date().toISOString() };
+    const size = (n?: number) => (typeof n === "number" && n > 0 && n < 100 ? Math.round(n * 100) / 100 : null);
+    const { error } = await admin
+      .from("books")
+      .update({ ...pins, print_cover_path: input.path, print_cover_width_in: size(input.widthIn), print_cover_height_in: size(input.heightIn), print_review_requested_at: new Date().toISOString() })
+      .eq("id", bookId)
+      .eq("author_id", profile.id);
+    if (error) return { error: "Could not save the file." };
+  } else if (kind === "manuscript") {
     if (!isBookFilePath(input.path, profile.id, bookId, "manuscript", "pdf")) return { error: "Unexpected file location." };
     const pages = Number.isInteger(input.pageCount) && input.pageCount! > 0 ? input.pageCount! : null;
     const size = (n?: number) => (typeof n === "number" && n > 0 && n < 100 ? Math.round(n * 100) / 100 : null);
@@ -166,10 +201,10 @@ export async function attachFile(
     height_in: typeof input.heightIn === "number" && input.heightIn > 0 && input.heightIn < 100 ? Math.round(input.heightIn * 100) / 100 : null,
     uploaded_by: profile.id,
   });
-  await admin.from("books").update({ files_confirmed_at: null }).eq("id", bookId);
+  if (!liveRevision) await admin.from("books").update({ files_confirmed_at: null }).eq("id", bookId);
 
   refresh(bookId);
-  return { ok: "Uploaded." };
+  return { ok: liveRevision ? "Uploaded. Our team checks it before it's printed; orders use the approved cover until then." : "Uploaded." };
 }
 
 export async function savePrintOptions(bookId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
