@@ -38,7 +38,7 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   return (
     <div className="container-x py-5 md:py-8">
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <Link href="/" className="hover:text-fg">
+        <Link href="/" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
           Home
         </Link>
         <span className="mx-2" aria-hidden>
@@ -78,7 +78,7 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
                 key={l.value}
                 href={href({ lang: l.value || undefined, page: undefined })}
                 aria-current={active ? "true" : undefined}
-                className={`inline-flex h-8 items-center rounded-md px-4 text-sm transition ${active ? "bg-primary font-medium text-on-primary" : "text-muted hover:text-fg"}`}
+                className={`inline-flex min-h-11 items-center rounded-md px-4 text-sm transition md:min-h-8 ${active ? "bg-primary font-medium text-on-primary" : "text-muted hover:text-fg"}`}
               >
                 {l.label}
               </Link>
@@ -143,7 +143,7 @@ function Chip({ href, active, label }: { href: string; active: boolean; label: s
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
-      className={`inline-flex h-9 shrink-0 items-center rounded-full border px-4 text-sm transition ${active ? "border-gold bg-gold font-medium text-navy" : "border-line-strong text-fg hover:border-gold"}`}
+      className="chip bg-surface"
     >
       {label}
     </Link>

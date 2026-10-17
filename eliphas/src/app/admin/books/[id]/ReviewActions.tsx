@@ -87,7 +87,7 @@ export function ReviewActions({
         <textarea id="note" rows={3} className="field py-3" value={note} onChange={(e) => setNote(e.target.value)} />
         <button
           type="button"
-          className="w-full text-sm font-semibold text-danger underline"
+          className="min-h-11 w-full text-sm font-semibold text-danger underline"
           disabled={pending}
           onClick={() => {
             if (window.confirm("Hide this book from the bookstore?")) run(() => adminUnpublish(bookId, note));

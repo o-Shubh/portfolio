@@ -1,4 +1,5 @@
-import { ChevronRight, Plus } from "lucide-react";
+import { AlertCircle, BookOpen, ChevronRight, Plus } from "lucide-react";
+import { EmptyState } from "@/components/EmptyState";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BarList } from "@/components/charts/BarList";
@@ -58,11 +59,19 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
   }
   const rangeCopies = stats.byMonth.reduce((s, m) => s + m.copies, 0);
 
+  // Everything that needs the author, in one place, each with the action to take
+  const todo: { key: string; text: React.ReactNode; href: string; action: string }[] = [
+    ...needsAction.map((b) => ({ key: b.id, text: <><span className="font-semibold">{b.title}</span>: our team asked for changes.</>, href: `/author/books/${b.id}`, action: "See note" })),
+    ...(serviceActions ?? []).map((o) => ({ key: o.id, text: <>Service request <span className="font-semibold">{o.order_number}</span> is waiting for you.</>, href: `/author/services/${o.id}`, action: "Open" })),
+    ...(!profile.author_terms_accepted_at ? [{ key: "terms", text: <>New author terms need your acceptance before you publish new books.</>, href: "/author/plan", action: "Review terms" }] : []),
+    ...(!totals.upi && totals.balance > 0 ? [{ key: "upi", text: <>Add your UPI ID so we can pay your earnings.</>, href: "/account/profile", action: "Add UPI ID" }] : []),
+  ];
+
   return (
     <>
       <PageHeader
         title={`Welcome, ${profile.full_name?.split(" ")[0]}`}
-        intro="Your sales, earnings and books."
+        intro="Your books, sales and earnings."
         action={
           <Link href="/author/books/new" className="btn-primary">
             <Plus className="h-5 w-5" aria-hidden /> New book
@@ -70,80 +79,120 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
         }
       />
 
-      <section className="card mb-6 flex flex-wrap items-center justify-between gap-4" aria-label="Plan">
-        <div>
-          <p className="text-sm text-muted">Plan</p>
-          <p className="text-lg font-semibold">
-            {pro.active ? "Author Pro" : profile.author_terms_accepted_at ? "Free" : "Original terms"}
-          </p>
-          <p className="text-sm text-muted">
-            {pro.active
-              ? `Paid until ${new Date(pro.accessUntil!).toLocaleDateString("en-IN", { dateStyle: "medium" })} · ${pro.credits} creative credit${pro.credits === 1 ? "" : "s"} left · renews only if you pay again`
-              : profile.author_terms_accepted_at
-                ? "Upgrade any time for a lower commission, analytics and promotional creatives."
-                : `New author terms (version ${terms.version}) need your acceptance before you publish new books.`}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {pro.active && (
-            <Link href="/author/analytics" className="btn-ghost">
-              Analytics
-            </Link>
-          )}
-          <Link href="/author/plan" className="btn-primary">
-            {pro.active ? "Manage plan" : profile.author_terms_accepted_at ? "Upgrade to Pro" : "Review terms"}
-          </Link>
-        </div>
-      </section>
-
-      {(serviceActions ?? []).length > 0 && (
-        <div className="card mb-6 ring-2 ring-gold">
-          <h2 className="text-lg">Service requests waiting for you</h2>
-          <ul className="mt-2 space-y-1">
-            {serviceActions!.map((o) => (
-              <li key={o.id}>
-                <Link href={`/author/services/${o.id}`} className="font-medium underline">
-                  {o.order_number}
+      {todo.length > 0 && (
+        <section aria-labelledby="todo-h" className="mb-8 rounded-[var(--radius-card)] bg-surface ring-2 ring-gold">
+          <h2 id="todo-h" className="flex items-center gap-2 px-5 pt-4 font-sans text-base font-semibold">
+            <AlertCircle className="h-5 w-5 text-accent-fg" aria-hidden /> Needs your attention
+          </h2>
+          <ul className="divide-y divide-line">
+            {todo.map((t) => (
+              <li key={t.key} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3">
+                <p className="min-w-0 flex-1">{t.text}</p>
+                <Link href={t.href} className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-fg">
+                  {t.action} <ChevronRight className="h-4 w-4" aria-hidden />
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       )}
 
-      {needsAction.length > 0 && (
-        <div className="card mb-6 ring-2 ring-danger/40">
-          <h2 className="text-lg">Needs your attention</h2>
-          <ul className="mt-2 space-y-1">
-            {needsAction.map((b) => (
-              <li key={b.id}>
-                <Link href={`/author/books/${b.id}`} className="font-medium underline">
-                  {b.title}
-                </Link>{" "}
-                — our team asked for changes.
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Headline numbers (all time) */}
+      {/* Headline numbers (all time). Earnings are the author's share after costs, never the readers' payments. */}
+      <h2 className="sr-only">Earnings</h2>
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Tile label="Copies sold" value={String(totals.copies)} sub={`${totals.monthCopies} this month`} />
-        <Tile label="Total earned" value={compactRupees(totals.earned)} sub={`${rupees(totals.monthEarnings)} this month`} />
-        <Tile label="Paid to you" value={compactRupees(totals.paid)} sub={stats.payouts[0] ? `last on ${fmtDate(stats.payouts[0].paid_at ?? stats.payouts[0].created_at)}` : "No payouts yet"} />
+        <Tile label="Your earnings" value={compactRupees(totals.earned)} sub={`${rupees(totals.monthEarnings)} this month`} />
         <Tile
-          label="Due to you"
+          label="Available for payout"
           value={compactRupees(Math.max(0, totals.balance))}
-          sub={totals.upi ? `to ${totals.upi}` : "Add your UPI ID"}
+          sub={totals.upi ? `Paid to ${totals.upi}` : "Add your UPI ID"}
           subHref={totals.upi ? undefined : "/account/profile"}
           highlight
         />
+        <Tile label="Paid to you" value={compactRupees(totals.paid)} sub={stats.payouts[0] ? `Last on ${fmtDate(stats.payouts[0].paid_at ?? stats.payouts[0].created_at)}` : "No payouts yet"} />
       </dl>
-      <p className="mt-2 text-xs text-muted">
-        Earnings are after printing, platform commission (+ GST) and payment charges. No tax is withheld from your earnings at present; any TDS will be
-        shown here separately if it applies. Shipping is paid by readers and never deducted.
+      <p className="mt-3 text-sm text-muted">
+        {totals.inProgress > 0 && (
+          <>
+            <span className="font-medium text-fg">{rupees(totals.inProgress)}</span> of your earnings is on orders still being printed or delivered.{" "}
+          </>
+        )}
+        Earnings are your share after printing, platform commission (+ GST) and payment charges; what readers pay is not shown as income. No tax is withheld at present; any TDS will be shown here separately. Shipping is paid by readers and never deducted.
       </p>
+
+      {/* Book status comes before charts: it's what authors act on */}
+      <section className="mt-10" aria-labelledby="books-h">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <h2 id="books-h" className="text-2xl">
+            Your books
+          </h2>
+          <Link href="/author/books" className="inline-flex min-h-11 items-center text-sm font-semibold text-accent-fg">
+            Manage books
+          </Link>
+        </div>
+        {books.length === 0 ? (
+          <EmptyState icon={BookOpen} title="No books yet" text="Add your title and manuscript; you can save and come back at any step." action={<Link href="/author/books/new" className="btn-primary">Start your first book</Link>} />
+        ) : (
+          <>
+          {/* Phones: one row per book */}
+          <ul className="divide-y divide-line rounded-[var(--radius-card)] bg-surface ring-1 ring-line sm:hidden">
+            {books.map((b) => {
+              const st = stats.byBook.get(b.id);
+              return (
+                <li key={b.id}>
+                  <Link href={`/author/books/${b.id}`} className="flex items-center gap-3 px-4 py-3">
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-semibold" lang={b.language}>{b.title}</span>
+                      <span className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
+                        <StatusBadge status={b.status} />
+                        <span className="tabular-nums">{copiesText(st?.copies ?? 0)}</span>
+                      </span>
+                    </span>
+                    <span className="text-right">
+                      <span className="block font-semibold tabular-nums">{rupees(st?.earnings ?? 0)}</span>
+                      <span className="text-xs text-muted">your earnings</span>
+                    </span>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted" aria-hidden />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hidden overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line sm:block">
+            <table className="w-full text-left text-sm">
+              <caption className="sr-only">Status, copies sold and your earnings per book, all time</caption>
+              <thead className="border-b border-line text-muted">
+                <tr>
+                  <th scope="col" className="p-4 font-medium">Book</th>
+                  <th scope="col" className="p-4 font-medium">Status</th>
+                  <th scope="col" className="p-4 text-right font-medium">Copies</th>
+                  <th scope="col" className="p-4 text-right font-medium">Your earnings</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {books.map((b) => {
+                  const st = stats.byBook.get(b.id);
+                  return (
+                    <tr key={b.id}>
+                      <th scope="row" className="p-4 font-semibold" lang={b.language}>
+                        <Link href={`/author/books/${b.id}`} className="hover:underline">
+                          {b.title}
+                        </Link>
+                      </th>
+                      <td className="p-4">
+                        <StatusBadge status={b.status} />
+                      </td>
+                      <td className="p-4 text-right tabular-nums">{st?.copies ?? 0}</td>
+                      <td className="p-4 text-right tabular-nums">{rupees(st?.earnings ?? 0)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          </>
+        )}
+      </section>
 
       {/* Range filter for the two charts */}
       <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -155,7 +204,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
               href={`/author?range=${r.key}`}
               scroll={false}
               aria-current={r.key === range.key ? "true" : undefined}
-              className={`inline-flex min-h-9 items-center rounded-full px-4 text-sm font-semibold ${
+              className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold md:min-h-9 ${
                 r.key === range.key ? "bg-surface text-fg shadow-soft" : "text-muted hover:text-fg"
               }`}
             >
@@ -199,71 +248,12 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
         </section>
       </div>
 
-      {/* Per-book */}
-      <section className="mt-10">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-2xl">Your books</h2>
-          <Link href="/author/books" className="text-sm font-semibold underline">
-            Manage books
-          </Link>
-        </div>
-        {books.length === 0 ? (
-          <div className="card text-center">
-            <p className="font-semibold">No books yet.</p>
-            <Link href="/author/books/new" className="btn-primary mt-4">
-              Start your first book
-            </Link>
-          </div>
-        ) : (
-          <div className="overflow-x-auto rounded-xl bg-surface shadow-soft ring-1 ring-line">
-            <table className="w-full text-left text-sm">
-              <caption className="sr-only">Copies sold and earnings per book, all time</caption>
-              <thead className="border-b border-line text-muted">
-                <tr>
-                  <th scope="col" className="p-4 font-medium">
-                    Book
-                  </th>
-                  <th scope="col" className="hidden p-4 font-medium sm:table-cell">
-                    Status
-                  </th>
-                  <th scope="col" className="p-4 text-right font-medium">
-                    Copies
-                  </th>
-                  <th scope="col" className="p-4 text-right font-medium">
-                    Earned
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {books.map((b) => {
-                  const s = stats.byBook.get(b.id);
-                  return (
-                    <tr key={b.id}>
-                      <th scope="row" className="p-4 font-semibold">
-                        <Link href={`/author/books/${b.id}`} className="hover:underline">
-                          {b.title}
-                        </Link>
-                      </th>
-                      <td className="hidden p-4 sm:table-cell">
-                        <StatusBadge status={b.status} />
-                      </td>
-                      <td className="p-4 text-right tabular-nums">{s?.copies ?? 0}</td>
-                      <td className="p-4 text-right tabular-nums">{rupees(s?.earnings ?? 0)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
       {/* Order tracking */}
       <section className="mt-10 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="card min-w-0">
           <div className="mb-3 flex items-center justify-between gap-3">
             <h2 className="text-xl">Latest orders</h2>
-            <Link href="/author/orders" className="text-sm font-semibold underline">
+            <Link href="/author/orders" className="inline-flex min-h-11 items-center text-sm font-semibold text-accent-fg">
               All orders
             </Link>
           </div>
@@ -312,6 +302,30 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
           )}
         </div>
       </section>
+
+      <section className="card mt-10 flex flex-wrap items-center justify-between gap-4" aria-label="Plan">
+        <div>
+          <p className="text-sm text-muted">Your plan</p>
+          <p className="text-lg font-semibold">{pro.active ? "Author Pro" : profile.author_terms_accepted_at ? "Free" : "Original terms"}</p>
+          <p className="text-sm text-muted">
+            {pro.active
+              ? `Paid until ${new Date(pro.accessUntil!).toLocaleDateString("en-IN", { dateStyle: "medium" })} · ${pro.credits} creative credit${pro.credits === 1 ? "" : "s"} left · renews only if you pay again`
+              : profile.author_terms_accepted_at
+                ? "Upgrade any time for a lower commission, analytics and promotional creatives."
+                : `New author terms (version ${terms.version}) need your acceptance before you publish new books.`}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {pro.active && (
+            <Link href="/author/analytics" className="btn-ghost">
+              Analytics
+            </Link>
+          )}
+          <Link href="/author/plan" className="btn-ghost">
+            {pro.active ? "Manage plan" : profile.author_terms_accepted_at ? "See Author Pro" : "Review terms"}
+          </Link>
+        </div>
+      </section>
     </>
   );
 }
@@ -334,10 +348,10 @@ function Tile({
   highlight?: boolean;
 }) {
   return (
-    <div className={`card ${highlight ? "bg-accent text-on-accent ring-0" : ""}`}>
-      <dt className={`text-sm ${highlight ? "opacity-75" : "text-muted"}`}>{label}</dt>
-      <dd className="mt-2 font-heading text-4xl tracking-tight tabular-nums md:text-[2.75rem]">{value}</dd>
-      <dd className={`mt-1 truncate text-sm ${highlight ? "opacity-80" : "text-muted"}`}>
+    <div className={`card p-4 md:p-5 ${highlight ? "ring-2 ring-gold" : ""}`}>
+      <dt className="text-sm text-muted">{label}</dt>
+      <dd className="mt-1.5 font-heading text-[1.85rem] leading-tight font-semibold tabular-nums md:text-[2.25rem]">{value}</dd>
+      <dd className="mt-1 truncate text-sm text-muted">
         {subHref ? (
           <Link href={subHref} className="font-medium underline underline-offset-2">
             {sub}

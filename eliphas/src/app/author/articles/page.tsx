@@ -65,16 +65,16 @@ export default async function MyArticlesPage() {
                 </div>
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${state.tone}`}>{state.label}</span>
                 <span className="flex gap-3 text-sm font-semibold">
-                  <Link href={`/author/articles/${a.id}`} className="underline">
+                  <Link href={`/author/articles/${a.id}`} className="inline-flex min-h-11 items-center underline">
                     Edit
                   </Link>
                   {a.status === "published" && a.moderation === "visible" && (
-                    <Link href={articlePath(a)} className="underline">
+                    <Link href={articlePath(a)} className="inline-flex min-h-11 items-center underline">
                       View
                     </Link>
                   )}
                   {a.first_published_at && (
-                    <Link href={`/author/articles/${a.id}/stats`} className="underline">
+                    <Link href={`/author/articles/${a.id}/stats`} className="inline-flex min-h-11 items-center underline">
                       Readership
                     </Link>
                   )}

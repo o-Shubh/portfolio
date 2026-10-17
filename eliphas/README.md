@@ -332,6 +332,25 @@ authorised book excerpts. Articles are free to read at `/articles` and on each a
   private. The sample appears on the book page and on articles that link to the book, once the book is
   published. Authors can update or stop sharing it at any time.
 
+### Design system
+
+Tokens live in `src/app/globals.css`: ink navy `#17214A`, warm white paper, marigold used sparingly
+(main buy actions, highlights), plus semantic colours (success, danger, warning, info, focus) for light and
+dark mode. Every text colour pair meets WCAG AA. Headings use Source Serif 4, interface text uses Inter, and
+Hindi falls through to Noto Serif/Sans Devanagari with extra line height.
+
+Shared building blocks (utility classes): `btn-primary` (one per task area), `btn-ghost` (secondary),
+`btn-accent` (buying), `btn-quiet`, `btn-danger`, `field` (shows `aria-invalid`), `label`, `hint`, `card`,
+`chip` (filters and tabs, 44 px on touch), `badge`, `notice`, `eyebrow`; components `PageHeader`,
+`EmptyState`, the status badges and `NavLinks` (phone tabs with a **More** sheet when a role has more than
+five sections).
+
+Behaviour: `useFormAction` keeps typed input on errors, ignores double submits, turns a dropped connection
+into a clear "try again" message and can warn about unsaved changes (`warnUnsaved`); `offlineSafe()` does the
+same for direct action calls; file uploads show a percentage (`src/lib/upload.ts`). There's a visible focus
+ring for keyboard users, a "Skip to content" link, and animations are switched off for people who ask for
+reduced motion.
+
 ### Orders and payments
 
 1. **Buy now** on a book → `/checkout/<book>`: copies (1–10) and delivery address. Or **Add to cart** on

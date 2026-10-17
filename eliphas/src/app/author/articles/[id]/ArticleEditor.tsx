@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore, useTran
 import { deleteArticle, publishArticle, saveArticle, unpublishArticle, type ArticleInput } from "@/app/actions/articles";
 import { ArticleBody } from "@/components/ArticleBody";
 import { LIMITS, parseArticle, publishProblems, readingMinutes, TOPICS, wordCount } from "@/lib/article-format";
+import { offlineSafe } from "@/lib/use-form-action";
 
 type Status = "draft" | "published" | "unpublished";
 type SaveState = { kind: "idle" } | { kind: "saving" } | { kind: "saved"; at: string } | { kind: "error"; message: string };
@@ -205,7 +206,7 @@ export function ArticleEditor({
     });
   const onDelete = () =>
     run(async () => {
-      const res = await deleteArticle(id);
+      const res = await offlineSafe(deleteArticle(id));
       if (res?.error) setMessage({ error: res.error });
     });
 
@@ -332,7 +333,7 @@ export function ArticleEditor({
                     ["link", Link2, "Link"],
                   ] as const
                 ).map(([k, Icon, label]) => (
-                  <button key={k} type="button" onClick={() => format(k)} className="grid h-10 w-10 place-items-center rounded-lg hover:bg-surface" aria-label={label} title={label}>
+                  <button key={k} type="button" onClick={() => format(k)} className="grid h-11 w-11 place-items-center rounded-lg hover:bg-surface" aria-label={label} title={label}>
                     <Icon className="h-4 w-4" aria-hidden />
                   </button>
                 ))}
@@ -438,7 +439,7 @@ export function ArticleEditor({
               </div>
             </div>
           ) : (
-            <button type="button" className="w-full text-sm font-medium text-danger underline" onClick={() => setConfirm("delete")}>
+            <button type="button" className="min-h-11 w-full text-sm font-medium text-danger underline" onClick={() => setConfirm("delete")}>
               Delete article…
             </button>
           )}
@@ -495,7 +496,7 @@ export function ArticleEditor({
           ) : (
             <label className="block">
               <span className="sr-only">Upload a cover image</span>
-              <input type="file" accept="image/jpeg,image/png,image/webp" className="block w-full text-sm" onChange={(e) => e.target.files?.[0] && void uploadCover(e.target.files[0])} />
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="block min-h-11 w-full py-2 text-sm" onChange={(e) => e.target.files?.[0] && void uploadCover(e.target.files[0])} />
               <span className="mt-1 block text-xs text-muted">JPEG, PNG or WebP, up to 5 MB. We remove location and camera details.</span>
             </label>
           )}

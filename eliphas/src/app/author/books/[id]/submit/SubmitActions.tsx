@@ -12,6 +12,7 @@ import {
 } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
 import type { BookStatus } from "@/lib/publishing";
+import { offlineSafe } from "@/lib/use-form-action";
 
 export function SubmitActions({
   bookId,
@@ -32,7 +33,7 @@ export function SubmitActions({
     if (confirmText && !window.confirm(confirmText)) return;
     setMsg(undefined);
     start(async () => {
-      const res = await fn(bookId);
+      const res = await offlineSafe(fn(bookId));
       setMsg(res);
       router.refresh();
     });

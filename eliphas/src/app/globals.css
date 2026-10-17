@@ -13,19 +13,35 @@
   }
 }
 
-/* ---------- Brand (from the Eliphas Indicus logo) ----------
-   Navy and gold. Navy carries headers and main buttons; gold is the buy/highlight colour. */
+/* =====================================================================
+   Eliphas design system
+   Calm and clear: ink navy for text and main actions, warm white paper,
+   marigold used sparingly for the one thing that matters most (buy, highlight).
+   Every colour pair used for text meets WCAG AA (checked in scripts/contrast).
+   ===================================================================== */
 @theme {
-  --color-ink: #13223c;
-  --color-paper: #ffffff;
-  --color-navy: #13223c;
-  --color-navy-2: #1d3157;
-  --color-gold: #cb9436;
-  --color-accent: #cb9436;
-  --color-on-accent: #13223c;
+  /* Brand */
+  --color-ink: #17214a;
+  --color-navy: #17214a;
+  --color-navy-2: #26326a;
+  --color-gold: #e9a31a; /* marigold: fills and rings only, never small text on white */
+  --color-accent: #e9a31a;
+  --color-on-accent: #17214a;
+  --color-paper: #fffdf9;
 
-  --font-heading: var(--font-poppins), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-poppins), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+  /* Type: serif headings, sans interface text; Devanagari fonts take over for Hindi letters */
+  --font-heading: var(--font-serif), var(--font-serif-deva), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), var(--font-sans-deva), ui-sans-serif, system-ui, sans-serif;
+
+  /* Radii */
+  --radius-control: 0.75rem; /* buttons, fields, chips */
+  --radius-card: 1rem;
+  --radius-sheet: 1.25rem;
+
+  /* Motion: short and purposeful */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
 }
 
 /* ---------- Semantic colours (change in dark mode) ----------
@@ -45,65 +61,77 @@
   --color-bar: var(--bar);
   --color-success: var(--success);
   --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-chart: var(--chart);
+  --color-focus: var(--focus);
 }
 
 :root {
   color-scheme: light;
-  --bg: #f1f3f6;
-  --surface: #ffffff;
-  --surface-2: #f5f6f9;
-  --fg: #0f1a2e;
-  --muted: #5b6478;
-  --line: rgb(19 34 60 / 0.1);
-  --line-strong: rgb(19 34 60 / 0.2);
-  --primary: #13223c;
+  --bg: #faf7f2; /* warm white page */
+  --surface: #fffdf9; /* cards and sheets */
+  --surface-2: #f3eee5; /* quiet fills: chips, table heads, inputs on cards */
+  --fg: #17214a; /* ink navy body text: 13.9:1 on --bg */
+  --muted: #535a73; /* secondary text: 6.4:1 on --bg */
+  --line: rgb(23 33 74 / 0.11);
+  --line-strong: rgb(23 33 74 / 0.24);
+  --primary: #17214a;
   --on-primary: #ffffff;
-  --accent-fg: #8a5f17; /* gold for text on white: passes AA */
-  --bar: #13223c; /* top bar and footer */
-  --success: #15803d;
-  --danger: #b91c1c;
-  --chart: #1f7a55; /* chart bars: passes contrast and chroma checks on white */
-  --shadow-color: 19 34 60;
+  --accent-fg: #8a5600; /* marigold for text on light backgrounds: 5.6:1 */
+  --bar: #17214a; /* top bar and footer */
+  --success: #17703a; /* 5.9:1 */
+  --danger: #b42318; /* 6.0:1 */
+  --warning: #8a5600;
+  --info: #26508f;
+  --chart: #1f7a55;
+  --focus: #2457c5; /* focus ring: visible on paper, navy and marigold */
+  --shadow-color: 23 33 74;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0a1222;
-    --surface: #111b30;
-    --surface-2: #18243c;
-    --fg: #f2f4f8;
-    --muted: #a3adc2;
-    --line: rgb(255 255 255 / 0.09);
-    --line-strong: rgb(255 255 255 / 0.2);
-    --primary: #e0b25a;
-    --on-primary: #13223c;
-    --accent-fg: #e0b25a;
-    --bar: #0d1a33;
-    --success: #4ade80;
-    --danger: #f87171;
+    --bg: #0d1126;
+    --surface: #151a35;
+    --surface-2: #1d2343;
+    --fg: #f3f1ec;
+    --muted: #b0b5c9;
+    --line: rgb(255 255 255 / 0.1);
+    --line-strong: rgb(255 255 255 / 0.22);
+    --primary: #f2b544;
+    --on-primary: #17214a;
+    --accent-fg: #f2b544;
+    --bar: #10152e;
+    --success: #5fd38d;
+    --danger: #ff8a7a;
+    --warning: #f2b544;
+    --info: #9cbcff;
     --chart: #3a9d73;
+    --focus: #9cbcff;
     --shadow-color: 0 0 0;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0a1222;
-  --surface: #111b30;
-  --surface-2: #18243c;
-  --fg: #f2f4f8;
-  --muted: #a3adc2;
-  --line: rgb(255 255 255 / 0.09);
-  --line-strong: rgb(255 255 255 / 0.2);
-  --primary: #e0b25a;
-  --on-primary: #13223c;
-  --accent-fg: #e0b25a;
-  --bar: #0d1a33;
-  --success: #4ade80;
-  --danger: #f87171;
+  --bg: #0d1126;
+  --surface: #151a35;
+  --surface-2: #1d2343;
+  --fg: #f3f1ec;
+  --muted: #b0b5c9;
+  --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.22);
+  --primary: #f2b544;
+  --on-primary: #17214a;
+  --accent-fg: #f2b544;
+  --bar: #10152e;
+  --success: #5fd38d;
+  --danger: #ff8a7a;
+  --warning: #f2b544;
+  --info: #9cbcff;
   --chart: #3a9d73;
+  --focus: #9cbcff;
   --shadow-color: 0 0 0;
 }
 
@@ -111,6 +139,8 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.55;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
 }
@@ -123,29 +153,54 @@ body {
   h4 {
     font-family: var(--font-heading);
     font-weight: 600;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    line-height: 1.2;
+    letter-spacing: -0.012em;
     text-wrap: balance;
   }
+  /* Devanagari needs room above and below the line */
+  :lang(hi) h1, :lang(hi) h2, :lang(hi) h3, [lang="hi"] h1, [lang="hi"] h2, [lang="hi"] h3 {
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+  :lang(hi) { line-height: 1.7; }
+
+  /* One visible, consistent focus ring for keyboard users (not shown on mouse/touch) */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* Respect zoom: never block pinch-zoom or lock text size */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  a, button, [role="button"], summary, label[for], select { cursor: pointer; }
+  button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
 }
 
 ::selection {
-  background: rgb(203 148 54 / 0.3);
+  background: rgb(233 163 26 / 0.3);
+}
+
+/* Short transitions only, and none for people who ask for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ---------- Shared building blocks ---------- */
 @utility shadow-soft {
-  box-shadow:
-    0 1px 2px rgb(var(--shadow-color) / 0.06),
-    0 4px 12px -4px rgb(var(--shadow-color) / 0.08);
+  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.05), 0 2px 8px -2px rgb(var(--shadow-color) / 0.06);
 }
 @utility shadow-lift {
-  box-shadow:
-    0 1px 2px rgb(var(--shadow-color) / 0.06),
-    0 16px 40px -12px rgb(var(--shadow-color) / 0.22);
+  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.06), 0 12px 32px -12px rgb(var(--shadow-color) / 0.2);
 }
+
+/* Buttons: one primary per task area; ghost for secondary; accent (marigold) only for buying */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition duration-150 select-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55;
 }
 @utility btn-primary {
   @apply btn bg-primary text-on-primary hover:opacity-90;
@@ -156,17 +211,37 @@ body {
 @utility btn-ghost {
   @apply btn bg-surface text-fg ring-1 ring-line-strong ring-inset hover:bg-surface-2;
 }
+@utility btn-quiet {
+  @apply btn bg-transparent px-3 text-fg hover:bg-surface-2;
+}
+@utility btn-danger {
+  @apply btn bg-danger text-white hover:opacity-90;
+}
+
 @utility card {
-  @apply rounded-xl bg-surface p-5 shadow-soft ring-1 ring-line md:p-6;
+  @apply rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line md:p-6;
 }
 @utility field {
-  @apply block min-h-11 w-full rounded-lg bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted/70 hover:ring-fg/30 focus:ring-2 focus:ring-gold disabled:opacity-60;
+  @apply block min-h-11 w-full rounded-[var(--radius-control)] bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted hover:ring-fg/35 focus:ring-2 focus:ring-focus disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-danger;
 }
 @utility label {
   @apply mb-1.5 block text-sm font-medium text-fg;
 }
+@utility hint {
+  @apply mt-1.5 text-sm text-muted;
+}
 @utility eyebrow {
-  @apply inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-accent-fg uppercase;
+  @apply inline-flex items-center gap-2 text-xs font-semibold tracking-[0.1em] text-accent-fg uppercase;
+}
+/* Filter chips and segmented tabs: 44 px tall on touch screens */
+@utility chip {
+  @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium ring-1 ring-line-strong ring-inset transition hover:bg-surface-2 md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
+}
+@utility badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}
+@utility notice {
+  @apply flex gap-3 rounded-[var(--radius-card)] p-4 text-sm ring-1;
 }
 @utility container-x {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;

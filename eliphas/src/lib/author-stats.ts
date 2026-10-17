@@ -13,7 +13,7 @@ export async function getAuthorStats(profileId: string, months: number) {
   since.setMonth(since.getMonth() - (months - 1), 1);
   since.setHours(0, 0, 0, 0);
 
-  const [balance, profile, byMonth, byCity, byBook, recent, payouts] = await Promise.all([
+  const [balance, profile, byMonth, byCity, byBook, recent, payouts, open] = await Promise.all([
     supabase.rpc("my_balance").single(),
     supabase.from("profiles").select("payout_upi").eq("id", profileId).single(),
     supabase.rpc("my_sales_by_month", { months }),
@@ -21,7 +21,10 @@ export async function getAuthorStats(profileId: string, months: number) {
     supabase.rpc("my_sales_by_book"),
     supabase.rpc("my_book_orders", { max_rows: 5, skip: 0 }),
     supabase.from("payouts").select("id, amount, reference, paid_at, created_at").eq("author_id", profileId).eq("status", "paid").order("created_at", { ascending: false }).limit(5),
+    supabase.rpc("my_book_orders", { max_rows: 200, skip: 0 }),
   ]);
+  // Earnings on orders that are paid but not delivered yet (shown for information; payouts use the balance)
+  const inProgress = (open.data ?? []).filter((o) => o.status !== "delivered").reduce((sum, o) => sum + Number(o.earning), 0);
 
   const monthRows = byMonth.data ?? [];
   const thisMonth = monthRows.at(-1);
@@ -34,6 +37,7 @@ export async function getAuthorStats(profileId: string, months: number) {
       upi: profile.data?.payout_upi ?? null,
       monthCopies: Number(thisMonth?.copies ?? 0),
       monthEarnings: Number(thisMonth?.earnings ?? 0),
+      inProgress,
     },
     byMonth: monthRows.map((r) => ({ month: r.month, copies: Number(r.copies), earnings: Number(r.earnings) })),
     byCity: (byCity.data ?? []).map((r) => ({ city: r.city, state: r.state, copies: Number(r.copies), earnings: Number(r.earnings) })),

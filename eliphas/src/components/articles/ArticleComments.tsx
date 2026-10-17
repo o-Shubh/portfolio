@@ -6,6 +6,7 @@ import { addComment, deleteComment, editComment, setBlock } from "@/app/actions/
 import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { ReportForm } from "./ReportForm";
 import { useClearIntent, useGate } from "./useGate";
+import { offlineSafe } from "@/lib/use-form-action";
 
 export type PublicComment = { id: string; body: string; created_at: string; edited_at: string | null; user_id: string; name: string; avatar: string | null; mine: boolean };
 
@@ -44,7 +45,7 @@ export function ArticleComments({ articleId, comments, signedIn, canComment, int
             e.preventDefault();
             if (!text.trim()) return setError("Write a comment first.");
             start(async () => {
-              const res = await addComment(articleId, text);
+              const res = await offlineSafe(addComment(articleId, text));
               const msg = gate(res, "comment");
               setError(msg);
               if ("ok" in res) {
@@ -109,7 +110,7 @@ function Comment({ c, signedIn }: { c: PublicComment; signedIn: boolean }) {
 
   const act = (fn: () => Promise<Parameters<typeof gate>[0]>, intent: string) =>
     start(async () => {
-      const res = await fn();
+      const res = await offlineSafe(fn());
       const msg = gate(res, intent);
       setError(msg);
       if ("ok" in res) {

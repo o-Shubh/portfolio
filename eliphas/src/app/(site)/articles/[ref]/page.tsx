@@ -107,13 +107,13 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
 
       <article className="mx-auto w-full max-w-3xl px-4 pt-4 sm:px-6 md:pt-8" lang={a.language}>
         <nav aria-label="Breadcrumb" className="truncate text-sm text-muted" lang="en">
-          <Link href="/" className="hover:text-fg">
+          <Link href="/" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
             Home
           </Link>
           <span className="mx-2" aria-hidden>
             ›
           </span>
-          <Link href="/articles" className="hover:text-fg">
+          <Link href="/articles" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
             Articles
           </Link>
           {a.topic && (
@@ -121,7 +121,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
               <span className="mx-2" aria-hidden>
                 ›
               </span>
-              <Link href={`/articles?topic=${a.topic}`} className="hover:text-fg">
+              <Link href={`/articles?topic=${a.topic}`} className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
                 {topicLabel(a.topic)}
               </Link>
             </>
@@ -217,7 +217,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
           </div>
           {author.bio && <p className="mt-3 whitespace-pre-line text-fg/90">{author.bio}</p>}
           {profileHref && (
-            <Link href={profileHref} className="mt-3 inline-block text-sm font-semibold underline underline-offset-2">
+            <Link href={profileHref} className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-2">
               Books and articles by {name}
             </Link>
           )}

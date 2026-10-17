@@ -6,15 +6,16 @@ import Link from "next/link";
  * `onDark`: always the white version, for the navy header and footer.
  * Otherwise navy on light screens and white in dark mode.
  */
-export function Logo({ href = "/", onDark = false, className = "h-10" }: { href?: string; onDark?: boolean; className?: string }) {
+export function Logo({ href = "/", onDark = false, className = "h-10", lazy = false }: { href?: string; onDark?: boolean; className?: string; lazy?: boolean }) {
+  const loading = lazy ? "lazy" : undefined;
   return (
-    <Link href={href} className="flex shrink-0 items-center" aria-label="Eliphas Indicus Publications, home">
+    <Link href={href} className="flex min-h-11 shrink-0 items-center" aria-label="Eliphas Indicus Publications, home">
       {onDark ? (
-        <img src="/brand/logo-full-light.png" alt="" className={`w-auto ${className}`} />
+        <img src="/brand/logo-full-light.png" alt="" loading={loading} className={`w-auto ${className}`} />
       ) : (
         <>
-          <img src="/brand/logo-full.png" alt="" className={`w-auto dark:hidden ${className}`} />
-          <img src="/brand/logo-full-light.png" alt="" className={`hidden w-auto dark:block ${className}`} />
+          <img src="/brand/logo-full.png" alt="" loading={loading} className={`w-auto dark:hidden ${className}`} />
+          <img src="/brand/logo-full-light.png" alt="" loading={loading} className={`hidden w-auto dark:block ${className}`} />
         </>
       )}
     </Link>

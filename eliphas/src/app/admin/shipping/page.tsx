@@ -52,7 +52,7 @@ export default async function ShippingAdmin() {
           </details>
         ))}
         <details className="card">
-          <summary className="cursor-pointer font-medium">Add a zone</summary>
+          <summary className="flex min-h-11 cursor-pointer items-center font-medium">Add a zone</summary>
           <div className="mt-4">
             <ZoneForm zone={null} />
           </div>

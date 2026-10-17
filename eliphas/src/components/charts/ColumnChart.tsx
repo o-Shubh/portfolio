@@ -137,7 +137,7 @@ export function ColumnChart({
         )}
       </div>
       <details className="mt-3 text-sm">
-        <summary className="cursor-pointer font-semibold text-muted hover:text-fg">Show as table</summary>
+        <summary className="inline-flex min-h-11 cursor-pointer items-center font-semibold text-muted hover:text-fg">Show as table</summary>
         <div className="mt-2 overflow-x-auto">
           <table id={tableId} className="w-full text-left tabular-nums">
             <caption className="sr-only">{caption}</caption>

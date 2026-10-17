@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { deleteMyAccount } from "@/app/actions/auth";
+import { offlineSafe } from "@/lib/use-form-action";
 
 /** Account deletion with a typed confirmation on the page. */
 export function DeleteAccount() {
@@ -19,7 +20,7 @@ export function DeleteAccount() {
         Removes your login and profile for good. Past orders are kept for tax records but no longer linked to you.
       </p>
       {!open ? (
-        <button type="button" className="mt-4 text-sm text-danger underline underline-offset-2" onClick={() => setOpen(true)}>
+        <button type="button" className="mt-2 min-h-11 text-sm text-danger underline underline-offset-2" onClick={() => setOpen(true)}>
           Delete my account
         </button>
       ) : (
@@ -29,7 +30,7 @@ export function DeleteAccount() {
             e.preventDefault();
             setError(undefined);
             startTransition(async () => {
-              const res = await deleteMyAccount(text);
+              const res = await offlineSafe(deleteMyAccount(text));
               if (res?.error) setError(res.error);
             });
           }}

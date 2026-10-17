@@ -9,7 +9,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <>
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
       <SiteFooter />
       <SiteTabBar accountHref={profile ? "/dashboard" : "/login"} />
       <InstallPrompt aboveTabBar />

@@ -60,7 +60,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
                 )}
                 <span className={c.ok ? "" : "font-medium"}>{c.label}</span>
                 {!c.ok && (
-                  <Link href={`/author/books/${book.id}/${c.step}`} className="ml-auto text-sm font-semibold underline">
+                  <Link href={`/author/books/${book.id}/${c.step}`} className="ml-auto inline-flex min-h-11 items-center px-1 text-sm font-semibold underline">
                     Fix
                   </Link>
                 )}

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { markNotificationsRead, setArticleNotifications, setBlock, setBookmark } from "@/app/actions/community";
+import { offlineSafe } from "@/lib/use-form-action";
 
 export function RemoveSaved({ articleId }: { articleId: string }) {
   const router = useRouter();
@@ -40,7 +41,7 @@ export function ArticleNotificationToggle({ on }: { on: boolean }) {
           setValue(next);
           setSaved(false);
           start(async () => {
-            const res = await setArticleNotifications(next);
+            const res = await offlineSafe(setArticleNotifications(next));
             if ("ok" in res) setSaved(true);
             else setValue(!next);
           });

@@ -74,7 +74,7 @@ export function PayButton({
       order_id: s.razorpayOrderId,
       name: "Eliphas Indicus",
       description: s.description,
-      theme: { color: "#13223C" },
+      theme: { color: "#17214a" },
       handler: (resp: RazorpayResponse) => finish(s, resp.razorpay_payment_id, resp.razorpay_signature),
       modal: {
         ondismiss: () => {

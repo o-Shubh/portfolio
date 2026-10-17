@@ -1,12 +1,13 @@
 "use client";
 
-import { BookOpen, House, PenLine, UserRound } from "lucide-react";
+import { BookOpen, House, Newspaper, PenLine, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
   { href: "/", label: "Home", icon: House, match: (p: string) => p === "/" },
   { href: "/books", label: "Books", icon: BookOpen, match: (p: string) => p === "/books" },
+  { href: "/articles", label: "Articles", icon: Newspaper, match: (p: string) => p.startsWith("/articles") },
   { href: "/login?next=/author", label: "Publish", icon: PenLine, match: (p: string) => p.startsWith("/pricing") },
 ];
 

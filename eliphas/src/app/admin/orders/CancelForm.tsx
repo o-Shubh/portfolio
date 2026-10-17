@@ -12,7 +12,7 @@ export function CancelForm({ orderId, paid }: { orderId: string; paid: boolean }
   if (state?.ok) return <FormMessage state={state} />;
   if (!open)
     return (
-      <button type="button" className="text-sm text-danger underline underline-offset-2" onClick={() => setOpen(true)}>
+      <button type="button" className="min-h-11 text-sm text-danger underline underline-offset-2" onClick={() => setOpen(true)}>
         Cancel order
       </button>
     );

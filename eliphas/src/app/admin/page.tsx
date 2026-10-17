@@ -134,7 +134,7 @@ export default async function AdminHome() {
       <section className="card">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg">Next in the review queue</h2>
-          <Link href="/admin/review" className="text-sm font-semibold underline">
+          <Link href="/admin/review" className="inline-flex min-h-11 items-center text-sm font-semibold underline">
             See all
           </Link>
         </div>

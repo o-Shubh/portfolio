@@ -61,7 +61,7 @@ export function SiteFooter() {
       <div className="bg-bar text-white">
         <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div>
-            <Logo onDark className="h-14" />
+            <Logo onDark className="h-14" lazy />
             <p className="mt-4 max-w-xs text-sm text-white/70">
               Self-publishing and print on demand. Your book, printed beautifully and delivered to readers.
             </p>

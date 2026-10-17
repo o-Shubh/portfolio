@@ -6,9 +6,9 @@ import type { Profile } from "@/lib/auth";
 import { ProfileFields } from "./ProfileFields";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
-  const [state, onSubmit, pending] = useFormAction(updateProfile);
+  const [state, onSubmit, pending, { onChange }] = useFormAction(updateProfile, { warnUnsaved: true });
   return (
-    <form onSubmit={onSubmit} className="card space-y-4">
+    <form onSubmit={onSubmit} onChange={onChange} className="card space-y-4">
       <ProfileFields profile={profile} />
       {(profile.role === "author" || profile.role === "admin") && (
         <div>

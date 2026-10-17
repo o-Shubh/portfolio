@@ -127,7 +127,7 @@ export function CheckoutForm({
       name: "Eliphas Indicus",
       description: `Order ${result.orderNumber}`,
       prefill: { name: result.name, contact: `+91${result.phone}` },
-      theme: { color: "#13223C" },
+      theme: { color: "#17214a" },
       handler: (r: RazorpayResponse) => finish(result, r.razorpay_payment_id, r.razorpay_signature),
       modal: {
         ondismiss: () => {
@@ -220,13 +220,13 @@ export function CheckoutForm({
             <div className="flex items-center justify-between">
               <span className="font-semibold">Copies</span>
               <div className="flex items-center gap-1 rounded-full bg-surface-2 p-1">
-                <button type="button" className="grid h-9 w-9 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="One less copy">
+                <button type="button" className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="One less copy">
                   <Minus className="h-4 w-4" />
                 </button>
                 <output className="w-8 text-center font-semibold tabular-nums" aria-live="polite">
                   {qty}
                 </output>
-                <button type="button" className="grid h-9 w-9 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} aria-label="One more copy">
+                <button type="button" className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} aria-label="One more copy">
                   <Plus className="h-4 w-4" />
                 </button>
               </div>

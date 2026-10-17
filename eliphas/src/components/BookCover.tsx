@@ -2,11 +2,11 @@
 
 // Typographic covers for books that don't have a cover image yet: flat colour, serif title.
 const PALETTES = [
-  { bg: "#13223C", fg: "#FFFFFF", rule: "#CB9436" },
-  { bg: "#CB9436", fg: "#13223C", rule: "#13223C" },
+  { bg: "#17214A", fg: "#FFFFFF", rule: "#E9A31A" },
+  { bg: "#E9A31A", fg: "#17214A", rule: "#17214A" },
   { bg: "#0F5E5C", fg: "#F2F4F8", rule: "#E0B25A" },
   { bg: "#7A2E3A", fg: "#F6EBDD", rule: "#E0B25A" },
-  { bg: "#F1E9DA", fg: "#13223C", rule: "#7A2E3A" },
+  { bg: "#F1E9DA", fg: "#17214A", rule: "#7A2E3A" },
   { bg: "#2F5DA8", fg: "#FFFFFF", rule: "#F3D27A" },
 ];
 

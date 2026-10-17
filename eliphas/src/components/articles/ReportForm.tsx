@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { reportContent } from "@/app/actions/community";
 import { useGate } from "./useGate";
+import { offlineSafe } from "@/lib/use-form-action";
 
 const REASONS = [
   { value: "spam", label: "Spam or advertising" },
@@ -43,7 +44,7 @@ export function ReportForm({ targetType, targetId, onDone, intent }: { targetTyp
         if (!reason) return setError("Choose a reason.");
         setError(null);
         start(async () => {
-          const res = await reportContent(targetType, targetId, reason, details);
+          const res = await offlineSafe(reportContent(targetType, targetId, reason, details));
           const msg = gate(res, intent);
           if (msg) setError(msg);
           else if ("ok" in res) setSent(true);

@@ -58,7 +58,7 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="grid h-10 w-10 place-items-center rounded-full text-white transition hover:bg-white/10"
+        className="grid h-11 w-11 place-items-center rounded-full text-white transition hover:bg-white/10"
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-label="Open menu"
@@ -75,7 +75,7 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="grid h-10 w-10 place-items-center rounded-full hover:bg-white/10"
+                  className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10"
                   aria-label="Close menu"
                 >
                   <X className="h-5 w-5" />

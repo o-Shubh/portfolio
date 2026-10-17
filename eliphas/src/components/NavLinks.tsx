@@ -20,9 +20,11 @@ import {
   Bookmark,
   Bell,
   ShieldAlert,
+  MoreHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 // Icons are referenced by name so server layouts can pass plain data.
 const ICONS = {
@@ -55,26 +57,31 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
     item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
   if (variant === "tabs") {
+    // Phones: up to five tabs. When there are more sections, the fifth tab is "More" and opens a sheet with the rest.
+    const primary = items.filter((i) => !i.sidebarOnly);
+    const shown = items.length <= 5 ? items : primary.slice(0, 4);
+    const rest = items.filter((i) => !shown.includes(i));
+    const tab = (active: boolean) =>
+      `flex min-h-14 w-full flex-col items-center justify-center gap-1 text-[0.7rem] font-medium transition ${active ? "text-accent-fg" : "text-muted"}`;
     return (
       <ul className="flex justify-around">
-        {items.filter((i) => !i.sidebarOnly).map((item) => {
+        {shown.map((item) => {
           const Icon = ICONS[item.icon];
           const active = isActive(item);
           return (
             <li key={item.href} className="flex-1">
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-1 text-[0.68rem] font-medium transition ${
-                  active ? "text-accent-fg" : "text-muted"
-                }`}
-              >
+              <Link href={item.href} aria-current={active ? "page" : undefined} className={tab(active)}>
                 <Icon className="h-[1.35rem] w-[1.35rem]" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
                 {item.label}
               </Link>
             </li>
           );
         })}
+        {rest.length > 0 && (
+          <li className="flex-1">
+            <MoreSheet items={rest} active={rest.some(isActive)} className={tab(rest.some(isActive))} isActive={isActive} />
+          </li>
+        )}
       </ul>
     );
   }
@@ -89,7 +96,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex h-10 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition ${
+              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition ${
                 active ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-surface-2 hover:text-fg"
               }`}
             >
@@ -100,5 +107,56 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
         );
       })}
     </ul>
+  );
+}
+
+function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; active: boolean; className: string; isActive: (i: NavItem) => boolean }) {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [lastPath, setLastPath] = useState(pathname);
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
+    setOpen(false);
+  }
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+  return (
+    <>
+      <button type="button" className={className} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(true)}>
+        <MoreHorizontal className="h-[1.35rem] w-[1.35rem]" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
+        More
+      </button>
+      {open && (
+        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
+          <button type="button" className="absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
+          <div className="safe-bottom absolute inset-x-0 bottom-0 rounded-t-[var(--radius-sheet)] bg-surface pt-2 shadow-lift">
+            <div className="mx-auto mb-1 h-1 w-10 rounded-full bg-line-strong" aria-hidden />
+            <ul className="px-2 pb-2">
+              {items.map((item) => {
+                const Icon = ICONS[item.icon];
+                const on = isActive(item);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={on ? "page" : undefined}
+                      onClick={() => setOpen(false)}
+                      className={`flex min-h-12 items-center gap-3 rounded-[var(--radius-control)] px-3 text-base ${on ? "bg-surface-2 font-semibold" : ""}`}
+                    >
+                      <Icon className="h-5 w-5 text-muted" aria-hidden />
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
