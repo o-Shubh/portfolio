@@ -59,7 +59,7 @@ export default async function CartPage() {
                         {book.eeid && (
                           <>
                             {" · "}
-                            <span className="mono">{book.eeid}</span>
+                            <span className="id-mono">{book.eeid}</span>
                           </>
                         )}
                       </p>

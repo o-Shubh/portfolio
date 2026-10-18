@@ -63,7 +63,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
     {
       term: "Eliphas Edition ID",
       value: book.eeid ? (
-        <Link href={`/e/${book.eeid}`} className="font-mono underline-offset-2 hover:underline" data-testid="book-eeid">
+        <Link href={`/e/${book.eeid}`} className="id-mono underline-offset-2 hover:underline" data-testid="book-eeid">
           {book.eeid}
         </Link>
       ) : null,
@@ -168,14 +168,14 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
               {book.isbn && (
                 <div className="group-row justify-between">
                   <dt className="text-muted">ISBN</dt>
-                  <dd className="mono">{book.isbn}</dd>
+                  <dd className="id-mono">{book.isbn}</dd>
                 </div>
               )}
               {book.eeid && (
                 <div className="group-row justify-between">
                   <dt className="text-muted">Edition ID</dt>
                   <dd>
-                    <Link href={`/e/${book.eeid}`} className="mono text-accent-fg underline-offset-2 hover:underline">
+                    <Link href={`/e/${book.eeid}`} className="id-mono text-accent-fg underline-offset-2 hover:underline">
                       {book.eeid}
                     </Link>
                   </dd>
@@ -195,7 +195,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
                 </span>
               ))}
             </div>
-            <h1 className="display mt-3 text-[1.875rem] leading-tight md:text-[2.375rem]">{book.title}</h1>
+            <h1 className="display book-title mt-3 text-[1.875rem] leading-tight md:text-[2.375rem]">{book.title}</h1>
             {book.subtitle && <p className="mt-1.5 font-serif text-lg text-muted italic md:text-xl">{book.subtitle}</p>}
             <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" lang="en">
               <AuthorAvatar name={book.author_name} path={author?.avatar_path ?? null} size="sm" />

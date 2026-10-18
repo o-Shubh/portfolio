@@ -65,7 +65,7 @@ export async function EditionIdentity({
           <dl className="space-y-1 text-sm">
             <div>
               <dt className="text-muted">Eliphas Edition ID</dt>
-              <dd className="mono text-base font-semibold break-all" data-testid="eeid">{book.eeid}</dd>
+              <dd className="id-mono text-base font-semibold break-all" data-testid="eeid">{book.eeid}</dd>
             </div>
             <div>
               <dt className="text-muted">Status</dt>

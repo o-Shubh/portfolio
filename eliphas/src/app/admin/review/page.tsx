@@ -110,7 +110,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
                   <div className="mt-1 flex items-center gap-2">
                     <StatusBadge status={b.status} />
                     {b.status === "in_review" && <span className="text-xs text-muted">submitted {timeAgo(b.submitted_at)}</span>}
-                    {b.eeid && <span className="mono text-xs text-muted" data-testid="row-eeid">{b.eeid}</span>}
+                    {b.eeid && <span className="id-mono text-xs text-muted" data-testid="row-eeid">{b.eeid}</span>}
                   </div>
                 </div>
               </Link>

@@ -40,7 +40,7 @@ export default async function AuthorOrders({ searchParams }: PageProps<"/author/
             <tbody className="divide-y divide-line">
               {rows.map((o) => (
                 <tr key={o.order_item_id}>
-                  <td className="p-4 font-medium whitespace-nowrap mono">{o.order_number}</td>
+                  <td className="p-4 font-medium whitespace-nowrap id-mono">{o.order_number}</td>
                   <td className="p-4 font-semibold">{o.book_title}</td>
                   <td className="p-4 text-right mono">{o.quantity}</td>
                   <td className="p-4">

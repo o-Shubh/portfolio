@@ -10,6 +10,11 @@ const PALETTES = [
   { bg: "#2F5DA8", fg: "#FFFFFF", rule: "#F3D27A" },
 ];
 
+/** The colours a typographic cover uses (also used to paint a 3D book's spine to match). */
+export function coverPalette(seed: string) {
+  return pick(seed);
+}
+
 function pick(seed: string) {
   // FNV-1a: spreads similar slugs across the palette
   let h = 2166136261;

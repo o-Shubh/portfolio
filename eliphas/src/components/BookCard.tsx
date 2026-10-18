@@ -4,30 +4,36 @@ import { BINDING_LABEL, coverUrl, LANGUAGE_LABEL, type PublicBook } from "@/lib/
 import { rupees } from "@/lib/pricing";
 import { AddToCartButton } from "./AddToCartButton";
 import { BookCover } from "./BookCover";
+import { QuickLook } from "./QuickLook";
 import { VerifiedBadge } from "./VerifiedBadge";
 
 /**
- * Catalogue tile: white card with a hairline, the cover in an ivory well, serif title, author, price and a
- * compact Add to cart. The whole card opens the book (title link stretched over it); Add stays its own button.
+ * Catalogue tile: large cover on an ivory well (lifts slightly on hover), serif title, author, a clear price,
+ * Add to cart and a Quick look sheet. The title link covers the tile; the buttons stay their own targets.
  */
 export function BookCard({ book, priority, showAdd = true }: { book: PublicBook; priority?: boolean; showAdd?: boolean }) {
+  const cover = <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" priority={priority} />;
+  const meta = [BINDING_LABEL[book.binding] ?? book.binding, book.page_count ? `${book.page_count} pages` : null, LANGUAGE_LABEL[book.language]].filter(Boolean).join(" · ");
   return (
-    <div className="group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] bg-surface ring-1 ring-line transition-shadow hover:shadow-lift has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-focus">
-      <div className="bg-ivory px-[16%] pt-[12%] pb-[10%]">
-        <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" priority={priority} />
+    <div className="group relative flex h-full flex-col has-[a:focus-visible]:rounded-[var(--radius-card)] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-focus">
+      <div className="relative rounded-[var(--radius-card)] bg-ivory px-[13%] pt-[11%] pb-[9%]">
+        <div className="book-lift">{cover}</div>
+        <div className="absolute top-2 right-2">
+          <QuickLook
+            book={{ id: book.id, slug: book.slug, title: book.title, author: book.author_name, price: rupees(Number(book.mrp)), language: book.language, description: book.description, meta, sample: Boolean(book.sample_path) }}
+            cover={<BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" />}
+          />
+        </div>
       </div>
-      <div className="flex flex-1 flex-col p-3">
-        <p className="line-clamp-1 text-xs text-muted">{book.author_name}</p>
-        <h3 className="mt-0.5 line-clamp-2 font-serif text-[0.98rem] leading-snug font-semibold tracking-normal" lang={book.language}>
+      <div className="flex flex-1 flex-col px-0.5 pt-3">
+        <h3 className="line-clamp-2 font-serif text-[1.02rem] leading-snug font-semibold tracking-normal" lang={book.language}>
           <Link href={`/books/${book.slug}`} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
             {book.title}
           </Link>
         </h3>
+        <p className="mt-0.5 line-clamp-1 text-sm text-muted">{book.author_name}</p>
         <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
-          <p className="flex items-baseline gap-1.5">
-            <span className="mono text-[0.95rem] font-medium">{rupees(Number(book.mrp))}</span>
-            <span className="text-[0.7rem] text-muted">{LANGUAGE_LABEL[book.language]}</span>
-          </p>
+          <p className="text-[1.0625rem] font-semibold tabular-nums">{rupees(Number(book.mrp))}</p>
           {showAdd && <AddToCartButton bookId={book.id} compact title={book.title} className="relative z-10 min-h-11 px-3 text-xs pointer-fine:min-h-8 pointer-fine:px-2.5" />}
         </div>
       </div>
@@ -37,7 +43,7 @@ export function BookCard({ book, priority, showAdd = true }: { book: PublicBook;
 
 export function BookGrid({ books }: { books: PublicBook[] }) {
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+    <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
       {books.map((b, i) => (
         <li key={b.id}>
           <BookCard book={b} priority={i < 4} />
@@ -52,7 +58,7 @@ export function BookShelf({ books, eager = false }: { books: PublicBook[]; eager
   return (
     <ul className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:-mx-8 lg:scroll-px-8 lg:px-8">
       {books.map((b, i) => (
-        <li key={b.id} className="w-[42%] shrink-0 snap-start sm:w-[28%] md:w-[22%] lg:w-[calc((100%-4rem)/5)]">
+        <li key={b.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] md:w-[24%] lg:w-[calc((100%-3rem)/4)]">
           <BookCard book={b} priority={eager && i < 4} />
         </li>
       ))}
@@ -74,8 +80,8 @@ export function BookRow({ book, verified, priority }: { book: PublicBook; verifi
       <div className="flex min-w-0 flex-1 flex-col">
         {(book.eeid || book.isbn) && (
           <p className="flex flex-wrap gap-1.5 text-[0.7rem] text-muted">
-            {book.eeid && <span className="mono rounded bg-surface-2 px-1.5 py-0.5">EEID {book.eeid}</span>}
-            {book.isbn && <span className="mono rounded bg-surface-2 px-1.5 py-0.5">ISBN {book.isbn}</span>}
+            {book.eeid && <span className="id-mono rounded bg-surface-2 px-1.5 py-0.5">EEID {book.eeid}</span>}
+            {book.isbn && <span className="id-mono rounded bg-surface-2 px-1.5 py-0.5">ISBN {book.isbn}</span>}
           </p>
         )}
         <h3 className="mt-1.5 font-serif text-lg leading-snug font-semibold tracking-normal sm:text-xl" lang={book.language}>
@@ -94,7 +100,7 @@ export function BookRow({ book, verified, priority }: { book: PublicBook; verifi
         )}
         <div className="mt-auto pt-3">
           <p className="flex flex-wrap items-baseline gap-x-2">
-            <span className="mono text-lg font-medium">{rupees(Number(book.mrp))}</span>
+            <span className="text-lg font-semibold tabular-nums">{rupees(Number(book.mrp))}</span>
             <span className="text-xs text-muted">Inclusive of all taxes</span>
           </p>
           <p className="mt-0.5 text-xs text-muted">{specs.join(" · ")}</p>
