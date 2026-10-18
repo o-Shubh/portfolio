@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const LANGS = [
   { value: "", label: "All" },
   { value: "en", label: "English" },
-  { value: "hi", label: "हिन्दी" },
+  { value: "hi", label: "Hindi" },
 ] as const;
 
 export default async function ArticlesPage({ searchParams }: PageProps<"/articles">) {

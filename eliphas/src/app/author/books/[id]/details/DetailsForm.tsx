@@ -39,7 +39,7 @@ export function DetailsForm({ book, disabled, others }: { book: Book; disabled: 
               Language
             </label>
             <select id="language" name="language" className="field" defaultValue={book.language}>
-              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="hi">Hindi</option>
               <option value="en">English</option>
             </select>
           </div>

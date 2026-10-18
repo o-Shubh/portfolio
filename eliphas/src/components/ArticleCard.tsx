@@ -20,7 +20,7 @@ export function ArticleCard({ a, showAuthor = true }: { a: Card; showAuthor?: bo
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <p className="flex items-center gap-2" lang="en">
           <span className="mono rounded bg-surface-2 px-1.5 py-0.5 text-[0.7rem] tracking-[0.04em] text-muted uppercase">{topicLabel(a.topic)}</span>
-          {a.language === "hi" && <span className="text-xs text-muted">हिन्दी</span>}
+          {a.language === "hi" && <span className="text-xs text-muted">Hindi</span>}
         </p>
         <h3 className="mt-2 text-xl leading-snug font-semibold tracking-[-0.01em]">
           <Link href={articlePath(a)} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">

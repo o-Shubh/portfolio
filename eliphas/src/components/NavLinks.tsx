@@ -27,6 +27,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
+import { usePresence } from "@/lib/use-presence";
 
 // Icons are referenced by name so server layouts can pass plain data.
 const ICONS = {
@@ -122,6 +123,7 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
     setOpen(false);
   }
   const sheet = useRef<HTMLDivElement>(null);
+  const { mounted, shown } = usePresence(open);
   const close = useCallback(() => setOpen(false), []);
   useDialogFocus(open, sheet, close);
   return (
@@ -130,10 +132,10 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
         <MoreHorizontal className="h-[1.35rem] w-[1.35rem]" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
         More
       </button>
-      {open && (
-        <div ref={sheet} className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
-          <button type="button" className="absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
-          <div className="sheet-panel safe-bottom absolute inset-x-0 bottom-0 pt-2">
+      {mounted && (
+        <div ref={sheet} className="motion-bottom-sheet fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections" data-state={shown ? "open" : "closed"} inert={!open}>
+          <button type="button" className="sheet-scrim absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
+          <div className="sheet-panel sheet-body safe-bottom absolute inset-x-0 bottom-0 pt-2">
             <div className="mx-auto mb-1 h-1 w-10 rounded-full bg-line-strong" aria-hidden />
             <ul className="px-2 pb-2">
               {items.map((item) => {

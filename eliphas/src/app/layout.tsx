@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Noto_Sans_Devanagari, Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
 import { ServiceWorker } from "@/components/ServiceWorker";
+import { TouchFeedback } from "@/components/TouchFeedback";
 import "./globals.css";
 
 // Inter for all interface text and numbers (600 headlines, 500 navigation and buttons, 400 body).
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         {children}
         <ServiceWorker />
+        <TouchFeedback />
       </body>
     </html>
   );
