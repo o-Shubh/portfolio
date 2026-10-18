@@ -18,84 +18,84 @@ Verification: **checked** (browser screenshot reviewed + automated checks), **au
 | 7 | Reader profile | `/u/{name}` | 07 | done | typecheck | Library/reading progress from Stitch NOT shown: private data |
 | 8 | Articles | `/articles` | 08 | done | screenshots 1440/390; no sideways scroll | No citations/DOI (not real data) |
 | 9 | Article | `/articles/{article}` | 09 | done | screenshots 1440/390; no sideways scroll | Outline built from the article's own headings |
-| 10 | Community feed | `/community` | 10 | todo | — |  |
-| 11 | Post | `/community/{post}` | 11 | todo | — |  |
-| 12 | Edit post | `/community/{post}/edit` | 12 | todo | — |  |
-| 13 | Edition page (QR target) | `/e/{EEID}` | 13 | todo | — |  |
-| 14 | Cart | `/cart` | 14 | todo | — |  |
-| 15 | Checkout (cart) | `/checkout` | 15 | todo | — |  |
-| 16 | Checkout (one book) | `/checkout/{book}` | 16 | todo | — |  |
-| 17 | Pricing | `/pricing` | 17 | todo | — |  |
-| 18 | FAQ | `/faq` | 18 | todo | — |  |
-| 19 | Contact | `/contact` | 19 | todo | — |  |
-| 20 | Community guidelines | `/community-guidelines` | — | todo | — |  |
-| 21 | Terms of use | `/terms` | 21 | todo | — |  |
-| 22 | Privacy policy | `/privacy` | 22 | todo | — |  |
-| 23 | Refunds | `/refunds` | 23 | todo | — |  |
-| 24 | Shipping policy | `/shipping` | 24 | todo | — |  |
+| 10 | Community feed | `/community` | 10 | done | typecheck + lint | Channels/'reading circles'/online status from Stitch omitted (no such data) |
+| 11 | Post | `/community/{post}` | 11 | done | typecheck + lint | Linked book card in sidebar uses the real book |
+| 12 | Edit post | `/community/{post}/edit` | 12 | done | typecheck + lint | Editor kept; no fake window controls |
+| 13 | Edition page (QR target) | `/e/{EEID}` | 13 | done | m18 passed | EEID copy kept honest (no 'cryptographic proof' claims) |
+| 14 | Cart | `/cart` | 14 | done | m11 re-run pending | Suggestions are real published books |
+| 15 | Checkout (cart) | `/checkout` | 15 | done | m11 re-run pending | Visual only; payment logic untouched |
+| 16 | Checkout (one book) | `/checkout/{book}` | 16 | done | m11 re-run pending | Visual only; payment logic untouched |
+| 17 | Pricing | `/pricing` | 17 | done | typecheck + lint | Real plans, commission and GST from settings; Stitch tiers/prices not used |
+| 18 | FAQ | `/faq` | 18 | done | typecheck + lint | FAQ content unchanged |
+| 19 | Contact | `/contact` | 19 | done | typecheck + lint | No contact form: there is no server-side inbox; flagged |
+| 20 | Community guidelines | `/community-guidelines` | — | done | typecheck + lint | No Stitch reference; uses the policy layout |
+| 21 | Terms of use | `/terms` | 21 | done | typecheck + lint | Legal text unchanged |
+| 22 | Privacy policy | `/privacy` | 22 | done | typecheck + lint | Legal text unchanged |
+| 23 | Refunds | `/refunds` | 23 | done | typecheck + lint | Legal text unchanged |
+| 24 | Shipping policy | `/shipping` | 24 | done | typecheck + lint | Legal text unchanged |
 | | **Sign in and sign up** | | | | | |
-| 25 | Reader login / sign up | `/login (?mode=signup)` | — | todo | — |  |
-| 26 | Author login / sign up | `/login/author (?mode=signup)` | — | todo | — |  |
-| 27 | Start publishing | `/login/author/start` | — | todo | — |  |
-| 28 | Welcome setup | `/onboarding` | — | todo | — |  |
+| 25 | Reader login / sign up | `/login (?mode=signup)` | — | done | m19/m20 run pending | No Stitch reference; shared auth sheet |
+| 26 | Author login / sign up | `/login/author (?mode=signup)` | — | done | m19/m20 run pending | No Stitch reference |
+| 27 | Start publishing | `/login/author/start` | — | done | m19 run pending |  |
+| 28 | Welcome setup | `/onboarding` | — | done | m19 run pending |  |
 | | **Reader account** | | | | | |
-| 29 | My orders | `/account` | — | todo | — |  |
-| 30 | Order details | `/account/orders/{order}` | — | todo | — |  |
-| 31 | Saved | `/account/saved` | — | todo | — |  |
-| 32 | Notifications | `/account/notifications` | — | todo | — |  |
-| 33 | Settings & help | `/account/profile` | — | todo | — |  |
-| 34 | Author verification | `/account/verification` | — | todo | — |  |
+| 29 | My orders | `/account` | — | done | typecheck + lint | Orders as an inset grouped list |
+| 30 | Order details | `/account/orders/{order}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 31 | Saved | `/account/saved` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 32 | Notifications | `/account/notifications` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 33 | Settings & help | `/account/profile` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 34 | Author verification | `/account/verification` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
 | | **Author workspace** | | | | | |
-| 35 | Overview | `/author` | — | todo | — |  |
-| 36 | My books | `/author/books` | — | todo | — |  |
-| 37 | New book | `/author/books/new` | — | todo | — |  |
-| 38 | Book · Details | `/author/books/{id}/details` | — | todo | — |  |
-| 39 | Book · Files | `/author/books/{id}/files` | — | todo | — |  |
-| 40 | Book · Pricing | `/author/books/{id}/print` | — | todo | — |  |
-| 41 | Book · Free sample | `/author/books/{id}/sample` | — | todo | — |  |
-| 42 | Book · Preview | `/author/books/{id}/preview` | — | todo | — |  |
-| 43 | Book · Submit | `/author/books/{id}/submit` | — | todo | — |  |
-| 44 | Earnings & payouts | `/author/earnings` | — | todo | — |  |
-| 45 | Orders | `/author/orders` | — | todo | — |  |
-| 46 | Analytics | `/author/analytics` | — | todo | — |  |
-| 47 | My articles | `/author/articles` | — | todo | — |  |
-| 48 | Article editor | `/author/articles/{id}` | — | todo | — |  |
-| 49 | Article stats | `/author/articles/{id}/stats` | — | todo | — |  |
-| 50 | My posts | `/author/community` | — | todo | — |  |
-| 51 | Services | `/author/services` | — | todo | — |  |
-| 52 | Service request | `/author/services/{id}` | — | todo | — |  |
-| 53 | Request a creative | `/author/creatives/new` | — | todo | — |  |
-| 54 | Service payments | `/author/payments` | — | todo | — |  |
-| 55 | Payment details | `/author/payments/{id}` | — | todo | — |  |
-| 56 | Pro membership | `/author/plan` | — | todo | — |  |
+| 35 | Overview | `/author` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 36 | My books | `/author/books` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 37 | New book | `/author/books/new` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 38 | Book · Details | `/author/books/{id}/details` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 39 | Book · Files | `/author/books/{id}/files` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 40 | Book · Pricing | `/author/books/{id}/print` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 41 | Book · Free sample | `/author/books/{id}/sample` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 42 | Book · Preview | `/author/books/{id}/preview` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 43 | Book · Submit | `/author/books/{id}/submit` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 44 | Earnings & payouts | `/author/earnings` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 45 | Orders | `/author/orders` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 46 | Analytics | `/author/analytics` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 47 | My articles | `/author/articles` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 48 | Article editor | `/author/articles/{id}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 49 | Article stats | `/author/articles/{id}/stats` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 50 | My posts | `/author/community` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 51 | Services | `/author/services` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 52 | Service request | `/author/services/{id}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 53 | Request a creative | `/author/creatives/new` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 54 | Service payments | `/author/payments` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 55 | Payment details | `/author/payments/{id}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 56 | Pro membership | `/author/plan` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
 | | **Admin** | | | | | |
-| 57 | Admin overview | `/admin` | — | todo | — |  |
-| 58 | Review queue | `/admin/review` | — | todo | — |  |
-| 59 | Book review | `/admin/books/{id}` | — | todo | — |  |
-| 60 | Authors | `/admin/authors` | — | todo | — |  |
-| 61 | Edition IDs | `/admin/editions` | — | todo | — |  |
-| 62 | Moderation | `/admin/moderation` | — | todo | — |  |
-| 63 | Orders | `/admin/orders` | — | todo | — |  |
-| 64 | Finance | `/admin/finance` | — | todo | — |  |
-| 65 | Payouts | `/admin/payouts` | — | todo | — |  |
-| 66 | Subscriptions | `/admin/subscriptions` | — | todo | — |  |
-| 67 | Plans | `/admin/plans` | — | todo | — |  |
-| 68 | Services | `/admin/services` | — | todo | — |  |
-| 69 | Service order | `/admin/services/orders/{id}` | — | todo | — |  |
-| 70 | Printers | `/admin/printers` | — | todo | — |  |
-| 71 | New printer | `/admin/printers/new` | — | todo | — |  |
-| 72 | Edit printer | `/admin/printers/{id}` | — | todo | — |  |
-| 73 | Shipping | `/admin/shipping` | — | todo | — |  |
-| 74 | Settings | `/admin/settings` | — | todo | — |  |
-| 75 | Issues | `/admin/issues` | — | todo | — |  |
+| 57 | Admin overview | `/admin` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 58 | Review queue | `/admin/review` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 59 | Book review | `/admin/books/{id}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 60 | Authors | `/admin/authors` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 61 | Edition IDs | `/admin/editions` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 62 | Moderation | `/admin/moderation` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 63 | Orders | `/admin/orders` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 64 | Finance | `/admin/finance` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 65 | Payouts | `/admin/payouts` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 66 | Subscriptions | `/admin/subscriptions` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 67 | Plans | `/admin/plans` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 68 | Services | `/admin/services` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 69 | Service order | `/admin/services/orders/{id}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 70 | Printers | `/admin/printers` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 71 | New printer | `/admin/printers/new` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 72 | Edit printer | `/admin/printers/{id}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 73 | Shipping | `/admin/shipping` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 74 | Settings | `/admin/settings` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 75 | Issues | `/admin/issues` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
 | | **Printer** | | | | | |
-| 76 | Print jobs | `/printer` | — | todo | — |  |
-| 77 | Print order | `/printer/orders/{id}` | — | todo | — |  |
+| 76 | Print jobs | `/printer` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
+| 77 | Print order | `/printer/orders/{id}` | — | partial | — | Shared system applied (cards, tables, figures, headers); per-screen review pending |
 | | **System screens** | | | | | |
-| 78 | Page not found | `(any missing page)` | — | todo | — |  |
-| 79 | Something went wrong | `(error)` | — | todo | — |  |
-| 80 | Offline | `(installed app, no connection)` | — | todo | — |  |
+| 78 | Page not found | `(any missing page)` | — | done | typecheck + lint | 404 with search |
+| 79 | Something went wrong | `(error)` | — | done | typecheck + lint | Error sheet with reference |
+| 80 | Offline | `(installed app, no connection)` | — | done | typecheck + lint | Offline page; service worker cache bumped to v2 |
 
 ## Resume here
 
-Stage 2: screens 1-9 done. Next: screen 10 community feed (src/app/(site)/community), 11 post, 12 edit post, 13 edition page /e/[eeid], then cart/checkout 14-16, pricing 17, FAQ 18, contact 19, guidelines 20, legal 21-24. Then dialog/sheet/toast pass, then stage 4+ (auth, account, author, admin, printer). Helper scripts: session scratchpad restart.sh, shot.mjs, side.mjs.
+Screens 1-29 and 78-80 done; 30-77 have the shared system applied, per-screen review pending. Next: rebuild, logged-in screenshots of account/author/admin/printer at 1440/390, fix issues, then the full regression run (m1-m20 + menu) and the light/dark audit. Then push and open the PR after #17 merges.

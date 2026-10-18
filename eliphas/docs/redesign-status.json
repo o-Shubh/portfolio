@@ -1,5 +1,5 @@
 {
- "_next": "Stage 2: screens 1-9 done. Next: screen 10 community feed (src/app/(site)/community), 11 post, 12 edit post, 13 edition page /e/[eeid], then cart/checkout 14-16, pricing 17, FAQ 18, contact 19, guidelines 20, legal 21-24. Then dialog/sheet/toast pass, then stage 4+ (auth, account, author, admin, printer). Helper scripts: session scratchpad restart.sh, shot.mjs, side.mjs.",
+ "_next": "Screens 1-29 and 78-80 done; 30-77 have the shared system applied, per-screen review pending. Next: rebuild, logged-in screenshots of account/author/admin/printer at 1440/390, fix issues, then the full regression run (m1-m20 + menu) and the light/dark audit. Then push and open the PR after #17 merges.",
  "1": {
   "impl": "done",
   "ver": "screenshots 1440/390 vs Stitch 01; no sideways scroll",
@@ -44,5 +44,360 @@
   "impl": "done",
   "ver": "screenshots 1440/390; no sideways scroll",
   "note": "Outline built from the article's own headings"
+ },
+ "10": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Channels/'reading circles'/online status from Stitch omitted (no such data)"
+ },
+ "11": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Linked book card in sidebar uses the real book"
+ },
+ "12": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Editor kept; no fake window controls"
+ },
+ "13": {
+  "impl": "done",
+  "ver": "m18 passed",
+  "note": "EEID copy kept honest (no 'cryptographic proof' claims)"
+ },
+ "14": {
+  "impl": "done",
+  "ver": "m11 re-run pending",
+  "note": "Suggestions are real published books"
+ },
+ "15": {
+  "impl": "done",
+  "ver": "m11 re-run pending",
+  "note": "Visual only; payment logic untouched"
+ },
+ "16": {
+  "impl": "done",
+  "ver": "m11 re-run pending",
+  "note": "Visual only; payment logic untouched"
+ },
+ "17": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Real plans, commission and GST from settings; Stitch tiers/prices not used"
+ },
+ "18": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "FAQ content unchanged"
+ },
+ "19": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "No contact form: there is no server-side inbox; flagged"
+ },
+ "20": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "No Stitch reference; uses the policy layout"
+ },
+ "21": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Legal text unchanged"
+ },
+ "22": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Legal text unchanged"
+ },
+ "23": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Legal text unchanged"
+ },
+ "24": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Legal text unchanged"
+ },
+ "25": {
+  "impl": "done",
+  "ver": "m19/m20 run pending",
+  "note": "No Stitch reference; shared auth sheet"
+ },
+ "26": {
+  "impl": "done",
+  "ver": "m19/m20 run pending",
+  "note": "No Stitch reference"
+ },
+ "27": {
+  "impl": "done",
+  "ver": "m19 run pending",
+  "note": ""
+ },
+ "28": {
+  "impl": "done",
+  "ver": "m19 run pending",
+  "note": ""
+ },
+ "29": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Orders as an inset grouped list"
+ },
+ "30": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "31": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "32": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "33": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "34": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "35": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "36": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "37": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "38": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "39": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "40": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "41": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "42": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "43": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "44": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "45": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "46": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "47": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "48": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "49": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "50": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "51": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "52": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "53": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "54": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "55": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "56": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "57": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "58": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "59": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "60": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "61": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "62": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "63": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "64": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "65": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "66": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "67": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "68": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "69": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "70": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "71": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "72": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "73": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "74": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "75": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "76": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "77": {
+  "impl": "partial",
+  "ver": "—",
+  "note": "Shared system applied (cards, tables, figures, headers); per-screen review pending"
+ },
+ "78": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "404 with search"
+ },
+ "79": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Error sheet with reference"
+ },
+ "80": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Offline page; service worker cache bumped to v2"
  }
 }

@@ -108,7 +108,7 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
           <p className="mt-3 rounded-[var(--radius-card)] border border-dashed border-line-strong p-8 text-center text-muted">No paid orders yet. Your earnings appear here as soon as a reader pays.</p>
         ) : (
           <div className="mt-3 overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line">
-            <table className="w-full min-w-[860px] text-left text-sm mono">
+            <table className="w-full min-w-[860px] text-left text-sm tabular-nums">
               <caption className="sr-only">Your earnings for each paid order line, with the costs taken from the selling price</caption>
               <thead className="border-b border-line bg-surface-2 text-muted">
                 <tr>
@@ -141,15 +141,15 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
                       <td className="p-3">
                         {void_ ? <span className="badge bg-surface-2">Refunded or cancelled</span> : <OrderStatusBadge status={l.orders.status} />}
                       </td>
-                      <td className="p-3 text-right">{rupees(sale)}</td>
-                      <td className="p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.print_cost_total))}`}</td>
-                      <td className="p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission))}`}</td>
-                      <td className="p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission_gst))}`}</td>
-                      <td className="p-3 text-right">
+                      <td className="mono p-3 text-right">{rupees(sale)}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.print_cost_total))}`}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission))}`}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission_gst))}`}</td>
+                      <td className="mono p-3 text-right">
                         {legacy || l.gateway_allocated === null ? "—" : `− ${rupees(n(l.gateway_allocated))}`}
                         {!legacy && l.orders.gateway_fee_source === "estimated" && <span className="block text-xs text-muted">estimated</span>}
                       </td>
-                      <td className="p-3 text-right font-semibold">{void_ ? <s>{rupees(earning({ ...l, reversed_at: null }))}</s> : rupees(earning(l))}</td>
+                      <td className="mono p-3 text-right font-semibold">{void_ ? <s>{rupees(earning({ ...l, reversed_at: null }))}</s> : rupees(earning(l))}</td>
                     </tr>
                   );
                 })}
