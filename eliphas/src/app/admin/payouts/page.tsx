@@ -96,7 +96,7 @@ export default async function PayoutsPage() {
                 <tr key={p.id}>
                   <td className="p-3">{new Date(p.paid_at ?? p.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}</td>
                   <td className="p-3">{p.profiles?.full_name}</td>
-                  <td className="p-3 text-right mono">{rupees(Number(p.amount))}</td>
+                  <td className="p-3 text-right mono">{rupees(Number(p.amount), true)}</td>
                   <td className="p-3">
                     {p.reference}
                     {p.note && <span className="block text-xs text-muted">{p.note}</span>}

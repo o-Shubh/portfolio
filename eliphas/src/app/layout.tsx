@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Noto_Sans_Devanagari, Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
+import { Inter, JetBrains_Mono, Noto_Sans_Devanagari, Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
 import { ServiceWorker } from "@/components/ServiceWorker";
 import "./globals.css";
 
-// Interface text uses the device's own sans-serif (San Francisco, Roboto, Segoe UI), set in globals.css.
-// Source Serif 4 is only for books and editorial reading. Hindi falls through to the Noto Devanagari fonts.
+// Inter for all interface text and numbers (600 headlines, 500 navigation and buttons, 400 body).
+// Noto Sans Devanagari for Hindi. Source Serif 4 only for samples, article bodies and literary excerpts.
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], weight: ["400", "500", "600"], display: "swap" });
 const serif = Source_Serif_4({ variable: "--font-book-serif", subsets: ["latin"], weight: ["400", "600"], display: "swap", preload: false });
-// Mono for IDs (EEID, order numbers) and money columns
+// JetBrains Mono only for identifiers: order IDs, Eliphas Edition IDs, technical references
 const mono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"], weight: ["400", "500"], display: "swap", preload: false });
 const sansDeva = Noto_Sans_Devanagari({ variable: "--font-sans-deva", subsets: ["devanagari"], weight: ["400", "500", "600"], display: "swap", preload: false });
 const serifDeva = Noto_Serif_Devanagari({ variable: "--font-serif-deva", subsets: ["devanagari"], weight: ["400", "600"], display: "swap", preload: false });
@@ -62,7 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${serif.variable} ${sansDeva.variable} ${serifDeva.variable} ${mono.variable} h-full antialiased`}
+      className={`${inter.variable} ${serif.variable} ${sansDeva.variable} ${serifDeva.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

@@ -205,7 +205,7 @@ export function CheckoutForm({
                 <li key={it.slug} className="flex gap-4">
                   <div className={`${items.length > 1 ? "w-14" : "w-20"} shrink-0`}>{it.cover}</div>
                   <div className="min-w-0">
-                    <p className="font-serif leading-snug font-semibold">{it.title}</p>
+                    <p className=" leading-snug font-semibold">{it.title}</p>
                     <p className="text-sm text-muted">{it.author}</p>
                     <p className="mono mt-1 font-medium">
                       {rupees(it.mrp)}

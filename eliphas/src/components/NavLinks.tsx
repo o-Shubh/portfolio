@@ -99,8 +99,8 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition pointer-fine:h-9 ${
-                active ? "bg-surface-3 font-medium text-fg" : "text-fg/90 hover:bg-surface-3/60 hover:text-fg"
+              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] font-medium transition pointer-fine:h-9 ${
+                active ? "bg-surface-3 text-fg" : "text-fg/90 hover:bg-surface-3/60 hover:text-fg"
               }`}
             >
               <Icon className={`h-[1.1rem] w-[1.1rem] ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`} aria-hidden />
@@ -145,7 +145,7 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
                       href={item.href}
                       aria-current={on ? "page" : undefined}
                       onClick={() => setOpen(false)}
-                      className={`flex min-h-12 items-center gap-3 rounded-[var(--radius-control)] px-3 text-base ${on ? "bg-surface-2 font-semibold" : ""}`}
+                      className={`flex min-h-12 items-center gap-3 rounded-[var(--radius-control)] px-3 text-base font-medium ${on ? "bg-surface-2" : ""}`}
                     >
                       <Icon className="h-5 w-5 text-muted" aria-hidden />
                       {item.label}

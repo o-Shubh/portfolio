@@ -52,7 +52,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="display text-3xl">Order {o.order_number}</h1>
+        <h1 className="display text-3xl">Order <span className="id-mono">{o.order_number}</span></h1>
         <OrderStatusBadge status={o.status} />
       </div>
       <p className="mt-1 text-muted">{ORDER_STATUS[o.status].reader}</p>

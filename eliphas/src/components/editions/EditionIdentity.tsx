@@ -54,7 +54,7 @@ export async function EditionIdentity({
           <div className="relative rounded-[var(--radius-control)] bg-white p-1 ring-1 ring-line" data-testid="qr-preview">
             <div className="[&>svg]:block [&>svg]:h-auto [&>svg]:w-full" role="img" aria-label={`QR code linking to ${url}`} dangerouslySetInnerHTML={{ __html: svg }} />
             {!production && (
-              <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-white/90 py-1 text-center text-xs font-bold tracking-wide text-danger" aria-hidden>
+              <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-white/90 py-1 text-center text-xs font-semibold tracking-wide text-danger" aria-hidden>
                 PREVIEW · NOT FOR PRINT
               </span>
             )}

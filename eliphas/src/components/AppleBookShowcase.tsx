@@ -148,7 +148,7 @@ export default function AppleBookShowcase({
               · {book.meta}
             </p>
             {book.subtitle && (
-              <p className="mt-6 text-base leading-relaxed font-light text-neutral-300 sm:text-lg" lang={book.language}>
+              <p className="mt-6 text-base leading-relaxed text-neutral-300 sm:text-lg" lang={book.language}>
                 &ldquo;{book.subtitle}&rdquo;
               </p>
             )}

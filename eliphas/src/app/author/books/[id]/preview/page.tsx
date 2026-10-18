@@ -45,7 +45,7 @@ export default async function PreviewPage({ params }: PageProps<"/author/books/[
               <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} />
             </div>
             <div className="min-w-0">
-              <p className="font-serif text-2xl font-semibold">{book.title || "Untitled"}</p>
+              <p className=" text-2xl font-semibold">{book.title || "Untitled"}</p>
               {book.subtitle && <p className="text-muted">{book.subtitle}</p>}
               <p className="mt-1 text-sm" lang="en">
                 by <span className="font-medium text-accent-fg">{book.author_name}</span>

@@ -134,22 +134,22 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
                       <td className="p-3">
                         <span className="font-medium" lang={l.books?.language}>{l.books?.title}</span>
                         <span className="block text-xs text-muted">
-                          {l.orders.order_number} · {l.quantity} {l.quantity === 1 ? "copy" : "copies"}
+                          <span className="id-mono">{l.orders.order_number}</span> · {l.quantity} {l.quantity === 1 ? "copy" : "copies"}
                           {l.author_plan ? ` · ${l.author_plan === "pro" ? "Pro" : l.author_plan === "free" ? "Free" : "original"} terms` : ""}
                         </span>
                       </td>
                       <td className="p-3">
                         {void_ ? <span className="badge bg-surface-2">Refunded or cancelled</span> : <OrderStatusBadge status={l.orders.status} />}
                       </td>
-                      <td className="mono p-3 text-right">{rupees(sale)}</td>
-                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.print_cost_total))}`}</td>
-                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission))}`}</td>
-                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission_gst))}`}</td>
+                      <td className="mono p-3 text-right">{rupees(sale, true)}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.print_cost_total), true)}`}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission), true)}`}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission_gst), true)}`}</td>
                       <td className="mono p-3 text-right">
-                        {legacy || l.gateway_allocated === null ? "—" : `− ${rupees(n(l.gateway_allocated))}`}
+                        {legacy || l.gateway_allocated === null ? "—" : `− ${rupees(n(l.gateway_allocated), true)}`}
                         {!legacy && l.orders.gateway_fee_source === "estimated" && <span className="block text-xs text-muted">estimated</span>}
                       </td>
-                      <td className="mono p-3 text-right font-semibold">{void_ ? <s>{rupees(earning({ ...l, reversed_at: null }))}</s> : rupees(earning(l))}</td>
+                      <td className="mono p-3 text-right font-semibold">{void_ ? <s>{rupees(earning({ ...l, reversed_at: null }), true)}</s> : rupees(earning(l), true)}</td>
                     </tr>
                   );
                 })}

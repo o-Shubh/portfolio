@@ -72,7 +72,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
                 <div className="min-w-0">
                   <p className="font-medium">{o.order_items.map((i) => `${i.books?.title} × ${i.quantity}`).join(", ")}</p>
                   <p className="text-sm text-muted">
-                    {o.order_number} · {o.ship_name}, {o.ship_city} ({o.ship_state}) ·{" "}
+                    <span className="id-mono">{o.order_number}</span> · {o.ship_name}, {o.ship_city} ({o.ship_state}) ·{" "}
                     {new Date(o.paid_at ?? o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                   </p>
                 </div>

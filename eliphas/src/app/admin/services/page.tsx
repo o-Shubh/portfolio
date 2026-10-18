@@ -58,7 +58,7 @@ export default async function AdminServicesPage({ searchParams }: PageProps<"/ad
                     {o.kind === "pro_creative" ? "Pro creative" : o.service_catalog?.name} · {(o.requirements as { title?: string }).title ?? "Untitled"}
                   </span>
                   <span className="block text-sm text-muted">
-                    {o.order_number} · {o.profiles?.full_name} · updated {new Date(o.updated_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                    <span className="id-mono">{o.order_number}</span> · {o.profiles?.full_name} · updated {new Date(o.updated_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                   </span>
                 </span>
                 <ServiceStatusBadge status={o.status} />

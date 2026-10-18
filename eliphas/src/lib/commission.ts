@@ -174,8 +174,9 @@ export function withGst(basePaise: number, gstPercent: number) {
 }
 
 /** ₹1,234.50 from paise. */
-export function formatPaise(paise: number): string {
+/** Indian-format rupees from paise. `fixed` always shows two decimals, so figures in a table share one precision. */
+export function formatPaise(paise: number, fixed = false): string {
   const r = paise / 100;
-  const whole = Number.isInteger(r);
-  return "₹" + r.toLocaleString("en-IN", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: 2 });
+  const digits = fixed || !Number.isInteger(r) ? 2 : 0;
+  return "₹" + r.toLocaleString("en-IN", { minimumFractionDigits: digits, maximumFractionDigits: 2 });
 }

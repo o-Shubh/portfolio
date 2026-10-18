@@ -36,7 +36,7 @@ export function PostCard({ post, intent, linkToPost = true }: { post: FeedPost; 
           </p>
         </div>
       </header>
-      <p className="mt-3 font-serif text-[1.0625rem] leading-relaxed break-words whitespace-pre-line">{post.body}</p>
+      <p className="mt-3 text-[1.0625rem] leading-relaxed break-words whitespace-pre-line">{post.body}</p>
       {img && <img src={img} alt={post.image_alt ?? ""} loading="lazy" decoding="async" className="mt-3 max-h-[28rem] w-full rounded-[var(--radius-control)] bg-surface-2 object-cover ring-1 ring-line" />}
       {post.book && (
         <Link href={`/books/${post.book.slug}`} className="mt-3 flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] bg-surface-2 px-3 py-2 text-sm hover:bg-[color-mix(in_srgb,var(--surface-2),var(--fg)_5%)]">

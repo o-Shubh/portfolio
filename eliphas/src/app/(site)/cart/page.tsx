@@ -50,7 +50,7 @@ export default async function CartPage() {
                 <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-wrap items-start justify-between gap-x-4">
                     <div className="min-w-0">
-                      <Link href={`/books/${book.slug}`} className="font-serif text-lg leading-snug font-semibold hover:underline" lang={book.language}>
+                      <Link href={`/books/${book.slug}`} className=" text-lg leading-snug font-semibold hover:underline" lang={book.language}>
                         {book.title}
                       </Link>
                       <p className="text-sm text-muted">{book.author_name}</p>
@@ -133,7 +133,7 @@ export default async function CartPage() {
                   <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size="xs" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <Link href={`/books/${b.slug}`} className="line-clamp-1 font-serif font-semibold hover:underline" lang={b.language}>
+                  <Link href={`/books/${b.slug}`} className="line-clamp-1 font-semibold hover:underline" lang={b.language}>
                     {b.title}
                   </Link>
                   <p className="truncate text-xs text-muted">{b.author_name}</p>

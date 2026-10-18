@@ -69,7 +69,7 @@ export default async function PostPage({ params, searchParams }: PageProps<"/com
                   <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-serif leading-snug font-semibold" lang={book.language}>
+                  <p className=" leading-snug font-semibold" lang={book.language}>
                     {book.title}
                   </p>
                   <p className="text-xs text-muted">{book.author_name}</p>

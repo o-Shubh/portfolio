@@ -93,7 +93,7 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
               </div>
             )}
             <h1 className="display text-[1.875rem] leading-tight md:text-[2.375rem]">{name}</h1>
-            {author.bio && <p className="mt-2 max-w-2xl font-serif text-[1.0625rem] leading-relaxed whitespace-pre-line text-fg/90">{author.bio}</p>}
+            {author.bio && <p className="mt-2 max-w-2xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-fg/90">{author.bio}</p>}
             {verified && <p className="mt-2 max-w-2xl text-xs text-muted">{VERIFIED_NOTE}</p>}
             <dl className="mt-4 grid max-w-md grid-cols-3 gap-px overflow-hidden rounded-[var(--radius-control)] bg-line ring-1 ring-line">
               {stats.map((st) => (

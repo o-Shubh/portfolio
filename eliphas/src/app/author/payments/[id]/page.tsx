@@ -50,20 +50,20 @@ export default async function ReceiptPage({ params }: PageProps<"/author/payment
           <tbody className="divide-y divide-line">
             <tr>
               <td className="py-2">{p.description}</td>
-              <td className="py-2 text-right mono">{formatPaise(p.base_paise)}</td>
+              <td className="py-2 text-right mono">{formatPaise(p.base_paise, true)}</td>
             </tr>
             <tr>
               <td className="py-2 text-muted">GST ({Number(p.gst_percent)}%)</td>
-              <td className="py-2 text-right mono">{formatPaise(p.gst_paise)}</td>
+              <td className="py-2 text-right mono">{formatPaise(p.gst_paise, true)}</td>
             </tr>
             <tr className="font-semibold">
               <td className="py-2">Total paid</td>
-              <td className="py-2 text-right mono">{formatPaise(p.amount_paise)}</td>
+              <td className="py-2 text-right mono">{formatPaise(p.amount_paise, true)}</td>
             </tr>
             {p.refunded_paise > 0 && (
               <tr>
                 <td className="py-2 text-muted">Refunded</td>
-                <td className="py-2 text-right mono">− {formatPaise(p.refunded_paise)}</td>
+                <td className="py-2 text-right mono">− {formatPaise(p.refunded_paise, true)}</td>
               </tr>
             )}
           </tbody>

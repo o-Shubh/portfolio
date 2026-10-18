@@ -52,7 +52,7 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
         <ServiceStatusBadge status={o.status} />
       </div>
       <p className="mt-1 text-sm text-muted">
-        {o.order_number} · {o.profiles?.full_name} · catalogue v{cat?.version ?? "—"} · revisions {o.revisions_used}/{o.revisions_allowed}
+        <span className="id-mono">{o.order_number}</span> · {o.profiles?.full_name} · catalogue v{cat?.version ?? "—"} · revisions {o.revisions_used}/{o.revisions_allowed}
         {paidPaise > 0 && ` · paid ${formatPaise(paidPaise)}`}
       </p>
       {o.books && (
@@ -70,7 +70,7 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
         <p className="mt-2 rounded-lg bg-accent/15 px-3 py-2 text-sm">
           Being replaced by bundle upgrade{" "}
           <Link href={`/admin/services/orders/${replacedBy.id}`} className="font-semibold underline">
-            {replacedBy.order_number}
+            <span className="id-mono">{replacedBy.order_number}</span>
           </Link>
           . Don&apos;t quote or charge this request separately.
         </p>

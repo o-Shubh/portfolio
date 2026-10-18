@@ -35,12 +35,12 @@
   /* Restrained marigold: Pro badge, small highlights. Fill with navy text; use marigold-fg for text. */
   --color-marigold: #c98200;
 
-  /* Type: the device's own sans-serif for the interface; a book serif for editorial content.
-     Hindi letters fall through to Noto Devanagari when the system font lacks them. */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, var(--font-sans-deva), "Noto Sans Devanagari", sans-serif;
+  /* Type: Inter for the interface and numbers; Hindi letters fall through to Noto Sans Devanagari.
+     Source Serif 4 only for reading (samples, article bodies, literary excerpts). */
+  --font-sans: var(--font-inter), var(--font-sans-deva), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
   --font-heading: var(--font-sans);
   --font-serif: var(--font-book-serif), var(--font-serif-deva), "Iowan Old Style", Georgia, serif;
-  /* IDs (EEID, order numbers), prices and ledgers */
+  /* Identifiers only: order IDs, Eliphas Edition IDs, technical references */
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Radii: restrained */
@@ -219,7 +219,9 @@ body {
     line-height: 1.4;
     letter-spacing: 0;
   }
-  :lang(hi) { line-height: 1.7; }
+  :lang(hi) { line-height: 1.7; letter-spacing: normal; }
+  /* Figures line up in every table, statistic and calculator */
+  table, dl, output { font-variant-numeric: tabular-nums; }
 
   /* One visible, consistent focus ring for keyboard users (not shown on mouse/touch) */
   :focus-visible {
@@ -265,7 +267,7 @@ body {
 
 /* Buttons: one primary per task area; ghost for secondary; accent (marigold) only for buying */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition-[background-color,opacity,box-shadow] duration-150 select-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 text-[0.9375rem] font-medium whitespace-nowrap transition-[background-color,opacity,box-shadow] duration-150 select-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55;
 }
 @utility btn-primary {
   @apply btn bg-primary text-on-primary hover:opacity-90;
@@ -305,14 +307,14 @@ body {
   @apply mt-1.5 text-sm text-muted;
 }
 @utility eyebrow {
-  @apply inline-flex items-center gap-2 text-sm font-semibold text-accent-fg;
+  @apply inline-flex items-center gap-2 text-sm font-medium text-accent-fg;
 }
 /* Filter chips and segmented tabs: 44 px tall on touch screens */
 @utility chip {
   @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium whitespace-nowrap ring-1 ring-line ring-inset transition hover:bg-surface-2 md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
 }
 @utility badge {
-  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
 }
 /* Verified author: navy on pale cobalt. Pro: marigold on cream. Never the same look. */
 @utility badge-verified {
@@ -370,6 +372,7 @@ body {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 @utility kbd {
   @apply rounded bg-surface-2 px-1 py-0.5 text-[0.7rem] text-muted;
@@ -501,7 +504,7 @@ body {
   vertical-align: top;
 }
 .ledger tr:last-child td { border-bottom: 0; }
-.ledger .num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ledger .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ledger-wrap { overflow-x: auto; border-radius: var(--radius-card); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
 
 /* Data tables everywhere (orders, finance, payouts): ledger-style headers and a quiet header band */
@@ -581,7 +584,7 @@ body {
 /* Hindi headlines: no negative tracking, a little more line height */
 :lang(hi) .display, .display:lang(hi) { letter-spacing: 0; line-height: 1.3; }
 /* Book titles may keep the book serif */
-.display.book-title { font-family: var(--font-serif); letter-spacing: -0.01em; }
+/* Book titles use the interface font like every other heading (serif is for reading only) */
 
 /* Scroll reveal: visible by default; only sections JS confirmed are below the fold start hidden */
 .reveal { transition: opacity 600ms ease, transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1); }

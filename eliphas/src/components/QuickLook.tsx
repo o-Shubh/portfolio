@@ -39,7 +39,7 @@ export function QuickLook({
           <div className="flex gap-5">
             <div className="w-28 shrink-0 sm:w-36">{cover}</div>
             <div className="min-w-0 flex-1">
-              <h2 id={`ql-${book.id}`} className="font-serif text-xl leading-snug font-semibold tracking-normal" lang={book.language}>
+              <h2 id={`ql-${book.id}`} className=" text-xl leading-snug font-semibold tracking-normal" lang={book.language}>
                 {book.title}
               </h2>
               <p className="mt-0.5 text-sm text-muted">{book.author}</p>

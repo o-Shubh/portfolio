@@ -39,7 +39,7 @@ export default async function ServicesPage() {
                   <span className="min-w-0">
                     <span className="block font-medium">{o.kind === "pro_creative" ? "Pro creative" : o.service_catalog?.name}</span>
                     <span className="block text-sm text-muted">
-                      {o.order_number} · {(o.requirements as { title?: string }).title ?? "Untitled"}
+                      <span className="id-mono">{o.order_number}</span> · {(o.requirements as { title?: string }).title ?? "Untitled"}
                     </span>
                   </span>
                   <span className="flex items-center gap-2">

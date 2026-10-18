@@ -31,7 +31,7 @@ export default async function IssuesPage() {
             <li key={i.id} className="card space-y-3">
               <div className="flex flex-wrap justify-between gap-2">
                 <p className="font-medium">
-                  {KIND[i.kind]} · order {i.orders?.order_number} · {i.orders?.ship_name} · printer {i.orders?.printers?.name ?? "—"}
+                  {KIND[i.kind]} · order <span className="id-mono">{i.orders?.order_number}</span> · {i.orders?.ship_name} · printer {i.orders?.printers?.name ?? "—"}
                 </p>
                 <span className="text-sm font-semibold">{i.status}</span>
               </div>
