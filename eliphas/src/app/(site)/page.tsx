@@ -4,6 +4,7 @@ import { BookShelf } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
 import { coverUrl, listGenres, listPublishedBooks } from "@/lib/books";
 import { estimateCopy, formatPaise, ruleFromPlanVersion } from "@/lib/commission";
+import { getCurrentProfile } from "@/lib/auth";
 import { getCurrentPlans } from "@/lib/plans";
 import { gatewayPercent, printCost, rupees } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
@@ -20,11 +21,12 @@ const FACTS = [
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const { account } = await searchParams;
-  const [{ books }, genres, { rates, fees }, plans] = await Promise.all([
+  const [{ books }, genres, { rates, fees }, plans, me] = await Promise.all([
     listPublishedBooks({ page: 1 }),
     listGenres(),
     getPricingSettings(),
     getCurrentPlans(),
+    getCurrentProfile(),
   ]);
   const heroBooks = books.slice(0, 3);
   const hindi = books.filter((b) => b.language === "hi");
@@ -52,10 +54,19 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             <Link href="/books" className="btn-accent">
               Browse books <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
-            <Link href="/login/author" className="btn-ghost">
+            <Link href="/login/author?mode=signup" className="btn-ghost">
               Publish your book
             </Link>
           </div>
+          {!me && (
+            <p className="mt-4 text-sm text-muted" data-testid="home-signup">
+              New here?{" "}
+              <Link href="/login?mode=signup" className="font-semibold text-accent-fg hover:underline">
+                Create a free account
+              </Link>{" "}
+              to save books, follow authors and join the community.
+            </p>
+          )}
         </div>
         {heroBooks.length === 3 && (
           <div className="relative mx-auto hidden h-72 w-full max-w-sm md:block" aria-hidden>
@@ -115,7 +126,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <section className="card text-center">
           <p className="text-lg font-semibold">The first books are on their way</p>
           <p className="mt-1 text-muted">Authors are preparing their books for print. Are you one of them?</p>
-          <Link href="/login/author" className="btn-primary mt-5">
+          <Link href="/login/author?mode=signup" className="btn-primary mt-5">
             Publish your book
           </Link>
         </section>
@@ -139,7 +150,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               ))}
             </ol>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/login/author" className="btn bg-white text-navy hover:bg-white/90">
+              <Link href="/login/author?mode=signup" className="btn bg-white text-navy hover:bg-white/90">
                 Start publishing <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link href="/pricing" className="btn bg-transparent text-white ring-1 ring-white/30 ring-inset hover:bg-white/10">

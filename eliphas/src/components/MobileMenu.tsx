@@ -90,9 +90,14 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
               <ul className="divide-y divide-line bg-surface shadow-soft">{MORE.map((l) => row(l))}</ul>
               <div className="space-y-4 px-4 pt-6">
                 {showPublish && (
-                  <Link href="/login/author" onClick={() => setOpen(false)} className="btn-primary w-full">
-                    Publish your book
-                  </Link>
+                  <>
+                    <Link href="/login?mode=signup" onClick={() => setOpen(false)} className="btn-primary w-full" data-testid="menu-signup">
+                      Create a free account
+                    </Link>
+                    <Link href="/login/author?mode=signup" onClick={() => setOpen(false)} className="btn-ghost w-full">
+                      Publish your book
+                    </Link>
+                  </>
                 )}
                 <div className="flex items-center justify-between text-sm text-muted">
                   Appearance

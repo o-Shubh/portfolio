@@ -55,7 +55,7 @@ export function AppShell({
             <span className="min-w-0">
               <span className="block truncate text-sm font-medium">{profile.full_name}</span>
               <span className="block truncate text-xs text-muted">
-                {ROLE_LABEL[profile.role]} · {formatPhone(profile.phone)}
+                {ROLE_LABEL[profile.role]} · {formatPhone(profile.phone) || "Google account"}
               </span>
             </span>
           </Link>

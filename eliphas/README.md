@@ -236,6 +236,13 @@ eliphas/
   an existing reader who uses it is offered "Start publishing" on the same account (orders and saved items stay).
   Logged-out visitors to `/author/…` are sent to the author login, everything else to the reader login. Admins
   and printers can use either; their roles never change.
+- **Sign up is the same as logging in.** A new number (or Google account) creates an account. Both entrances
+  have a sign-up view (`/login?mode=signup`, `/login/author?mode=signup`) linked from the header ("Log in / Sign
+  up"), the phone menu, the home page and the footer.
+- **Continue with Google** appears on both entrances automatically once Google is switched on in Supabase (see
+  "Google sign-in setup" below). Google accounts start as readers (or authors via the author entrance) and
+  need no phone number. A Google sign-in and a mobile-number sign-in are separate accounts unless the person
+  connects Google in Settings → Ways to sign in.
 - **Printer** and **Admin** – only given by an admin. Add the phone number to the
   `role_invites` table (or, from milestone 4, the printer list); when that person
   logs in for the first time they get the role.
@@ -459,6 +466,27 @@ reduced motion.
 - **QR address.** QR codes use `PUBLIC_SITE_ORIGIN` (validated: https, a real domain, no path; localhost, preview
   and storage hosts are refused). Without it, previews are labelled "not for print" and downloads are off, with an
   admin message explaining what to set.
+
+### Google sign-in setup (about 10 minutes)
+
+1. **Google Cloud Console** → APIs & Services → **OAuth consent screen**: External, app name "Eliphas Indicus
+   Publications", your support email, logo optional; add your domain under Authorised domains. Publish the app.
+2. **Credentials** → Create credentials → **OAuth client ID** → Web application.
+   - Authorised JavaScript origins: `https://your-domain.in`
+   - Authorised redirect URI: `https://<your-project-ref>.supabase.co/auth/v1/callback`
+     (shown in Supabase → Authentication → Sign In / Providers → Google → "Callback URL").
+   Copy the **Client ID** and **Client secret**.
+3. **Supabase** → Authentication → Sign In / Providers → **Google**: enable, paste the Client ID and secret, save.
+4. **Supabase** → Authentication → **URL Configuration**: Site URL `https://your-domain.in`; add Redirect URLs
+   `https://your-domain.in/auth/callback` (and your Vercel preview pattern, e.g. `https://*-your-team.vercel.app/**`,
+   if you test on previews).
+5. Optional: Authentication → Sign In / Providers → turn on **Allow manual linking** so people can connect Google to
+   their existing mobile-number account (Settings → Ways to sign in).
+6. Within 5 minutes the "Continue with Google" button appears on `/login` and `/login/author`. Try it once with your
+   own Google account.
+
+Admin and printer roles are still given by phone number (`role_invites`) or by an admin; a Google sign-up is never
+made admin automatically.
 
 ### Release checklist (decisions and configuration still needed)
 
