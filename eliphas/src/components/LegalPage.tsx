@@ -44,7 +44,7 @@ export function LegalPage({
         <PrintButton />
       </header>
       <div className="mt-6 grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
-        <aside className="lg:sticky lg:top-24 lg:self-start print:hidden">
+        <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start print:hidden">
           <nav aria-label="Policies">
             <p className="mb-2 text-xs font-semibold tracking-[0.06em] text-muted uppercase">Policies</p>
             <ul className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:block lg:space-y-0.5 lg:px-0">

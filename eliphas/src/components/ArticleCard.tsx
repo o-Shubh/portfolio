@@ -27,7 +27,7 @@ export function ArticleCard({ a, showAuthor = true }: { a: Card; showAuthor?: bo
             {a.title}
           </Link>
         </h3>
-        <p className="mt-1.5 line-clamp-3 text-sm text-fg/75">{a.excerpt}</p>
+        <p className="mt-1.5 line-clamp-3 text-sm text-fg/90">{a.excerpt}</p>
         <p className="mt-auto flex flex-wrap items-center gap-x-1.5 pt-4 text-xs text-muted" lang="en">
           {showAuthor && a.author?.full_name && (
             <span className="inline-flex items-center gap-1 font-medium text-fg">

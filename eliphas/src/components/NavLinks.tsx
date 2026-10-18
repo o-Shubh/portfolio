@@ -100,7 +100,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition pointer-fine:h-9 ${
-                active ? "bg-surface-3 font-medium text-fg" : "text-fg/80 hover:bg-surface-3/60 hover:text-fg"
+                active ? "bg-surface-3 font-medium text-fg" : "text-fg/90 hover:bg-surface-3/60 hover:text-fg"
               }`}
             >
               <Icon className={`h-[1.1rem] w-[1.1rem] ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`} aria-hidden />

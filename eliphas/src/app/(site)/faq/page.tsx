@@ -62,7 +62,7 @@ export default function FaqPage() {
                       {f.q}
                       <ChevronDown className="h-4 w-4 shrink-0 text-muted transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
                     </summary>
-                    <p className="max-w-2xl px-4 pb-5 leading-relaxed text-fg/80 sm:px-5">{f.a}</p>
+                    <p className="max-w-2xl px-4 pb-5 leading-relaxed text-fg/90 sm:px-5">{f.a}</p>
                   </details>
                 ))}
               </div>

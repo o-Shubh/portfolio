@@ -136,7 +136,7 @@ export default async function CommunityPage({ searchParams }: PageProps<"/commun
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <ShieldCheck className="h-4 w-4 text-accent-fg" aria-hidden /> Community guidelines
             </h2>
-            <ul className="mt-2.5 space-y-2 text-sm text-fg/80">
+            <ul className="mt-2.5 space-y-2 text-sm text-fg/90">
               <li className="flex gap-2">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden /> Discuss the work, not the person.
               </li>

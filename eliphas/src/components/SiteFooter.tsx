@@ -76,7 +76,7 @@ export function SiteFooter() {
               <ul className="mt-3 space-y-0.5">
                 {c.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="inline-flex min-h-10 items-center text-sm text-muted transition hover:text-fg">
+                    <Link href={l.href} className="inline-flex min-h-11 items-center text-sm text-muted transition hover:text-fg pointer-fine:min-h-8">
                       {l.label}
                     </Link>
                   </li>

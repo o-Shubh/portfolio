@@ -88,7 +88,7 @@ export function BookRow({ book, verified, priority }: { book: PublicBook; verifi
           {verified && <VerifiedBadge compact />}
         </p>
         {book.description && (
-          <p className="mt-2 line-clamp-2 text-sm text-fg/80 max-sm:hidden" lang={book.language}>
+          <p className="mt-2 line-clamp-2 text-sm text-fg/90 max-sm:hidden" lang={book.language}>
             {book.description}
           </p>
         )}

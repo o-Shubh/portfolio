@@ -20,6 +20,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 8 | Author articles, follows, notifications, moderation | ✅ Done |
 | 9 | Author verification, community for everyone, samples on every book, open reviews | ✅ Done (migration 000015) |
 | 10 | Eliphas Edition IDs (EEID) and QR codes | ✅ Done (migration 000017) |
+| 11 | Redesign to the shared "Cupertino Editorial" system; admin Finance fix | ✅ Done (migration 000018) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
