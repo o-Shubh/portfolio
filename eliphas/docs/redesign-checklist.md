@@ -11,13 +11,13 @@ Verification: **checked** (browser screenshot reviewed + automated checks), **au
 | | **Public website** | | | | | |
 | 1 | Home | `/` | 01 | done | screenshots 1440/390 vs Stitch 01; no sideways scroll | Spotlight uses the newest real book; QR is real when an EEID exists |
 | 2 | Bookstore | `/books` | 02 | done | screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked | Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data) |
-| 3 | Book page | `/books/{book}` | 03 | todo | — |  |
-| 4 | Sample reader | `/books/{book}/sample` | 04 | todo | — |  |
-| 5 | Authors directory | `/authors` | 05 | todo | — |  |
-| 6 | Author profile | `/authors/{name}` | 06 | todo | — |  |
-| 7 | Reader profile | `/u/{name}` | 07 | todo | — |  |
-| 8 | Articles | `/articles` | 08 | todo | — |  |
-| 9 | Article | `/articles/{article}` | 09 | todo | — |  |
+| 3 | Book page | `/books/{book}` | 03 | done | screenshots 1440/390; no sideways scroll (also 768) | Stitch quantity stepper, formats/ePub, TOC, fake appraisals left out (no real data) |
+| 4 | Sample reader | `/books/{book}/sample` | 04 | done | typecheck; reader test m15/m17 pending in final run | PDF sample (real file), so no reflow/theme controls; end-of-sample buy panel added |
+| 5 | Authors directory | `/authors` | 05 | done | screenshots 1440/390; no sideways scroll | Verified filter uses real verification records |
+| 6 | Author profile | `/authors/{name}` | 06 | done | screenshots 1440/390; no sideways scroll | No Pro/academic credentials shown (not real data) |
+| 7 | Reader profile | `/u/{name}` | 07 | done | typecheck | Library/reading progress from Stitch NOT shown: private data |
+| 8 | Articles | `/articles` | 08 | done | screenshots 1440/390; no sideways scroll | No citations/DOI (not real data) |
+| 9 | Article | `/articles/{article}` | 09 | done | screenshots 1440/390; no sideways scroll | Outline built from the article's own headings |
 | 10 | Community feed | `/community` | 10 | todo | — |  |
 | 11 | Post | `/community/{post}` | 11 | todo | — |  |
 | 12 | Edit post | `/community/{post}/edit` | 12 | todo | — |  |
@@ -98,4 +98,4 @@ Verification: **checked** (browser screenshot reviewed + automated checks), **au
 
 ## Resume here
 
-Stage 1 shared system done except the dialog/sheet/toast pass. Stage 2: screens 1 (home) and 2 (bookstore) are done. Next: screen 3, the book page src/app/(site)/books/[slug]/page.tsx, compared with Stitch 03 at 1440 and 390. Helper scripts live in the session scratchpad: restart.sh, shot.mjs, side.mjs.
+Stage 2: screens 1-9 done. Next: screen 10 community feed (src/app/(site)/community), 11 post, 12 edit post, 13 edition page /e/[eeid], then cart/checkout 14-16, pricing 17, FAQ 18, contact 19, guidelines 20, legal 21-24. Then dialog/sheet/toast pass, then stage 4+ (auth, account, author, admin, printer). Helper scripts: session scratchpad restart.sh, shot.mjs, side.mjs.

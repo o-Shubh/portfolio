@@ -7,7 +7,7 @@ export function ArticleBody({ blocks }: { blocks: Block[] }) {
       {blocks.map((b, i) => {
         switch (b.t) {
           case "h2":
-            return <h2 key={i}><Inlines c={b.c} /></h2>;
+            return <h2 key={i} id={`s-${i}`} className="scroll-mt-24"><Inlines c={b.c} /></h2>;
           case "h3":
             return <h3 key={i}><Inlines c={b.c} /></h3>;
           case "quote":
@@ -46,4 +46,11 @@ function Inlines({ c }: { c: Inline[] }) {
       })}
     </>
   );
+}
+
+const plain = (c: Inline[]): string => c.map((n) => (n.t === "text" ? n.v : plain(n.c))).join("");
+
+/** Section headings for an "In this article" list; ids match the headings ArticleBody renders. */
+export function articleOutline(blocks: Block[]) {
+  return blocks.flatMap((b, i) => (b.t === "h2" ? [{ id: `s-${i}`, text: plain(b.c) }] : []));
 }

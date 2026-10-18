@@ -1,5 +1,48 @@
 {
-  "_next": "Stage 1 shared system done except the dialog/sheet/toast pass. Stage 2: screens 1 (home) and 2 (bookstore) are done. Next: screen 3, the book page src/app/(site)/books/[slug]/page.tsx, compared with Stitch 03 at 1440 and 390. Helper scripts live in the session scratchpad: restart.sh, shot.mjs, side.mjs.",
-  "1": {"impl": "done", "ver": "screenshots 1440/390 vs Stitch 01; no sideways scroll", "note": "Spotlight uses the newest real book; QR is real when an EEID exists"},
-  "2": {"impl": "done", "ver": "screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked", "note": "Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data)"}
+ "_next": "Stage 2: screens 1-9 done. Next: screen 10 community feed (src/app/(site)/community), 11 post, 12 edit post, 13 edition page /e/[eeid], then cart/checkout 14-16, pricing 17, FAQ 18, contact 19, guidelines 20, legal 21-24. Then dialog/sheet/toast pass, then stage 4+ (auth, account, author, admin, printer). Helper scripts: session scratchpad restart.sh, shot.mjs, side.mjs.",
+ "1": {
+  "impl": "done",
+  "ver": "screenshots 1440/390 vs Stitch 01; no sideways scroll",
+  "note": "Spotlight uses the newest real book; QR is real when an EEID exists"
+ },
+ "2": {
+  "impl": "done",
+  "ver": "screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked",
+  "note": "Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data)"
+ },
+ "3": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll (also 768)",
+  "note": "Stitch quantity stepper, formats/ePub, TOC, fake appraisals left out (no real data)"
+ },
+ "4": {
+  "impl": "done",
+  "ver": "typecheck; reader test m15/m17 pending in final run",
+  "note": "PDF sample (real file), so no reflow/theme controls; end-of-sample buy panel added"
+ },
+ "5": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll",
+  "note": "Verified filter uses real verification records"
+ },
+ "6": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll",
+  "note": "No Pro/academic credentials shown (not real data)"
+ },
+ "7": {
+  "impl": "done",
+  "ver": "typecheck",
+  "note": "Library/reading progress from Stitch NOT shown: private data"
+ },
+ "8": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll",
+  "note": "No citations/DOI (not real data)"
+ },
+ "9": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll",
+  "note": "Outline built from the article's own headings"
+ }
 }

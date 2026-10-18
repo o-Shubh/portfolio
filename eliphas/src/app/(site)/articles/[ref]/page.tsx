@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleCard, articleDate } from "@/components/ArticleCard";
-import { ArticleBody } from "@/components/ArticleBody";
+import { ArticleBody, articleOutline } from "@/components/ArticleBody";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { ArticleActions } from "@/components/articles/ArticleActions";
 import { ArticleComments } from "@/components/articles/ArticleComments";
 import { FollowButton } from "@/components/articles/FollowButton";
@@ -77,6 +78,8 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
   ]);
   const comments = await publicComments(a.id, state.blockedIds);
   const blocks = bodyBlocks(a);
+  const outline = articleOutline(blocks);
+  const verified = Boolean((await admin.from("profiles").select("verified_author_at").eq("id", a.author_id).maybeSingle()).data?.verified_author_at);
   const cover = coverUrl(a.cover_path);
   const isAuthor = me?.id === a.author_id;
   const name = author.full_name ?? "Eliphas author";
@@ -104,7 +107,8 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       {!isAuthor && <ViewBeacon articleId={a.id} />}
 
-      <article className="mx-auto w-full max-w-3xl px-4 pt-4 sm:px-6 md:pt-8" lang={a.language}>
+      <div className="container-x lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-10">
+      <article className="mx-auto w-full max-w-3xl pt-4 md:pt-8 lg:mx-0" lang={a.language}>
         <nav aria-label="Breadcrumb" className="truncate text-sm text-muted" lang="en">
           <Link href="/" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
             Home
@@ -131,13 +135,13 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
           <p className="eyebrow" lang="en">
             {topicLabel(a.topic)}
           </p>
-          <h1 className="mt-2 font-serif text-[2rem] leading-tight font-semibold tracking-[-0.01em] break-words md:text-[2.75rem]">{a.title}</h1>
-          <p className="mt-3 text-lg text-muted md:text-xl">{a.excerpt}</p>
+          <h1 className="display mt-2 text-[2rem] leading-tight break-words md:text-[2.75rem]">{a.title}</h1>
+          <p className="mt-3 font-serif text-lg text-muted italic md:text-xl">{a.excerpt}</p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3" lang="en">
             <AuthorAvatar name={author.full_name} path={author.avatar_path} />
             <div className="min-w-0 flex-1">
-              <p className="font-semibold">{profileHref ? <Link href={profileHref} className="hover:underline hover:underline-offset-2">{name}</Link> : name}</p>
+              <p className="flex items-center gap-1.5 font-semibold">{profileHref ? <Link href={profileHref} className="hover:underline hover:underline-offset-2">{name}</Link> : name}{verified && <VerifiedBadge compact />}</p>
               <p className="text-sm text-muted">
                 <time dateTime={firstDate ?? undefined}>{articleDate(firstDate)}</time>
                 {updated && (
@@ -160,12 +164,12 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
         </header>
 
         {cover && (
-          <figure className="mt-6 overflow-hidden rounded-xl bg-surface-2 ring-1 ring-line">
+          <figure className="mt-6 overflow-hidden rounded-[var(--radius-card)] bg-surface-2 ring-1 ring-line">
             <img src={cover} alt={a.cover_alt ?? ""} className="h-auto w-full" fetchPriority="high" />
           </figure>
         )}
 
-        <div className="mt-8">
+        <div className="mt-8 rounded-[18px] bg-surface px-5 py-6 ring-1 ring-line sm:px-10 sm:py-10 [&>.article-body>:first-child]:mt-0">
           <ArticleBody blocks={blocks} />
         </div>
 
@@ -184,7 +188,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
         </div>
 
         {book && (
-          <aside aria-label="Related book" className="mt-8 flex gap-4 rounded-xl bg-surface p-4 shadow-soft ring-1 ring-line" lang="en">
+          <aside aria-label="Related book" className="mt-8 flex gap-4 rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line" lang="en">
             <div className="w-20 shrink-0 sm:w-24">
               <BookCover title={book.title} author={book.author_name} slug={book.slug} src={bookCoverUrl(book.cover_path)} size="sm" />
             </div>
@@ -206,7 +210,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
           </aside>
         )}
 
-        <section aria-label="About the author" className="mt-8 rounded-xl bg-surface-2 p-5" lang="en">
+        <section aria-label="About the author" className="mt-8 rounded-[var(--radius-card)] bg-surface-2 p-5" lang="en">
           <div className="flex items-center gap-3">
             <AuthorAvatar name={author.full_name} path={author.avatar_path} size="lg" />
             <div className="min-w-0">
@@ -240,6 +244,38 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
           , and our team reviews every report.
         </p>
       </article>
+
+      <aside className="hidden pt-24 lg:block" aria-label="Article tools" lang="en">
+        <div className="sticky top-24 space-y-4">
+          {outline.length > 1 && (
+            <nav aria-label="In this article" className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line">
+              <p className="text-xs font-semibold tracking-[0.06em] text-muted uppercase">In this article</p>
+              <ol className="mt-2 space-y-0.5 text-sm">
+                {outline.map((o, i) => (
+                  <li key={o.id}>
+                    <a href={`#${o.id}`} className="flex gap-2 rounded-md px-2 py-1.5 hover:bg-surface-2" lang={a.language}>
+                      <span className="mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="line-clamp-2">{o.text}</span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
+          <div className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line">
+            <p className="text-xs font-semibold tracking-[0.06em] text-muted uppercase">Written by</p>
+            <p className="mt-2 flex items-center gap-2 font-medium">
+              <AuthorAvatar name={author.full_name} path={author.avatar_path} size="sm" />
+              <span className="truncate">{name}</span>
+              {verified && <VerifiedBadge compact />}
+            </p>
+            <p className="mono mt-3 text-xs text-muted">
+              {readingMinutes(a.word_count)} min read · {a.word_count.toLocaleString("en-IN")} words
+            </p>
+          </div>
+        </div>
+      </aside>
+      </div>
 
       {more.articles.length > 0 && (
         <section className="container-x mt-12" aria-labelledby="more-h" lang="en">

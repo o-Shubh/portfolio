@@ -1,4 +1,4 @@
-import { MessagesSquare } from "lucide-react";
+import { MessagesSquare, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
@@ -6,6 +6,7 @@ import { FollowButton } from "@/components/articles/FollowButton";
 import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { PostCard } from "@/components/community/PostCard";
 import { EmptyState } from "@/components/EmptyState";
+import { ShareButton } from "@/components/ShareButton";
 import { readerState } from "@/lib/articles";
 import { getCurrentProfile } from "@/lib/auth";
 import { FEED_PAGE, listPosts } from "@/lib/posts";
@@ -38,29 +39,59 @@ export default async function MemberPage({ params, searchParams }: PageProps<"/u
   ]);
   const pages = Math.max(1, Math.ceil(total / FEED_PAGE));
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 md:py-10">
-      <header className="flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-surface p-5 shadow-soft ring-1 ring-line">
+    <div className="container-x py-5 md:py-8">
+      <nav aria-label="Breadcrumb" className="text-sm text-muted">
+        <Link href="/community" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
+          Community
+        </Link>
+        <span className="mx-2" aria-hidden>
+          ›
+        </span>
+        <span className="text-fg">{p.full_name}</span>
+      </nav>
+      <header className="mt-2 flex flex-col gap-5 rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line sm:flex-row sm:items-start md:p-7">
         <AuthorAvatar name={p.full_name} path={p.avatar_path} size="lg" />
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl">{p.full_name}</h1>
-          <p className="text-sm text-muted tabular-nums">
-            Reader · {followers ?? 0} {followers === 1 ? "follower" : "followers"}
+          <h1 className="display text-[1.75rem] leading-tight md:text-[2.125rem]">{p.full_name}</h1>
+          <p className="mt-1 flex flex-wrap gap-x-3 text-sm text-muted">
+            <span>Reader</span>
+            <span>
+              <span className="mono text-fg">{followers ?? 0}</span> {followers === 1 ? "follower" : "followers"}
+            </span>
+            <span>
+              <span className="mono text-fg">{total}</span> {total === 1 ? "post" : "posts"}
+            </span>
           </p>
-          {p.bio && <p className="mt-2 whitespace-pre-line">{p.bio}</p>}
+          {p.bio && <p className="mt-3 max-w-2xl font-serif text-[1.0625rem] leading-relaxed whitespace-pre-line text-fg/90">{p.bio}</p>}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {me?.id !== p.id && !state.blockedWithAuthor && <FollowButton authorId={p.id!} authorName={p.full_name ?? "this member"} following={state.following} />}
+            <ShareButton path={`/u/${p.handle}`} title={p.full_name ?? undefined} label="Share profile" />
+          </div>
         </div>
-        {me?.id !== p.id && !state.blockedWithAuthor && <FollowButton authorId={p.id!} authorName={p.full_name ?? "this member"} following={state.following} />}
       </header>
-      <h2 className="mt-8 text-xl">Posts</h2>
-      <div className="mt-3 space-y-4">
-        {posts.length ? posts.map((post) => <PostCard key={post.id} post={post} />) : <EmptyState icon={MessagesSquare} title="No posts yet" />}
+      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <section aria-labelledby="posts-h" className="min-w-0">
+          <h2 id="posts-h" className="text-lg">
+            Posts
+          </h2>
+          <div className="mt-3 space-y-4">
+            {posts.length ? posts.map((post) => <PostCard key={post.id} post={post} />) : <EmptyState icon={MessagesSquare} title="No posts yet" />}
+          </div>
+          {pages > 1 && (
+            <nav aria-label="Pages" className="mt-8 flex items-center justify-center gap-3">
+              {page > 1 && <Link className="btn-ghost" href={`/u/${p.handle}?page=${page - 1}`}>Newer</Link>}
+              <span className="mono text-sm text-muted">Page {page} of {pages}</span>
+              {page < pages && <Link className="btn-ghost" href={`/u/${p.handle}?page=${page + 1}`}>Older</Link>}
+            </nav>
+          )}
+        </section>
+        <aside className="lg:pt-10">
+          <div className="notice-info">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-accent-fg" aria-hidden />
+            <p>Profiles show only a name, photo, bio and public posts. Orders, saved items, reading and phone numbers are never shown.</p>
+          </div>
+        </aside>
       </div>
-      {pages > 1 && (
-        <nav aria-label="Pages" className="mt-8 flex items-center justify-center gap-3">
-          {page > 1 && <Link className="btn-ghost" href={`/u/${p.handle}?page=${page - 1}`}>Newer</Link>}
-          <span className="text-sm text-muted">Page {page} of {pages}</span>
-          {page < pages && <Link className="btn-ghost" href={`/u/${p.handle}?page=${page + 1}`}>Older</Link>}
-        </nav>
-      )}
     </div>
   );
 }
