@@ -48,7 +48,7 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
         <ArrowLeft className="h-4 w-4" aria-hidden /> Services
       </Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl">{o.kind === "pro_creative" ? "Pro creative" : cat?.name}</h1>
+        <h1 className="display text-2xl">{o.kind === "pro_creative" ? "Pro creative" : cat?.name}</h1>
         <ServiceStatusBadge status={o.status} />
       </div>
       <p className="mt-1 text-sm text-muted">

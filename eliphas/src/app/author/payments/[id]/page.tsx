@@ -28,7 +28,7 @@ export default async function ReceiptPage({ params }: PageProps<"/author/payment
       <div className="card space-y-6 print:shadow-none print:ring-0">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl">{taxInvoice ? "Tax invoice" : "Payment receipt"}</h1>
+            <h1 className="display text-2xl">{taxInvoice ? "Tax invoice" : "Payment receipt"}</h1>
             <p className="text-sm text-muted">No. {p.receipt_number}</p>
             <p className="text-sm text-muted">{new Date(p.paid_at ?? p.created_at).toLocaleDateString("en-IN", { dateStyle: "long" })}</p>
           </div>

@@ -30,7 +30,7 @@ export function ServiceCard({ item, actions, headingLevel = 3 }: { item: Catalog
           {item.name}
         </H>
         <p className="mt-1 text-2xl font-semibold mono">{price.main}</p>
-        <p className="text-sm text-muted mono">{price.detail}</p>
+        <p className="text-sm text-muted tabular-nums">{price.detail}</p>
         <p className="mt-2 text-sm text-muted">{item.scope}</p>
       </header>
 

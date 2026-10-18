@@ -84,7 +84,7 @@ export function BookAddOns({ bookId, options, requests }: { bookId: string; opti
                   <span className={`min-w-0 ${blocked ? "opacity-70" : ""}`}>
                     <span className="flex flex-wrap items-baseline gap-x-2">
                       <span className="font-semibold">{o.name}</span>
-                      <span className="text-sm mono text-muted">{o.price}</span>
+                      <span className="text-sm text-muted tabular-nums">{o.price}</span>
                     </span>
                     {blocked ? (
                       <span className="mt-0.5 block text-xs font-medium">{blocked}</span>

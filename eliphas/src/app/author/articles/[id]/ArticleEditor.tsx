@@ -296,7 +296,7 @@ export function ArticleEditor({
         {preview ? (
           <article className="card" lang={f.language}>
             {cover && <img src={cover} alt={f.cover_alt} className="mb-5 aspect-[16/9] w-full rounded-[var(--radius-card)] object-cover" />}
-            <h1 className="text-3xl md:text-4xl">{f.title || "Untitled article"}</h1>
+            <h1 className="display text-3xl md:text-4xl">{f.title || "Untitled article"}</h1>
             {f.excerpt && <p className="mt-3 text-lg text-muted">{f.excerpt}</p>}
             <p className="mt-2 text-sm text-muted">{readingMinutes(words)} min read · preview, not published</p>
             <div className="mt-6 max-w-[68ch]">

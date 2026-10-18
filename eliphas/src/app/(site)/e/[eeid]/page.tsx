@@ -60,7 +60,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
   if (state === "removed" || !b) {
     return shell(
       <div className="mx-auto max-w-md text-center">
-        <h1 className="text-2xl">This edition is not available</h1>
+        <h1 className="display text-2xl">This edition is not available</h1>
         <div className="mt-3">{idLine}</div>
         <Link href="/books" className="btn-ghost mt-6 inline-flex">
           Browse the bookstore
@@ -71,7 +71,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
   if (state === "pending") {
     return shell(
       <div className="mx-auto max-w-md text-center">
-        <h1 className="text-2xl">Not yet available</h1>
+        <h1 className="display text-2xl">Not yet available</h1>
         <p className="mt-2 text-muted">This edition has been approved and will appear here when it&apos;s published.</p>
         <div className="mt-3">{idLine}</div>
         <Link href="/books" className="btn-ghost mt-6 inline-flex">

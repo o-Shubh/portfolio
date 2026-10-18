@@ -91,7 +91,7 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
               <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl md:text-3xl" lang={book.language}>
+              <h1 className="display text-2xl md:text-3xl" lang={book.language}>
                 {book.title}
               </h1>
               {book.subtitle && <p className="text-muted">{book.subtitle}</p>}
