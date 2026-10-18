@@ -52,7 +52,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             <Link href="/books" className="btn-accent">
               Browse books <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
-            <Link href="/login?next=/author" className="btn-ghost">
+            <Link href="/login/author" className="btn-ghost">
               Publish your book
             </Link>
           </div>
@@ -115,7 +115,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <section className="card text-center">
           <p className="text-lg font-semibold">The first books are on their way</p>
           <p className="mt-1 text-muted">Authors are preparing their books for print. Are you one of them?</p>
-          <Link href="/login?next=/author" className="btn-primary mt-5">
+          <Link href="/login/author" className="btn-primary mt-5">
             Publish your book
           </Link>
         </section>
@@ -139,7 +139,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               ))}
             </ol>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/login?next=/author" className="btn bg-white text-navy hover:bg-white/90">
+              <Link href="/login/author" className="btn bg-white text-navy hover:bg-white/90">
                 Start publishing <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link href="/pricing" className="btn bg-transparent text-white ring-1 ring-white/30 ring-inset hover:bg-white/10">

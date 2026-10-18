@@ -230,6 +230,12 @@ eliphas/
 - **Author** – chosen at sign-up ("I'm joining as an author") or later from Account → Author verification.
   It's the same account, so authors keep everything readers can do. Publishing books is self-service;
   **Verified author** (below) is a separate, admin-given badge.
+- **Two logins, one account.** `/login` is the **reader login** (buying, reading, community) and `/login/author`
+  is the **author login** (publishing dashboard), with a Reader/Author switch on both. Both use the same
+  mobile-number account, so nobody needs two accounts. A new number on the author login is set up as an author;
+  an existing reader who uses it is offered "Start publishing" on the same account (orders and saved items stay).
+  Logged-out visitors to `/author/…` are sent to the author login, everything else to the reader login. Admins
+  and printers can use either; their roles never change.
 - **Printer** and **Admin** – only given by an admin. Add the phone number to the
   `role_invites` table (or, from milestone 4, the printer list); when that person
   logs in for the first time they get the role.

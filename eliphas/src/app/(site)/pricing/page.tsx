@@ -68,7 +68,7 @@ export default async function PricingPage() {
               Commission: {free.percent}% of the book price per copy, minimum {formatPaise(free.minPaise)}, plus {free.gstPercent}% GST on the commission
             </Li>
           </ul>
-          <Link href="/login?next=/author" className="btn-primary mt-6 w-full">
+          <Link href="/login/author" className="btn-primary mt-6 w-full">
             Start publishing free
           </Link>
         </div>
@@ -92,7 +92,7 @@ export default async function PricingPage() {
             <Li>Unused creative credits don&apos;t roll over</Li>
             <Li>Not included: cover design, manuscript editing, book formatting, advertising spend, guaranteed sales</Li>
           </ul>
-          <Link href="/login?next=/author/plan" className="btn-accent mt-6 w-full">
+          <Link href="/login/author?next=/author/plan" className="btn-accent mt-6 w-full">
             Get Pro
           </Link>
         </div>
@@ -172,7 +172,7 @@ export default async function PricingPage() {
                 key={c.id}
                 item={c as CatalogItem}
                 actions={
-                  <Link href="/login?next=/author/services" className="btn-primary">
+                  <Link href="/login/author?next=/author/services" className="btn-primary">
                     Request this service
                   </Link>
                 }

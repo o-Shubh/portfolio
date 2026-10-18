@@ -35,7 +35,8 @@ export async function updateSession(request: NextRequest) {
 
   if (!loggedIn && isProtected) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    // Author pages go to the author login; everything else to the reader login
+    url.pathname = path === "/author" || path.startsWith("/author/") ? "/login/author" : "/login";
     url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}`;
     const redirect = NextResponse.redirect(url);
     response.cookies.getAll().forEach((c) => redirect.cookies.set(c));

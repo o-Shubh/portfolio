@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { ChevronDown } from "lucide-react";
 import { COUNTRIES, countryByIso, DEFAULT_COUNTRY, formatPhone, toInternational } from "@/lib/phone";
 
-export function LoginForm({ next }: { next: string }) {
+/** Phone + code sign-in. `audience` is which entrance was used (reader or author login); both use the same account. */
+export function LoginForm({ next, audience = "reader" }: { next: string; audience?: "reader" | "author" }) {
   const router = useRouter();
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [country, setCountry] = useState<string>(DEFAULT_COUNTRY);
@@ -50,9 +51,19 @@ export function LoginForm({ next }: { next: string }) {
       setError(friendly(error.message));
       return;
     }
-    // New accounts set up their name first, then carry on to where they were going (e.g. liking an article)
-    const { data: profile } = data.user ? await supabase.from("profiles").select("full_name").eq("id", data.user.id).maybeSingle() : { data: null };
-    router.replace(!profile?.full_name && next !== "/dashboard" ? `/onboarding?next=${encodeURIComponent(next)}` : next);
+    // New accounts set up their name first, then carry on to where they were going (e.g. liking an article).
+    // On the author login, new accounts are set up as authors, and existing reader accounts are offered publishing.
+    const { data: profile } = data.user ? await supabase.from("profiles").select("full_name, role").eq("id", data.user.id).maybeSingle() : { data: null };
+    const dest = !profile?.full_name
+      ? audience === "author"
+        ? `/onboarding?as=author&next=${encodeURIComponent(next)}`
+        : next !== "/dashboard"
+          ? `/onboarding?next=${encodeURIComponent(next)}`
+          : next
+      : audience === "author" && profile.role === "reader"
+        ? `/login/author/start?next=${encodeURIComponent(next)}`
+        : next;
+    router.replace(dest);
     router.refresh();
   }
 

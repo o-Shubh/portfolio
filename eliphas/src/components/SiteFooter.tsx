@@ -13,7 +13,7 @@ const COLUMNS = [
   {
     title: "Publish",
     links: [
-      { href: "/login?next=/author", label: "Start publishing" },
+      { href: "/login/author", label: "Start publishing" },
       { href: "/pricing", label: "Pricing and royalties" },
       { href: "/faq", label: "Help and FAQ" },
     ],
@@ -21,7 +21,8 @@ const COLUMNS = [
   {
     title: "Account",
     links: [
-      { href: "/login", label: "Log in" },
+      { href: "/login", label: "Reader login" },
+      { href: "/login/author", label: "Author login" },
       { href: "/account", label: "My orders" },
       { href: "/account/profile", label: "Profile" },
     ],
