@@ -62,7 +62,7 @@ export default async function MemberPage({ params, searchParams }: PageProps<"/u
               <span className="mono text-fg">{total}</span> {total === 1 ? "post" : "posts"}
             </span>
           </p>
-          {p.bio && <p className="mt-3 max-w-2xl font-serif text-[1.0625rem] leading-relaxed whitespace-pre-line text-fg/90">{p.bio}</p>}
+          {p.bio && <p className="mt-3 max-w-2xl text-[1.0625rem] leading-relaxed whitespace-pre-line text-fg/90">{p.bio}</p>}
           <div className="mt-4 flex flex-wrap gap-2">
             {me?.id !== p.id && !state.blockedWithAuthor && <FollowButton authorId={p.id!} authorName={p.full_name ?? "this member"} following={state.following} />}
             <ShareButton path={`/u/${p.handle}`} title={p.full_name ?? undefined} label="Share profile" />

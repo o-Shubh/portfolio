@@ -26,7 +26,7 @@ export function BookCard({ book, priority, showAdd = true }: { book: PublicBook;
         </div>
       </div>
       <div className="flex flex-1 flex-col px-0.5 pt-3">
-        <h3 className="line-clamp-2 font-serif text-[1.02rem] leading-snug font-semibold tracking-normal" lang={book.language}>
+        <h3 className="line-clamp-2 text-[1.02rem] leading-snug font-semibold tracking-normal" lang={book.language}>
           <Link href={`/books/${book.slug}`} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
             {book.title}
           </Link>
@@ -84,7 +84,7 @@ export function BookRow({ book, verified, priority }: { book: PublicBook; verifi
             {book.isbn && <span className="id-mono rounded bg-surface-2 px-1.5 py-0.5">ISBN {book.isbn}</span>}
           </p>
         )}
-        <h3 className="mt-1.5 font-serif text-lg leading-snug font-semibold tracking-normal sm:text-xl" lang={book.language}>
+        <h3 className="mt-1.5 text-lg leading-snug font-semibold tracking-normal sm:text-xl" lang={book.language}>
           <Link href={`/books/${book.slug}`} className="rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
             {book.title}
           </Link>

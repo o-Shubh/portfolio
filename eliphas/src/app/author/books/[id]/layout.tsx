@@ -15,7 +15,7 @@ export default async function BookEditorLayout({ children, params }: LayoutProps
         <ArrowLeft className="h-4 w-4" aria-hidden /> My books
       </Link>
       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h1 className="display book-title text-2xl md:text-3xl" lang={book.language}>
+        <h1 className="display text-2xl md:text-3xl" lang={book.language}>
           {book.title}
         </h1>
         <StatusBadge status={book.status} />

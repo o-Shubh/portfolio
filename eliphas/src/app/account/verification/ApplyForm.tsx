@@ -28,7 +28,7 @@ export function ApplyForm({ initial }: { initial: { pen_name: string; bio: strin
         </label>
         <select id="v-lang" name="language" className="field" defaultValue={initial.language || "en"}>
           <option value="en">English</option>
-          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="hi">Hindi</option>
           <option value="both">Both</option>
         </select>
       </div>

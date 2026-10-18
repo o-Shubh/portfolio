@@ -51,7 +51,7 @@ export default async function AuthorOrders({ searchParams }: PageProps<"/author/
                     <OrderStatusBadge status={o.status} />
                   </td>
                   <td className="p-4 whitespace-nowrap text-muted">{o.delivered_at ? `Delivered ${d(o.delivered_at)}` : o.shipped_at ? `Shipped ${d(o.shipped_at)}` : "—"}</td>
-                  <td className="p-4 text-right font-semibold mono">{rupees(Number(o.earning))}</td>
+                  <td className="p-4 text-right font-semibold mono">{rupees(Number(o.earning), true)}</td>
                 </tr>
               ))}
             </tbody>

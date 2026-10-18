@@ -90,7 +90,7 @@ export default async function PrinterHome({ searchParams }: PageProps<"/printer"
                       {o.order_items.map((i) => i.books?.title).join(", ")}
                     </p>
                     <p className="text-sm text-muted">
-                      {o.order_number} · {copies} {copies === 1 ? "copy" : "copies"} · to {o.ship_city}, {o.ship_state}
+                      <span className="id-mono">{o.order_number}</span> · {copies} {copies === 1 ? "copy" : "copies"} · to {o.ship_city}, {o.ship_state}
                     </p>
                     <div className="mt-2 flex items-center gap-2">
                       <OrderStatusBadge status={o.status} />

@@ -54,7 +54,7 @@ export function EditionIdStory({
           <div className="w-full max-w-[15rem] rounded-[18px] bg-surface p-4 text-left shadow-sheet ring-1 ring-line">
             <p className="text-[0.65rem] font-semibold tracking-[0.06em] text-muted uppercase">Eliphas Edition ID</p>
             <p className="id-mono mt-0.5 text-sm font-medium">{id}</p>
-            <p className="mt-3 line-clamp-2 font-serif font-semibold" lang={book?.language}>
+            <p className="mt-3 line-clamp-2 font-semibold" lang={book?.language}>
               {book?.title ?? "Your book"}
             </p>
             <p className="text-xs text-muted">{book ? `${book.author_name} · ${book.format}` : "Author · Paperback"}</p>

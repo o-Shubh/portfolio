@@ -128,7 +128,7 @@ export function SampleReader({
                       </Link>
         )}
         <div className="min-w-0 flex-1 sm:text-center">
-          <p className="truncate font-serif font-semibold">{title}</p>
+          <p className="truncate font-semibold">{title}</p>
           <p className="truncate text-[0.7rem] text-muted">
             <span className="mono mr-1.5 inline-flex items-center gap-1 tracking-[0.06em] text-marigold-fg uppercase">
               <span className="h-1.5 w-1.5 rounded-full bg-marigold" aria-hidden /> Free sample

@@ -17,8 +17,8 @@ export function NewBookForm() {
       <fieldset>
         <legend className="label">Language of the book</legend>
         <div className="grid grid-cols-2 gap-3">
-          <Choice name="language" value="hi" label="हिन्दी" sub="Hindi" />
-          <Choice name="language" value="en" label="English" sub="अंग्रेज़ी" />
+          <Choice name="language" value="hi" label="Hindi" sub="Devanagari script" />
+          <Choice name="language" value="en" label="English" sub="Latin script" />
         </div>
       </fieldset>
       <FormMessage state={state} />

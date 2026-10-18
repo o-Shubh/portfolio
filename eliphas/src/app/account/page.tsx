@@ -42,9 +42,9 @@ export default async function AccountHome() {
               <li key={o.id}>
                 <Link href={`/account/orders/${o.id}`} className="flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-surface-2/60 sm:px-5">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-serif font-semibold">{titles}</p>
+                    <p className="truncate font-semibold">{titles}</p>
                     <p className="text-sm text-muted">
-                      <span className="mono">{o.order_number}</span> · {copies} {copies === 1 ? "copy" : "copies"} · <span className="mono">{rupees(Number(o.total))}</span> ·{" "}
+                      <span className="id-mono">{o.order_number}</span> · {copies} {copies === 1 ? "copy" : "copies"} · <span className="mono">{rupees(Number(o.total))}</span> ·{" "}
                       {new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                     </p>
                     <div className="mt-2">

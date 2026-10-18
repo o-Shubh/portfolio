@@ -148,7 +148,7 @@ export default function AppleBookShowcase({
               · {book.meta}
             </p>
             {book.subtitle && (
-              <p className="mt-6 text-base leading-relaxed font-light text-neutral-300 sm:text-lg" lang={book.language}>
+              <p className="mt-6 text-base leading-relaxed text-neutral-300 sm:text-lg" lang={book.language}>
                 &ldquo;{book.subtitle}&rdquo;
               </p>
             )}
@@ -232,10 +232,10 @@ export default function AppleBookShowcase({
             <Bento icon={Layers} tone="rose" label="Binding" title={book.specs.binding}>
               Trim size {book.specs.size}. Covers and pages are checked by our team before a book goes live.
             </Bento>
-            <Bento wide icon={Languages} tone="teal" label="Two languages" title="Hindi and English" watermark="अ / A">
+            <Bento wide icon={Languages} tone="teal" label="Two languages" title="Hindi and English">
               Independent voices in both languages.{" "}
-              <Link href="/books?lang=hi" className="text-neutral-200 underline-offset-2 hover:underline" lang="hi">
-                हिन्दी पुस्तकें
+              <Link href="/books?lang=hi" className="text-neutral-200 underline-offset-2 hover:underline">
+                Hindi books
               </Link>{" "}
               ·{" "}
               <Link href="/books?lang=en" className="text-neutral-200 underline-offset-2 hover:underline">

@@ -198,8 +198,8 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
                 </span>
               ))}
             </div>
-            <h1 className="display book-title mt-3 text-[1.875rem] leading-tight md:text-[2.375rem]">{book.title}</h1>
-            {book.subtitle && <p className="mt-1.5 font-serif text-lg text-muted italic md:text-xl">{book.subtitle}</p>}
+            <h1 className="display mt-3 text-[1.875rem] leading-tight md:text-[2.375rem]">{book.title}</h1>
+            {book.subtitle && <p className="mt-1.5 text-lg text-muted md:text-xl">{book.subtitle}</p>}
             <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" lang="en">
               <AuthorAvatar name={book.author_name} path={author?.avatar_path ?? null} size="sm" />
               <p className="flex items-center gap-1.5 text-sm">

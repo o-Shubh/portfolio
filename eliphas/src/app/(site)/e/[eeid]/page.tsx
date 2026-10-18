@@ -104,10 +104,10 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold tracking-[0.06em] text-muted uppercase">Edition record</p>
-          <h1 className="display book-title mt-1.5 text-[1.875rem] leading-tight md:text-[2.5rem]" lang={b.language}>
+          <h1 className="display mt-1.5 text-[1.875rem] leading-tight md:text-[2.5rem]" lang={b.language}>
             {b.title}
           </h1>
-          {b.subtitle && <p className="mt-1 font-serif text-lg text-muted italic" lang={b.language}>{b.subtitle}</p>}
+          {b.subtitle && <p className="mt-1 text-lg text-muted" lang={b.language}>{b.subtitle}</p>}
           <p className="mt-2 text-sm">
             by{" "}
             {handle ? (

@@ -131,14 +131,14 @@ export default async function PricingPage() {
                 ).map(([k, a, b]) => (
                   <tr key={k}>
                     <td>{k}</td>
-                    <td className="num">{k === "Book price" ? "" : "− "}{formatPaise(a)}</td>
-                    <td className="num">{k === "Book price" ? "" : "− "}{formatPaise(b)}</td>
+                    <td className="num">{k === "Book price" ? "" : "− "}{formatPaise(a, true)}</td>
+                    <td className="num">{k === "Book price" ? "" : "− "}{formatPaise(b, true)}</td>
                   </tr>
                 ))}
                 <tr className="bg-tint-success font-semibold">
                   <td>You earn per copy</td>
-                  <td className="num text-success">{formatPaise(exFree.authorEarningPaise)}</td>
-                  <td className="num text-success">{formatPaise(exPro.authorEarningPaise)}</td>
+                  <td className="num text-success">{formatPaise(exFree.authorEarningPaise, true)}</td>
+                  <td className="num text-success">{formatPaise(exPro.authorEarningPaise, true)}</td>
                 </tr>
               </tbody>
             </table>
@@ -224,8 +224,8 @@ export default async function PricingPage() {
                           "—"
                         ) : (
                           <>
-                            <span className="font-medium">{rupees(c)}</span>
-                            <span className="block text-xs text-muted">lowest price {rupees(minimumPriceRupees(c * 100, free, gw))}</span>
+                            <span className="font-medium">{rupees(c, true)}</span>
+                            <span className="block text-xs text-muted">lowest price {rupees(minimumPriceRupees(c * 100, free, gw), true)}</span>
                           </>
                         )}
                       </td>

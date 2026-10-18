@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
+import { usePresence } from "@/lib/use-presence";
 import { createPortal } from "react-dom";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -31,6 +32,7 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
   }
 
   const sheet = useRef<HTMLDivElement>(null);
+  const { mounted, shown } = usePresence(open);
   const close = useCallback(() => setOpen(false), []);
   useDialogFocus(open, sheet, close);
   useEffect(() => {
@@ -60,7 +62,7 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="grid h-11 w-11 place-items-center rounded-full text-fg transition hover:bg-surface-2"
+        className="press grid h-11 w-11 place-items-center rounded-full text-fg hover:bg-surface-2"
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-label="Open menu"
@@ -68,16 +70,25 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
         <Menu className="h-5 w-5" />
       </button>
 
-      {open &&
+      {mounted &&
         createPortal(
-          <div id="mobile-menu" ref={sheet} role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden">
+          <div
+            id="mobile-menu"
+            ref={sheet}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            data-state={shown ? "open" : "closed"}
+            inert={!open}
+            className="motion-sheet fixed inset-0 z-50 flex flex-col bg-bg md:hidden"
+          >
             <div className="safe-top border-b border-line bg-surface text-fg">
               <div className="flex h-16 items-center justify-between px-4">
                 <span className="text-lg font-semibold">Menu</span>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface-2"
+                  className="press grid h-11 w-11 place-items-center rounded-full hover:bg-surface-2"
                   aria-label="Close menu"
                 >
                   <X className="h-5 w-5" />

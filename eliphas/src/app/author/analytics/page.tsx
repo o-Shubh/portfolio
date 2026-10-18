@@ -95,7 +95,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
                   <tr key={period}>
                     <td className="py-1.5">{new Date(period).toLocaleDateString("en-IN", range.grain === "month" ? { month: "short", year: "numeric" } : { day: "numeric", month: "short" })}</td>
                     <td className="py-1.5 text-right mono">{v.copies}</td>
-                    <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100)}</td>
+                    <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100, true)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -120,7 +120,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
                   <tr key={id}>
                     <td className="py-1.5">{titles.get(id) ?? "—"}</td>
                     <td className="py-1.5 text-right mono">{v.copies}</td>
-                    <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100)}</td>
+                    <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100, true)}</td>
                   </tr>
                 ))}
               </tbody>

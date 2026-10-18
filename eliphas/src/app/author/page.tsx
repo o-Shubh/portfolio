@@ -66,7 +66,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
     ...books
       .filter((b) => b.status === "published" && !b.sample_path)
       .map((b) => ({ key: `sample-${b.id}`, text: <><span className="font-semibold">{b.title}</span> shows &ldquo;Sample coming soon&rdquo;. Add a free sample so readers can try it.</>, href: `/author/books/${b.id}/sample`, action: "Add sample" })),
-    ...(serviceActions ?? []).map((o) => ({ key: o.id, text: <>Service request <span className="font-semibold">{o.order_number}</span> is waiting for you.</>, href: `/author/services/${o.id}`, action: "Open" })),
+    ...(serviceActions ?? []).map((o) => ({ key: o.id, text: <>Service request <span className="id-mono font-medium">{o.order_number}</span> is waiting for you.</>, href: `/author/services/${o.id}`, action: "Open" })),
     ...(!profile.author_terms_accepted_at ? [{ key: "terms", text: <>New author terms need your acceptance before you publish new books.</>, href: "/author/plan", action: "Review terms" }] : []),
     ...(!totals.upi && totals.balance > 0 ? [{ key: "upi", text: <>Add your UPI ID so we can pay your earnings.</>, href: "/account/profile", action: "Add UPI ID" }] : []),
   ];
@@ -226,7 +226,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
                         <StatusBadge status={b.status} />
                       </td>
                       <td className="p-4 text-right mono">{st?.copies ?? 0}</td>
-                      <td className="p-4 text-right mono">{rupees(st?.earnings ?? 0)}</td>
+                      <td className="p-4 text-right mono">{rupees(st?.earnings ?? 0, true)}</td>
                     </tr>
                   );
                 })}

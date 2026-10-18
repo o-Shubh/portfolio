@@ -35,15 +35,22 @@
   /* Restrained marigold: Pro badge, small highlights. Fill with navy text; use marigold-fg for text. */
   --color-marigold: #c98200;
 
-  /* Type: the device's own sans-serif for the interface; a book serif for editorial content.
-     Hindi letters fall through to Noto Devanagari when the system font lacks them. */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, var(--font-sans-deva), "Noto Sans Devanagari", sans-serif;
+  /* Type: Inter for the interface and numbers; Hindi letters fall through to Noto Sans Devanagari.
+     Source Serif 4 only for reading (samples, article bodies, literary excerpts). */
+  --font-sans: var(--font-inter), var(--font-sans-deva), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
   --font-heading: var(--font-sans);
   --font-serif: var(--font-book-serif), var(--font-serif-deva), "Iowan Old Style", Georgia, serif;
-  /* IDs (EEID, order numbers), prices and ledgers */
+  /* Identifiers only: order IDs, Eliphas Edition IDs, technical references */
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Radii: restrained */
+  /* Motion: quick response, soft finish. Transform and opacity only. */
+  --motion-press: 140ms; /* button and control feedback */
+  --motion-ui: 240ms; /* menus, tabs, hover lifts */
+  --motion-sheet: 340ms; /* dialogs and sheets */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
   --radius-control: 0.625rem; /* buttons, fields, chips: 10px */
   --radius-card: 0.875rem; /* 14px */
   --radius-sheet: 1.125rem; /* reader stage, dialogs, sheets: 18px */
@@ -219,7 +226,9 @@ body {
     line-height: 1.4;
     letter-spacing: 0;
   }
-  :lang(hi) { line-height: 1.7; }
+  :lang(hi) { line-height: 1.7; letter-spacing: normal; }
+  /* Figures line up in every table, statistic and calculator */
+  table, dl, output { font-variant-numeric: tabular-nums; }
 
   /* One visible, consistent focus ring for keyboard users (not shown on mouse/touch) */
   :focus-visible {
@@ -265,7 +274,7 @@ body {
 
 /* Buttons: one primary per task area; ghost for secondary; accent (marigold) only for buying */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition-[background-color,opacity,box-shadow] duration-150 select-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 text-[0.9375rem] font-medium whitespace-nowrap transition-[scale,transform,background-color,opacity,box-shadow] duration-[var(--motion-press)] ease-[var(--ease-out)] select-none active:scale-[0.97] disabled:active:scale-100 disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:cursor-not-allowed aria-disabled:opacity-55;
 }
 @utility btn-primary {
   @apply btn bg-primary text-on-primary hover:opacity-90;
@@ -305,14 +314,14 @@ body {
   @apply mt-1.5 text-sm text-muted;
 }
 @utility eyebrow {
-  @apply inline-flex items-center gap-2 text-sm font-semibold text-accent-fg;
+  @apply inline-flex items-center gap-2 text-sm font-medium text-accent-fg;
 }
 /* Filter chips and segmented tabs: 44 px tall on touch screens */
 @utility chip {
-  @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium whitespace-nowrap ring-1 ring-line ring-inset transition hover:bg-surface-2 md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
+  @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium whitespace-nowrap ring-1 ring-line ring-inset transition-[scale,transform,background-color,color,box-shadow] duration-[var(--motion-ui)] ease-[var(--ease-out)] hover:bg-surface-2 active:scale-[0.97] md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
 }
 @utility badge {
-  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
 }
 /* Verified author: navy on pale cobalt. Pro: marigold on cream. Never the same look. */
 @utility badge-verified {
@@ -342,14 +351,16 @@ body {
   @apply inline-flex items-center gap-0.5 rounded-[var(--radius-control)] bg-surface-2 p-0.5;
 }
 @utility segment {
-  @apply inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 text-sm font-medium text-muted transition-colors hover:text-fg pointer-fine:min-h-8 aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-soft aria-[current=true]:bg-surface aria-[current=true]:text-fg aria-[current=true]:shadow-soft aria-[pressed=true]:bg-surface aria-[pressed=true]:text-fg aria-[pressed=true]:shadow-soft;
+  @apply inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 text-sm font-medium text-muted transition-[scale,transform,background-color,color,box-shadow] duration-[var(--motion-ui)] ease-[var(--ease-out)] hover:text-fg active:scale-[0.97] pointer-fine:min-h-8 aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-soft aria-[current=true]:bg-surface aria-[current=true]:text-fg aria-[current=true]:shadow-soft aria-[pressed=true]:bg-surface aria-[pressed=true]:text-fg aria-[pressed=true]:shadow-soft;
 }
 /* Dialogs: dimmed, blurred backdrop; 18px panel with sheet shadow. On phones, sheets rise from the bottom. */
 @utility dialog-backdrop {
-  @apply fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 backdrop-blur-sm;
+  @apply fixed inset-0 z-50 grid place-items-center bg-black/45 p-4;
+  animation: fade-in var(--motion-sheet) var(--ease-out);
 }
 @utility dialog-panel {
   @apply w-full max-w-sm rounded-[18px] bg-surface p-6 text-fg shadow-sheet ring-1 ring-line;
+  animation: rise-in var(--motion-sheet) var(--ease-out);
 }
 @utility sheet-panel {
   @apply rounded-t-[18px] bg-surface text-fg shadow-sheet ring-1 ring-line;
@@ -370,6 +381,7 @@ body {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 @utility kbd {
   @apply rounded bg-surface-2 px-1 py-0.5 text-[0.7rem] text-muted;
@@ -501,7 +513,7 @@ body {
   vertical-align: top;
 }
 .ledger tr:last-child td { border-bottom: 0; }
-.ledger .num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ledger .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ledger-wrap { overflow-x: auto; border-radius: var(--radius-card); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
 
 /* Data tables everywhere (orders, finance, payouts): ledger-style headers and a quiet header band */
@@ -536,7 +548,7 @@ body {
   inset: 0;
   transform-style: preserve-3d;
   transform: rotateX(calc(var(--rest-x) + var(--tilt-x))) rotateY(calc(var(--rest-y) + var(--tilt-y)));
-  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 400ms var(--ease-out);
 }
 .book3d-body > * { position: absolute; backface-visibility: hidden; }
 .book3d-front { inset: 0; transform: translateZ(calc(var(--depth) / 2)); }
@@ -571,7 +583,7 @@ body {
   background: radial-gradient(closest-side, rgb(1 10 52 / 0.32), transparent);
   filter: blur(6px);
   transform: translateX(var(--shadow-x, 4%));
-  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 400ms var(--ease-out);
 }
 .book3d-spine .book3d-shadow { --shadow-x: -6%; }
 @media (prefers-reduced-motion: reduce) {
@@ -581,22 +593,28 @@ body {
 /* Hindi headlines: no negative tracking, a little more line height */
 :lang(hi) .display, .display:lang(hi) { letter-spacing: 0; line-height: 1.3; }
 /* Book titles may keep the book serif */
-.display.book-title { font-family: var(--font-serif); letter-spacing: -0.01em; }
+/* Book titles use the interface font like every other heading (serif is for reading only) */
 
 /* Scroll reveal: visible by default; only sections JS confirmed are below the fold start hidden */
-.reveal { transition: opacity 600ms ease, transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+.reveal { transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out); }
 .reveal[data-reveal="pending"] { opacity: 0; transform: translateY(12px); }
 @media (prefers-reduced-motion: reduce) { .reveal { transition: none; } .reveal[data-reveal="pending"] { opacity: 1; transform: none; } }
 
 /* Quick look sheet */
-.quick-look::backdrop { background: rgb(0 0 0 / 0.4); backdrop-filter: blur(4px); }
-.quick-look[open] { animation: sheet-in 260ms cubic-bezier(0.2, 0.7, 0.2, 1); }
-@keyframes sheet-in { from { opacity: 0; transform: translateY(16px); } }
-@media (prefers-reduced-motion: reduce) { .quick-look[open] { animation: none; } }
+.quick-look {
+  transition: opacity var(--motion-sheet) var(--ease-out), transform var(--motion-sheet) var(--ease-out), overlay var(--motion-sheet) allow-discrete, display var(--motion-sheet) allow-discrete;
+}
+.quick-look:not([open]) { opacity: 0; transform: translateY(16px); }
+.quick-look::backdrop { background: rgb(0 0 0 / 0.45); transition: opacity var(--motion-sheet) var(--ease-out), overlay var(--motion-sheet) allow-discrete, display var(--motion-sheet) allow-discrete; }
+.quick-look:not([open])::backdrop { opacity: 0; }
+@starting-style {
+  .quick-look[open] { opacity: 0; transform: translateY(16px); }
+  .quick-look[open]::backdrop { opacity: 0; }
+}
 
 /* Book tiles lift a little on hover (pointer devices only) */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .book-lift { transition: transform 300ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .book-lift { transition: transform var(--motion-ui) var(--ease-out); }
   .group:hover .book-lift { transform: translateY(-4px) rotate(-0.6deg); }
 }
 
@@ -606,10 +624,6 @@ body {
 .paper-panel :focus-visible { outline-color: #4a63c9; }
 
 /* Hero entrance: a short fade and 12px rise; nothing for reduced motion */
-@media (prefers-reduced-motion: no-preference) {
-  .hero-in { animation: rise-in 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-  .hero-in-image { animation: fade-in 900ms ease 120ms both; }
-}
 @keyframes rise-in { from { opacity: 0; transform: translateY(12px); } }
 @keyframes fade-in { from { opacity: 0; } }
 /* Supplied artwork: soften the photo's edges into its paper panel */
@@ -623,3 +637,17 @@ body {
 @utility perspective-1000 {
   perspective: 1000px;
 }
+
+/* Pressed feedback for icon buttons and other custom controls */
+.press { transition: transform var(--motion-press) var(--ease-out), background-color var(--motion-press) var(--ease-out); }
+.press:active { transform: scale(0.94); }
+
+/* Full-screen phone menu: fades and rises 12px; the same transition runs backwards on close */
+.motion-sheet { transition: opacity var(--motion-sheet) var(--ease-out), transform var(--motion-sheet) var(--ease-out); }
+.motion-sheet[data-state="closed"] { opacity: 0; transform: translateY(12px); }
+
+/* Bottom sheet: the scrim fades, the panel slides up from the edge */
+.motion-bottom-sheet .sheet-scrim { transition: opacity var(--motion-sheet) var(--ease-out); }
+.motion-bottom-sheet .sheet-body { transition: transform var(--motion-sheet) var(--ease-out); }
+.motion-bottom-sheet[data-state="closed"] .sheet-scrim { opacity: 0; }
+.motion-bottom-sheet[data-state="closed"] .sheet-body { transform: translateY(100%); }

@@ -110,7 +110,7 @@ export default async function AuthorsPage({ searchParams }: PageProps<"/authors"
                   <div className="flex items-start gap-3.5">
                     <AuthorAvatar name={a.full_name} path={a.avatar_path} size="lg" />
                     <div className="min-w-0">
-                      <h2 className="flex items-center gap-1.5 font-serif text-lg font-semibold tracking-normal">
+                      <h2 className="flex items-center gap-1.5 text-lg font-semibold tracking-normal">
                         <Link href={`/authors/${a.handle}`} className="truncate after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
                           {a.full_name}
                         </Link>
@@ -125,7 +125,7 @@ export default async function AuthorsPage({ searchParams }: PageProps<"/authors"
                   {book && (
                     <p className="mt-3 rounded-[var(--radius-control)] bg-surface-2 px-3 py-2 text-sm">
                       <span className="block text-[0.7rem] font-semibold tracking-[0.06em] text-muted uppercase">Latest book</span>
-                      <span className="mt-0.5 block truncate font-serif" lang={book.language}>
+                      <span className="mt-0.5 block truncate" lang={book.language}>
                         {book.title}
                       </span>
                     </p>

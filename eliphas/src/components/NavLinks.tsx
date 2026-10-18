@@ -27,6 +27,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
+import { usePresence } from "@/lib/use-presence";
 
 // Icons are referenced by name so server layouts can pass plain data.
 const ICONS = {
@@ -99,8 +100,8 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition pointer-fine:h-9 ${
-                active ? "bg-surface-3 font-medium text-fg" : "text-fg/90 hover:bg-surface-3/60 hover:text-fg"
+              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] font-medium transition pointer-fine:h-9 ${
+                active ? "bg-surface-3 text-fg" : "text-fg/90 hover:bg-surface-3/60 hover:text-fg"
               }`}
             >
               <Icon className={`h-[1.1rem] w-[1.1rem] ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`} aria-hidden />
@@ -122,6 +123,7 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
     setOpen(false);
   }
   const sheet = useRef<HTMLDivElement>(null);
+  const { mounted, shown } = usePresence(open);
   const close = useCallback(() => setOpen(false), []);
   useDialogFocus(open, sheet, close);
   return (
@@ -130,10 +132,10 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
         <MoreHorizontal className="h-[1.35rem] w-[1.35rem]" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
         More
       </button>
-      {open && (
-        <div ref={sheet} className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
-          <button type="button" className="absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
-          <div className="sheet-panel safe-bottom absolute inset-x-0 bottom-0 pt-2">
+      {mounted && (
+        <div ref={sheet} className="motion-bottom-sheet fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections" data-state={shown ? "open" : "closed"} inert={!open}>
+          <button type="button" className="sheet-scrim absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
+          <div className="sheet-panel sheet-body safe-bottom absolute inset-x-0 bottom-0 pt-2">
             <div className="mx-auto mb-1 h-1 w-10 rounded-full bg-line-strong" aria-hidden />
             <ul className="px-2 pb-2">
               {items.map((item) => {
@@ -145,7 +147,7 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
                       href={item.href}
                       aria-current={on ? "page" : undefined}
                       onClick={() => setOpen(false)}
-                      className={`flex min-h-12 items-center gap-3 rounded-[var(--radius-control)] px-3 text-base ${on ? "bg-surface-2 font-semibold" : ""}`}
+                      className={`flex min-h-12 items-center gap-3 rounded-[var(--radius-control)] px-3 text-base font-medium ${on ? "bg-surface-2" : ""}`}
                     >
                       <Icon className="h-5 w-5 text-muted" aria-hidden />
                       {item.label}

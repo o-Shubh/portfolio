@@ -55,7 +55,7 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
         <ArrowLeft className="h-4 w-4" aria-hidden /> Print jobs
       </Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="display text-3xl">{o.order_number}</h1>
+        <h1 className="display text-3xl"><span className="id-mono">{o.order_number}</span></h1>
         <OrderStatusBadge status={o.status} />
       </div>
 
@@ -65,7 +65,7 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
             <section key={it.id} className="card">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="text-2xl">{it.books?.title}</h2>
-                <span className="rounded-full bg-accent px-3 py-1 text-sm font-bold text-on-accent">
+                <span className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-on-accent">
                   {it.quantity} {it.quantity === 1 ? "copy" : "copies"}
                 </span>
               </div>

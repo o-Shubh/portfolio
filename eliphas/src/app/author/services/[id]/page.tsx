@@ -53,7 +53,7 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
         <ServiceStatusBadge status={order.status} />
       </div>
       <p className="mt-1 text-muted">
-        {order.order_number} · {SERVICE_STATUS[order.status].author}
+        <span className="id-mono">{order.order_number}</span> · {SERVICE_STATUS[order.status].author}
       </p>
       {order.books && (
         <p className="mt-1 text-sm">
@@ -68,7 +68,7 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
         <p className="mt-3 rounded-lg bg-accent/15 px-3 py-2 text-sm">
           This request is part of your bundle upgrade{" "}
           <Link href={`/author/services/${replacedBy.id}`} className="font-semibold underline">
-            {replacedBy.order_number}
+            <span className="id-mono">{replacedBy.order_number}</span>
           </Link>
           . It won&apos;t be charged separately; if it was never paid, it closes when you pay the bundle.
         </p>

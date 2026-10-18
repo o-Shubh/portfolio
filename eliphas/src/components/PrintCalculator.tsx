@@ -45,7 +45,7 @@ export function PrintCalculator({
   const warning = sizeWarning?.(v.trim_size) ?? null;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_minmax(0,360px)]">
+    <div className="grid gap-6 tabular-nums lg:grid-cols-[1fr_minmax(0,360px)]">
       <fieldset disabled={disabled} className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>

@@ -116,7 +116,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       {books.length > 0 && (
         <Reveal as="section" className="container-x space-y-14">
           <Shelf title="New arrivals" note="Fresh from independent authors" href="/books" books={books.slice(0, 8)} />
-          {hindi.length > 0 && <Shelf title="Hindi books" note="हिन्दी पुस्तकें" href="/books?lang=hi" books={hindi.slice(0, 8)} />}
+          {hindi.length > 0 && <Shelf title="Hindi books" note="Independent voices in Hindi" href="/books?lang=hi" books={hindi.slice(0, 8)} />}
           {genres.length > 0 && (
             <nav aria-label="Browse by category">
               <ul className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
@@ -128,8 +128,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
                   </li>
                 ))}
                 <li>
-                  <Link href="/books?lang=hi" className="chip bg-surface" lang="hi">
-                    हिन्दी पुस्तकें
+                  <Link href="/books?lang=hi" className="chip bg-surface">
+                    Hindi books
                   </Link>
                 </li>
               </ul>

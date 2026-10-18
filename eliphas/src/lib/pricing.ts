@@ -85,12 +85,10 @@ export function shippingFor(subtotal: number, s: Shipping): number {
 }
 
 /** ₹1,234 or ₹1,234.50 in Indian number format. */
-export function rupees(n: number): string {
-  const whole = Number.isInteger(n);
-  return (
-    "₹" +
-    n.toLocaleString("en-IN", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: 2 })
-  );
+/** Indian-format rupees. Whole amounts drop the decimals (₹299); `fixed` always shows two (₹299.00), for tables. */
+export function rupees(n: number, fixed = false): string {
+  const digits = fixed || !Number.isInteger(n) ? 2 : 0;
+  return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: digits, maximumFractionDigits: 2 });
 }
 
 /**
