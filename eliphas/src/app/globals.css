@@ -618,3 +618,8 @@ body {
   mask-composite: intersect;
 }
 @media (max-width: 1023.98px) { .art-fade-top { mask-image: linear-gradient(to bottom, transparent, #000 14%); } }
+
+/* 3D stage perspective (AppleBookShowcase) */
+@utility perspective-1000 {
+  perspective: 1000px;
+}

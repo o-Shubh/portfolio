@@ -1,14 +1,12 @@
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { AddToCartButton } from "@/components/AddToCartButton";
+import AppleBookShowcase from "@/components/AppleBookShowcase";
 import { BeforeAfter } from "@/components/BeforeAfter";
-import { Book3D } from "@/components/Book3D";
 import { BookShelf } from "@/components/BookCard";
-import { BookCover, coverPalette } from "@/components/BookCover";
+import { BookCover } from "@/components/BookCover";
 import { EditionIdStory } from "@/components/EditionIdStory";
 import { Reveal } from "@/components/Reveal";
-import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { getCurrentProfile } from "@/lib/auth";
 import { authorHandle, BINDING_LABEL, coverUrl, LANGUAGE_LABEL, listGenres, listPublishedBooks } from "@/lib/books";
 import { estimateCopy, formatPaise, ruleFromPlanVersion } from "@/lib/commission";
@@ -20,6 +18,8 @@ import { SAMPLE_IMAGES, SAMPLE_LABEL } from "@/lib/service-portfolio";
 import { getPricingSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+const FEATURED_SLUG = "monsoon-letters";
+
 // Example used in the author section. Prices come from the settings table.
 const EXAMPLE = { page_count: 200, trim_size: "5x8", binding: "paperback", interior: "bw", paper: "cream", cover_finish: "matte" };
 const EXAMPLE_MRP = 299;
@@ -28,21 +28,36 @@ const EXAMPLE_MRP = 299;
 export default async function Home({ searchParams }: PageProps<"/">) {
   const { account } = await searchParams;
   const [{ books }, genres, { rates, fees }, plans, me] = await Promise.all([listPublishedBooks({ page: 1 }), listGenres(), getPricingSettings(), getCurrentPlans(), getCurrentProfile()]);
-  const spotlight = books[0] ?? null;
-  // Showcase order: one behind on the left, the newest in front, one behind on the right
-  const showcase = books.length >= 3 ? [books[1], books[0], books[2]] : spotlight ? [spotlight] : [];
-  const trio = showcase.length === 3;
+  // The featured book: Monsoon Letters while it's in the catalogue, otherwise the newest book
+  const featured = books.find((b) => b.slug === FEATURED_SLUG) ?? books[0] ?? null;
+  const label = (group: Record<string, { label: string }>, key: string) => group[key]?.label ?? key;
   const hindi = books.filter((b) => b.language === "hi");
   const cost = printCost(EXAMPLE, rates);
   const example = cost === null ? null : estimateCopy(EXAMPLE_MRP * 100, cost * 100, ruleFromPlanVersion(plans.free), gatewayPercent(fees));
   // The Edition ID story uses a real edition when one exists
   const edition = books.find((b) => b.eeid) ?? null;
 
-  const [handle, author, qr] = await Promise.all([
-    spotlight ? authorHandle(spotlight.author_id) : null,
-    spotlight ? createAdminClient().from("public_profiles").select("avatar_path, verified_author").eq("id", spotlight.author_id).maybeSingle().then((r) => r.data) : null,
+  const admin = createAdminClient();
+  const [handle, siblings, qr] = await Promise.all([
+    featured ? authorHandle(featured.author_id) : null,
+    // Other published editions of the same work (e.g. a hardcover), for the edition selector
+    featured
+      ? admin
+          .from("books")
+          .select("work_id")
+          .eq("id", featured.id)
+          .maybeSingle()
+          .then(async ({ data }) =>
+            data?.work_id ? ((await admin.from("books").select("slug, binding, mrp, edition_label").eq("work_id", data.work_id).eq("status", "published").order("mrp")).data ?? []) : [],
+          )
+      : [],
     edition?.eeid ? qrSvg(editionUrl(qrOrigin().origin, edition.eeid)) : null,
   ]);
+  const editions = (siblings.length ? siblings : featured ? [featured] : []).map((e) => ({
+    slug: e.slug,
+    label: [label(rates.binding, e.binding), e.edition_label].filter(Boolean).join(" · "),
+    price: rupees(Number(e.mrp)),
+  }));
   const { format } = SAMPLE_IMAGES;
 
   return (
@@ -55,107 +70,46 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         </div>
       )}
 
-      {/* ---------- Hero: headline and actions in HTML, the supplied artwork on an ivory panel (ivory in both themes) ---------- */}
-      <section aria-labelledby="hero-h" className="container-x pt-4 md:pt-6">
-        <div className="paper-panel relative overflow-hidden rounded-[24px]">
-          <div className="hero-in relative z-10 px-6 pt-10 pb-2 sm:px-10 sm:pt-14 lg:absolute lg:top-0 lg:left-0 lg:w-[56%] lg:px-12 lg:pt-10 xl:px-14 xl:pt-14">
-            <h1 id="hero-h" className="display text-[2.5rem] leading-[1.04] sm:text-6xl lg:text-5xl xl:text-[4rem]">
-              Find your next great read.
-            </h1>
-            <p className="paper-muted mt-5 max-w-[30rem] text-lg sm:text-xl lg:mt-4 lg:text-lg">Discover independent voices in Hindi and English. Printed when you order. Delivered to your door.</p>
-            <div className="mt-8 flex flex-wrap gap-3 lg:mt-6">
-              <Link href="/books" className="btn-primary min-h-12 px-6 text-base">
-                Explore books
-              </Link>
-              <Link href="/login/author?mode=signup" className="btn min-h-12 bg-black/[0.06] px-6 text-base text-[#1d1d1f] hover:bg-black/10">
-                Publish your book
-              </Link>
-            </div>
-          </div>
-          <Image
-            src="/graphics/eliphas-hero.webp"
-            width={1536}
-            height={1024}
-            alt=""
-            sizes="(min-width: 1180px) 1180px, 100vw"
-            loading="eager"
-            fetchPriority="high"
-            className="hero-in-image art-fade-top h-auto w-full"
-          />
-        </div>
-        {!me && (
-          <p className="mt-4 text-center text-sm text-muted" data-testid="home-signup">
-            New here?{" "}
-            <Link href="/login?mode=signup" className="font-semibold text-accent-fg underline-offset-2 hover:underline">
-              Create a free account
-            </Link>{" "}
-            to save books and follow authors.
-          </p>
-        )}
-      </section>
-
-      {/* ---------- Real featured books ---------- */}
-      {spotlight && (
-        <Reveal as="section" className="container-x">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16" data-book3d-zone>
-            <div className={`relative mx-auto grid w-full max-w-[32rem] items-end px-2 pt-4 pb-10 ${trio ? "grid-cols-[1fr_1.45fr_1fr]" : "max-w-[15rem] grid-cols-1"}`}>
-              {showcase.map((b, idx) => {
-                const front = !trio || idx === 1;
-                return (
-                  <Link
-                    key={b.id}
-                    href={`/books/${b.slug}`}
-                    aria-label={`${b.title} by ${b.author_name}`}
-                    tabIndex={front ? undefined : -1}
-                    className={`block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-focus ${front ? "z-10" : `z-0 -translate-y-[6%] ${idx === 0 ? "translate-x-[16%]" : "-translate-x-[16%]"}`}`}
-                  >
-                    <Book3D pages={b.page_count} spine={spineColour(b)} pose={idx === 0 && trio ? "spine" : "pages"} interactive={front}>
-                      <BookCover title={b.title} author={b.author_name} slug={b.slug} src={coverUrl(b.cover_path)} size={front ? "lg" : "md"} />
-                    </Book3D>
-                  </Link>
-                );
-              })}
-            </div>
-            <article aria-labelledby="spot-h" data-testid="spotlight">
-              <p className="text-sm font-semibold text-marigold-fg">New in the bookstore</p>
-              <h2 id="spot-h" className="display book-title mt-2 text-[2rem] sm:text-[2.75rem]" lang={spotlight.language}>
-                <Link href={`/books/${spotlight.slug}`} className="hover:underline hover:underline-offset-4">
-                  {spotlight.title}
-                </Link>
-              </h2>
-              <p className="mt-2 flex flex-wrap items-center gap-1.5 text-muted">
-                {handle ? (
-                  <Link href={`/authors/${handle}`} className="font-medium text-fg hover:underline">
-                    {spotlight.author_name}
-                  </Link>
-                ) : (
-                  <span className="font-medium text-fg">{spotlight.author_name}</span>
-                )}
-                {author?.verified_author && <VerifiedBadge compact />}
-                <span aria-hidden>·</span>
-                <span>{[BINDING_LABEL[spotlight.binding] ?? spotlight.binding, LANGUAGE_LABEL[spotlight.language]].join(" · ")}</span>
+      {/* ---------- Product stage: the featured book, its real editions and how it's made ---------- */}
+      {featured ? (
+        <AppleBookShowcase
+          book={{
+            slug: featured.slug,
+            title: featured.title,
+            subtitle: featured.subtitle,
+            author: featured.author_name,
+            authorHref: handle ? `/authors/${handle}` : null,
+            description: featured.description,
+            language: featured.language,
+            meta: [featured.genre, LANGUAGE_LABEL[featured.language]].filter(Boolean).join(" · "),
+            pages: featured.page_count,
+            sample: Boolean(featured.sample_path),
+            specs: {
+              paper: label(rates.paper, featured.paper),
+              binding: label(rates.binding, featured.binding),
+              interior: label(rates.interior, featured.interior),
+              size: label(rates.trim_sizes, featured.trim_size),
+            },
+          }}
+          editions={editions}
+          cover={<BookCover title={featured.title} author={featured.author_name} slug={featured.slug} src={coverUrl(featured.cover_path)} size="lg" priority />}
+          signup={
+            !me && (
+              <p className="mt-6 text-sm text-neutral-400" data-testid="home-signup">
+                New here?{" "}
+                <Link href="/login?mode=signup" className="font-semibold text-amber-300 underline-offset-2 hover:underline">
+                  Create a free account
+                </Link>{" "}
+                to save books and follow authors.
               </p>
-              {spotlight.description && (
-                <p className="mt-5 line-clamp-4 max-w-[52ch] text-[1.0625rem] leading-relaxed text-fg/90" lang={spotlight.language}>
-                  {spotlight.description}
-                </p>
-              )}
-              <p className="mt-6 text-3xl font-semibold tabular-nums">{rupees(Number(spotlight.mrp))}</p>
-              <p className="text-sm text-muted">Inclusive of all taxes · shipping shown at checkout</p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link href={`/checkout/${spotlight.slug}`} className="btn-accent min-h-12 px-6 text-base">
-                  Buy now
-                </Link>
-                <AddToCartButton bookId={spotlight.id} className="min-h-12 px-5 text-base" />
-                {spotlight.sample_path && (
-                  <Link href={`/books/${spotlight.slug}/sample`} className="btn-quiet min-h-12 text-base">
-                    <BookOpen className="h-4 w-4" aria-hidden /> Read a sample
-                  </Link>
-                )}
-              </div>
-            </article>
-          </div>
-        </Reveal>
+            )
+          }
+        />
+      ) : (
+        <section className="container-x pt-10 text-center">
+          <h1 className="display text-4xl">Literature, engineered for the senses.</h1>
+          <p className="mt-3 text-muted">The first books are on their way.</p>
+        </section>
       )}
 
       {/* ---------- Shelves ---------- */}
@@ -274,7 +228,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         </div>
         <div className="mt-12 rounded-[24px] bg-surface-2 px-6 py-10 sm:px-10">
           <EditionIdStory
-            book={edition ? { title: edition.title, author_name: edition.author_name, slug: edition.slug, cover: coverUrl(edition.cover_path), eeid: edition.eeid, format: BINDING_LABEL[edition.binding] ?? edition.binding, language: edition.language } : spotlight ? { title: spotlight.title, author_name: spotlight.author_name, slug: spotlight.slug, cover: coverUrl(spotlight.cover_path), eeid: null, format: BINDING_LABEL[spotlight.binding] ?? spotlight.binding, language: spotlight.language } : null}
+            book={edition ? { title: edition.title, author_name: edition.author_name, slug: edition.slug, cover: coverUrl(edition.cover_path), eeid: edition.eeid, format: BINDING_LABEL[edition.binding] ?? edition.binding, language: edition.language } : featured ? { title: featured.title, author_name: featured.author_name, slug: featured.slug, cover: coverUrl(featured.cover_path), eeid: null, format: BINDING_LABEL[featured.binding] ?? featured.binding, language: featured.language } : null}
             qr={qr}
           />
         </div>
@@ -316,9 +270,4 @@ function Shelf({ title, note, href, books }: { title: string; note?: string; hre
       <BookShelf books={books} />
     </div>
   );
-}
-
-/** Spine colour: the typographic cover's own colour, or navy for photographed covers. */
-function spineColour(b: { slug: string; cover_path: string | null }) {
-  return b.cover_path ? "#17214A" : coverPalette(b.slug).bg;
 }
