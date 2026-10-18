@@ -12,7 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#ffffff",
+    // Android launch screen: the icon on its own navy
+    background_color: "#13223c",
     theme_color: "#ffffff",
     categories: ["books", "education", "shopping"],
     icons: [
