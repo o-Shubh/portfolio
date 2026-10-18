@@ -59,7 +59,7 @@ export default function FaqPage() {
 
           <div className="flex flex-col items-start gap-4 rounded-2xl bg-surface-2 p-8 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-2xl font-semibold">Ready when you are.</p>
-            <Link href="/login?next=/author" className="btn-primary">
+            <Link href="/login/author" className="btn-primary">
               Start publishing
             </Link>
           </div>

@@ -63,7 +63,7 @@ export async function SiteHeader() {
             <UserRound className="h-[1.1rem] w-[1.1rem]" aria-hidden /> {account.label}
           </Link>
           {!profile && (
-            <Link href="/login?next=/author" className="btn-primary ml-1 hidden min-h-10 px-4 text-sm md:inline-flex">
+            <Link href="/login/author" className="btn-primary ml-1 hidden min-h-10 px-4 text-sm md:inline-flex">
               Publish your book
             </Link>
           )}
