@@ -16,7 +16,7 @@ export function PostCard({ post, intent, linkToPost = true }: { post: FeedPost; 
   const name = post.author?.full_name ?? "Author";
   const profile = profilePath(post.author);
   return (
-    <article className="rounded-[var(--radius-card)] bg-surface p-4 shadow-soft ring-1 ring-line sm:p-5" data-testid="post">
+    <article className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line sm:p-5" data-testid="post">
       <header className="flex items-center gap-3">
         <AuthorAvatar name={post.author?.full_name ?? null} path={post.author?.avatar_path} size="md" />
         <div className="min-w-0">
@@ -24,7 +24,7 @@ export function PostCard({ post, intent, linkToPost = true }: { post: FeedPost; 
             {profile ? <Link href={profile} className="hover:underline">{name}</Link> : name}
             {post.author?.verified_author_at && <VerifiedBadge compact />}
           </p>
-          <p className="text-sm text-muted">
+          <p className="text-xs text-muted">
             {linkToPost ? (
               <Link href={`/community/${post.id}`} className="hover:underline">
                 <time dateTime={post.published_at ?? undefined}>{postDate(post.published_at)}</time>
@@ -36,7 +36,7 @@ export function PostCard({ post, intent, linkToPost = true }: { post: FeedPost; 
           </p>
         </div>
       </header>
-      <p className="mt-3 text-[1.0625rem] leading-relaxed break-words whitespace-pre-line">{post.body}</p>
+      <p className="mt-3 font-serif text-[1.0625rem] leading-relaxed break-words whitespace-pre-line">{post.body}</p>
       {img && <img src={img} alt={post.image_alt ?? ""} loading="lazy" decoding="async" className="mt-3 max-h-[28rem] w-full rounded-[var(--radius-control)] bg-surface-2 object-cover ring-1 ring-line" />}
       {post.book && (
         <Link href={`/books/${post.book.slug}`} className="mt-3 flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] bg-surface-2 px-3 py-2 text-sm hover:bg-[color-mix(in_srgb,var(--surface-2),var(--fg)_5%)]">

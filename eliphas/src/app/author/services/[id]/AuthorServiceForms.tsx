@@ -180,7 +180,7 @@ export function CancelService({ orderId, paid }: { orderId: string; paid: boolea
   const [pending, start] = useTransition();
   if (msg?.ok) return <FormMessage state={msg} />;
   return confirming ? (
-    <div className="space-y-2 rounded-xl border border-line p-3">
+    <div className="space-y-2 rounded-[var(--radius-card)] border border-line p-3">
       <p className="text-sm">{paid ? "Cancel and get a full refund? Work hasn't started yet." : "Cancel this request? Nothing has been charged."}</p>
       <div className="flex gap-2">
         <button type="button" className="btn bg-danger text-white" disabled={pending} onClick={() => start(async () => setMsg(await cancelMyService(orderId)))}>

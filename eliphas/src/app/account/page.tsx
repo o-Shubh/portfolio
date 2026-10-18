@@ -27,23 +27,23 @@ export default async function AccountHome() {
 
       {!orders?.length ? (
         <div className="card text-center">
-          <p className="font-semibold">No orders yet.</p>
+          <p className="display text-lg">No orders yet.</p>
           <Link href="/books" className="btn-primary mt-4">
             Browse the bookstore
           </Link>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul className="group-list">
           {orders.map((o) => {
             const titles = o.order_items.map((i) => i.books?.title).filter(Boolean).join(", ");
             const copies = o.order_items.reduce((n, i) => n + i.quantity, 0);
             return (
               <li key={o.id}>
-                <Link href={`/account/orders/${o.id}`} className="card flex items-center gap-4 transition hover:-translate-y-0.5 hover:shadow-lift">
+                <Link href={`/account/orders/${o.id}`} className="flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-surface-2/60 sm:px-5">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{titles}</p>
+                    <p className="truncate font-serif font-semibold">{titles}</p>
                     <p className="text-sm text-muted">
-                      {o.order_number} · {copies} {copies === 1 ? "copy" : "copies"} · {rupees(Number(o.total))} ·{" "}
+                      <span className="mono">{o.order_number}</span> · {copies} {copies === 1 ? "copy" : "copies"} · <span className="mono">{rupees(Number(o.total))}</span> ·{" "}
                       {new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                     </p>
                     <div className="mt-2">
@@ -59,13 +59,13 @@ export default async function AccountHome() {
       )}
 
       {profile.role === "reader" && (
-        <div className="card mt-8 ring-2 ring-accent/50">
-          <h2 className="text-xl">Have a book in you?</h2>
-          <p className="mt-1 text-muted">
+        <div className="mt-8 rounded-[18px] bg-primary p-6 text-on-primary">
+          <h2 className="display text-xl text-on-primary">Have a book in you?</h2>
+          <p className="mt-1 text-on-primary/80">
             Publish in print across India. No upfront cost: we print each copy when someone orders it.
           </p>
           <form action={becomeAuthor} className="mt-4">
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn bg-white text-primary hover:bg-white/90">
               Start publishing
             </button>
           </form>

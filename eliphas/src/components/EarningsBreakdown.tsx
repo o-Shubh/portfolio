@@ -38,7 +38,7 @@ function Row({ label, value, strong, valueClass = "" }: { label: string; value: 
   return (
     <div className={`flex justify-between gap-4 ${strong ? "font-semibold" : "text-muted"}`}>
       <dt>{label}</dt>
-      <dd className={`tabular-nums ${strong ? "text-fg" : ""} ${valueClass}`}>{value}</dd>
+      <dd className={`mono ${strong ? "text-fg" : ""} ${valueClass}`}>{value}</dd>
     </div>
   );
 }

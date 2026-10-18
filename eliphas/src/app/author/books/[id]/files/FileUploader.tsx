@@ -100,7 +100,7 @@ export function FileUploader({
   return (
     <div className="mt-4">
       {current && (
-        <div className="mb-4 flex items-center gap-3 rounded-xl bg-surface-2 p-3">
+        <div className="mb-4 flex items-center gap-3 rounded-[var(--radius-card)] bg-surface-2 p-3">
           {current.preview ? (
             <img src={current.preview} alt="Uploaded cover" className="h-24 w-16 rounded object-cover" />
           ) : (

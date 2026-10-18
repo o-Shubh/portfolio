@@ -49,7 +49,7 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
         <ArrowLeft className="h-4 w-4" aria-hidden /> Services
       </Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl md:text-3xl">{name}</h1>
+        <h1 className="display text-2xl md:text-3xl">{name}</h1>
         <ServiceStatusBadge status={order.status} />
       </div>
       <p className="mt-1 text-muted">
@@ -227,7 +227,7 @@ function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
   return (
     <div className={`flex justify-between gap-4 ${strong ? "border-t border-line pt-1 font-semibold" : ""}`}>
       <dt className={strong ? "" : "text-muted"}>{k}</dt>
-      <dd className="tabular-nums">{v}</dd>
+      <dd className="mono">{v}</dd>
     </div>
   );
 }

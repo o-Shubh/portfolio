@@ -147,7 +147,7 @@ export function CheckoutForm({
         <input type="hidden" name="from_cart" value={fromCart ? "1" : "0"} />
 
         <section className="card space-y-4">
-          <h2 className="text-2xl">Delivery address</h2>
+          <h2 className="text-xl">Delivery address</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field id="ship_name" label="Full name" autoComplete="name" defaultValue={defaults.ship_name} />
             <Field
@@ -205,9 +205,9 @@ export function CheckoutForm({
                 <li key={it.slug} className="flex gap-4">
                   <div className={`${items.length > 1 ? "w-14" : "w-20"} shrink-0`}>{it.cover}</div>
                   <div className="min-w-0">
-                    <p className="leading-snug font-medium">{it.title}</p>
+                    <p className="font-serif leading-snug font-semibold">{it.title}</p>
                     <p className="text-sm text-muted">{it.author}</p>
-                    <p className="mt-1 font-semibold tabular-nums">
+                    <p className="mono mt-1 font-medium">
                       {rupees(it.mrp)}
                       {!editable && <span className="font-normal text-muted"> × {qtys[i]}</span>}
                     </p>
@@ -219,14 +219,14 @@ export function CheckoutForm({
             {editable && (
             <div className="flex items-center justify-between">
               <span className="font-semibold">Copies</span>
-              <div className="flex items-center gap-1 rounded-full bg-surface-2 p-1">
-                <button type="button" className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="One less copy">
+              <div className="flex items-center gap-0.5 rounded-[var(--radius-control)] bg-surface-2 p-0.5">
+                <button type="button" className="grid h-11 w-11 place-items-center rounded-[8px] hover:bg-surface disabled:opacity-40 pointer-fine:h-9 pointer-fine:w-9" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} aria-label="One less copy">
                   <Minus className="h-4 w-4" />
                 </button>
-                <output className="w-8 text-center font-semibold tabular-nums" aria-live="polite">
+                <output className="mono w-8 text-center font-medium" aria-live="polite">
                   {qty}
                 </output>
-                <button type="button" className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} aria-label="One more copy">
+                <button type="button" className="grid h-11 w-11 place-items-center rounded-[8px] hover:bg-surface disabled:opacity-40 pointer-fine:h-9 pointer-fine:w-9" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} aria-label="One more copy">
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
@@ -236,7 +236,7 @@ export function CheckoutForm({
             <dl className="space-y-2 border-t border-line pt-4">
               <div className="flex justify-between text-muted">
                 <dt>Books</dt>
-                <dd className="tabular-nums">{rupees(booksTotal)}</dd>
+                <dd className="mono">{rupees(booksTotal)}</dd>
               </div>
               <div className="flex justify-between text-muted">
                 <dt>Shipping</dt>
@@ -250,9 +250,9 @@ export function CheckoutForm({
                 </p>
               )}
               {quote && "error" in quote && <p className="text-xs text-danger">{quote.error}</p>}
-              <div className="flex justify-between border-t border-line pt-3 text-lg font-semibold">
+              <div className="flex items-baseline justify-between border-t border-line pt-3 text-lg font-semibold">
                 <dt>Total</dt>
-                <dd className="tabular-nums">{priced ? formatPaise(priced.totalPaise) : "—"}</dd>
+                <dd className="mono text-2xl font-medium">{priced ? formatPaise(priced.totalPaise) : "—"}</dd>
               </div>
             </dl>
 
@@ -262,7 +262,7 @@ export function CheckoutForm({
               </p>
             )}
             <input type="hidden" name="expected_total_paise" value={priced?.totalPaise ?? ""} />
-            <button type="submit" className="btn-accent w-full" disabled={busy || !priced || quoting}>
+            <button type="submit" className="btn-accent min-h-12 w-full text-base" disabled={busy || !priced || quoting}>
               {busy ? "Opening payment…" : priced ? `Pay ${formatPaise(priced.totalPaise)}` : "Enter delivery PIN code"}
             </button>
             <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
@@ -289,8 +289,8 @@ export function CheckoutForm({
       </form>
 
       {mockOrder && (
-        <div role="dialog" aria-modal="true" aria-labelledby="mock-title" className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="card w-full max-w-sm space-y-4 text-center">
+        <div role="dialog" aria-modal="true" aria-labelledby="mock-title" className="dialog-backdrop">
+          <div className="dialog-panel space-y-4 text-center">
             <span className="eyebrow">Test payment</span>
             <h2 id="mock-title" className="text-2xl">
               Pay {rupees(mockOrder.amountPaise / 100)}

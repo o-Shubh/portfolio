@@ -32,8 +32,9 @@ export function BookCover({
   size?: "xs" | "sm" | "md" | "lg";
   priority?: boolean;
 }) {
-  const radius = size === "xs" ? "rounded-[3px]" : "rounded-[4px]";
-  const shell = `relative aspect-[2/3] w-full overflow-hidden ${radius} shadow-[0_1px_2px_rgb(0_0_0/0.1),0_12px_28px_-12px_rgb(0_0_0/0.35)] ring-1 ring-black/5 dark:ring-white/10`;
+  // Bound books: square-ish spine edge, rounded fore-edge, spine shadow
+  const radius = size === "xs" ? "rounded-l-[2px] rounded-r-[4px]" : "rounded-l-[3px] rounded-r-lg";
+  const shell = `relative aspect-[2/3] w-full overflow-hidden ${radius} ${size === "xs" ? "shadow-soft" : "shadow-spine"} ring-1 ring-black/5 dark:ring-white/10`;
   // Spine crease and a soft sheen, so flat covers read as books
   const sheen = (
     <>

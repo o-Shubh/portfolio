@@ -69,7 +69,7 @@ export default async function MyArticlesPage() {
                   <p className="text-sm text-muted">
                     {a.status === "published" && a.published_at ? `Published ${fmt(a.published_at)}` : `Edited ${fmt(a.updated_at)}`}
                     {a.first_published_at && (
-                      <span className="tabular-nums">
+                      <span className="mono">
                         {" "}· {tally(views.data, a.id)} views · {tally(likes.data, a.id)} likes · {tally(comments.data, a.id)} comments
                       </span>
                     )}

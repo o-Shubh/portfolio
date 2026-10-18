@@ -3,7 +3,7 @@ export function PageHeader({ title, intro, action }: { title: string; intro?: st
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4 md:mb-8">
       <div className="min-w-0">
-        <h1 className="text-[1.75rem] md:text-[2.125rem]">{title}</h1>
+        <h1 className="display text-[1.75rem] leading-tight md:text-[2.125rem]">{title}</h1>
         {intro && <p className="mt-1.5 max-w-2xl text-muted">{intro}</p>}
       </div>
       {action}

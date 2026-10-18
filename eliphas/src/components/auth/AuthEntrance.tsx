@@ -37,12 +37,12 @@ export async function AuthEntrance({ audience, mode, next, error }: { audience: 
   return (
     <>
       <LoginSwitch current={audience} next={keepNext(next) ? next : undefined} mode={mode} />
-      <h1 className="text-3xl" data-testid="auth-title">
+      <h1 className="display text-[1.875rem] leading-tight" data-testid="auth-title">
         {copy.title}
       </h1>
       <p className="mt-3 text-muted">{copy.intro}</p>
       {error && ERRORS[error] && (
-        <p role="alert" className="notice mt-4 text-sm" data-testid="auth-error">
+        <p role="alert" className="notice-danger mt-4" data-testid="auth-error">
           {ERRORS[error]}
         </p>
       )}

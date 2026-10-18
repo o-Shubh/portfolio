@@ -120,7 +120,7 @@ export default async function AdminHome() {
           const inner = (
             <>
               <dt className="text-sm text-muted">{s.label}</dt>
-              <dd className={`mt-1 font-heading text-3xl tracking-tight tabular-nums ${s.alert ? "text-accent-fg" : ""}`}>{s.value}</dd>
+              <dd className={`mt-1 mono text-3xl font-medium ${s.alert ? "text-accent-fg" : ""}`}>{s.value}</dd>
             </>
           );
           return s.href ? (

@@ -15,7 +15,7 @@ export async function NotificationBell({ userId, className = "" }: { userId: str
     >
       <Bell className="h-5 w-5" aria-hidden />
       {unread > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[0.7rem] font-bold text-on-primary tabular-nums" aria-hidden>
+        <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[0.7rem] font-bold text-on-primary mono" aria-hidden>
           {unread > 99 ? "99+" : unread}
         </span>
       )}

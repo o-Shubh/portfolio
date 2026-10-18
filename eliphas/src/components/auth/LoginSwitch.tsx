@@ -13,13 +13,13 @@ export function LoginSwitch({ current, next, mode = "login" }: { current: "reade
     { key: "author", label: "Author", icon: PenLine, href: `/login/author${current === "author" ? q(next) : q()}` },
   ] as const;
   return (
-    <nav aria-label="Choose login" className="mb-8 grid grid-cols-2 rounded-full bg-surface-2 p-1">
+    <nav aria-label="Choose login" className="segmented mb-8 grid w-full grid-cols-2">
       {tabs.map((t) => (
         <Link
           key={t.key}
           href={t.href}
           aria-current={current === t.key ? "page" : undefined}
-          className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full text-sm font-semibold ${current === t.key ? "bg-surface text-fg shadow-soft" : "text-muted hover:text-fg"}`}
+          className="segment gap-2 pointer-fine:min-h-9"
           data-testid={`login-switch-${t.key}`}
         >
           <t.icon className="h-4 w-4" aria-hidden /> {t.label}

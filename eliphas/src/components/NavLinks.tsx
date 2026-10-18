@@ -65,7 +65,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
     const shown = items.length <= 5 ? items : primary.slice(0, 4);
     const rest = items.filter((i) => !shown.includes(i));
     const tab = (active: boolean) =>
-      `flex min-h-14 w-full flex-col items-center justify-center gap-1 text-[0.7rem] font-medium transition ${active ? "text-accent-fg" : "text-muted"}`;
+      `flex min-h-[3.25rem] w-full flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-medium transition ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`;
     return (
       <ul className="flex justify-around">
         {shown.map((item) => {
@@ -99,11 +99,11 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition ${
-                active ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-surface-2 hover:text-fg"
+              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition pointer-fine:h-9 ${
+                active ? "bg-surface-3 font-medium text-fg" : "text-fg/90 hover:bg-surface-3/60 hover:text-fg"
               }`}
             >
-              <Icon className="h-[1.1rem] w-[1.1rem]" aria-hidden />
+              <Icon className={`h-[1.1rem] w-[1.1rem] ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`} aria-hidden />
               {item.label}
             </Link>
           </li>
@@ -133,7 +133,7 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
       {open && (
         <div ref={sheet} className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
           <button type="button" className="absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
-          <div className="safe-bottom absolute inset-x-0 bottom-0 rounded-t-[var(--radius-sheet)] bg-surface pt-2 shadow-lift">
+          <div className="sheet-panel safe-bottom absolute inset-x-0 bottom-0 pt-2">
             <div className="mx-auto mb-1 h-1 w-10 rounded-full bg-line-strong" aria-hidden />
             <ul className="px-2 pb-2">
               {items.map((item) => {

@@ -39,7 +39,7 @@ export function FollowButton({ authorId, authorName, following, intent, classNam
         disabled={pending}
         aria-pressed={on}
         aria-label={on ? `Following ${authorName}. Unfollow` : `Follow ${authorName}`}
-        className={`${on ? "btn-ghost" : "btn-primary"} min-h-10 px-4 text-sm ${className}`}
+        className={`${on ? "btn-ghost" : "btn-primary"} min-h-11 px-4 text-sm pointer-fine:min-h-9 ${className}`}
       >
         {on ? <Check className="h-4 w-4" aria-hidden /> : <UserPlus className="h-4 w-4" aria-hidden />}
         {on ? "Following" : "Follow"}

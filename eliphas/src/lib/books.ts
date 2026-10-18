@@ -16,6 +16,13 @@ export type PublicBook = Pick<
 
 export const PAGE_SIZE = 24;
 
+export type BookSort = "newest" | "price-asc" | "price-desc";
+export const BOOK_SORTS: { value: BookSort; label: string }[] = [
+  { value: "newest", label: "Newest first" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
+];
+
 /** Removes characters that have meaning in PostgREST filters, keeps Hindi letters. */
 function cleanSearch(q: string) {
   return q.replace(/[,()*%\\:."']/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
@@ -25,24 +32,31 @@ export async function listPublishedBooks({
   q = "",
   lang,
   genre,
+  binding,
+  maxPrice,
+  sort = "newest",
   page = 1,
 }: {
   q?: string;
   lang?: "hi" | "en";
   genre?: string;
+  binding?: "paperback" | "hardcover";
+  maxPrice?: number;
+  sort?: BookSort;
   page?: number;
 }) {
   const supabase = await createClient();
-  let query = supabase
-    .from("books")
-    .select(PUBLIC_COLUMNS, { count: "exact" })
-    .eq("status", "published")
-    .order("published_at", { ascending: false });
+  let query = supabase.from("books").select(PUBLIC_COLUMNS, { count: "exact" }).eq("status", "published");
+  if (sort === "price-asc") query = query.order("mrp", { ascending: true, nullsFirst: false });
+  else if (sort === "price-desc") query = query.order("mrp", { ascending: false, nullsFirst: false });
+  query = query.order("published_at", { ascending: false }).order("id");
 
   const term = cleanSearch(q);
   if (term) query = query.or(`title.ilike.%${term}%,author_name.ilike.%${term}%,subtitle.ilike.%${term}%`);
   if (lang) query = query.eq("language", lang);
   if (genre) query = query.eq("genre", genre);
+  if (binding) query = query.eq("binding", binding);
+  if (maxPrice && maxPrice > 0) query = query.lte("mrp", maxPrice);
 
   const from = (page - 1) * PAGE_SIZE;
   const { data, count, error } = await query.range(from, from + PAGE_SIZE - 1);
@@ -88,6 +102,7 @@ export function coverUrl(path: string | null): string | null {
 }
 
 export const LANGUAGE_LABEL: Record<string, string> = { hi: "Hindi", en: "English" };
+export const BINDING_LABEL: Record<string, string> = { paperback: "Paperback", hardcover: "Hardcover" };
 
 /** The author's public page handle, if they have one (for linking their name). */
 export async function authorHandle(authorId: string): Promise<string | null> {

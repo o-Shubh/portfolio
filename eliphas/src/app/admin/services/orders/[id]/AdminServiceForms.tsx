@@ -48,7 +48,7 @@ export function QuoteForm({
         </L>
       </div>
       {priors.length > 0 && (
-        <fieldset className="space-y-2 rounded-xl bg-surface-2 p-3">
+        <fieldset className="space-y-2 rounded-[var(--radius-card)] bg-surface-2 p-3">
           <legend className="px-1 text-sm font-semibold">Credits for earlier requests (₹, before GST)</legend>
           <p className="text-xs text-muted">Leave empty for no credit. A credit can&apos;t be more than what was paid. The author sees each line.</p>
           {priors.map((p) => (
@@ -110,7 +110,7 @@ export function Deliver({ orderId, needsQc }: { orderId: string; needsQc: boolea
       </div>
       <form onSubmit={onSubmit} className="space-y-3">
         {needsQc && (
-          <fieldset className="rounded-xl border border-line p-3">
+          <fieldset className="rounded-[var(--radius-card)] border border-line p-3">
             <legend className="px-1 text-sm font-semibold">Quality check (required for final print files)</legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {QC_ITEMS.map((i) => (

@@ -52,7 +52,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl">Order {o.order_number}</h1>
+        <h1 className="display text-3xl">Order {o.order_number}</h1>
         <OrderStatusBadge status={o.status} />
       </div>
       <p className="mt-1 text-muted">{ORDER_STATUS[o.status].reader}</p>
@@ -83,9 +83,9 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
             <h2 className="mb-5 text-xl">Tracking</h2>
             <OrderTimeline order={o} />
             {o.tracking_number && (
-              <p className="mt-6 flex items-center gap-2 rounded-xl bg-surface-2 p-3 text-sm">
+              <p className="mt-6 flex items-center gap-2 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
                 <Truck className="h-4 w-4 shrink-0" aria-hidden />
-                {o.courier}: <span className="font-semibold tabular-nums select-all">{o.tracking_number}</span>
+                {o.courier}: <span className="font-semibold mono select-all">{o.tracking_number}</span>
               </p>
             )}
           </section>

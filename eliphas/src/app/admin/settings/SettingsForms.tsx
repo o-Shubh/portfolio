@@ -87,7 +87,7 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
         </section>
       ))}
 
-      <div className="sticky bottom-20 z-10 rounded-xl bg-surface shadow-soft ring-1 ring-line/95 p-4 backdrop-blur md:bottom-4">
+      <div className="sticky bottom-20 z-10 rounded-[var(--radius-card)] bg-surface ring-1 ring-line/95 p-4 backdrop-blur md:bottom-4">
         <FormMessage state={state} />
         <button type="submit" className="btn-primary mt-2" disabled={pending}>
           {pending ? "Saving…" : "Save all changes"}
@@ -104,7 +104,7 @@ export function RatesJsonForm({ json }: { json: string }) {
       <label htmlFor="json" className="sr-only">
         Print rates JSON
       </label>
-      <textarea id="json" name="json" rows={18} defaultValue={json} spellCheck={false} className="field py-3 font-mono text-sm" />
+      <textarea id="json" name="json" rows={18} defaultValue={json} spellCheck={false} className="field py-3 mono text-sm" />
       <FormMessage state={state} />
       <button type="submit" className="btn-ghost" disabled={pending}>
         {pending ? "Checking…" : "Check and save JSON"}

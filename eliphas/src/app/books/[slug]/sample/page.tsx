@@ -22,7 +22,7 @@ export default async function SamplePage({ params }: PageProps<"/books/[slug]/sa
   if (!url) {
     return (
       <main id="main" className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-3 px-4 text-center">
-        <h1 className="text-2xl">Sample coming soon</h1>
+        <h1 className="display text-2xl">Sample coming soon</h1>
         <p className="text-muted">The author is preparing a free sample of {book.title}. You can still read the description and reviews on the book page.</p>
         <Link href={`/books/${book.slug}`} className="btn-primary mt-2">
           Back to the book

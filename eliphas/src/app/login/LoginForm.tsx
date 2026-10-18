@@ -69,7 +69,7 @@ export function LoginForm({ next, audience = "reader", submitLabel = "Send code"
           <div className="flex gap-2">
             {/* The real select sits invisibly on top of a compact "IN +91" label */}
             <div className="relative shrink-0">
-              <span className="field flex w-auto items-center gap-1.5 pr-2.5 tabular-nums" aria-hidden="true">
+              <span className="field flex w-auto items-center gap-1.5 pr-2.5 mono" aria-hidden="true">
                 <span className="text-xs font-medium text-muted">{country}</span>+{countryByIso(country).dial}
                 <ChevronDown className="h-4 w-4 text-muted" />
               </span>
@@ -143,7 +143,7 @@ export function LoginForm({ next, audience = "reader", submitLabel = "Send code"
           autoComplete="one-time-code"
           pattern="\d{6}"
           maxLength={6}
-          className="field min-h-14 text-center font-mono text-2xl tracking-[0.5em]"
+          className="field min-h-14 text-center mono text-2xl tracking-[0.5em]"
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
           aria-invalid={Boolean(error)}

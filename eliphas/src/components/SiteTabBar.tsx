@@ -17,7 +17,7 @@ export function SiteTabBar({ accountHref }: { accountHref: string }) {
   if (pathname.startsWith("/books/") || pathname.startsWith("/checkout")) return null;
   const tabs = [...TABS, { href: accountHref, label: "Account", icon: UserRound, match: (p: string) => p.startsWith("/login") }];
   return (
-    <nav aria-label="Sections" className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface md:hidden">
+    <nav aria-label="Sections" className="glass safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line md:hidden supports-[not(backdrop-filter:blur(1px))]:bg-surface">
       <ul className="flex">
         {tabs.map((t) => {
           const active = t.match(pathname);
@@ -26,7 +26,7 @@ export function SiteTabBar({ accountHref }: { accountHref: string }) {
               <Link
                 href={t.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-1 text-[0.7rem] font-medium ${active ? "text-accent-fg" : "text-muted"}`}
+                className={`flex min-h-[3.25rem] flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-medium ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`}
               >
                 <t.icon className="h-[1.35rem] w-[1.35rem]" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
                 {t.label}

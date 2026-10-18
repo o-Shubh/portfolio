@@ -71,7 +71,7 @@ export function PostEditor({
             <label htmlFor="p-body" className="label">
               Post
             </label>
-            <span className={`mb-1.5 text-xs tabular-nums ${body.length > 2900 ? "text-danger" : "text-muted"}`}>{body.length}/3000</span>
+            <span className={`mb-1.5 text-xs mono ${body.length > 2900 ? "text-danger" : "text-muted"}`}>{body.length}/3000</span>
           </div>
           <textarea id="p-body" name="body" rows={7} maxLength={3000} value={body} onChange={(e) => setBody(e.target.value)} className="field py-3" placeholder="What would you like to tell your readers?" />
         </div>

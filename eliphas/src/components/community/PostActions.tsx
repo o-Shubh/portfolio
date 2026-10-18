@@ -65,13 +65,13 @@ export function PostActions({ postId, liked, likes, saved, comments, url, intent
       <div className="-mx-3 flex flex-wrap items-center">
         <button type="button" className={`${btn} ${like.on ? "text-fg" : ""}`} aria-pressed={like.on} onClick={() => toggle(!like.on)} disabled={pending} data-testid="post-like">
           <Heart className={`h-4 w-4 ${like.on ? "fill-current text-danger" : ""}`} aria-hidden />
-          <span className="tabular-nums">{like.count}</span>
+          <span className="mono">{like.count}</span>
           <span className="sr-only">{like.on ? "Liked. Unlike" : "Like"}</span>
         </button>
         {showReplyLink && (
           <Link href={`/community/${postId}#comments`} className={btn}>
             <MessageCircle className="h-4 w-4" aria-hidden />
-            <span className="tabular-nums">{comments}</span>
+            <span className="mono">{comments}</span>
             <span className="sr-only">{comments === 1 ? "reply" : "replies"}</span>
           </Link>
         )}

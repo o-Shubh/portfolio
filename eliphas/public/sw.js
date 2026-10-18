@@ -7,7 +7,7 @@
  *    friendly "you're offline" page is shown instead.
  *  - Nothing private is ever cached: no pages, no API calls, no Supabase or Razorpay requests.
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const STATIC_CACHE = `eliphas-static-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 

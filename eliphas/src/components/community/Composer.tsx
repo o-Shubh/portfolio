@@ -64,7 +64,7 @@ export function Composer({ name, books }: { name: string | null; books: { id: st
   }
 
   return (
-    <form onSubmit={submit} className="rounded-[var(--radius-card)] bg-surface p-4 shadow-soft ring-1 ring-line" aria-label="New post" data-testid="composer">
+    <form onSubmit={submit} className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line" aria-label="New post" data-testid="composer">
       <label htmlFor="composer-body" className="sr-only">
         What&apos;s on your mind{name ? `, ${name.split(" ")[0]}` : ""}?
       </label>
@@ -111,7 +111,7 @@ export function Composer({ name, books }: { name: string | null; books: { id: st
           <ImagePlus className="h-5 w-5" aria-hidden /> <span className="hidden sm:inline">Image</span>
           <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         </label>
-        <span className={`ml-auto text-xs tabular-nums ${body.length > LIMIT - 100 ? "text-danger" : "text-muted"}`}>
+        <span className={`ml-auto text-xs mono ${body.length > LIMIT - 100 ? "text-danger" : "text-muted"}`}>
           {body.length}/{LIMIT}
         </span>
         <button type="submit" className="btn-primary" disabled={pending || !body.trim()}>

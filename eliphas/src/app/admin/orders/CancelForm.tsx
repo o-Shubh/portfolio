@@ -17,7 +17,7 @@ export function CancelForm({ orderId, paid }: { orderId: string; paid: boolean }
       </button>
     );
   return (
-    <form onSubmit={onSubmit} className="w-full space-y-2 rounded-xl border border-line p-3">
+    <form onSubmit={onSubmit} className="w-full space-y-2 rounded-[var(--radius-card)] border border-line p-3">
       <label htmlFor={`reason-${orderId}`} className="label">
         Reason (the buyer sees this)
       </label>

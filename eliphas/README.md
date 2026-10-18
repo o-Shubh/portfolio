@@ -20,6 +20,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 8 | Author articles, follows, notifications, moderation | ✅ Done |
 | 9 | Author verification, community for everyone, samples on every book, open reviews | ✅ Done (migration 000015) |
 | 10 | Eliphas Edition IDs (EEID) and QR codes | ✅ Done (migration 000017) |
+| 11 | Redesign to the shared "Cupertino Editorial" system; admin Finance fix | ✅ Done (migration 000018) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -357,21 +358,49 @@ authorised book excerpts. Articles are free to read at `/articles` and on each a
   be saved or screenshotted like any web page; only the full manuscript is protected. The pdf.js worker is
   copied to `public/pdf.worker.min.mjs` by `npm install` (postinstall).
 
-### Design system
+### Design system ("Cupertino Editorial")
 
-Tokens live in `src/app/globals.css`. The look is neutral and quiet: white and soft-grey surfaces
-(`#FFFFFF` / `#F5F5F7`; black and `#1C1C1E` in dark mode), hairline borders, gentle shadows,
-restrained corners (10 px controls, 14 px cards) and one accent, Eliphas navy `#17214A` (lifted to
-`#4A63C9` on dark backgrounds). Every text colour pair meets WCAG AA. Interface text uses the device's
-own sans-serif (San Francisco, Roboto, Segoe UI) with Noto Sans Devanagari for Hindi. Source Serif 4
-(and Noto Serif Devanagari) is kept for books and editorial reading: book and article titles, article
-text and typographic covers. The header is white with a light blur; there are no other glass effects.
+Visual reference: the Stitch export (screens 01–24 and a component sheet). Functional reference: the
+80-screen brief. The live, per-screen checklist is `docs/redesign-checklist.md` (regenerate it with
+`python3 docs/redesign_checklist.py` after editing `docs/redesign-status.json`).
 
-Shared building blocks (utility classes): `btn-primary` (one per task area), `btn-ghost` (secondary),
-`btn-accent` (buying), `btn-quiet`, `btn-danger`, `field` (shows `aria-invalid`), `label`, `hint`, `card`,
-`chip` (filters and tabs, 44 px on touch), `badge`, `notice`, `eyebrow`; components `PageHeader`,
-`EmptyState`, the status badges and `NavLinks` (phone tabs with a **More** sheet when a role has more than
-five sections).
+Tokens live in `src/app/globals.css`, in light and dark versions:
+- Surfaces: white and system grey `#F5F5F7` (black and `#1C1C1E` in dark mode); warm ivory `#FBF8F2` behind
+  the bookstore, book pages and reading.
+- Lines: hairlines `#E5E5EA`, input borders `#D1D1D6`.
+- Colours: navy `#17214A` for main actions; cobalt `#4A63C9` for focus and links; marigold `#C98200`
+  with dark ink only for buying (Buy now, Pay, Get Pro). Tints for info, warning, danger and success
+  notices.
+- Shape: radii of 10 px (controls), 14 px (cards) and 18 px (dialogs, sheets, reading panels);
+  hairline cards without heavy shadows; a book-spine shadow on covers.
+- Fonts: the device's own sans-serif for the interface; Source Serif 4 for titles and reading;
+  JetBrains Mono for figures, order numbers, ISBNs and Edition IDs.
+
+Shared building blocks (utility classes):
+- Buttons: `btn-primary`, `btn-ghost`, `btn-tinted` (grey, e.g. Read sample), `btn-accent`/`btn-buy`
+  (buying only), `btn-quiet`, `btn-danger`.
+- Forms: `field` (cobalt focus halo; shows `aria-invalid`), `label`, `hint`.
+- Layout: `card`, `group-list`/`group-row` (inset grouped lists), `segmented`/`segment` (iOS/macOS
+  segmented controls), `chip`.
+- Labels and notices: `badge`, `badge-verified` (pale cobalt), `badge-pro` (cream and marigold; never
+  confused with Verified), `notice-info`/`-warn`/`-danger`/`-success`.
+- Overlays: `dialog-backdrop`, `dialog-panel`, `sheet-panel`.
+- Text and data: `mono`, `display` (serif headings), `glass` (header and tab bar), `.ledger` tables.
+  Data tables everywhere get ledger-style headers.
+
+Components:
+- Navigation: `SiteHeader` (glass bar with a segmented main nav), `SiteTabBar`, `AppShell` (260 px
+  sidebar on desktop, tab bar with a **More** sheet on phones).
+- Books: `BookCard` (tile), `BookRow` (bookstore result row).
+- Pages and states: `PageHeader`, `EmptyState`, `LegalPage`.
+- Actions: `ShareButton`, `PrintButton`, `AutoSubmitSelect`.
+
+Where the Stitch mock content conflicted with how Eliphas actually works, the real rules were kept
+and the conflict is recorded in the checklist. Examples:
+- Pricing: GST rates, Pro prices and discounts; ePub and digital formats.
+- Made-up content: ratings and review counts, "cryptographic" EEID claims, reading circles.
+- Privacy: reader libraries and reading progress on public profiles are not shown.
+- Missing backend: a contact form with no server-side inbox.
 
 Behaviour: `useFormAction` keeps typed input on errors, ignores double submits, turns a dropped connection
 into a clear "try again" message and can warn about unsaved changes (`warnUnsaved`); `offlineSafe()` does the

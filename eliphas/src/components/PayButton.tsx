@@ -98,8 +98,8 @@ export function PayButton({
         </p>
       )}
       {mock && (
-        <div role="dialog" aria-modal="true" aria-labelledby="mockpay-title" className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
-          <div className="card w-full max-w-sm space-y-4 text-center">
+        <div role="dialog" aria-modal="true" aria-labelledby="mockpay-title" className="dialog-backdrop">
+          <div className="dialog-panel space-y-4 text-center">
             <span className="eyebrow">Test payment</span>
             <h2 id="mockpay-title" className="text-2xl">
               Pay {formatPaise(mock.amountPaise)}

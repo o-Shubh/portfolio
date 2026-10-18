@@ -47,7 +47,7 @@ export function BookReviews({
         {average !== null && (
           <p className="flex items-center gap-2 text-sm">
             <Stars value={average} label={`Average ${average.toFixed(1)} out of 5`} />
-            <span className="tabular-nums text-muted">
+            <span className="mono text-muted">
               {average.toFixed(1)} · {total} {total === 1 ? "review" : "reviews"}
             </span>
           </p>
@@ -62,7 +62,7 @@ export function BookReviews({
               <dd className="h-2 overflow-hidden rounded-full bg-surface-2" aria-hidden>
                 <span className="block h-full rounded-full bg-marigold" style={{ width: `${(counts[n - 1] / total) * 100}%` }} />
               </dd>
-              <dd className="text-right tabular-nums text-muted">{counts[n - 1]}</dd>
+              <dd className="text-right mono text-muted">{counts[n - 1]}</dd>
             </div>
           ))}
         </dl>

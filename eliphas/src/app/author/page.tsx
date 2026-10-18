@@ -188,11 +188,11 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
                       <span className="block font-semibold" lang={b.language}>{b.title}</span>
                       <span className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
                         <StatusBadge status={b.status} />
-                        <span className="tabular-nums">{copiesText(st?.copies ?? 0)}</span>
+                        <span className="mono">{copiesText(st?.copies ?? 0)}</span>
                       </span>
                     </span>
                     <span className="text-right">
-                      <span className="block font-semibold tabular-nums">{rupees(st?.earnings ?? 0)}</span>
+                      <span className="block font-semibold mono">{rupees(st?.earnings ?? 0)}</span>
                       <span className="text-xs text-muted">your earnings</span>
                     </span>
                     <ChevronRight className="h-4 w-4 shrink-0 text-muted" aria-hidden />
@@ -225,8 +225,8 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
                       <td className="p-4">
                         <StatusBadge status={b.status} />
                       </td>
-                      <td className="p-4 text-right tabular-nums">{st?.copies ?? 0}</td>
-                      <td className="p-4 text-right tabular-nums">{rupees(st?.earnings ?? 0)}</td>
+                      <td className="p-4 text-right mono">{st?.copies ?? 0}</td>
+                      <td className="p-4 text-right mono">{rupees(st?.earnings ?? 0)}</td>
                     </tr>
                   );
                 })}
@@ -248,7 +248,7 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
               scroll={false}
               aria-current={r.key === range.key ? "true" : undefined}
               className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold md:min-h-9 ${
-                r.key === range.key ? "bg-surface text-fg shadow-soft" : "text-muted hover:text-fg"
+                r.key === range.key ? "bg-surface text-fg" : "text-muted hover:text-fg"
               }`}
             >
               {r.label}
@@ -333,13 +333,13 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
                     <span className="block font-semibold">{fmtDate(p.paid_at ?? p.created_at)}</span>
                     <span className="text-muted">Ref {p.reference}</span>
                   </span>
-                  <span className="font-semibold tabular-nums">{rupees(Number(p.amount))}</span>
+                  <span className="font-semibold mono">{rupees(Number(p.amount))}</span>
                 </li>
               ))}
             </ul>
           )}
           {!totals.upi && (
-            <Link href="/account/profile" className="mt-4 flex items-center justify-between rounded-xl bg-accent/10 p-3 text-sm font-semibold ring-1 ring-accent/30">
+            <Link href="/account/profile" className="mt-4 flex items-center justify-between rounded-[var(--radius-card)] bg-accent/10 p-3 text-sm font-semibold ring-1 ring-accent/30">
               Add your UPI ID to get paid <ChevronRight className="h-4 w-4" aria-hidden />
             </Link>
           )}
@@ -391,9 +391,9 @@ function Tile({
   highlight?: boolean;
 }) {
   return (
-    <div className={`card p-4 md:p-5 ${highlight ? "ring-2 ring-accent/30" : ""}`}>
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className="mt-1.5 font-heading text-[1.85rem] leading-tight font-semibold tabular-nums md:text-[2.25rem]">{value}</dd>
+    <div className={`card p-4 md:p-5 ${highlight ? "bg-tint-info ring-accent-fg/20" : ""}`}>
+      <dt className="text-[0.72rem] font-semibold tracking-[0.04em] text-muted uppercase">{label}</dt>
+      <dd className="mono mt-1.5 text-[1.75rem] leading-tight font-medium md:text-[2rem]">{value}</dd>
       <dd className="mt-1 truncate text-sm text-muted">
         {subHref ? (
           <Link href={subHref} className="font-medium underline underline-offset-2">
@@ -408,5 +408,5 @@ function Tile({
 }
 
 function EmptyChart({ text }: { text: string }) {
-  return <p className="grid min-h-40 place-items-center rounded-xl bg-surface-2 p-6 text-center text-sm text-muted">{text}</p>;
+  return <p className="grid min-h-40 place-items-center rounded-[var(--radius-card)] bg-surface-2 p-6 text-center text-sm text-muted">{text}</p>;
 }

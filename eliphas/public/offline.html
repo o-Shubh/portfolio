@@ -3,18 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#13223c" />
+    <meta name="theme-color" content="#17214a" />
     <title>You're offline · Eliphas Indicus</title>
     <style>
-      :root { --bg: #f1f3f6; --fg: #13223c; --muted: #5b6478; color-scheme: light; }
-      @media (prefers-color-scheme: dark) { :root { --bg: #0a1222; --fg: #f2f4f8; --muted: #a3adc2; color-scheme: dark; } }
+      :root { --bg: #f5f5f7; --card: #fff; --line: #e5e5ea; --fg: #1d1d1f; --muted: #6e6e73; --primary: #17214a; --on-primary: #fff; color-scheme: light; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #000; --card: #1c1c1e; --line: #38383a; --fg: #f5f5f7; --muted: #a1a1a6; --primary: #4a63c9; color-scheme: dark; } }
       body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
         font: 17px/1.6 system-ui, sans-serif; padding: 24px; box-sizing: border-box; text-align: center; }
       img { width: 72px; height: 72px; border-radius: 18px; }
-      h1 { font: 600 1.8rem/1.2 system-ui, sans-serif; letter-spacing: -0.02em; margin: 20px 0 8px; }
+      main { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 32px 24px; max-width: 26rem; box-shadow: 0 24px 60px rgb(0 0 0 / .12); }
+      h1 { font: 600 1.8rem/1.2 "Source Serif 4", Georgia, serif; letter-spacing: -0.02em; margin: 20px 0 8px; }
       p { color: var(--muted); margin: 0 auto; max-width: 22rem; }
-      button { margin-top: 24px; min-height: 48px; padding: 0 28px; border: 0; border-radius: 999px;
-        background: #cb9436; color: #13223c; font: 600 1rem system-ui, sans-serif; cursor: pointer; }
+      button { margin-top: 24px; min-height: 48px; padding: 0 28px; border: 0; border-radius: 10px;
+        background: var(--primary); color: var(--on-primary); font: 600 1rem system-ui, sans-serif; cursor: pointer; }
+      button:focus-visible { outline: 3px solid rgb(74 99 201 / .45); outline-offset: 2px; }
     </style>
   </head>
   <body>

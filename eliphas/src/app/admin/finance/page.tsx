@@ -90,7 +90,7 @@ export default async function FinancePage({ searchParams }: PageProps<"/admin/fi
               {g.rows.map(([k, v]) => (
                 <div key={k} className="flex justify-between gap-4 py-2">
                   <dt className="text-muted">{k}</dt>
-                  <dd className="font-medium tabular-nums">{rupees(Math.round(v * 100) / 100)}</dd>
+                  <dd className="font-medium mono">{rupees(Math.round(v * 100) / 100)}</dd>
                 </div>
               ))}
             </dl>
@@ -118,9 +118,9 @@ export default async function FinancePage({ searchParams }: PageProps<"/admin/fi
                   <td className="p-3">
                     {p.description} {p.mode === "mock" && <span className="text-xs text-muted">(test)</span>}
                   </td>
-                  <td className="p-3 text-right tabular-nums">{formatPaise(p.base_paise)}</td>
-                  <td className="p-3 text-right tabular-nums">{formatPaise(p.gst_paise)}</td>
-                  <td className="p-3 text-right tabular-nums">{p.refunded_paise ? formatPaise(p.refunded_paise) : "—"}</td>
+                  <td className="p-3 text-right mono">{formatPaise(p.base_paise)}</td>
+                  <td className="p-3 text-right mono">{formatPaise(p.gst_paise)}</td>
+                  <td className="p-3 text-right mono">{p.refunded_paise ? formatPaise(p.refunded_paise) : "—"}</td>
                   <td className="p-3">{p.status}</td>
                 </tr>
               ))}

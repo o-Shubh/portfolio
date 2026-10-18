@@ -55,7 +55,7 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
         <ArrowLeft className="h-4 w-4" aria-hidden /> Print jobs
       </Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl">{o.order_number}</h1>
+        <h1 className="display text-3xl">{o.order_number}</h1>
         <OrderStatusBadge status={o.status} />
       </div>
 
@@ -126,7 +126,7 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
             </p>
             <p className="mt-2 font-medium">{formatPhone(o.ship_phone)}</p>
             {o.tracking_number && (
-              <p className="mt-3 rounded-xl bg-surface-2 p-3">
+              <p className="mt-3 rounded-[var(--radius-card)] bg-surface-2 p-3">
                 {o.courier}: <span className="font-semibold">{o.tracking_number}</span>
               </p>
             )}

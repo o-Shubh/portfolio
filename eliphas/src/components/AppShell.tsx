@@ -37,18 +37,18 @@ export function AppShell({
   return (
     <div className="flex min-h-dvh flex-1 flex-col md:flex-row">
       {/* Sidebar (md and up) */}
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-surface px-3 py-4 md:flex">
+      <aside className="sticky top-0 hidden h-dvh w-[260px] shrink-0 flex-col overflow-y-auto border-r border-line bg-surface-2/70 px-3 py-4 md:flex">
         <div className="px-2">
           <Logo href="/" className="h-11" />
         </div>
-        <p className="mt-8 px-2 text-xs font-medium text-muted">{areaLabel}</p>
+        <p className="mt-7 px-3 text-[0.6875rem] font-semibold tracking-[0.06em] text-muted uppercase">{areaLabel}</p>
         <NavLinks items={nav} variant="sidebar" />
         <div className="mt-auto space-y-1 border-t border-line pt-3">
           <Link href="/account/profile" className="flex items-center gap-3 rounded-lg p-2 transition hover:bg-surface-2">
             {photo ? (
               <img src={photo} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
             ) : (
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-semibold text-accent-fg ring-1 ring-line">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-xs font-semibold text-on-primary">
                 {initials}
               </span>
             )}
@@ -75,7 +75,7 @@ export function AppShell({
       </aside>
 
       {/* Top bar (phones) */}
-      <header className="safe-top sticky top-0 z-20 border-b border-line bg-surface/90 text-fg backdrop-blur-md md:hidden">
+      <header className="glass safe-top sticky top-0 z-20 border-b border-line text-fg md:hidden supports-[not(backdrop-filter:blur(1px))]:bg-surface">
         <div className="flex h-14 items-center justify-between pr-2 pl-4">
           <Logo href="/" className="h-9" />
           <div className="flex items-center">
@@ -100,7 +100,7 @@ export function AppShell({
       {/* Tab bar (phones) */}
       <nav
         aria-label={`${areaLabel} navigation`}
-        className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface md:hidden"
+        className="glass safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-line md:hidden supports-[not(backdrop-filter:blur(1px))]:bg-surface"
       >
         <NavLinks items={nav} variant="tabs" />
       </nav>

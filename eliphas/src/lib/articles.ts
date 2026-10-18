@@ -73,9 +73,9 @@ export async function viewerKey(userId: string | null): Promise<{ key: string; n
 }
 
 export type ArticleCard = Pick<Article, "id" | "short_id" | "slug" | "title" | "excerpt" | "cover_path" | "cover_alt" | "language" | "topic" | "published_at" | "word_count"> & {
-  author: { id: string; full_name: string | null; handle: string | null } | null;
+  author: { id: string; full_name: string | null; handle: string | null; avatar_path?: string | null; verified_author_at?: string | null } | null;
 };
-const CARD_COLUMNS = "id, short_id, slug, title, excerpt, cover_path, cover_alt, language, topic, published_at, word_count, author:profiles!articles_author_id_fkey(id, full_name, handle)";
+const CARD_COLUMNS = "id, short_id, slug, title, excerpt, cover_path, cover_alt, language, topic, published_at, word_count, author:profiles!articles_author_id_fkey(id, full_name, handle, avatar_path, verified_author_at)";
 
 /** Published, visible articles, newest first. Search covers title, excerpt and author name. */
 export async function listPublicArticles({ q, lang, topic, page = 1, authorId, excludeId, limit = PAGE_SIZE }: { q?: string; lang?: string; topic?: string; page?: number; authorId?: string; excludeId?: string; limit?: number }) {

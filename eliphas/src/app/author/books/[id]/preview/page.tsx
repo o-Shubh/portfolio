@@ -50,7 +50,7 @@ export default async function PreviewPage({ params }: PageProps<"/author/books/[
               <p className="mt-1 text-sm" lang="en">
                 by <span className="font-medium text-accent-fg">{book.author_name}</span>
               </p>
-              <p className="mt-3 text-2xl font-semibold tabular-nums" lang="en">
+              <p className="mt-3 text-2xl font-semibold mono" lang="en">
                 {book.mrp !== null ? rupees(Number(book.mrp)) : "Price not set"}
               </p>
               {book.description ? <p className="mt-3 line-clamp-6 whitespace-pre-line text-fg/90">{book.description}</p> : <p className="mt-3 text-muted">No description yet.</p>}
@@ -58,7 +58,7 @@ export default async function PreviewPage({ params }: PageProps<"/author/books/[
                 <dt className="text-muted">Language</dt>
                 <dd>{LANGUAGE_LABEL[book.language]}</dd>
                 <dt className="text-muted">Pages</dt>
-                <dd className="tabular-nums">{book.page_count ?? "—"}</dd>
+                <dd className="mono">{book.page_count ?? "—"}</dd>
                 <dt className="text-muted">Size</dt>
                 <dd>{label(rates.trim_sizes, book.trim_size)}</dd>
                 <dt className="text-muted">Binding</dt>

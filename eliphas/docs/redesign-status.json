@@ -1,0 +1,403 @@
+{
+ "_next": "All 80 screens have the shared system. Screens 30-77 are 'partial': styled through shared components but not individually redesigned (no Stitch references). Next, after PR #17 merges: push the branch, open the redesign PR, publish the 000018 SQL page. Optional follow-up: individual layouts for screens 30-77 if Stitch designs are produced for them.",
+ "1": {
+  "impl": "done",
+  "ver": "screenshots 1440/390 vs Stitch 01; no sideways scroll",
+  "note": "Spotlight uses the newest real book; QR is real when an EEID exists"
+ },
+ "2": {
+  "impl": "done",
+  "ver": "screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked",
+  "note": "Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data)"
+ },
+ "3": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll (also 768)",
+  "note": "Stitch quantity stepper, formats/ePub, TOC, fake appraisals left out (no real data)"
+ },
+ "4": {
+  "impl": "done",
+  "ver": "typecheck; reader test m15/m17 pending in final run",
+  "note": "PDF sample (real file), so no reflow/theme controls; end-of-sample buy panel added"
+ },
+ "5": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll; audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Verified filter uses real verification records"
+ },
+ "6": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll; audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "No Pro/academic credentials shown (not real data)"
+ },
+ "7": {
+  "impl": "done",
+  "ver": "typecheck; audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Library/reading progress from Stitch NOT shown: private data"
+ },
+ "8": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll; audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "No citations/DOI (not real data)"
+ },
+ "9": {
+  "impl": "done",
+  "ver": "screenshots 1440/390; no sideways scroll; audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Outline built from the article's own headings"
+ },
+ "10": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Channels/'reading circles'/online status from Stitch omitted (no such data)"
+ },
+ "11": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Linked book card in sidebar uses the real book"
+ },
+ "12": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Editor kept; no fake window controls"
+ },
+ "13": {
+  "impl": "done",
+  "ver": "m18 passed",
+  "note": "EEID copy kept honest (no 'cryptographic proof' claims)"
+ },
+ "14": {
+  "impl": "done",
+  "ver": "screenshots via m11; m5/m11 checkout and payment suites passed",
+  "note": "Suggestions are real published books"
+ },
+ "15": {
+  "impl": "done",
+  "ver": "screenshots via m11; m5/m11 checkout and payment suites passed",
+  "note": "Visual only; payment logic untouched"
+ },
+ "16": {
+  "impl": "done",
+  "ver": "screenshots via m11; m5/m11 checkout and payment suites passed",
+  "note": "Visual only; payment logic untouched"
+ },
+ "17": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Real plans, commission and GST from settings; Stitch tiers/prices not used"
+ },
+ "18": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "FAQ content unchanged"
+ },
+ "19": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "No contact form: there is no server-side inbox; flagged"
+ },
+ "20": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "No Stitch reference; uses the policy layout"
+ },
+ "21": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Legal text unchanged"
+ },
+ "22": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Legal text unchanged"
+ },
+ "23": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Legal text unchanged"
+ },
+ "24": {
+  "impl": "done",
+  "ver": "audit 360/390/768/1440 light + 390/1440 dark; regression suite passed",
+  "note": "Legal text unchanged"
+ },
+ "25": {
+  "impl": "done",
+  "ver": "m19 + m20 passed; audit screenshots 360-1440",
+  "note": "No Stitch reference; shared auth sheet"
+ },
+ "26": {
+  "impl": "done",
+  "ver": "m19 + m20 passed; audit screenshots 360-1440",
+  "note": "No Stitch reference"
+ },
+ "27": {
+  "impl": "done",
+  "ver": "m19 + m20 passed; audit screenshots 360-1440",
+  "note": ""
+ },
+ "28": {
+  "impl": "done",
+  "ver": "m19 + m20 passed; audit screenshots 360-1440",
+  "note": ""
+ },
+ "29": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Orders as an inset grouped list"
+ },
+ "30": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "31": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "32": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "33": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "34": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "35": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "36": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "37": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "38": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "39": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "40": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "41": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "42": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "43": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "44": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "45": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "46": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "47": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "48": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "49": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "50": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "51": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "52": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "53": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "54": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "55": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "56": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "57": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "58": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "59": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "60": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "61": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "62": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "63": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "64": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied. Bug fixed: Finance figures failed to load (migration 000018); fin.mjs check added"
+ },
+ "65": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "66": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "67": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "68": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "69": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "70": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "71": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "72": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "73": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "74": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "75": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "76": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "77": {
+  "impl": "partial",
+  "ver": "audit screenshots 360/390/768/1440 (light) and 390/1440 (dark), no overflow; role suites passed",
+  "note": "Shared system applied (cards, tables, mono figures, display titles, dialogs, notices). No Stitch reference; no per-screen layout changes"
+ },
+ "78": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "404 with search"
+ },
+ "79": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Error sheet with reference"
+ },
+ "80": {
+  "impl": "done",
+  "ver": "typecheck + lint",
+  "note": "Offline page; service worker cache bumped to v2"
+ }
+}

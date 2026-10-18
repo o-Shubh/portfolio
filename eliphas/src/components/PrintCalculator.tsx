@@ -94,7 +94,7 @@ export function PrintCalculator({
 
         <OptionGroup label="Book size" name="trim_size" options={rates.trim_sizes} value={v.trim_size} onChange={(x) => set("trim_size", x)} />
         {warning && (
-          <p role="note" className="-mt-3 rounded-xl bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
+          <p role="note" className="-mt-3 rounded-[var(--radius-card)] bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
             {warning}
           </p>
         )}
@@ -158,7 +158,7 @@ function OptionGroup({
         {sortedOptions(options).map(([key, o]) => (
           <label
             key={key}
-            className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line px-3 has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/10 has-[:disabled]:cursor-not-allowed"
+            className="flex min-h-11 cursor-pointer items-center gap-2 rounded-[var(--radius-card)] bg-surface-2 ring-1 ring-transparent transition hover:ring-line px-3 has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/10 has-[:disabled]:cursor-not-allowed"
           >
             <input
               type="radio"

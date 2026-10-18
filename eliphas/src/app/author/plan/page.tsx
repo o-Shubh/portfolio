@@ -51,8 +51,8 @@ export default async function PlanPage() {
             )}
           </div>
           {status.active && (
-            <div className="rounded-xl bg-surface-2 px-4 py-3 text-center">
-              <p className="text-3xl font-semibold tabular-nums">{status.credits}</p>
+            <div className="rounded-[var(--radius-card)] bg-surface-2 px-4 py-3 text-center">
+              <p className="text-3xl font-semibold mono">{status.credits}</p>
               <p className="text-xs text-muted">creative credits left this period</p>
             </div>
           )}

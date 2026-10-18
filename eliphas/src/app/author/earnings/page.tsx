@@ -87,7 +87,7 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
         {tiles.map((t) => (
           <div key={t.label} className="card p-4 md:p-5">
             <dt className="text-sm text-muted">{t.label}</dt>
-            <dd className="mt-1.5 text-[1.75rem] leading-tight font-semibold tracking-tight tabular-nums">{rupees(Math.round(t.value * 100) / 100)}</dd>
+            <dd className="mt-1.5 text-[1.75rem] leading-tight font-semibold tracking-tight mono">{rupees(Math.round(t.value * 100) / 100)}</dd>
             <dd className="mt-1 text-sm text-muted">{t.sub}</dd>
           </div>
         ))}
@@ -141,15 +141,15 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
                       <td className="p-3">
                         {void_ ? <span className="badge bg-surface-2">Refunded or cancelled</span> : <OrderStatusBadge status={l.orders.status} />}
                       </td>
-                      <td className="p-3 text-right">{rupees(sale)}</td>
-                      <td className="p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.print_cost_total))}`}</td>
-                      <td className="p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission))}`}</td>
-                      <td className="p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission_gst))}`}</td>
-                      <td className="p-3 text-right">
+                      <td className="mono p-3 text-right">{rupees(sale)}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.print_cost_total))}`}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission))}`}</td>
+                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission_gst))}`}</td>
+                      <td className="mono p-3 text-right">
                         {legacy || l.gateway_allocated === null ? "—" : `− ${rupees(n(l.gateway_allocated))}`}
                         {!legacy && l.orders.gateway_fee_source === "estimated" && <span className="block text-xs text-muted">estimated</span>}
                       </td>
-                      <td className="p-3 text-right font-semibold">{void_ ? <s>{rupees(earning({ ...l, reversed_at: null }))}</s> : rupees(earning(l))}</td>
+                      <td className="mono p-3 text-right font-semibold">{void_ ? <s>{rupees(earning({ ...l, reversed_at: null }))}</s> : rupees(earning(l))}</td>
                     </tr>
                   );
                 })}
@@ -196,7 +196,7 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
                   </span>
                 </span>
                 <span className="text-right">
-                  <span className="block font-semibold tabular-nums">{rupees(n(p.amount))}</span>
+                  <span className="block font-semibold mono">{rupees(n(p.amount))}</span>
                   <span className="text-xs text-muted">{p.status === "paid" ? "Paid" : p.status}</span>
                 </span>
               </li>
