@@ -227,12 +227,12 @@ export function ArticleEditor({
     <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
       <div className="min-w-0 space-y-5">
         {moderated && (
-          <p role="note" className="rounded-xl bg-danger/10 p-3 text-sm ring-1 ring-danger/25">
+          <p role="note" className="rounded-[var(--radius-card)] bg-danger/10 p-3 text-sm ring-1 ring-danger/25">
             Our team has {moderated === "removed" ? "removed" : "hidden"} this article from the site.{moderationReason && <> Reason: {moderationReason}.</>} Contact support to discuss it.
           </p>
         )}
         {offerRestore ? (
-          <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl bg-accent/15 p-3 text-sm">
+          <div role="alert" className="flex flex-wrap items-center gap-3 rounded-[var(--radius-card)] bg-accent/15 p-3 text-sm">
             <span className="flex-1">This browser has unsaved changes for this article from earlier.</span>
             <button
               type="button"
@@ -265,7 +265,7 @@ export function ArticleEditor({
           </div>
         ) : (
           message && (
-            <p role={message.error ? "alert" : "status"} className={`rounded-xl p-3 text-sm font-medium ${message.error ? "bg-danger/10 text-danger" : "bg-success/15 text-success"}`}>
+            <p role={message.error ? "alert" : "status"} className={`rounded-[var(--radius-card)] p-3 text-sm font-medium ${message.error ? "bg-danger/10 text-danger" : "bg-success/15 text-success"}`}>
               {message.error ?? message.ok}
             </p>
           )
@@ -273,10 +273,10 @@ export function ArticleEditor({
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-full bg-surface-2 p-1" role="group" aria-label="Editor view">
-            <button type="button" aria-pressed={!preview} onClick={() => setPreview(false)} className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${!preview ? "bg-surface shadow-soft" : "text-muted"}`}>
+            <button type="button" aria-pressed={!preview} onClick={() => setPreview(false)} className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${!preview ? "bg-surface" : "text-muted"}`}>
               <Pencil className="h-4 w-4" aria-hidden /> Write
             </button>
-            <button type="button" aria-pressed={preview} onClick={() => setPreview(true)} className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${preview ? "bg-surface shadow-soft" : "text-muted"}`}>
+            <button type="button" aria-pressed={preview} onClick={() => setPreview(true)} className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${preview ? "bg-surface" : "text-muted"}`}>
               <Eye className="h-4 w-4" aria-hidden /> Preview
             </button>
           </div>
@@ -295,7 +295,7 @@ export function ArticleEditor({
 
         {preview ? (
           <article className="card" lang={f.language}>
-            {cover && <img src={cover} alt={f.cover_alt} className="mb-5 aspect-[16/9] w-full rounded-xl object-cover" />}
+            {cover && <img src={cover} alt={f.cover_alt} className="mb-5 aspect-[16/9] w-full rounded-[var(--radius-card)] object-cover" />}
             <h1 className="text-3xl md:text-4xl">{f.title || "Untitled article"}</h1>
             {f.excerpt && <p className="mt-3 text-lg text-muted">{f.excerpt}</p>}
             <p className="mt-2 text-sm text-muted">{readingMinutes(words)} min read · preview, not published</p>
@@ -316,7 +316,7 @@ export function ArticleEditor({
                 <label htmlFor="a-body" className="label">
                   Article
                 </label>
-                <span className="text-xs text-muted tabular-nums">
+                <span className="text-xs text-muted mono">
                   {words} words · {readingMinutes(words)} min read
                 </span>
               </div>
@@ -381,7 +381,7 @@ export function ArticleEditor({
           )}
           {!live &&
             (confirm === "publish" ? (
-              <div className="space-y-2 rounded-xl bg-surface-2 p-3 text-sm">
+              <div className="space-y-2 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
                 {problems.length ? (
                   <>
                     <p className="font-semibold">Before publishing:</p>
@@ -410,7 +410,7 @@ export function ArticleEditor({
             ))}
           {live &&
             (confirm === "unpublish" ? (
-              <div className="space-y-2 rounded-xl bg-surface-2 p-3 text-sm">
+              <div className="space-y-2 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
                 <p>Take this article off the site? Likes and comments are kept if you publish it again.</p>
                 <div className="flex gap-2">
                   <button type="button" className="btn-primary flex-1" disabled={busy} onClick={onUnpublish}>
@@ -427,7 +427,7 @@ export function ArticleEditor({
               </button>
             ))}
           {confirm === "delete" ? (
-            <div className="space-y-2 rounded-xl bg-danger/10 p-3 text-sm">
+            <div className="space-y-2 rounded-[var(--radius-card)] bg-danger/10 p-3 text-sm">
               <p>Delete this article for good, with its likes and comments? This can&apos;t be undone.</p>
               <div className="flex gap-2">
                 <button type="button" className="btn flex-1 bg-danger text-white" disabled={busy} onClick={onDelete}>
@@ -525,7 +525,7 @@ function Field({ label, hint, count, htmlFor, children }: { label: string; hint?
         <label htmlFor={htmlFor} className="label">
           {label}
         </label>
-        {count && <span className="text-xs text-muted tabular-nums">{count}</span>}
+        {count && <span className="text-xs text-muted mono">{count}</span>}
       </div>
       {children}
       {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}

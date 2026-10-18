@@ -35,7 +35,7 @@ export function ArticleComments({ articleId, comments, signedIn, canComment, int
   return (
     <section id="comments" aria-labelledby="comments-h" className="scroll-mt-24">
       <h2 id="comments-h" className="text-xl">
-        Comments <span className="text-muted tabular-nums">({comments.length})</span>
+        Comments <span className="text-muted mono">({comments.length})</span>
       </h2>
 
       {canComment ? (

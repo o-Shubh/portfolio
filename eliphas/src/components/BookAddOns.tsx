@@ -48,7 +48,7 @@ export function BookAddOns({ bookId, options, requests }: { bookId: string; opti
       </p>
 
       {requests.length > 0 && (
-        <ul className="mt-4 divide-y divide-line rounded-xl bg-surface-2 px-4 text-sm">
+        <ul className="mt-4 divide-y divide-line rounded-[var(--radius-card)] bg-surface-2 px-4 text-sm">
           {requests.map((r) => (
             <li key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5">
               <Link href={`/author/services/${r.id}`} className="min-w-0 flex-1 font-medium underline-offset-2 hover:underline">
@@ -70,7 +70,7 @@ export function BookAddOns({ bookId, options, requests }: { bookId: string; opti
             const samples = SERVICE_PORTFOLIO[o.code]?.samples ?? [];
             const offerUpgrade = o.code === BUNDLE_CODE && blocked === BUNDLE_OVERLAP && upgradable;
             return (
-              <div key={o.code} className={`rounded-xl border p-3 ${checked ? "border-accent bg-accent/10" : "border-line"}`}>
+              <div key={o.code} className={`rounded-[var(--radius-card)] border p-3 ${checked ? "border-accent bg-accent/10" : "border-line"}`}>
                 <label className={`flex gap-3 ${blocked ? "" : "cursor-pointer"}`}>
                   <input
                     type="checkbox"
@@ -84,7 +84,7 @@ export function BookAddOns({ bookId, options, requests }: { bookId: string; opti
                   <span className={`min-w-0 ${blocked ? "opacity-70" : ""}`}>
                     <span className="flex flex-wrap items-baseline gap-x-2">
                       <span className="font-semibold">{o.name}</span>
-                      <span className="text-sm tabular-nums text-muted">{o.price}</span>
+                      <span className="text-sm mono text-muted">{o.price}</span>
                     </span>
                     {blocked ? (
                       <span className="mt-0.5 block text-xs font-medium">{blocked}</span>

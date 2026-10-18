@@ -227,7 +227,7 @@ function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
   return (
     <div className={`flex justify-between gap-4 ${strong ? "border-t border-line pt-1 font-semibold" : ""}`}>
       <dt className={strong ? "" : "text-muted"}>{k}</dt>
-      <dd className="tabular-nums">{v}</dd>
+      <dd className="mono">{v}</dd>
     </div>
   );
 }

@@ -30,7 +30,7 @@ export default async function PrintersPage({ searchParams }: PageProps<"/admin/p
         }
       />
       {added && (
-        <p role="status" className="mb-4 rounded-xl bg-success/15 p-3 font-medium text-success">
+        <p role="status" className="mb-4 rounded-[var(--radius-card)] bg-success/15 p-3 font-medium text-success">
           Printer added. They can now log in with their phone number.
         </p>
       )}

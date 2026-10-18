@@ -50,7 +50,7 @@ export default async function AdminEditionsPage() {
 
         <section className="card" aria-labelledby="recent-h">
           <h2 id="recent-h" className="text-lg">
-            Recently assigned <span className="text-muted tabular-nums">({total ?? 0} in total)</span>
+            Recently assigned <span className="text-muted mono">({total ?? 0} in total)</span>
           </h2>
           <p className="mt-1 text-sm text-muted">
             Find any edition by its exact EEID in the{" "}
@@ -69,7 +69,7 @@ export default async function AdminEditionsPage() {
                 return (
                   <li key={r.eeid} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                     <span className="min-w-0">
-                      <span className="font-mono font-semibold">{r.eeid}</span>{" "}
+                      <span className="mono font-semibold">{r.eeid}</span>{" "}
                       {book ? (
                         <Link href={`/admin/books/${book.id}`} className="underline-offset-2 hover:underline">
                           {book.title}

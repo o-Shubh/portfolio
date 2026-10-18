@@ -87,7 +87,7 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
         {tiles.map((t) => (
           <div key={t.label} className="card p-4 md:p-5">
             <dt className="text-sm text-muted">{t.label}</dt>
-            <dd className="mt-1.5 text-[1.75rem] leading-tight font-semibold tracking-tight tabular-nums">{rupees(Math.round(t.value * 100) / 100)}</dd>
+            <dd className="mt-1.5 text-[1.75rem] leading-tight font-semibold tracking-tight mono">{rupees(Math.round(t.value * 100) / 100)}</dd>
             <dd className="mt-1 text-sm text-muted">{t.sub}</dd>
           </div>
         ))}
@@ -108,7 +108,7 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
           <p className="mt-3 rounded-[var(--radius-card)] border border-dashed border-line-strong p-8 text-center text-muted">No paid orders yet. Your earnings appear here as soon as a reader pays.</p>
         ) : (
           <div className="mt-3 overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line">
-            <table className="w-full min-w-[860px] text-left text-sm tabular-nums">
+            <table className="w-full min-w-[860px] text-left text-sm mono">
               <caption className="sr-only">Your earnings for each paid order line, with the costs taken from the selling price</caption>
               <thead className="border-b border-line bg-surface-2 text-muted">
                 <tr>
@@ -196,7 +196,7 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
                   </span>
                 </span>
                 <span className="text-right">
-                  <span className="block font-semibold tabular-nums">{rupees(n(p.amount))}</span>
+                  <span className="block font-semibold mono">{rupees(n(p.amount))}</span>
                   <span className="text-xs text-muted">{p.status === "paid" ? "Paid" : p.status}</span>
                 </span>
               </li>

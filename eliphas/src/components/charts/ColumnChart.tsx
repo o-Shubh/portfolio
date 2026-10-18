@@ -77,7 +77,7 @@ export function ColumnChart({
           {ticks.map((t) => (
             <g key={t}>
               <line x1={pad.left} x2={width - pad.right} y1={y(t)} y2={y(t)} stroke="var(--line)" strokeWidth={1} />
-              <text x={pad.left - 8} y={y(t)} dy="0.32em" textAnchor="end" fontSize={11} fill="var(--muted)" className="tabular-nums">
+              <text x={pad.left - 8} y={y(t)} dy="0.32em" textAnchor="end" fontSize={11} fill="var(--muted)" className="mono">
                 {t >= 1000 ? `${Math.round(t / 100) / 10}K` : t}
               </text>
             </g>
@@ -101,7 +101,7 @@ export function ColumnChart({
                 )}
                 {/* only the peak is labelled; the tooltip and table carry the rest */}
                 {i === peak && d.value > 0 && active === null && (
-                  <text x={cx} y={y(d.value) - 6} textAnchor="middle" fontSize={11} fontWeight={600} fill="var(--fg)" className="tabular-nums">
+                  <text x={cx} y={y(d.value) - 6} textAnchor="middle" fontSize={11} fontWeight={600} fill="var(--fg)" className="mono">
                     {d.value}
                   </text>
                 )}
@@ -127,11 +127,11 @@ export function ColumnChart({
         {a && (
           <div
             role="status"
-            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-xl bg-surface px-3 py-2 text-sm whitespace-nowrap shadow-lift ring-1 ring-line"
+            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-[var(--radius-card)] bg-surface px-3 py-2 text-sm whitespace-nowrap shadow-lift ring-1 ring-line"
             style={{ left: Math.min(Math.max(ax, 70), width - 70), top: Math.max(y(a.value) - 8, 40) }}
           >
-            <p className="font-semibold tabular-nums">{a.valueText}</p>
-            {a.detail && <p className="text-muted tabular-nums">{a.detail}</p>}
+            <p className="font-semibold mono">{a.valueText}</p>
+            {a.detail && <p className="text-muted mono">{a.detail}</p>}
             <p className="text-xs text-muted">{a.longLabel}</p>
           </div>
         )}
@@ -139,7 +139,7 @@ export function ColumnChart({
       <details className="mt-3 text-sm">
         <summary className="inline-flex min-h-11 cursor-pointer items-center font-semibold text-muted hover:text-fg">Show as table</summary>
         <div className="mt-2 overflow-x-auto">
-          <table id={tableId} className="w-full text-left tabular-nums">
+          <table id={tableId} className="w-full text-left mono">
             <caption className="sr-only">{caption}</caption>
             <tbody className="divide-y divide-line">
               {data.map((d) => (

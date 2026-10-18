@@ -73,7 +73,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
           }
         />
         {pageWarning && trim && (
-          <p role="note" className="mt-4 rounded-xl bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
+          <p role="note" className="mt-4 rounded-[var(--radius-card)] bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
             Your PDF pages are {book.manuscript_width_in} × {book.manuscript_height_in} in, but the book size is{" "}
             <strong>{trim.label}</strong>. Change the size on the {printLink} step, or export your PDF at the right size.
           </p>
@@ -107,7 +107,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
         <p className="mt-1 text-sm text-muted">
           The full cover the printer uses: back, spine and front in one PDF, with bleed. Up to 10 MB.
         </p>
-        <div className="mt-3 rounded-xl bg-surface-2 p-3 text-sm">
+        <div className="mt-3 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
           {expected ? (
             <>
               <p className="font-semibold">
@@ -148,7 +148,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
           }
         />
         {coverWarning && expected && (
-          <p role="note" className="mt-4 rounded-xl bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
+          <p role="note" className="mt-4 rounded-[var(--radius-card)] bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
             This PDF is {book.print_cover_width_in} × {book.print_cover_height_in} in, but it should be {expected.widthIn} ×{" "}
             {expected.heightIn} in. Please re-export it at that size.
           </p>
@@ -177,11 +177,11 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
                   return (
                     <tr key={v.id}>
                       <td className="py-2 pr-4">{v.kind === "manuscript" ? "Manuscript" : v.kind === "print_cover" ? "Print cover" : "Front cover image"}</td>
-                      <td className="py-2 pr-4 tabular-nums">
+                      <td className="py-2 pr-4 mono">
                         v{v.version}
                         {v.page_count ? ` · ${v.page_count} pages` : ""}
                       </td>
-                      <td className="py-2 pr-4 tabular-nums">{new Date(v.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</td>
+                      <td className="py-2 pr-4 mono">{new Date(v.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</td>
                       <td className="py-2">
                         {approved[v.kind]?.id === v.id ? <span className="badge bg-success/15 text-success">Approved</span> : current ? <span className="badge bg-surface-2">Current</span> : <span className="text-muted">Earlier</span>}
                       </td>

@@ -86,7 +86,7 @@ export function ArticleActions({
         <button type="button" className={`${btn} ${like.on ? "border-gold bg-gold/15" : ""}`} aria-pressed={like.on} onClick={() => toggleLike(!like.on)} disabled={pending} data-testid="like">
           <Heart className={`h-4 w-4 ${like.on ? "fill-current text-[#b4412f]" : ""}`} aria-hidden />
           {like.on ? "Liked" : "Like"}
-          <span className="tabular-nums text-muted" aria-label={`${like.count} ${like.count === 1 ? "like" : "likes"}`}>
+          <span className="mono text-muted" aria-label={`${like.count} ${like.count === 1 ? "like" : "likes"}`}>
             {like.count}
           </span>
         </button>

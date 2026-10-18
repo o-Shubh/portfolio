@@ -21,7 +21,7 @@ export default async function StartPublishingPage({ searchParams }: PageProps<"/
   if (me.role !== "reader") {
     return (
       <AuthFrame audience="author">
-        <h1 className="text-3xl">Author tools aren&apos;t available here</h1>
+        <h1 className="display text-[1.875rem] leading-tight">Author tools aren&apos;t available here</h1>
         <p className="mt-3 text-muted">This number is set up as a {me.role} account. To publish, sign up with a different mobile number, or contact us.</p>
         <Link href={ROLE_HOME[me.role]} className="btn-primary mt-6 inline-flex">
           Back to my dashboard
@@ -35,7 +35,7 @@ export default async function StartPublishingPage({ searchParams }: PageProps<"/
       <span className="grid h-12 w-12 place-items-center rounded-full bg-accent/10 text-accent-fg">
         <PenLine className="h-6 w-6" aria-hidden />
       </span>
-      <h1 className="mt-4 text-3xl">Start publishing, {me.full_name.split(" ")[0]}?</h1>
+      <h1 className="display mt-4 text-[1.875rem] leading-tight">Start publishing, {me.full_name.split(" ")[0]}?</h1>
       <p className="mt-3 text-muted">
         Your number is registered as a reader. Turn on author tools for this same account: your orders, saved items and community profile stay
         exactly as they are, and you can still shop as usual.

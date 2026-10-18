@@ -94,7 +94,7 @@ export default async function AdminServiceOrder({ params }: PageProps<"/admin/se
                       {p.name} · {p.orderNumber}
                     </Link>
                     <span className="flex items-center gap-2">
-                      <span className="tabular-nums text-muted">{p.paidPaise ? `paid ${formatPaise(p.paidPaise)} + GST` : "not paid"}</span>
+                      <span className="mono text-muted">{p.paidPaise ? `paid ${formatPaise(p.paidPaise)} + GST` : "not paid"}</span>
                       <ServiceStatusBadge status={p.status} />
                     </span>
                   </li>

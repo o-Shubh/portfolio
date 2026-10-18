@@ -17,22 +17,22 @@ const PANELS = {
 export function AuthFrame({ children, audience = "author" }: { children: React.ReactNode; audience?: "reader" | "author" }) {
   const panel = PANELS[audience];
   return (
-    <div className="grid min-h-dvh flex-1 lg:grid-cols-[1fr_1.05fr]">
+    <div className="grid min-h-dvh flex-1 bg-surface-2/60 lg:grid-cols-[1fr_1.05fr]">
       <div className="safe-top flex flex-col px-4 py-5 sm:px-8">
         <div className="flex items-center justify-between">
           <Logo className="h-11" />
           <ThemeToggle />
         </div>
         <main id="main" tabIndex={-1} className="flex flex-1 items-center justify-center py-12 outline-none">
-          <div className="w-full max-w-sm">{children}</div>
+          <div className="w-full max-w-sm sm:max-w-md sm:rounded-[18px] sm:bg-surface sm:p-8 sm:shadow-sheet sm:ring-1 sm:ring-line">{children}</div>
         </main>
       </div>
 
-      <aside className="relative m-3 hidden overflow-hidden rounded-2xl bg-navy p-12 text-white lg:flex lg:flex-col">
+      <aside className="relative m-3 hidden overflow-hidden rounded-[18px] bg-navy p-12 text-white lg:flex lg:flex-col">
         {/* eslint-disable-next-line @next/next/no-img-element -- static brand image */}
         <img src="/brand/logo-full-light.png" alt="" className="relative h-16 w-auto self-start" />
         <div className="relative mt-auto">
-          <h2 className="max-w-lg text-5xl leading-[1.1] font-semibold">
+          <h2 className="display max-w-lg text-5xl leading-[1.1] text-white">
             {panel.title}
           </h2>
           <ul className="mt-10 space-y-3 text-lg text-white/85">

@@ -31,7 +31,7 @@ export function NewBookForm() {
 
 function Choice({ name, value, label, sub }: { name: string; value: string; label: string; sub: string }) {
   return (
-    <label className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl bg-surface-2 ring-1 ring-transparent transition hover:ring-line p-3 has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/10">
+    <label className="flex min-h-14 cursor-pointer items-center gap-3 rounded-[var(--radius-card)] bg-surface-2 ring-1 ring-transparent transition hover:ring-line p-3 has-[:checked]:ring-2 has-[:checked]:ring-accent has-[:checked]:bg-accent/10">
       <input type="radio" name={name} value={value} required className="h-5 w-5 accent-fg" />
       <span>
         <span className="block font-semibold">{label}</span>

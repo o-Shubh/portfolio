@@ -49,21 +49,21 @@ export default async function PayoutsPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted">Balance</p>
-                  <p className="font-heading text-2xl tracking-tight tabular-nums">{rupees(Number(b.balance))}</p>
+                  <p className="mono text-2xl font-medium">{rupees(Number(b.balance))}</p>
                 </div>
               </div>
               <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
                 <div>
                   <dt className="text-muted">Copies sold</dt>
-                  <dd className="font-medium tabular-nums">{b.copies_sold}</dd>
+                  <dd className="font-medium mono">{b.copies_sold}</dd>
                 </div>
                 <div>
                   <dt className="text-muted">Earned</dt>
-                  <dd className="font-medium tabular-nums">{rupees(Number(b.earned))}</dd>
+                  <dd className="font-medium mono">{rupees(Number(b.earned))}</dd>
                 </div>
                 <div>
                   <dt className="text-muted">Paid</dt>
-                  <dd className="font-medium tabular-nums">{rupees(Number(b.paid))}</dd>
+                  <dd className="font-medium mono">{rupees(Number(b.paid))}</dd>
                 </div>
               </dl>
               {Number(b.balance) > 0 && b.author_id && (
@@ -81,7 +81,7 @@ export default async function PayoutsPage() {
       {!history?.length ? (
         <div className="card text-muted">No payouts yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl bg-surface shadow-soft ring-1 ring-line">
+        <div className="overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line">
           <table className="w-full min-w-[520px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>
@@ -96,7 +96,7 @@ export default async function PayoutsPage() {
                 <tr key={p.id}>
                   <td className="p-3">{new Date(p.paid_at ?? p.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}</td>
                   <td className="p-3">{p.profiles?.full_name}</td>
-                  <td className="p-3 text-right tabular-nums">{rupees(Number(p.amount))}</td>
+                  <td className="p-3 text-right mono">{rupees(Number(p.amount))}</td>
                   <td className="p-3">
                     {p.reference}
                     {p.note && <span className="block text-xs text-muted">{p.note}</span>}

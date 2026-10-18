@@ -85,9 +85,9 @@ export function MobileMenu({ links, account, showPublish }: { links: L[]; accoun
               </div>
             </div>
             <nav aria-label="Menu" className="safe-bottom flex-1 overflow-y-auto pb-6">
-              <ul className="mt-3 divide-y divide-line bg-surface shadow-soft">{[...links, account].map((l) => row(l, true))}</ul>
+              <ul className="mt-3 divide-y divide-line bg-surface">{[...links, account].map((l) => row(l, true))}</ul>
               <p className="px-4 pt-6 pb-2 text-xs font-semibold tracking-wider text-muted uppercase">More</p>
-              <ul className="divide-y divide-line bg-surface shadow-soft">{MORE.map((l) => row(l))}</ul>
+              <ul className="divide-y divide-line bg-surface">{MORE.map((l) => row(l))}</ul>
               <div className="space-y-4 px-4 pt-6">
                 {showPublish && (
                   <>

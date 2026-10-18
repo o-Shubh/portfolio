@@ -43,7 +43,7 @@ export default async function MyPostsPage() {
                 <Link href={`/community/${p.id}/edit`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
                   <span className="min-w-0 flex-1">
                     <span className="line-clamp-2 font-medium">{p.body || "Empty draft"}</span>
-                    <span className="text-sm text-muted tabular-nums">
+                    <span className="text-sm text-muted mono">
                       {p.status === "published" && p.published_at ? new Date(p.published_at).toLocaleDateString("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" }) : "Not published"}
                       {p.status === "published" && ` · ${tally(likes, p.id)} likes · ${tally(comments, p.id)} replies`}
                     </span>

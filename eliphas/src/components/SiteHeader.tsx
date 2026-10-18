@@ -61,7 +61,7 @@ export async function SiteHeader() {
           <Link href="/cart" className={icon} aria-label={inCart ? `Cart, ${inCart} ${inCart === 1 ? "copy" : "copies"}` : "Cart"}>
             <ShoppingBag className="h-5 w-5" aria-hidden />
             {inCart > 0 && (
-              <span className="absolute top-1 right-1 grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-buy px-1 text-[0.65rem] font-bold text-on-buy tabular-nums" aria-hidden>
+              <span className="absolute top-1 right-1 grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-buy px-1 text-[0.65rem] font-bold text-on-buy mono" aria-hidden>
                 {inCart}
               </span>
             )}

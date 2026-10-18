@@ -111,7 +111,7 @@ export function ReviewActions({
             : "This book is unpublished."}
       </p>
       {lastNote && (
-        <p className="rounded-xl bg-surface-2 p-3 text-sm">
+        <p className="rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
           <span className="font-semibold">Last note:</span> {lastNote}
         </p>
       )}

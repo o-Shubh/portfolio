@@ -40,7 +40,7 @@ export default async function PaymentsPage() {
                 <tr key={p.id}>
                   <td className="p-3 whitespace-nowrap">{new Date(p.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}</td>
                   <td className="p-3">{p.description}</td>
-                  <td className="p-3 text-right tabular-nums">{formatPaise(p.amount_paise)}</td>
+                  <td className="p-3 text-right mono">{formatPaise(p.amount_paise)}</td>
                   <td className="p-3">
                     {STATUS[p.status]}
                     {p.refunded_paise > 0 && ` (${formatPaise(p.refunded_paise)} back)`}

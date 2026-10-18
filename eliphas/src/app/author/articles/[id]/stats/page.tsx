@@ -58,7 +58,7 @@ export default async function ArticleStatsPage({ params }: PageProps<"/author/ar
         ].map(([k, v]) => (
           <div key={k} className="card">
             <dt className="text-sm text-muted">{k}</dt>
-            <dd className="mt-1 text-2xl font-semibold tabular-nums">{v}</dd>
+            <dd className="mt-1 text-2xl font-semibold mono">{v}</dd>
           </div>
         ))}
       </dl>
@@ -76,7 +76,7 @@ export default async function ArticleStatsPage({ params }: PageProps<"/author/ar
             <h2 className="text-lg">Related-book clicks</h2>
             {a.related_book_id ? (
               <>
-                <p className="mt-2 text-3xl font-semibold tabular-nums">{bookClicks}</p>
+                <p className="mt-2 text-3xl font-semibold mono">{bookClicks}</p>
                 <p className="mt-1 text-sm text-muted">
                   Times readers opened your book from this article (once per reader or browser per day). This shows interest, not sales: we don&apos;t link these clicks
                   to orders.

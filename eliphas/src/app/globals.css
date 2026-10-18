@@ -292,7 +292,7 @@ body {
 }
 
 @utility card {
-  @apply rounded-[var(--radius-card)] bg-surface p-5 shadow-soft ring-1 ring-line md:p-6;
+  @apply rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line md:p-6;
 }
 /* Text fields: hairline border, cobalt border + 3px halo on focus; 44px on touch, 40px with a mouse */
 @utility field {
@@ -497,3 +497,17 @@ body {
 .ledger tr:last-child td { border-bottom: 0; }
 .ledger .num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ledger-wrap { overflow-x: auto; border-radius: var(--radius-card); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+
+/* Data tables everywhere (orders, finance, payouts): ledger-style headers and a quiet header band */
+@layer base {
+  thead :where(th) {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  thead:where(:not(.ledger thead)) {
+    background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+  }
+}

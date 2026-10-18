@@ -30,7 +30,7 @@ export function ReportIssue({ orderId, userId, shippedOnly }: { orderId: string;
     setPhotos((p) => [...p, path]);
   }
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-line p-4">
+    <form onSubmit={onSubmit} className="space-y-3 rounded-[var(--radius-card)] border border-line p-4">
       <input type="hidden" name="photos" value={photos.join("\n")} />
       <label className="block">
         <span className="label">What went wrong?</span>

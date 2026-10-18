@@ -22,7 +22,7 @@ export default async function OnboardingPage({ searchParams }: PageProps<"/onboa
   return (
     <AuthFrame audience={asAuthor ? "author" : "reader"}>
       <span className="eyebrow">Almost there</span>
-      <h1 className="mt-3 text-4xl">{asAuthor ? "Set up your author account" : "Tell us about you"}</h1>
+      <h1 className="display mt-3 text-[1.875rem] leading-tight">{asAuthor ? "Set up your author account" : "Tell us about you"}</h1>
       <p className="mt-2 text-muted">This takes 30 seconds.</p>
       <OnboardingForm profile={suggested ? { ...profile, full_name: suggested } : profile} next={safeNext} asAuthor={asAuthor} />
     </AuthFrame>

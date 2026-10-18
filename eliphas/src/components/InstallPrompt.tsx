@@ -88,7 +88,7 @@ export function InstallPrompt({ aboveTabBar = false }: { aboveTabBar?: boolean }
       <div className="rounded-[var(--radius-card)] bg-surface p-4 shadow-sheet ring-1 ring-line">
         <div className="flex items-start gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element -- the app icon itself */}
-          <img src="/icons/icon-192.png" alt="" className="h-12 w-12 shrink-0 rounded-xl" />
+          <img src="/icons/icon-192.png" alt="" className="h-12 w-12 shrink-0 rounded-[var(--radius-card)]" />
           <div className="min-w-0 flex-1">
             <p id="install-title" className="font-medium">
               Get the Eliphas app
@@ -106,10 +106,10 @@ export function InstallPrompt({ aboveTabBar = false }: { aboveTabBar?: boolean }
 
         {mode === "ios" ? (
           <ol className="mt-3 space-y-2 text-sm">
-            <li className="flex items-center gap-2 rounded-xl bg-surface-2 px-3 py-2">
+            <li className="flex items-center gap-2 rounded-[var(--radius-card)] bg-surface-2 px-3 py-2">
               <span className="font-semibold">1.</span> Tap <Share className="h-4 w-4" aria-label="Share" /> <span className="font-semibold">Share</span> in Safari&apos;s toolbar
             </li>
-            <li className="flex items-center gap-2 rounded-xl bg-surface-2 px-3 py-2">
+            <li className="flex items-center gap-2 rounded-[var(--radius-card)] bg-surface-2 px-3 py-2">
               <span className="font-semibold">2.</span> Choose <SquarePlus className="h-4 w-4" aria-hidden /> <span className="font-semibold">Add to Home Screen</span>
             </li>
           </ol>

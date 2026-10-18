@@ -39,8 +39,8 @@ export default async function PlansPage() {
                 <td className="p-3 font-medium">
                   {v.plan} v{v.version}
                 </td>
-                <td className="p-3 tabular-nums">{v.price_paise ? formatPaise(v.price_paise) : "—"}</td>
-                <td className="p-3 tabular-nums">
+                <td className="p-3 mono">{v.price_paise ? formatPaise(v.price_paise) : "—"}</td>
+                <td className="p-3 mono">
                   {Number(v.commission_percent)}%, min {formatPaise(v.commission_min_paise)}
                 </td>
                 <td className="p-3">{Number(v.commission_gst_percent)}%</td>

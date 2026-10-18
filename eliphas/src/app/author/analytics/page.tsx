@@ -94,8 +94,8 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
                 {[...byPeriod.entries()].map(([period, v]) => (
                   <tr key={period}>
                     <td className="py-1.5">{new Date(period).toLocaleDateString("en-IN", range.grain === "month" ? { month: "short", year: "numeric" } : { day: "numeric", month: "short" })}</td>
-                    <td className="py-1.5 text-right tabular-nums">{v.copies}</td>
-                    <td className="py-1.5 text-right tabular-nums">{rupees(Math.round(v.earnings * 100) / 100)}</td>
+                    <td className="py-1.5 text-right mono">{v.copies}</td>
+                    <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -119,8 +119,8 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
                 {[...byBook.entries()].sort((a, b) => b[1].copies - a[1].copies).map(([id, v]) => (
                   <tr key={id}>
                     <td className="py-1.5">{titles.get(id) ?? "—"}</td>
-                    <td className="py-1.5 text-right tabular-nums">{v.copies}</td>
-                    <td className="py-1.5 text-right tabular-nums">{rupees(Math.round(v.earnings * 100) / 100)}</td>
+                    <td className="py-1.5 text-right mono">{v.copies}</td>
+                    <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -166,9 +166,9 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
                       </span>
                     </td>
                     <td className="py-2">{titles.get(c.book_id) ?? "—"}</td>
-                    <td className="py-2 text-right tabular-nums">{Number(c.clicks)}</td>
-                    <td className="py-2 text-right tabular-nums">{Number(c.orders)}</td>
-                    <td className="py-2 text-right tabular-nums">{Number(c.copies)}</td>
+                    <td className="py-2 text-right mono">{Number(c.clicks)}</td>
+                    <td className="py-2 text-right mono">{Number(c.orders)}</td>
+                    <td className="py-2 text-right mono">{Number(c.copies)}</td>
                     <td className="py-2 text-right whitespace-nowrap">
                       {!c.archived && (
                         <span className="flex justify-end gap-3">

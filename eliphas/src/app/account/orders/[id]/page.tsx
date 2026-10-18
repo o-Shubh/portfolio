@@ -83,9 +83,9 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
             <h2 className="mb-5 text-xl">Tracking</h2>
             <OrderTimeline order={o} />
             {o.tracking_number && (
-              <p className="mt-6 flex items-center gap-2 rounded-xl bg-surface-2 p-3 text-sm">
+              <p className="mt-6 flex items-center gap-2 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
                 <Truck className="h-4 w-4 shrink-0" aria-hidden />
-                {o.courier}: <span className="font-semibold tabular-nums select-all">{o.tracking_number}</span>
+                {o.courier}: <span className="font-semibold mono select-all">{o.tracking_number}</span>
               </p>
             )}
           </section>

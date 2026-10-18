@@ -19,7 +19,7 @@ export function CancelOrder({ orderId }: { orderId: string }) {
           Cancel order
         </button>
       ) : (
-        <div className="rounded-xl border border-line p-4">
+        <div className="rounded-[var(--radius-card)] border border-line p-4">
           <p className="font-medium">Cancel this order?</p>
           <p className="mt-1 text-sm text-muted">You get a full refund to your original payment method.</p>
           <div className="mt-4 flex gap-2">

@@ -77,7 +77,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold tabular-nums">{rupees(Number(o.total))}</p>
+                  <p className="font-semibold mono">{rupees(Number(o.total))}</p>
                   <OrderStatusBadge status={o.status} />
                 </div>
               </div>
@@ -104,7 +104,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
                     <span className={`font-medium ${o.refund_status === "failed" ? "text-danger" : "text-fg"}`}>
                       {o.razorpay_payment_id ? (o.refund_status ?? "not started") : "not needed"}
                     </span>
-                    {o.refund_id && <span className="ml-1 tabular-nums">({o.refund_id})</span>}
+                    {o.refund_id && <span className="ml-1 mono">({o.refund_id})</span>}
                   </span>
                   {o.razorpay_payment_id && (o.refund_status === "failed" || !o.refund_status) && <RetryRefund orderId={o.id} />}
                 </div>

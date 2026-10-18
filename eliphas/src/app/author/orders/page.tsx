@@ -26,7 +26,7 @@ export default async function AuthorOrders({ searchParams }: PageProps<"/author/
       {rows.length === 0 ? (
         <div className="card text-center text-muted">No orders yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl bg-surface shadow-soft ring-1 ring-line">
+        <div className="overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>
@@ -40,9 +40,9 @@ export default async function AuthorOrders({ searchParams }: PageProps<"/author/
             <tbody className="divide-y divide-line">
               {rows.map((o) => (
                 <tr key={o.order_item_id}>
-                  <td className="p-4 font-medium whitespace-nowrap tabular-nums">{o.order_number}</td>
+                  <td className="p-4 font-medium whitespace-nowrap mono">{o.order_number}</td>
                   <td className="p-4 font-semibold">{o.book_title}</td>
-                  <td className="p-4 text-right tabular-nums">{o.quantity}</td>
+                  <td className="p-4 text-right mono">{o.quantity}</td>
                   <td className="p-4">
                     {o.ship_city}, <span className="text-muted">{o.ship_state}</span>
                   </td>
@@ -51,7 +51,7 @@ export default async function AuthorOrders({ searchParams }: PageProps<"/author/
                     <OrderStatusBadge status={o.status} />
                   </td>
                   <td className="p-4 whitespace-nowrap text-muted">{o.delivered_at ? `Delivered ${d(o.delivered_at)}` : o.shipped_at ? `Shipped ${d(o.shipped_at)}` : "—"}</td>
-                  <td className="p-4 text-right font-semibold tabular-nums">{rupees(Number(o.earning))}</td>
+                  <td className="p-4 text-right font-semibold mono">{rupees(Number(o.earning))}</td>
                 </tr>
               ))}
             </tbody>

@@ -124,7 +124,7 @@ export function SampleGallery({ title, samples, previews = 3, compact = false }:
 
           <footer className="space-y-2 px-4 pt-3 pb-4">
             <p className="text-sm font-medium" aria-live="polite">
-              <span className="tabular-nums text-white/70">
+              <span className="mono text-white/70">
                 {index + 1} of {count}
               </span>{" "}
               · {s.label}
