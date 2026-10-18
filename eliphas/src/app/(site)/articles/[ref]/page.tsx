@@ -202,7 +202,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps<"/
                 </a>
                 {book.sample_path && (
                   <Link href={`/books/${book.slug}/sample`} className="btn-ghost min-h-10 px-4 text-sm" data-testid="article-read-sample">
-                    Read sample
+                    Read a sample
                   </Link>
                 )}
               </div>

@@ -51,6 +51,9 @@ const format = {
   pull: img("format-after-pullquote", 1067, 1600, "After: page with pull quote", "Sample formatted interior page with a running header, body text and a highlighted pull quote."),
 };
 
+/** The cover and formatting samples, for showing on public pages (always with SAMPLE_LABEL). */
+export const SAMPLE_IMAGES = { cover, format };
+
 const CREATIVES = [
   {
     key: "reveal",

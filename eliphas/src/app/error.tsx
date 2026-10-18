@@ -19,7 +19,7 @@ export default function Error({ error, retry }: { error: Error & { digest?: stri
       </p>
       {error.digest && (
         <p className="mt-3 text-xs text-muted">
-          Reference: <span className="mono select-all">{error.digest}</span>
+          Reference: <span className="id-mono select-all">{error.digest}</span>
         </p>
       )}
       <div className="mt-6 flex flex-wrap gap-3">

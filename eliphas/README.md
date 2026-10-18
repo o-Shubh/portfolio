@@ -373,8 +373,18 @@ Tokens live in `src/app/globals.css`, in light and dark versions:
   notices.
 - Shape: radii of 10 px (controls), 14 px (cards) and 18 px (dialogs, sheets, reading panels);
   hairline cards without heavy shadows; a book-spine shadow on covers.
-- Fonts: the device's own sans-serif for the interface; Source Serif 4 for titles and reading;
-  JetBrains Mono for figures, order numbers, ISBNs and Edition IDs.
+- Fonts: the device's own sans-serif for the interface and all headlines (`display`: semibold, slightly
+  tight; normal tracking and more line height for Hindi). Source Serif 4 only for book titles
+  (`display book-title`), literary excerpts and reading. JetBrains Mono only for identifiers (`id-mono`:
+  Edition IDs, ISBNs, order numbers) and ledger tables; prices use the sans with even-width digits (`mono`).
+
+Design pack (Apple-inspired brief, `public/graphics/`): the homepage hero and the author section use the
+supplied artwork (`eliphas-hero`, `eliphas-publishing-journey`; WebP served, PNG originals kept) on ivory
+"paper panels" that stay ivory in dark mode. They are decorative concept books, never catalogue items.
+New components: `Book3D` (real cover, spine, page edges and depth from the page count; follows the
+pointer only with a mouse, static on touch and for reduced motion), `Reveal` (scroll fade, visible
+without JavaScript), `BeforeAfter` (keyboard-accessible slider), `QuickLook` (native dialog; bottom
+sheet on phones) and `EditionIdStory`.
 
 Shared building blocks (utility classes):
 - Buttons: `btn-primary`, `btn-ghost`, `btn-tinted` (grey, e.g. Read sample), `btn-accent`/`btn-buy`

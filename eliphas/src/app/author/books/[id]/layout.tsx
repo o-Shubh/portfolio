@@ -11,11 +11,11 @@ export default async function BookEditorLayout({ children, params }: LayoutProps
 
   return (
     <>
-      <Link href="/author/books" className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-muted hover:text-fg">
+      <Link href="/author/books" className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-muted hover:text-fg md:min-h-0">
         <ArrowLeft className="h-4 w-4" aria-hidden /> My books
       </Link>
       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h1 className="display text-2xl md:text-3xl" lang={book.language}>
+        <h1 className="display book-title text-2xl md:text-3xl" lang={book.language}>
           {book.title}
         </h1>
         <StatusBadge status={book.status} />
@@ -23,7 +23,7 @@ export default async function BookEditorLayout({ children, params }: LayoutProps
       <p className="mt-1 text-sm text-muted">{STATUS[book.status].help}</p>
 
       {book.status === "changes_requested" && book.review_note && (
-        <div role="note" className="mt-4 flex gap-3 rounded-[var(--radius-card)] bg-danger/10 ring-1 ring-danger/25 p-4">
+        <div role="note" className="notice-danger mt-4">
           <MessageSquareWarning className="mt-0.5 h-5 w-5 shrink-0 text-danger" aria-hidden />
           <div>
             <p className="font-semibold">Note from our review team</p>
@@ -32,7 +32,7 @@ export default async function BookEditorLayout({ children, params }: LayoutProps
         </div>
       )}
       {!isEditable(book) && (
-        <div role="note" className="mt-4 flex gap-3 rounded-[var(--radius-card)] bg-surface-2 p-4 text-sm">
+        <div role="note" className="notice-info mt-4">
           <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <p>
             {book.status === "in_review"

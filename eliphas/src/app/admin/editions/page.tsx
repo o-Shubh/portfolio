@@ -69,7 +69,7 @@ export default async function AdminEditionsPage() {
                 return (
                   <li key={r.eeid} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                     <span className="min-w-0">
-                      <span className="mono font-semibold">{r.eeid}</span>{" "}
+                      <span className="id-mono font-semibold">{r.eeid}</span>{" "}
                       {book ? (
                         <Link href={`/admin/books/${book.id}`} className="underline-offset-2 hover:underline">
                           {book.title}

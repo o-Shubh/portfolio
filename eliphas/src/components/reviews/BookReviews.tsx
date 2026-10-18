@@ -39,7 +39,7 @@ export function BookReviews({
 }) {
   const total = reviews.length;
   return (
-    <section className="card" aria-labelledby="reviews-h" id="reviews">
+    <section className="border-t border-line pt-6" aria-labelledby="reviews-h" id="reviews">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="reviews-h" className="text-lg">
           Reader reviews

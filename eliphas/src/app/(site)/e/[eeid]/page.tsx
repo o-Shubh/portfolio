@@ -53,7 +53,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
   );
   const idLine = (
     <p className="text-sm text-muted">
-      Eliphas Edition ID <span className="font-mono font-semibold text-fg" data-testid="edition-eeid">{eeid}</span>
+      Eliphas Edition ID <span className="id-mono font-semibold text-fg" data-testid="edition-eeid">{eeid}</span>
     </p>
   );
 
@@ -63,7 +63,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
         <h1 className="display text-2xl">This edition is not available</h1>
         <div className="mt-3">{idLine}</div>
         <Link href="/books" className="btn-ghost mt-6 inline-flex">
-          Browse the bookstore
+          Explore books
         </Link>
       </div>,
     );
@@ -75,7 +75,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
         <p className="mt-2 text-muted">This edition has been approved and will appear here when it&apos;s published.</p>
         <div className="mt-3">{idLine}</div>
         <Link href="/books" className="btn-ghost mt-6 inline-flex">
-          Browse the bookstore
+          Explore books
         </Link>
       </div>,
     );
@@ -93,9 +93,9 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
     { term: "Language", value: LANGUAGE_LABEL[b.language] ?? b.language },
   ].filter((f) => f.value);
   const record = [
-    { term: "Edition ID", value: <span className="mono" data-testid="edition-eeid">{eeid}</span> },
+    { term: "Edition ID", value: <span className="id-mono" data-testid="edition-eeid">{eeid}</span> },
     { term: "Edition", value: b.edition_label || null },
-    { term: "ISBN", value: b.isbn ? <span className="mono">{b.isbn}</span> : null },
+    { term: "ISBN", value: b.isbn ? <span className="id-mono">{b.isbn}</span> : null },
     { term: "Published", value: live && b.published_at ? new Date(b.published_at).toLocaleDateString("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" }) : null },
   ].filter((f) => f.value);
 
@@ -103,8 +103,8 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
     <div lang="en">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="mono text-xs tracking-[0.06em] text-muted uppercase">Edition record</p>
-          <h1 className="display mt-1.5 text-[1.875rem] leading-tight md:text-[2.5rem]" lang={b.language}>
+          <p className="text-xs font-semibold tracking-[0.06em] text-muted uppercase">Edition record</p>
+          <h1 className="display book-title mt-1.5 text-[1.875rem] leading-tight md:text-[2.5rem]" lang={b.language}>
             {b.title}
           </h1>
           {b.subtitle && <p className="mt-1 font-serif text-lg text-muted italic" lang={b.language}>{b.subtitle}</p>}
@@ -122,7 +122,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
         <div className="flex items-center gap-3 self-start rounded-[var(--radius-card)] bg-surface px-4 py-2.5 ring-1 ring-line md:self-auto">
           <div>
             <p className="text-[0.7rem] font-semibold tracking-[0.06em] text-muted uppercase">Eliphas Edition ID</p>
-            <p className="mono font-medium">{eeid}</p>
+            <p className="id-mono font-medium">{eeid}</p>
           </div>
           <CopyButton text={eeid} label="Copy" />
         </div>
@@ -183,7 +183,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
                 {b.mrp !== null && <AddToCartButton bookId={b.id} className="min-h-12 bg-white/10 text-on-primary ring-0 hover:bg-white/15" />}
                 {b.sample_path && (
                   <Link href={`/books/${b.slug}/sample`} className="btn min-h-12 gap-2 bg-white/10 text-on-primary hover:bg-white/15" data-testid="edition-sample">
-                    <BookOpen className="h-5 w-5" aria-hidden /> Read sample
+                    <BookOpen className="h-5 w-5" aria-hidden /> Read a sample
                   </Link>
                 )}
               </div>

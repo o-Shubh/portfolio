@@ -27,9 +27,10 @@ export default async function AccountHome() {
 
       {!orders?.length ? (
         <div className="card text-center">
-          <p className="display text-lg">No orders yet.</p>
+          <p className="display text-lg">Your next chapter starts here.</p>
+          <p className="mt-1 text-sm text-muted">Books you order will appear here, with tracking.</p>
           <Link href="/books" className="btn-primary mt-4">
-            Browse the bookstore
+            Explore books
           </Link>
         </div>
       ) : (

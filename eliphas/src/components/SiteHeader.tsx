@@ -52,7 +52,7 @@ export async function SiteHeader() {
       <div className="container-x flex h-14 items-center gap-3 lg:gap-5">
         <Logo className="h-9 md:h-10" />
         <HeaderNav links={SITE_LINKS} />
-        <SearchBar id="q-desktop" placeholder="Search" className="ml-auto hidden min-w-36 flex-1 md:block lg:max-w-56 xl:max-w-72" />
+        <SearchBar id="q-desktop" placeholder="Search" className="ml-auto hidden min-w-28 flex-1 md:block lg:max-w-56 xl:max-w-72" />
         <div className="ml-auto flex items-center gap-0.5 md:ml-0">
           <span className="hidden xl:block">
             <ThemeToggle />

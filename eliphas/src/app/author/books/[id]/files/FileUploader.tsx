@@ -23,6 +23,8 @@ async function inspectPdf(file: File) {
   }
 }
 
+const NOUN = { manuscript: "manuscript", cover: "cover image", print_cover: "print cover" } as const;
+
 export function FileUploader({
   kind,
   bookId,
@@ -88,10 +90,10 @@ export function FileUploader({
     if (res?.error) return setError(res.error);
     setDone(
       kind === "manuscript" && info
-        ? `Uploaded. We found ${info.pageCount} pages.`
+        ? `Your manuscript is uploaded. We found ${info.pageCount} pages.`
         : kind === "manuscript"
-          ? "Uploaded. We couldn't read the page count — please enter it on the next step."
-          : "Uploaded.",
+          ? "Your manuscript is uploaded. We couldn't read the page count, so please enter it on the next step."
+          : `Your ${NOUN[kind]} is uploaded.`,
     );
     router.refresh();
   }
@@ -128,7 +130,7 @@ export function FileUploader({
             {status === "checking"
               ? "Reading PDF…"
               : status === "uploading"
-                ? `Uploading ${Math.round(progress * 100)}%… keep this page open`
+                ? `Uploading ${NOUN[kind]}… ${Math.round(progress * 100)}%. Keep this page open.`
                 : status === "saving"
                   ? "Saving…"
                   : current

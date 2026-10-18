@@ -1,19 +1,19 @@
 {
- "_next": "All 80 screens have the shared system. Screens 30-77 are 'partial': styled through shared components but not individually redesigned (no Stitch references). Next, after PR #17 merges: push the branch, open the redesign PR, publish the 000018 SQL page. Optional follow-up: individual layouts for screens 30-77 if Stitch designs are produced for them.",
+ "_next": "Design pack (COMPLETE-DESIGN-BRIEF.md) applied: system-sans headlines and mono-for-IDs everywhere via shared utilities; homepage, book page, shelves and copy pass done individually. Not individually revisited in the design-pack pass (they inherit the shared typography, colours and components only): screens 5-24 except 3, all account/author/admin/printer screens (29-77). Next if continuing: per-screen layout review of the author publishing flow (37-43) and admin dashboards (57-75).",
  "1": {
   "impl": "done",
-  "ver": "screenshots 1440/390 vs Stitch 01; no sideways scroll",
-  "note": "Spotlight uses the newest real book; QR is real when an EEID exists"
+  "ver": "design pack: screenshots 1440/1024/390, dark, 200% zoom, reduced motion, no-JS; m2 passed",
+  "note": "Hero artwork (decorative), real featured books in Book3D, shelves with Quick look, publishing story, before/after sample, Edition ID illustration, final invitation"
  },
  "2": {
   "impl": "done",
   "ver": "screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked",
-  "note": "Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data)"
+  "note": "Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data); design pack: tiles with larger covers and Quick look"
  },
  "3": {
   "impl": "done",
-  "ver": "screenshots 1440/390; no sideways scroll (also 768)",
-  "note": "Stitch quantity stepper, formats/ePub, TOC, fake appraisals left out (no real data)"
+  "ver": "design pack: screenshots 1440/390, dark, Hindi, 200% zoom",
+  "note": "Book3D cover; open sections with dividers instead of cards; one primary Buy now"
  },
  "4": {
   "impl": "done",

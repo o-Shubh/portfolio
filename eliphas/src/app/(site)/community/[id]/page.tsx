@@ -78,7 +78,7 @@ export default async function PostPage({ params, searchParams }: PageProps<"/com
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <Link href={book.sample_path ? `/books/${book.slug}/sample` : `/books/${book.slug}`} className="btn-tinted min-h-11 px-2 text-sm pointer-fine:min-h-9">
-                  {book.sample_path ? "Read sample" : "View book"}
+                  {book.sample_path ? "Read a sample" : "View book"}
                 </Link>
                 <Link href={`/checkout/${book.slug}`} className="btn-accent min-h-11 px-2 text-sm pointer-fine:min-h-9">
                   Buy now

@@ -361,8 +361,12 @@ body {
 @utility group-row {
   @apply flex min-h-12 items-center gap-3 px-4 py-2.5;
 }
-/* Mono labels: EEIDs, order numbers, ledger figures */
+/* Figures (prices, counts): the system sans with even-width digits, so columns line up */
 @utility mono {
+  font-variant-numeric: tabular-nums;
+}
+/* Identifiers only (Edition IDs, ISBNs, order numbers, references): monospace for easy reading aloud and copying */
+@utility id-mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
@@ -378,11 +382,13 @@ body {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 /* Editorial display type */
+/* Headlines: the device's own sans, semibold, slightly tight. Hindi gets normal tracking and more room. */
 @utility display {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-wrap: balance;
 }
 /* Warm ivory page background for editorial areas (bookstore, book pages, articles) */
 @utility editorial {
@@ -511,3 +517,104 @@ body {
     background: color-mix(in srgb, var(--surface-2) 70%, transparent);
   }
 }
+
+/* ---------- 3D book (Book3D): faces sized in container units, depth from the page count ---------- */
+.book3d {
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 2 / 3;
+  width: 100%;
+  perspective: 1000px;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --rest-x: 5deg;
+  --rest-y: -32deg;
+}
+.book3d-spine { --rest-y: 34deg; }
+.book3d-body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--rest-x) + var(--tilt-x))) rotateY(calc(var(--rest-y) + var(--tilt-y)));
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.book3d-body > * { position: absolute; backface-visibility: hidden; }
+.book3d-front { inset: 0; transform: translateZ(calc(var(--depth) / 2)); }
+.book3d-front > * { height: 100%; box-shadow: none; }
+.book3d-back { inset: 0; transform: rotateY(180deg) translateZ(calc(var(--depth) / 2)); background: var(--spine); border-radius: 8px 3px 3px 8px; }
+/* Spine: the cover's colour with a hinge highlight */
+.book3d-left {
+  top: 0; bottom: 0; width: var(--depth); left: calc(50% - var(--depth) / 2);
+  transform: rotateY(-90deg) translateZ(50cqw);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--spine), black 35%), var(--spine) 30%, color-mix(in srgb, var(--spine), white 12%) 55%, color-mix(in srgb, var(--spine), black 25%));
+  border-radius: 2px;
+}
+/* Fore-edge: stacked ivory pages, set just inside the boards */
+.book3d-right {
+  top: 1.2%; bottom: 1.2%; width: calc(var(--depth) * 0.94); left: calc(50% - var(--depth) * 0.47);
+  transform: rotateY(90deg) translateZ(calc(50cqw - 1.2cqw));
+  background:
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #e9e1cf, #f7f1e3 40%, #efe7d4);
+}
+.book3d-top {
+  left: 0; right: 1.2cqw; height: calc(var(--depth) * 0.94); top: calc(50% - var(--depth) * 0.47);
+  transform: rotateX(90deg) translateZ(calc(75cqw - 1.2cqw));
+  background:
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.06) 0 1px, transparent 1px 3px),
+    linear-gradient(0deg, #ece4d2, #f8f2e5);
+}
+/* Floor shadow: wide and soft, darker under the spine side */
+.book3d-shadow {
+  position: absolute;
+  left: 4%; right: -6%; bottom: -7%; height: 14%;
+  background: radial-gradient(closest-side, rgb(1 10 52 / 0.32), transparent);
+  filter: blur(6px);
+  transform: translateX(var(--shadow-x, 4%));
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.book3d-spine .book3d-shadow { --shadow-x: -6%; }
+@media (prefers-reduced-motion: reduce) {
+  .book3d-body, .book3d-shadow { transition: none; }
+}
+
+/* Hindi headlines: no negative tracking, a little more line height */
+:lang(hi) .display, .display:lang(hi) { letter-spacing: 0; line-height: 1.3; }
+/* Book titles may keep the book serif */
+.display.book-title { font-family: var(--font-serif); letter-spacing: -0.01em; }
+
+/* Scroll reveal: visible by default; only sections JS confirmed are below the fold start hidden */
+.reveal { transition: opacity 600ms ease, transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+.reveal[data-reveal="pending"] { opacity: 0; transform: translateY(12px); }
+@media (prefers-reduced-motion: reduce) { .reveal { transition: none; } .reveal[data-reveal="pending"] { opacity: 1; transform: none; } }
+
+/* Quick look sheet */
+.quick-look::backdrop { background: rgb(0 0 0 / 0.4); backdrop-filter: blur(4px); }
+.quick-look[open] { animation: sheet-in 260ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(16px); } }
+@media (prefers-reduced-motion: reduce) { .quick-look[open] { animation: none; } }
+
+/* Book tiles lift a little on hover (pointer devices only) */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .book-lift { transition: transform 300ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .group:hover .book-lift { transform: translateY(-4px) rotate(-0.6deg); }
+}
+
+/* Paper panel: the supplied ivory artwork keeps its ivory ground and dark ink in both themes */
+.paper-panel { background: #fbf8f2; color: #1d1d1f; }
+.paper-panel .paper-muted { color: #55555c; }
+.paper-panel :focus-visible { outline-color: #4a63c9; }
+
+/* Hero entrance: a short fade and 12px rise; nothing for reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-in { animation: rise-in 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .hero-in-image { animation: fade-in 900ms ease 120ms both; }
+}
+@keyframes rise-in { from { opacity: 0; transform: translateY(12px); } }
+@keyframes fade-in { from { opacity: 0; } }
+/* Supplied artwork: soften the photo's edges into its paper panel */
+.art-fade {
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  mask-composite: intersect;
+}
+@media (max-width: 1023.98px) { .art-fade-top { mask-image: linear-gradient(to bottom, transparent, #000 14%); } }
