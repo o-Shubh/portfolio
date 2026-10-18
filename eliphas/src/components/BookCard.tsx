@@ -56,7 +56,7 @@ export function BookGrid({ books }: { books: PublicBook[] }) {
 /** A horizontal row of product cards that scrolls sideways. */
 export function BookShelf({ books, eager = false }: { books: PublicBook[]; eager?: boolean }) {
   return (
-    <ul className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:-mx-8 lg:scroll-px-8 lg:px-8">
+    <ul className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 sm:gap-4 md:-mx-8 md:scroll-px-8 md:px-8 lg:-mx-12 lg:scroll-px-12 lg:px-12">
       {books.map((b, i) => (
         <li key={b.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] md:w-[24%] lg:w-[calc((100%-3rem)/4)]">
           <BookCard book={b} priority={eager && i < 4} />

@@ -22,7 +22,7 @@ export default async function BookSamplePage({ params }: PageProps<"/author/book
       <div>
         <h2 className="text-xl">Free sample</h2>
         <p className="mt-1 text-sm text-muted">
-          Every book page has a &ldquo;Read sample&rdquo; button. Choose pages from your manuscript or upload your own sample PDF, check the preview, then approve it. We publish a separate copy of just those pages; your full manuscript stays private.
+          Every book page has a &ldquo;Read a sample&rdquo; button. Choose pages from your manuscript or upload your own sample PDF, check the preview, then approve it. We publish a separate copy of just those pages; your full manuscript stays private.
           {!live && " New books need an approved sample before they go live."}
         </p>
       </div>

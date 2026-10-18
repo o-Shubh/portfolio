@@ -80,7 +80,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             sizes="(min-width: 1180px) 1180px, 100vw"
             loading="eager"
             fetchPriority="high"
-            className="hero-in-image art-fade-top h-auto w-full lg:[mask-image:none]"
+            className="hero-in-image art-fade-top h-auto w-full"
           />
         </div>
         {!me && (

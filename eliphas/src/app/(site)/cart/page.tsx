@@ -34,9 +34,9 @@ export default async function CartPage() {
         <div className="mt-8 flex flex-col items-center gap-4 rounded-[var(--radius-card)] bg-surface px-6 py-14 text-center ring-1 ring-line">
           <ShoppingCart className="h-10 w-10 text-muted" aria-hidden />
           <p className="display text-xl">Your cart is empty.</p>
-          <p className="text-sm text-muted">Find something to read in the bookstore.</p>
+          <p className="text-sm text-muted">Your next chapter starts here.</p>
           <Link href="/books" className="btn-primary">
-            Browse books
+            Explore books
           </Link>
         </div>
       ) : (

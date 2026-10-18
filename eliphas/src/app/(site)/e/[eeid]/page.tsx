@@ -63,7 +63,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
         <h1 className="display text-2xl">This edition is not available</h1>
         <div className="mt-3">{idLine}</div>
         <Link href="/books" className="btn-ghost mt-6 inline-flex">
-          Browse the bookstore
+          Explore books
         </Link>
       </div>,
     );
@@ -75,7 +75,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
         <p className="mt-2 text-muted">This edition has been approved and will appear here when it&apos;s published.</p>
         <div className="mt-3">{idLine}</div>
         <Link href="/books" className="btn-ghost mt-6 inline-flex">
-          Browse the bookstore
+          Explore books
         </Link>
       </div>,
     );
@@ -183,7 +183,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
                 {b.mrp !== null && <AddToCartButton bookId={b.id} className="min-h-12 bg-white/10 text-on-primary ring-0 hover:bg-white/15" />}
                 {b.sample_path && (
                   <Link href={`/books/${b.slug}/sample`} className="btn min-h-12 gap-2 bg-white/10 text-on-primary hover:bg-white/15" data-testid="edition-sample">
-                    <BookOpen className="h-5 w-5" aria-hidden /> Read sample
+                    <BookOpen className="h-5 w-5" aria-hidden /> Read a sample
                   </Link>
                 )}
               </div>

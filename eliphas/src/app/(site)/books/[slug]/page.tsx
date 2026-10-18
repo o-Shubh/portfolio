@@ -12,7 +12,8 @@ import { getCurrentProfile } from "@/lib/auth";
 import { listReviews } from "@/lib/reviews";
 import { notFound } from "next/navigation";
 import { BookShelf } from "@/components/BookCard";
-import { BookCover } from "@/components/BookCover";
+import { Book3D } from "@/components/Book3D";
+import { BookCover, coverPalette } from "@/components/BookCover";
 import { authorHandle, coverUrl, getPublishedBook, LANGUAGE_LABEL, moreByAuthor } from "@/lib/books";
 import { rupees } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
@@ -95,7 +96,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
 
   const buyPanel = (
     <div className="rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line" lang="en">
-      <p className="mono text-[2rem] leading-none font-medium">{rupees(Number(book.mrp))}</p>
+      <p className="text-[2rem] leading-none font-semibold tabular-nums">{rupees(Number(book.mrp))}</p>
       <p className="mt-1.5 text-sm text-muted">Inclusive of all taxes</p>
       <p className="mt-1 text-sm text-muted">{label(rates.binding, book.binding)}</p>
       <p className="mt-4 flex items-start gap-2 rounded-[var(--radius-control)] bg-surface-2 p-3 text-sm">
@@ -150,12 +151,14 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
       <div className="mt-4 grid gap-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-x-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)_17.5rem]">
         {/* Cover, sample, edition record */}
         <div className="space-y-3 md:sticky md:top-24 md:row-span-3 md:self-start lg:row-span-2">
-          <div className="rounded-[var(--radius-card)] bg-ivory px-[24%] py-[9%] ring-1 ring-line md:px-[14%] md:py-[12%]">
-            <BookCover title={book.title} author={book.author_name} slug={book.slug} src={cover} size="lg" priority />
+          <div className="rounded-[24px] bg-ivory px-[26%] pt-[10%] pb-[14%] md:px-[17%] md:pt-[13%] md:pb-[17%]" data-book3d-zone>
+            <Book3D pages={book.page_count} spine={book.cover_path ? "#17214A" : coverPalette(book.slug).bg}>
+              <BookCover title={book.title} author={book.author_name} slug={book.slug} src={cover} size="lg" priority />
+            </Book3D>
           </div>
           {sample ? (
             <Link href={`/books/${book.slug}/sample`} className="btn-tinted min-h-12 w-full gap-2 text-base" data-testid="read-sample">
-              <BookOpen className="h-5 w-5" aria-hidden /> Read free sample
+              <BookOpen className="h-5 w-5" aria-hidden /> Read a sample
               <span className="text-sm font-normal text-muted">{book.sample_from && book.sample_to ? `· pages ${book.sample_from}–${book.sample_to}` : ""}</span>
             </Link>
           ) : (
@@ -252,9 +255,9 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
 
       </div>
 
-      <div className="mt-10 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]" lang="en">
+      <div className="mt-14 grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]" lang="en">
         {author && (author.bio || handle) && (
-          <section className="card">
+          <section className="border-t border-line pt-6">
             <h2 className="text-lg">About {book.author_name}</h2>
             <div className="mt-4 flex gap-4">
               <AuthorAvatar name={book.author_name} path={author.avatar_path} size="lg" />
@@ -269,7 +272,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
             </div>
           </section>
         )}
-        <section className="card">
+        <section className="border-t border-line pt-6">
           <h2 className="text-lg">Product details</h2>
           <dl className="mt-3 divide-y divide-line">
             {details.map((d) => (
