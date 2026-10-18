@@ -1,0 +1,5 @@
+{
+  "_next": "Stage 1 shared system done except the dialog/sheet/toast pass. Stage 2: screens 1 (home) and 2 (bookstore) are done. Next: screen 3, the book page src/app/(site)/books/[slug]/page.tsx, compared with Stitch 03 at 1440 and 390. Helper scripts live in the session scratchpad: restart.sh, shot.mjs, side.mjs.",
+  "1": {"impl": "done", "ver": "screenshots 1440/390 vs Stitch 01; no sideways scroll", "note": "Spotlight uses the newest real book; QR is real when an EEID exists"},
+  "2": {"impl": "done", "ver": "screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked", "note": "Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data)"}
+}

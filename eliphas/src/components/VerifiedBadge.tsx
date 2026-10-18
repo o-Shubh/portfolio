@@ -11,7 +11,7 @@ export function VerifiedBadge({ compact = false }: { compact?: boolean }) {
       <title>{title}</title>
     </BadgeCheck>
   ) : (
-    <span className="badge bg-accent/10 text-accent-fg" title={title}>
+    <span className="badge-verified" title={title}>
       <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> Verified author
     </span>
   );

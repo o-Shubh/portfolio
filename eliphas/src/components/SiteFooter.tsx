@@ -61,12 +61,13 @@ export function SiteFooter() {
           ))}
         </ul>
       </div>
-      <div className="border-t border-line bg-surface text-fg">
+      <div className="border-t border-line bg-surface-2 text-fg">
         <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div>
-            <Logo className="h-12" lazy />
-            <p className="mt-4 max-w-xs text-sm text-muted">
-              Self-publishing and print on demand. Your book, printed beautifully and delivered to readers.
+            <Logo className="h-11" lazy />
+            <p className="display mt-4 text-lg">Eliphas Indicus Publications</p>
+            <p className="mt-1 max-w-xs text-sm text-muted">
+              Books by independent authors in Hindi and English, printed on demand and delivered across India.
             </p>
           </div>
           {COLUMNS.map((c) => (
@@ -85,7 +86,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="safe-bottom border-t border-line">
-          <div className="container-x flex flex-wrap items-center justify-between gap-2 py-5 text-xs text-muted">
+          <div className="mono container-x flex flex-wrap items-center justify-between gap-2 py-5 text-xs text-muted">
             <span>© {new Date().getFullYear()} Eliphas Indicus Publications</span>
             <span>Print on demand · No stock · No upfront cost</span>
           </div>

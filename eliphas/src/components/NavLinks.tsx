@@ -65,7 +65,7 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
     const shown = items.length <= 5 ? items : primary.slice(0, 4);
     const rest = items.filter((i) => !shown.includes(i));
     const tab = (active: boolean) =>
-      `flex min-h-14 w-full flex-col items-center justify-center gap-1 text-[0.7rem] font-medium transition ${active ? "text-accent-fg" : "text-muted"}`;
+      `flex min-h-[3.25rem] w-full flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-medium transition ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`;
     return (
       <ul className="flex justify-around">
         {shown.map((item) => {
@@ -99,11 +99,11 @@ export function NavLinks({ items, variant }: { items: NavItem[]; variant: "sideb
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition ${
-                active ? "bg-primary font-medium text-on-primary" : "text-muted hover:bg-surface-2 hover:text-fg"
+              className={`flex h-11 items-center gap-2.5 rounded-lg px-3 text-[0.9375rem] transition pointer-fine:h-9 ${
+                active ? "bg-surface-3 font-medium text-fg" : "text-fg/80 hover:bg-surface-3/60 hover:text-fg"
               }`}
             >
-              <Icon className="h-[1.1rem] w-[1.1rem]" aria-hidden />
+              <Icon className={`h-[1.1rem] w-[1.1rem] ${active ? "text-primary dark:text-accent-fg" : "text-muted"}`} aria-hidden />
               {item.label}
             </Link>
           </li>

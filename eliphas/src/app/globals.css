@@ -14,11 +14,13 @@
 }
 
 /* =====================================================================
-   Eliphas design system
-   Quiet and neutral: white and soft-grey surfaces, system sans-serif type,
-   hairline borders, gentle depth and one navy accent. Serif type is kept
-   for books and editorial reading (titles, articles), never for interface chrome.
-   Every colour pair used for text meets WCAG AA in light and dark mode.
+   Eliphas design system ("Cupertino Editorial", from the Stitch export)
+   System utility surfaces (#F5F5F7 grey, white grouped cards, hairlines) for
+   tools and navigation; warm ivory (#FBF8F2) for the bookstore and reading.
+   Navy is the operational ink; marigold is reserved for buying and Pro;
+   cobalt marks focus and links in secondary contexts. Source Serif 4 for
+   editorial display and reading; the device's system sans for the interface;
+   a mono face for IDs and money. Every text pair meets WCAG AA in both themes.
    ===================================================================== */
 @theme {
   /* Brand */
@@ -38,11 +40,13 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, var(--font-sans-deva), "Noto Sans Devanagari", sans-serif;
   --font-heading: var(--font-sans);
   --font-serif: var(--font-book-serif), var(--font-serif-deva), "Iowan Old Style", Georgia, serif;
+  /* IDs (EEID, order numbers), prices and ledgers */
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Radii: restrained */
   --radius-control: 0.625rem; /* buttons, fields, chips: 10px */
   --radius-card: 0.875rem; /* 14px */
-  --radius-sheet: 1.125rem;
+  --radius-sheet: 1.125rem; /* reader stage, dialogs, sheets: 18px */
 
   /* Motion: short and purposeful */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -73,6 +77,14 @@
   --color-focus: var(--focus);
   --color-ivory: var(--ivory);
   --color-marigold-fg: var(--marigold-fg);
+  --color-surface-3: var(--surface-3);
+  --color-buy: var(--buy);
+  --color-on-buy: var(--on-buy);
+  --color-glass: var(--glass);
+  --color-tint-info: var(--tint-info);
+  --color-tint-warn: var(--tint-warn);
+  --color-tint-danger: var(--tint-danger);
+  --color-tint-success: var(--tint-success);
 }
 
 :root {
@@ -80,10 +92,11 @@
   --bg: #f5f5f7; /* soft grey page */
   --surface: #ffffff; /* cards, sheets, header */
   --surface-2: #f0f0f3; /* quiet fills: chips, table heads, segmented controls */
+  --surface-3: #e5e5ea; /* pressed / selected segment, ghost button fill */
   --fg: #1d1d1f; /* near-black text: 15.6:1 on --bg */
   --muted: #62626a; /* secondary text: 5.6:1 on --bg */
-  --line: rgb(0 0 0 / 0.08);
-  --line-strong: rgb(0 0 0 / 0.16);
+  --line: #e5e5ea; /* hairline separators (Apple system rule) */
+  --line-strong: #d1d1d6; /* field borders */
   --primary: #17214a; /* Eliphas navy: main buttons */
   --on-primary: #ffffff;
   --accent: #17214a; /* the one accent: fills, rings, selected states */
@@ -95,9 +108,16 @@
   --warning: #8a5600;
   --info: #2b4192;
   --chart: #2b4192;
-  --focus: #2b4192;
+  --focus: #4a63c9; /* cobalt focus ring + halo */
   --ivory: #fbf8f2; /* warm paper for bookstore and reading pages only */
   --marigold-fg: #8a5600; /* marigold for text on light surfaces: 6.0:1 */
+  --buy: #c98200; /* marigold fill for buying; text on it uses --on-buy */
+  --on-buy: #241500; /* dark ink on marigold: 7.6:1 (white would be 2.9:1) */
+  --glass: rgb(255 255 255 / 0.82); /* translucent bars and menus */
+  --tint-info: #ebf0ff;
+  --tint-warn: #fef6e6;
+  --tint-danger: #fdecea;
+  --tint-success: #e8f5ec;
   --shadow-color: 0 0 0;
 }
 
@@ -109,8 +129,8 @@
     --surface-2: #2c2c2e;
     --fg: #f5f5f7;
     --muted: #a1a1a8;
-    --line: rgb(255 255 255 / 0.1);
-    --line-strong: rgb(255 255 255 / 0.2);
+    --line: #38383a;
+    --line-strong: #48484a;
     --primary: #4a63c9; /* navy, lifted so it reads on black: white text 5.1:1 */
     --on-primary: #ffffff;
     --accent: #4a63c9;
@@ -125,6 +145,14 @@
     --focus: #a9b9ff;
     --ivory: #12110e;
     --marigold-fg: #f2b544;
+    --buy: #e09a1f;
+    --on-buy: #1c1100;
+    --glass: rgb(28 28 30 / 0.85);
+    --surface-3: #3a3a3c;
+    --tint-info: #1b2340;
+    --tint-warn: #2e2410;
+    --tint-danger: #3a1714;
+    --tint-success: #13291b;
     --shadow-color: 0 0 0;
   }
 }
@@ -136,8 +164,8 @@
   --surface-2: #2c2c2e;
   --fg: #f5f5f7;
   --muted: #a1a1a8;
-  --line: rgb(255 255 255 / 0.1);
-  --line-strong: rgb(255 255 255 / 0.2);
+  --line: #38383a;
+  --line-strong: #48484a;
   --primary: #4a63c9;
   --on-primary: #ffffff;
   --accent: #4a63c9;
@@ -152,6 +180,14 @@
   --focus: #a9b9ff;
   --ivory: #12110e;
   --marigold-fg: #f2b544;
+  --buy: #e09a1f;
+  --on-buy: #1c1100;
+  --glass: rgb(28 28 30 / 0.85);
+  --surface-3: #3a3a3c;
+  --tint-info: #1b2340;
+  --tint-warn: #2e2410;
+  --tint-danger: #3a1714;
+  --tint-success: #13291b;
   --shadow-color: 0 0 0;
 }
 
@@ -198,7 +234,7 @@ body {
 }
 
 ::selection {
-  background: rgb(43 65 146 / 0.22);
+  background: rgb(74 99 201 / 0.25);
 }
 
 /* Short transitions only, and none for people who ask for less motion */
@@ -216,7 +252,15 @@ body {
   box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 1px 1px rgb(var(--shadow-color) / 0.02);
 }
 @utility shadow-lift {
-  box-shadow: 0 2px 6px rgb(var(--shadow-color) / 0.06), 0 12px 28px -10px rgb(var(--shadow-color) / 0.16);
+  box-shadow: 0 4px 14px rgb(var(--shadow-color) / 0.08);
+}
+/* Level 3: dialogs, inspectors, sheets */
+@utility shadow-sheet {
+  box-shadow: 0 12px 32px rgb(23 33 74 / 0.12);
+}
+/* Book jackets cast a spine shadow */
+@utility shadow-spine {
+  box-shadow: -6px 8px 20px rgb(1 10 52 / 0.18), -2px 2px 4px rgb(0 0 0 / 0.06);
 }
 
 /* Buttons: one primary per task area; ghost for secondary; accent (marigold) only for buying */
@@ -226,12 +270,19 @@ body {
 @utility btn-primary {
   @apply btn bg-primary text-on-primary hover:opacity-90;
 }
-/* Kept for buying actions; same navy accent as primary (one accent colour) */
+/* Buying only (Buy now, Pay, Get Pro): marigold with dark ink, a faint top highlight */
 @utility btn-accent {
-  @apply btn bg-primary text-on-primary hover:opacity-90;
+  @apply btn bg-buy text-on-buy shadow-[inset_0_1px_0_rgb(255_255_255/0.25)] hover:brightness-105;
+}
+@utility btn-buy {
+  @apply btn-accent;
 }
 @utility btn-ghost {
-  @apply btn bg-surface text-fg ring-1 ring-line-strong ring-inset hover:bg-surface-2;
+  @apply btn bg-surface text-fg ring-1 ring-line ring-inset hover:bg-surface-2;
+}
+/* Grey system button (e.g. Read free sample) */
+@utility btn-tinted {
+  @apply btn bg-surface-3 text-fg hover:brightness-95;
 }
 @utility btn-quiet {
   @apply btn bg-transparent px-3 text-fg hover:bg-surface-2;
@@ -243,8 +294,9 @@ body {
 @utility card {
   @apply rounded-[var(--radius-card)] bg-surface p-5 shadow-soft ring-1 ring-line md:p-6;
 }
+/* Text fields: hairline border, cobalt border + 3px halo on focus; 44px on touch, 40px with a mouse */
 @utility field {
-  @apply block min-h-11 w-full rounded-[var(--radius-control)] bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted hover:ring-fg/35 focus:ring-2 focus:ring-focus disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-danger;
+  @apply block min-h-11 w-full rounded-[var(--radius-control)] bg-surface px-3.5 text-base text-fg ring-1 ring-line-strong transition outline-none ring-inset placeholder:text-muted hover:ring-fg/30 focus:ring-focus focus:shadow-[0_0_0_3px_rgb(74_99_201/0.25)] disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-danger pointer-fine:min-h-10;
 }
 @utility label {
   @apply mb-1.5 block text-sm font-medium text-fg;
@@ -257,13 +309,70 @@ body {
 }
 /* Filter chips and segmented tabs: 44 px tall on touch screens */
 @utility chip {
-  @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium ring-1 ring-line ring-inset transition hover:bg-surface-2 md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
+  @apply inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-medium whitespace-nowrap ring-1 ring-line ring-inset transition hover:bg-surface-2 md:min-h-9 aria-[current=page]:bg-primary aria-[current=page]:text-on-primary aria-[current=page]:ring-primary aria-[current=true]:bg-primary aria-[current=true]:text-on-primary aria-[current=true]:ring-primary;
 }
 @utility badge {
   @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
 }
+/* Verified author: navy on pale cobalt. Pro: marigold on cream. Never the same look. */
+@utility badge-verified {
+  @apply badge bg-tint-info text-accent-fg ring-1 ring-accent-fg/15 ring-inset;
+}
+@utility badge-pro {
+  @apply badge bg-tint-warn text-marigold-fg uppercase tracking-[0.04em] ring-1 ring-marigold/30 ring-inset;
+}
 @utility notice {
   @apply flex gap-3 rounded-[var(--radius-card)] p-4 text-sm ring-1;
+}
+/* Tinted notices (checkout/forms validation, alerts) */
+@utility notice-info {
+  @apply notice bg-tint-info text-fg ring-accent-fg/20;
+}
+@utility notice-warn {
+  @apply notice bg-tint-warn text-fg ring-marigold/30;
+}
+@utility notice-danger {
+  @apply notice bg-tint-danger text-fg ring-danger/25;
+}
+@utility notice-success {
+  @apply notice bg-tint-success text-fg ring-success/25;
+}
+/* Segmented control (iOS tabs / macOS toolbar filter) */
+@utility segmented {
+  @apply inline-flex items-center gap-0.5 rounded-[var(--radius-control)] bg-surface-2 p-0.5;
+}
+@utility segment {
+  @apply inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 text-sm font-medium text-muted transition-colors hover:text-fg pointer-fine:min-h-8 aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-soft aria-[current=true]:bg-surface aria-[current=true]:text-fg aria-[current=true]:shadow-soft aria-[pressed=true]:bg-surface aria-[pressed=true]:text-fg aria-[pressed=true]:shadow-soft;
+}
+/* Settings-style inset grouped list: white card, hairline rows */
+@utility group-list {
+  @apply overflow-hidden rounded-[var(--radius-card)] bg-surface ring-1 ring-line divide-y divide-line;
+}
+@utility group-row {
+  @apply flex min-h-12 items-center gap-3 px-4 py-2.5;
+}
+/* Mono labels: EEIDs, order numbers, ledger figures */
+@utility mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+@utility kbd {
+  @apply rounded bg-surface-2 px-1 py-0.5 text-[0.7rem] text-muted;
+  font-family: var(--font-mono);
+}
+/* Translucent bars and floating menus */
+@utility glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+/* Editorial display type */
+@utility display {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 /* Warm ivory page background for editorial areas (bookstore, book pages, articles) */
 @utility editorial {
@@ -273,7 +382,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 @utility container-x {
-  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  @apply mx-auto w-full max-w-[1180px] px-4 md:px-8 lg:px-12;
 }
 @utility no-scrollbar {
   scrollbar-width: none;
@@ -352,3 +461,29 @@ body {
 .article-body li + li { margin-top: 0.35em; }
 .article-body a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent-fg); }
 .article-body strong { font-weight: 600; }
+
+/* Financial ledgers and operational tables: hairline rows, mono figures, scroll inside their box on phones */
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.ledger th {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.ledger td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.ledger tr:last-child td { border-bottom: 0; }
+.ledger .num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ledger-wrap { overflow-x: auto; border-radius: var(--radius-card); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
