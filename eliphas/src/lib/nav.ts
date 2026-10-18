@@ -3,6 +3,7 @@ import type { Role } from "@/lib/auth";
 
 // Navigation for each logged-in area. Later milestones add items here.
 export const AUTHOR_NAV: NavItem[] = [
+  { href: "/author/distribution", label: "Distribution", icon: "shipping", sidebarOnly: true },
   { href: "/author", label: "Overview", icon: "dashboard", exact: true },
   { href: "/author/books", label: "My books", icon: "books" },
   { href: "/author/earnings", label: "Earnings & payouts", icon: "money" },
@@ -22,6 +23,7 @@ export const PRINTER_NAV: NavItem[] = [
 ];
 
 export const ADMIN_NAV: NavItem[] = [
+  { href: "/admin/distribution", label: "Distribution", icon: "shipping", sidebarOnly: true },
   { href: "/admin", label: "Overview", icon: "dashboard", exact: true },
   { href: "/admin/review", label: "Review", icon: "review" },
   { href: "/admin/orders", label: "Orders", icon: "orders" },

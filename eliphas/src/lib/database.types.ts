@@ -23,7 +23,14 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "account_restrictions": {
+            "distribution_requests": {
+ Row: {id: string; author_id: string; book_id: string; channel: string; markets: string; residence_country: string; rights_confirmed: boolean; status: string; review_note: string; created_at: string; updated_at: string;}
+ ComputedFields: never
+ Insert: {id?: string; author_id: string; book_id: string; channel: string; markets: string; residence_country: string; rights_confirmed: boolean; status?: string; review_note?: string; created_at?: string; updated_at?: string;}
+ Update: {status?: string; review_note?: string; updated_at?: string;}
+ Relationships: []
+ },
+ "account_restrictions": {
                   Row: {
                     "created_at": string,"created_by": string | null,"reason": string,"until": string | null,"user_id": string
                   }
