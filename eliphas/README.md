@@ -373,10 +373,14 @@ Tokens live in `src/app/globals.css`, in light and dark versions:
   notices.
 - Shape: radii of 10 px (controls), 14 px (cards) and 18 px (dialogs, sheets, reading panels);
   hairline cards without heavy shadows; a book-spine shadow on covers.
-- Fonts: the device's own sans-serif for the interface and all headlines (`display`: semibold, slightly
-  tight; normal tracking and more line height for Hindi). Source Serif 4 only for book titles
-  (`display book-title`), literary excerpts and reading. JetBrains Mono only for identifiers (`id-mono`:
-  Edition IDs, ISBNs, order numbers) and ledger tables; prices use the sans with even-width digits (`mono`).
+- Fonts (all via `next/font` in `src/app/layout.tsx`, wired through `--font-sans`, `--font-serif`, `--font-mono`):
+  Inter for every interface element and all numbers (600 headlines, 500 navigation and buttons, 400 body);
+  Noto Sans Devanagari for Hindi (normal letter spacing, taller lines); Source Serif 4 only for article
+  bodies, samples and literary excerpts; JetBrains Mono only for identifiers (`id-mono`: order IDs,
+  Edition IDs, references; never wraps). Tables, statistics and calculators use tabular digits.
+- Money: `rupees()` and `formatPaise()` use the Indian locale. Whole amounts drop decimals in prose (₹299);
+  pass `true` for a fixed two decimals (₹299.00), which every money table and the Finance page use so a
+  column shares one precision.
 
 Design pack (Apple-inspired brief, `public/graphics/`): the homepage hero and the author section use the
 supplied artwork (`eliphas-hero`, `eliphas-publishing-journey`; WebP served, PNG originals kept) on ivory
