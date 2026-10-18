@@ -2,12 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { postLoginPath } from "@/lib/post-login";
 import { createClient } from "@/lib/supabase/client";
 import { ChevronDown } from "lucide-react";
 import { COUNTRIES, countryByIso, DEFAULT_COUNTRY, formatPhone, toInternational } from "@/lib/phone";
 
 /** Phone + code sign-in. `audience` is which entrance was used (reader or author login); both use the same account. */
-export function LoginForm({ next, audience = "reader" }: { next: string; audience?: "reader" | "author" }) {
+export function LoginForm({ next, audience = "reader", submitLabel = "Send code" }: { next: string; audience?: "reader" | "author"; submitLabel?: string }) {
   const router = useRouter();
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [country, setCountry] = useState<string>(DEFAULT_COUNTRY);
@@ -54,16 +55,7 @@ export function LoginForm({ next, audience = "reader" }: { next: string; audienc
     // New accounts set up their name first, then carry on to where they were going (e.g. liking an article).
     // On the author login, new accounts are set up as authors, and existing reader accounts are offered publishing.
     const { data: profile } = data.user ? await supabase.from("profiles").select("full_name, role").eq("id", data.user.id).maybeSingle() : { data: null };
-    const dest = !profile?.full_name
-      ? audience === "author"
-        ? `/onboarding?as=author&next=${encodeURIComponent(next)}`
-        : next !== "/dashboard"
-          ? `/onboarding?next=${encodeURIComponent(next)}`
-          : next
-      : audience === "author" && profile.role === "reader"
-        ? `/login/author/start?next=${encodeURIComponent(next)}`
-        : next;
-    router.replace(dest);
+    router.replace(postLoginPath(profile, audience, next));
     router.refresh();
   }
 
@@ -117,7 +109,7 @@ export function LoginForm({ next, audience = "reader" }: { next: string; audienc
         </div>
         {error && <ErrorText>{error}</ErrorText>}
         <button type="submit" className="btn-primary w-full" disabled={busy}>
-          {busy ? "Sending…" : "Send code"}
+          {busy ? "Sending…" : submitLabel}
         </button>
       </form>
     );

@@ -68,7 +68,7 @@ export default async function PricingPage() {
               Commission: {free.percent}% of the book price per copy, minimum {formatPaise(free.minPaise)}, plus {free.gstPercent}% GST on the commission
             </Li>
           </ul>
-          <Link href="/login/author" className="btn-primary mt-6 w-full">
+          <Link href="/login/author?mode=signup" className="btn-primary mt-6 w-full">
             Start publishing free
           </Link>
         </div>

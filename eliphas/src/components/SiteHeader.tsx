@@ -40,7 +40,7 @@ function SearchBar({ id, className = "" }: { id: string; className?: string }) {
 /** Site header: logo, search, a few clear destinations, account and cart. */
 export async function SiteHeader() {
   const [profile, inCart] = await Promise.all([getCurrentProfile(), cartBadgeCount()]);
-  const account = profile ? { href: "/dashboard", label: "My account" } : { href: "/login", label: "Log in" };
+  const account = profile ? { href: "/dashboard", label: "My account" } : { href: "/login", label: "Log in / Sign up" };
   const icon = "relative grid h-11 w-11 place-items-center rounded-full text-fg hover:bg-surface-2";
 
   return (
@@ -63,7 +63,7 @@ export async function SiteHeader() {
             <UserRound className="h-[1.1rem] w-[1.1rem]" aria-hidden /> {account.label}
           </Link>
           {!profile && (
-            <Link href="/login/author" className="btn-primary ml-1 hidden min-h-10 px-4 text-sm md:inline-flex">
+            <Link href="/login/author?mode=signup" className="btn-primary ml-1 hidden min-h-10 px-4 text-sm md:inline-flex">
               Publish your book
             </Link>
           )}
