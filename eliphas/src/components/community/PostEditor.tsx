@@ -62,7 +62,7 @@ export function PostEditor({
     <div className="grid max-w-4xl gap-6 lg:grid-cols-[1fr_260px]">
       <form onSubmit={onSubmit} onChange={onChange} className="space-y-5">
         {moderated && (
-          <p role="note" className="notice bg-danger/10 ring-danger/25">
+          <p role="note" className="notice-danger">
             Our team has {moderated === "removed" ? "removed" : "hidden"} this post. Contact support to discuss it.
           </p>
         )}

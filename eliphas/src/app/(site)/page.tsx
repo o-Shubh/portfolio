@@ -49,7 +49,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
     <div className="space-y-20 pb-8 md:space-y-28">
       {account === "deleted" && (
         <div className="container-x pt-4">
-          <p role="status" className="notice bg-surface ring-line">
+          <p role="status" className="notice-info">
             Your account has been deleted. Thank you for reading with us.
           </p>
         </div>

@@ -9,9 +9,9 @@ Verification: **checked** (browser screenshot reviewed + automated checks), **au
 | # | Screen | Route | Stitch ref | Implementation | Verification | Blockers / notes |
 |---|---|---|---|---|---|---|
 | | **Public website** | | | | | |
-| 1 | Home | `/` | 01 | done | screenshots 1440/390 vs Stitch 01; no sideways scroll | Spotlight uses the newest real book; QR is real when an EEID exists |
-| 2 | Bookstore | `/books` | 02 | done | screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked | Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data) |
-| 3 | Book page | `/books/{book}` | 03 | done | screenshots 1440/390; no sideways scroll (also 768) | Stitch quantity stepper, formats/ePub, TOC, fake appraisals left out (no real data) |
+| 1 | Home | `/` | 01 | done | design pack: screenshots 1440/1024/390, dark, 200% zoom, reduced motion, no-JS; m2 passed | Hero artwork (decorative), real featured books in Book3D, shelves with Quick look, publishing story, before/after sample, Edition ID illustration, final invitation |
+| 2 | Bookstore | `/books` | 02 | done | screenshots 1440/390 vs Stitch 02; m2 passed; sort/filter checked | Fake ratings, 'Verified EEID only', fulfilment filters and table view left out (no real data); design pack: tiles with larger covers and Quick look |
+| 3 | Book page | `/books/{book}` | 03 | done | design pack: screenshots 1440/390, dark, Hindi, 200% zoom | Book3D cover; open sections with dividers instead of cards; one primary Buy now |
 | 4 | Sample reader | `/books/{book}/sample` | 04 | done | typecheck; reader test m15/m17 pending in final run | PDF sample (real file), so no reflow/theme controls; end-of-sample buy panel added |
 | 5 | Authors directory | `/authors` | 05 | done | screenshots 1440/390; no sideways scroll; audit 360/390/768/1440 light + 390/1440 dark; regression suite passed | Verified filter uses real verification records |
 | 6 | Author profile | `/authors/{name}` | 06 | done | screenshots 1440/390; no sideways scroll; audit 360/390/768/1440 light + 390/1440 dark; regression suite passed | No Pro/academic credentials shown (not real data) |
@@ -98,4 +98,4 @@ Verification: **checked** (browser screenshot reviewed + automated checks), **au
 
 ## Resume here
 
-All 80 screens have the shared system. Screens 30-77 are 'partial': styled through shared components but not individually redesigned (no Stitch references). Next, after PR #17 merges: push the branch, open the redesign PR, publish the 000018 SQL page. Optional follow-up: individual layouts for screens 30-77 if Stitch designs are produced for them.
+Design pack (COMPLETE-DESIGN-BRIEF.md) applied: system-sans headlines and mono-for-IDs everywhere via shared utilities; homepage, book page, shelves and copy pass done individually. Not individually revisited in the design-pack pass (they inherit the shared typography, colours and components only): screens 5-24 except 3, all account/author/admin/printer screens (29-77). Next if continuing: per-screen layout review of the author publishing flow (37-43) and admin dashboards (57-75).

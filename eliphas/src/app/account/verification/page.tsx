@@ -25,7 +25,7 @@ export default async function VerificationPage() {
       <PageHeader title="Author verification" intro="Get the Verified Author badge on your profile, posts and articles. Verification is free and separate from Author Pro." />
       <div className="max-w-2xl space-y-6">
         {me.verified_author_at ? (
-          <section className="notice bg-success/10 ring-success/25">
+          <section className="notice-success">
             <BadgeCheck className="h-5 w-5 shrink-0 text-success" aria-hidden />
             <div>
               <p className="font-semibold">Your author profile is verified</p>
@@ -35,7 +35,7 @@ export default async function VerificationPage() {
             </div>
           </section>
         ) : latest?.status === "pending" ? (
-          <section className="notice bg-surface ring-line">
+          <section className="notice-info">
             <Clock className="h-5 w-5 shrink-0 text-muted" aria-hidden />
             <div>
               <p className="font-semibold">Waiting for review</p>
@@ -43,7 +43,7 @@ export default async function VerificationPage() {
             </div>
           </section>
         ) : latest && ["changes_requested", "rejected", "revoked"].includes(latest.status) ? (
-          <section className="notice bg-danger/10 ring-danger/25">
+          <section className="notice-danger">
             <XCircle className="h-5 w-5 shrink-0 text-danger" aria-hidden />
             <div>
               <p className="font-semibold">{STATUS[latest.status]}</p>
