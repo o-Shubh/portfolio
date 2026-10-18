@@ -85,7 +85,7 @@ export function InstallPrompt({ aboveTabBar = false }: { aboveTabBar?: boolean }
       aria-labelledby="install-title"
       className={`safe-bottom fixed inset-x-0 z-40 px-3 md:right-4 md:left-auto md:w-96 ${aboveTabBar ? "bottom-20 md:bottom-4" : "bottom-3"}`}
     >
-      <div className="rounded-xl bg-surface p-4 shadow-lift ring-1 ring-line">
+      <div className="rounded-[var(--radius-card)] bg-surface p-4 shadow-sheet ring-1 ring-line">
         <div className="flex items-start gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element -- the app icon itself */}
           <img src="/icons/icon-192.png" alt="" className="h-12 w-12 shrink-0 rounded-xl" />

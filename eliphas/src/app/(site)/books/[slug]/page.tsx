@@ -147,9 +147,9 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
         )}
       </nav>
 
-      <div className="mt-4 grid gap-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)_17.5rem]">
+      <div className="mt-4 grid gap-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-x-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)_17.5rem]">
         {/* Cover, sample, edition record */}
-        <div className="space-y-3 md:sticky md:top-24 md:self-start">
+        <div className="space-y-3 md:sticky md:top-24 md:row-span-3 md:self-start lg:row-span-2">
           <div className="rounded-[var(--radius-card)] bg-ivory px-[24%] py-[9%] ring-1 ring-line md:px-[14%] md:py-[12%]">
             <BookCover title={book.title} author={book.author_name} slug={book.slug} src={cover} size="lg" priority />
           </div>
@@ -186,7 +186,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
         </div>
 
         {/* Title, author, facts, synopsis */}
-        <div className="min-w-0 space-y-5" lang={book.language}>
+        <div className="min-w-0 space-y-5 md:col-start-2" lang={book.language}>
           <div>
             <div className="flex flex-wrap gap-1.5 text-xs" lang="en">
               {[book.genre, LANGUAGE_LABEL[book.language], book.edition_label].filter(Boolean).map((t) => (
@@ -233,8 +233,13 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
             </dl>
           )}
 
-          <div className="lg:hidden">{buyPanel}</div>
+        </div>
 
+        <div className="md:col-start-2 lg:col-start-3 lg:row-span-2 lg:row-start-1">
+          <div className="lg:sticky lg:top-24">{buyPanel}</div>
+        </div>
+
+        <div className="min-w-0 md:col-start-2" lang={book.language}>
           {book.description && (
             <section>
               <h2 className="text-xs font-semibold tracking-[0.06em] text-muted uppercase" lang="en">
@@ -245,7 +250,6 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
           )}
         </div>
 
-        <div className="hidden lg:sticky lg:top-24 lg:block lg:self-start">{buyPanel}</div>
       </div>
 
       <div className="mt-10 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]" lang="en">

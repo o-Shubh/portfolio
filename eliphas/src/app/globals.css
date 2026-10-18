@@ -344,6 +344,16 @@ body {
 @utility segment {
   @apply inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 text-sm font-medium text-muted transition-colors hover:text-fg pointer-fine:min-h-8 aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-soft aria-[current=true]:bg-surface aria-[current=true]:text-fg aria-[current=true]:shadow-soft aria-[pressed=true]:bg-surface aria-[pressed=true]:text-fg aria-[pressed=true]:shadow-soft;
 }
+/* Dialogs: dimmed, blurred backdrop; 18px panel with sheet shadow. On phones, sheets rise from the bottom. */
+@utility dialog-backdrop {
+  @apply fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 backdrop-blur-sm;
+}
+@utility dialog-panel {
+  @apply w-full max-w-sm rounded-[18px] bg-surface p-6 text-fg shadow-sheet ring-1 ring-line;
+}
+@utility sheet-panel {
+  @apply rounded-t-[18px] bg-surface text-fg shadow-sheet ring-1 ring-line;
+}
 /* Settings-style inset grouped list: white card, hairline rows */
 @utility group-list {
   @apply overflow-hidden rounded-[var(--radius-card)] bg-surface ring-1 ring-line divide-y divide-line;

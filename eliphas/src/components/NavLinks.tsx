@@ -133,7 +133,7 @@ function MoreSheet({ items, active, className, isActive }: { items: NavItem[]; a
       {open && (
         <div ref={sheet} className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
           <button type="button" className="absolute inset-0 h-full w-full cursor-default bg-black/40" aria-label="Close" onClick={() => setOpen(false)} />
-          <div className="safe-bottom absolute inset-x-0 bottom-0 rounded-t-[var(--radius-sheet)] bg-surface pt-2 shadow-lift">
+          <div className="sheet-panel safe-bottom absolute inset-x-0 bottom-0 pt-2">
             <div className="mx-auto mb-1 h-1 w-10 rounded-full bg-line-strong" aria-hidden />
             <ul className="px-2 pb-2">
               {items.map((item) => {

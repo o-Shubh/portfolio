@@ -64,7 +64,7 @@ export function Composer({ name, books }: { name: string | null; books: { id: st
   }
 
   return (
-    <form onSubmit={submit} className="rounded-[var(--radius-card)] bg-surface p-4 shadow-soft ring-1 ring-line" aria-label="New post" data-testid="composer">
+    <form onSubmit={submit} className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line" aria-label="New post" data-testid="composer">
       <label htmlFor="composer-body" className="sr-only">
         What&apos;s on your mind{name ? `, ${name.split(" ")[0]}` : ""}?
       </label>

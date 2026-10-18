@@ -41,26 +41,29 @@ export default async function PricingPage() {
   return (
     <div className="container-x py-10 md:py-16">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="eyebrow">Pricing</p>
-        <h1 className="mt-4 text-4xl md:text-5xl">Free to publish. You set the price.</h1>
+        <p className="mono inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs tracking-[0.06em] text-muted uppercase">
+          <span className="h-1.5 w-1.5 rounded-full bg-marigold" aria-hidden /> Pricing for authors
+        </p>
+        <h1 className="display mt-4 text-[2.25rem] leading-tight md:text-5xl">Free to publish. You set the price.</h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
           No setup fee and no stock to buy. When a copy sells we deduct printing, our commission (+ GST) and payment charges; the rest is your earning.
           Pro and services are optional and never needed to publish.
         </p>
       </div>
       {rates.is_sample && (
-        <p role="note" className="mx-auto mt-8 max-w-3xl rounded-xl border border-line bg-surface px-4 py-3 text-center text-sm">
+        <p role="note" className="notice-warn mx-auto mt-8 max-w-3xl justify-center text-center">
           <strong>Sample print rates.</strong> Print costs are indicative until printer rates are final. Your dashboard always uses the current rate.
         </p>
       )}
 
       {/* ---------- Plans ---------- */}
       <section className="mt-12 grid gap-4 md:grid-cols-2" aria-label="Plans">
-        <div className="card">
-          <h2 className="text-2xl">Free Author</h2>
-          <p className="mt-2 text-4xl font-semibold">₹0</p>
+        <div className="flex flex-col rounded-[var(--radius-card)] bg-surface p-6 ring-1 ring-line md:p-7">
+          <p className="mono text-xs tracking-[0.06em] text-muted uppercase">Default</p>
+          <h2 className="display mt-1 text-2xl">Free Author</h2>
+          <p className="mono mt-4 text-4xl font-medium">₹0</p>
           <p className="text-sm text-muted">No subscription</p>
-          <ul className="mt-5 space-y-2 text-sm">
+          <ul className="mt-5 mb-auto space-y-2 text-sm">
             <Li ok>Publishing and bookstore listing</Li>
             <Li ok>Sales, earnings and payout dashboard</Li>
             <Li ok>Standard support</Li>
@@ -72,16 +75,19 @@ export default async function PricingPage() {
             Start publishing free
           </Link>
         </div>
-        <div className="card ring-2 ring-accent/30">
-          <h2 className="text-2xl">Author Pro</h2>
-          <p className="mt-2 text-4xl font-semibold">
+        <div className="flex flex-col rounded-[var(--radius-card)] bg-surface p-6 ring-2 ring-marigold/40 md:p-7">
+          <p>
+            <span className="badge-pro">Optional</span>
+          </p>
+          <h2 className="display mt-1 text-2xl">Author Pro</h2>
+          <p className="mono mt-4 text-4xl font-medium">
             {formatPaise(proPrice.totalPaise)}
-            <span className="ml-1 text-base font-normal text-muted">/ month</span>
+            <span className="ml-1 font-sans text-base font-normal text-muted">/ month</span>
           </p>
           <p className="text-sm text-muted">
             {formatPaise(plans.pro.price_paise)} + {Number(plans.pro.gst_percent)}% GST. Prepaid monthly; renew when you want.
           </p>
-          <ul className="mt-5 space-y-2 text-sm">
+          <ul className="mt-5 mb-auto space-y-2 text-sm">
             <Li ok>Everything in Free</Li>
             <Li ok>
               Lower commission: {pro.percent}% per copy, minimum {formatPaise(pro.minPaise)}, plus {pro.gstPercent}% GST
@@ -99,21 +105,21 @@ export default async function PricingPage() {
       </section>
 
       {exFree && exPro && (
-        <section className="mt-12 card" aria-labelledby="example-heading">
+        <section className="mt-12 rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line md:p-7" aria-labelledby="example-heading">
           <h2 id="example-heading" className="text-xl">
             Example: a 200-page paperback at ₹299
           </h2>
           <p className="mt-1 text-sm text-muted">Print cost {formatPaise(exFree.printCostPaise)}. Payment charges estimated at {gw}% of the book price.</p>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[420px] text-sm">
-              <thead className="text-muted">
+          <div className="ledger-wrap mt-4">
+            <table className="ledger min-w-[420px]">
+              <thead>
                 <tr>
-                  <th className="py-2 text-left font-medium">Per copy</th>
-                  <th className="py-2 text-right font-medium">Free</th>
-                  <th className="py-2 text-right font-medium">Pro</th>
+                  <th>Per copy</th>
+                  <th className="num">Free</th>
+                  <th className="num">Pro</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line tabular-nums">
+              <tbody>
                 {(
                   [
                     ["Book price", exFree.pricePaise, exPro.pricePaise],
@@ -124,15 +130,15 @@ export default async function PricingPage() {
                   ] as const
                 ).map(([k, a, b]) => (
                   <tr key={k}>
-                    <td className="py-2">{k}</td>
-                    <td className="py-2 text-right">{k === "Book price" ? "" : "− "}{formatPaise(a)}</td>
-                    <td className="py-2 text-right">{k === "Book price" ? "" : "− "}{formatPaise(b)}</td>
+                    <td>{k}</td>
+                    <td className="num">{k === "Book price" ? "" : "− "}{formatPaise(a)}</td>
+                    <td className="num">{k === "Book price" ? "" : "− "}{formatPaise(b)}</td>
                   </tr>
                 ))}
-                <tr className="font-semibold">
-                  <td className="py-2">You earn per copy</td>
-                  <td className="py-2 text-right text-success">{formatPaise(exFree.authorEarningPaise)}</td>
-                  <td className="py-2 text-right text-success">{formatPaise(exPro.authorEarningPaise)}</td>
+                <tr className="bg-tint-success font-semibold">
+                  <td>You earn per copy</td>
+                  <td className="num text-success">{formatPaise(exFree.authorEarningPaise)}</td>
+                  <td className="num text-success">{formatPaise(exPro.authorEarningPaise)}</td>
                 </tr>
               </tbody>
             </table>
@@ -146,7 +152,7 @@ export default async function PricingPage() {
 
       <section className="mt-16" id="calculator" aria-labelledby="calc-heading">
         <p className="eyebrow">Calculator</p>
-        <h2 id="calc-heading" className="mt-3 text-2xl md:text-3xl">
+        <h2 id="calc-heading" className="display mt-3 text-2xl md:text-3xl">
           Your earnings per copy
         </h2>
         <p className="mt-2 text-muted">Uses the current print rates. Every deduction is shown.</p>
@@ -159,7 +165,7 @@ export default async function PricingPage() {
       {services && services.length > 0 && (
         <section className="mt-16" aria-labelledby="services-heading">
           <p className="eyebrow">Optional</p>
-          <h2 id="services-heading" className="mt-3 text-2xl md:text-3xl">
+          <h2 id="services-heading" className="display mt-3 text-2xl md:text-3xl">
             One-time author services
           </h2>
           <p className="mt-2 max-w-2xl text-muted">
@@ -187,33 +193,33 @@ export default async function PricingPage() {
 
       <section className="mt-16">
         <p className="eyebrow">Print costs</p>
-        <h2 className="mt-3 text-2xl md:text-3xl">Print cost per copy</h2>
+        <h2 className="display mt-3 text-2xl md:text-3xl">Print cost per copy</h2>
         <p className="mt-2 text-muted">Matte cover. The lowest price is where a Free author&apos;s earning is just above zero.</p>
-        <div className="mt-6 overflow-x-auto rounded-xl border border-line bg-surface">
-          <table className="w-full min-w-[560px] text-left">
+        <div className="ledger-wrap mt-6">
+          <table className="ledger min-w-[560px]">
             <caption className="sr-only">Print cost per copy by format and page count</caption>
-            <thead className="border-b border-line bg-surface-2 text-sm text-muted">
+            <thead>
               <tr>
-                <th scope="col" className="p-4 font-medium">
+                <th scope="col">
                   Format
                 </th>
                 {PAGE_COUNTS.map((p) => (
-                  <th key={p} scope="col" className="p-4 text-right font-medium">
+                  <th key={p} scope="col" className="num">
                     {p} pages
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody>
               {TABLE_ROWS.map((row) => (
                 <tr key={row.label}>
-                  <th scope="row" className="p-4 font-medium">
+                  <th scope="row" className="!text-sm !font-medium !tracking-normal !text-fg !normal-case">
                     {row.label}
                   </th>
                   {PAGE_COUNTS.map((p) => {
                     const c = printCost({ ...BASE, ...row.opts, page_count: p }, rates);
                     return (
-                      <td key={p} className="p-4 text-right tabular-nums">
+                      <td key={p} className="num">
                         {c === null ? (
                           "—"
                         ) : (
@@ -232,22 +238,22 @@ export default async function PricingPage() {
         </div>
         <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
           {sortedOptions(rates.binding).map(([k, b]) => (
-            <div key={k} className="flex justify-between gap-4 rounded-lg bg-surface px-3 py-2">
+            <div key={k} className="flex justify-between gap-4 rounded-[var(--radius-control)] bg-surface px-3 py-2 ring-1 ring-line">
               <dt className="text-muted">{b.label} binding and cover</dt>
-              <dd className="tabular-nums">{rupees(b.base)}</dd>
+              <dd className="mono">{rupees(b.base)}</dd>
             </div>
           ))}
           {sortedOptions(rates.interior).map(([k, i]) => (
-            <div key={k} className="flex justify-between gap-4 rounded-lg bg-surface px-3 py-2">
+            <div key={k} className="flex justify-between gap-4 rounded-[var(--radius-control)] bg-surface px-3 py-2 ring-1 ring-line">
               <dt className="text-muted">{i.label} page</dt>
-              <dd className="tabular-nums">{rupees(i.per_page)} / page</dd>
+              <dd className="mono">{rupees(i.per_page)} / page</dd>
             </div>
           ))}
         </dl>
       </section>
 
-      <section className="mt-16 card">
-        <h2 className="text-2xl">For readers</h2>
+      <section className="mt-16 rounded-[var(--radius-card)] bg-surface-2 p-6 md:p-8">
+        <h2 className="display text-2xl">For readers</h2>
         <p className="mt-3 text-muted">
           Readers pay the price the author sets plus shipping, which depends on the delivery PIN code and parcel weight. The exact shipping charge and total
           are shown at checkout before payment. Commission never applies to shipping.

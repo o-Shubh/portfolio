@@ -19,11 +19,12 @@ export default async function EditPostPage({ params }: PageProps<"/community/[id
   if (!p || p.author_id !== me.id) notFound();
   const { data: books } = me.verified_author_at ? await admin.from("books").select("id, title").eq("author_id", me.id).eq("status", "published").order("title") : { data: [] };
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 md:py-10">
+    <div className="container-x py-5 md:py-8">
+      <div className="max-w-4xl">
       <Link href="/community" className="inline-flex min-h-11 items-center text-sm font-medium text-muted hover:text-fg">
         ← Community
       </Link>
-      <h1 className="mt-1 mb-5 text-[1.75rem]">{p.status === "published" ? "Edit post" : "Draft post"}</h1>
+      <h1 className="display mt-1 mb-5 text-[1.75rem] md:text-[2.125rem]">{p.status === "published" ? "Edit post" : "Draft post"}</h1>
       <PostEditor
         id={p.id}
         status={p.status as "draft" | "published"}
@@ -34,6 +35,7 @@ export default async function EditPostPage({ params }: PageProps<"/community/[id
         canLinkBook={Boolean(me.verified_author_at)}
         publicPath={`/community/${p.id}`}
       />
+      </div>
     </div>
   );
 }

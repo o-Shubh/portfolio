@@ -22,14 +22,14 @@ export function CartLineControls({ bookId, title, qty, maxQty, available }: { bo
   return (
     <div className="flex flex-wrap items-center gap-3">
       {available && (
-        <div className="flex items-center gap-1 rounded-full bg-surface-2 p-1" aria-busy={pending}>
-          <button type="button" className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => run(() => setCartQty(bookId, qty - 1))} disabled={pending || qty <= 1} aria-label={`One less copy of ${title}`}>
+        <div className="flex items-center gap-0.5 rounded-[var(--radius-control)] bg-surface-2 p-0.5" aria-busy={pending}>
+          <button type="button" className="grid h-11 w-11 place-items-center rounded-[8px] hover:bg-surface disabled:opacity-40 pointer-fine:h-9 pointer-fine:w-9" onClick={() => run(() => setCartQty(bookId, qty - 1))} disabled={pending || qty <= 1} aria-label={`One less copy of ${title}`}>
             <Minus className="h-4 w-4" />
           </button>
-          <output className="w-8 text-center font-semibold tabular-nums" aria-live="polite" aria-label={`Copies of ${title}`}>
+          <output className="mono w-8 text-center font-medium" aria-live="polite" aria-label={`Copies of ${title}`}>
             {qty}
           </output>
-          <button type="button" className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface disabled:opacity-40" onClick={() => run(() => setCartQty(bookId, qty + 1))} disabled={pending || qty >= maxQty} aria-label={`One more copy of ${title}`}>
+          <button type="button" className="grid h-11 w-11 place-items-center rounded-[8px] hover:bg-surface disabled:opacity-40 pointer-fine:h-9 pointer-fine:w-9" onClick={() => run(() => setCartQty(bookId, qty + 1))} disabled={pending || qty >= maxQty} aria-label={`One more copy of ${title}`}>
             <Plus className="h-4 w-4" />
           </button>
         </div>
