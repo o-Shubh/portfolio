@@ -8,7 +8,8 @@ import { PostCard } from "@/components/community/PostCard";
 import { listPosts } from "@/lib/posts";
 import { FollowButton } from "@/components/articles/FollowButton";
 import { AuthorAvatar } from "@/components/AuthorAvatar";
-import { BookGrid } from "@/components/BookCard";
+import { BookGrid, BookRow } from "@/components/BookCard";
+import { ShareButton } from "@/components/ShareButton";
 import { getPublicAuthor, listPublicArticles, PAGE_SIZE, readerState } from "@/lib/articles";
 import { getCurrentProfile } from "@/lib/auth";
 import type { PublicBook } from "@/lib/books";
@@ -41,7 +42,7 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
     getCurrentProfile(),
     supabase
       .from("books")
-      .select("id, slug, title, subtitle, author_name, description, language, genre, isbn, page_count, trim_size, binding, interior, paper, cover_finish, mrp, cover_path, published_at, author_id", { count: "exact" })
+      .select("id, slug, title, subtitle, author_name, description, language, genre, isbn, page_count, trim_size, binding, interior, paper, cover_finish, mrp, cover_path, published_at, author_id, sample_path, sample_from, sample_to, eeid, edition_label", { count: "exact" })
       .eq("status", "published")
       .eq("author_id", author.id)
       .order("published_at", { ascending: false })
@@ -62,40 +63,81 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
     { key: "updates", label: "Updates", count: updates.total, href: `/authors/${author.handle}?tab=updates` },
   ];
 
+  const [first, ...rest] = books;
+  const stats = [
+    { label: "Books", value: booksRes.count ?? books.length },
+    { label: "Articles", value: articles.total },
+    { label: "Updates", value: updates.total },
+  ];
+
   return (
     <div className="container-x py-5 md:py-8">
-      <header className="flex flex-wrap items-center gap-4 rounded-xl bg-surface p-5 shadow-soft ring-1 ring-line md:p-6">
-        <AuthorAvatar name={author.full_name} path={author.avatar_path} size="lg" />
-        <div className="min-w-0 flex-1">
-          <p className="eyebrow">Author</p>
-          <h1 className="mt-1 flex flex-wrap items-center gap-2 text-2xl md:text-3xl">
-            {name} {verified && <VerifiedBadge />}
-          </h1>
-          {author.bio && <p className="mt-2 max-w-2xl whitespace-pre-line text-fg/90">{author.bio}</p>}
-          {verified && <p className="mt-2 max-w-2xl text-xs text-muted">{VERIFIED_NOTE}</p>}
+      <nav aria-label="Breadcrumb" className="text-sm text-muted">
+        <Link href="/authors" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
+          Authors
+        </Link>
+        <span className="mx-2" aria-hidden>
+          ›
+        </span>
+        <span className="text-fg">{name}</span>
+      </nav>
+      <header className="mt-2 rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line md:p-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+          <div className="shrink-0 [&_img]:h-24 [&_img]:w-24 [&>*]:h-24 [&>*]:w-24 [&>*]:text-2xl md:[&_img]:h-28 md:[&_img]:w-28 md:[&>*]:h-28 md:[&>*]:w-28">
+            <AuthorAvatar name={author.full_name} path={author.avatar_path} size="lg" />
+          </div>
+          <div className="min-w-0 flex-1">
+            {verified && (
+              <div className="mb-2">
+                <VerifiedBadge />
+              </div>
+            )}
+            <h1 className="display text-[1.875rem] leading-tight md:text-[2.375rem]">{name}</h1>
+            {author.bio && <p className="mt-2 max-w-2xl font-serif text-[1.0625rem] leading-relaxed whitespace-pre-line text-fg/90">{author.bio}</p>}
+            {verified && <p className="mt-2 max-w-2xl text-xs text-muted">{VERIFIED_NOTE}</p>}
+            <dl className="mt-4 grid max-w-md grid-cols-3 gap-px overflow-hidden rounded-[var(--radius-control)] bg-line ring-1 ring-line">
+              {stats.map((st) => (
+                <div key={st.label} className="bg-surface-2 px-3 py-2.5">
+                  <dt className="text-[0.7rem] font-semibold tracking-[0.06em] text-muted uppercase">{st.label}</dt>
+                  <dd className="mono mt-0.5 text-lg font-medium">{st.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {me?.id !== author.id && !state.blockedWithAuthor && <FollowButton authorId={author.id} authorName={name} following={state.following} intent={intent} />}
+              <ShareButton path={`/authors/${author.handle}`} title={name} label="Share profile" />
+            </div>
+          </div>
         </div>
-        {me?.id !== author.id && !state.blockedWithAuthor && <FollowButton authorId={author.id} authorName={name} following={state.following} intent={intent} />}
       </header>
 
-      <nav aria-label="Author sections" className="no-scrollbar mt-6 flex gap-1 overflow-x-auto border-b border-line">
-        {tabs.map((t) => (
-          <Link
-            key={t.key}
-            href={t.href}
-            aria-current={tab === t.key ? "page" : undefined}
-            className={`-mb-px inline-flex min-h-11 items-center gap-2 border-b-2 px-4 text-sm font-medium ${tab === t.key ? "border-gold text-fg" : "border-transparent text-muted hover:text-fg"}`}
-          >
-            {t.label} <span className="tabular-nums text-muted">{t.count}</span>
-          </Link>
-        ))}
+      <nav aria-label="Author sections" className="no-scrollbar mt-6 overflow-x-auto">
+        <div className="segmented">
+          {tabs.map((t) => (
+            <Link key={t.key} href={t.href} aria-current={tab === t.key ? "page" : undefined} className="segment px-4 whitespace-nowrap">
+              {t.label} <span className="mono text-xs text-muted">{t.count}</span>
+            </Link>
+          ))}
+        </div>
       </nav>
 
       <div className="mt-6">
         {tab === "books" ? (
-          books.length ? (
-            <BookGrid books={books} />
+          first ? (
+            <div className="space-y-6">
+              <div className="max-w-3xl">
+                <h2 className="mb-2 text-xs font-semibold tracking-[0.06em] text-muted uppercase">Latest book</h2>
+                <BookRow book={first} verified={verified} priority />
+              </div>
+              {rest.length > 0 && (
+                <section>
+                  <h2 className="mb-3 text-lg">All books</h2>
+                  <BookGrid books={rest} />
+                </section>
+              )}
+            </div>
           ) : (
-            <p className="rounded-xl bg-surface px-6 py-12 text-center text-muted shadow-soft ring-1 ring-line">No published books yet.</p>
+            <p className="rounded-[var(--radius-card)] bg-surface px-6 py-12 text-center text-muted ring-1 ring-line">No published books yet.</p>
           )
         ) : tab === "updates" ? (
           updates.posts.length ? (
@@ -105,12 +147,12 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
               ))}
             </div>
           ) : (
-            <p className="rounded-xl bg-surface px-6 py-12 text-center text-muted shadow-soft ring-1 ring-line">No updates yet.</p>
+            <p className="rounded-[var(--radius-card)] bg-surface px-6 py-12 text-center text-muted ring-1 ring-line">No updates yet.</p>
           )
         ) : articles.articles.length ? (
           <ArticleGrid articles={articles.articles} showAuthor={false} />
         ) : (
-          <p className="rounded-xl bg-surface px-6 py-12 text-center text-muted shadow-soft ring-1 ring-line">No articles yet.</p>
+          <p className="rounded-[var(--radius-card)] bg-surface px-6 py-12 text-center text-muted ring-1 ring-line">No articles yet.</p>
         )}
       </div>
 

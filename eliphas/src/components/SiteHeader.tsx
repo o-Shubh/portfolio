@@ -18,7 +18,7 @@ export const SITE_LINKS = [
 ];
 
 /** Search form used in the header. A plain GET form: works before JavaScript loads. */
-function SearchBar({ id, className = "" }: { id: string; className?: string }) {
+function SearchBar({ id, className = "", placeholder = "Search books and authors" }: { id: string; className?: string; placeholder?: string }) {
   return (
     <form action="/books" role="search" className={`relative ${className}`}>
       <label htmlFor={id} className="sr-only">
@@ -30,7 +30,7 @@ function SearchBar({ id, className = "" }: { id: string; className?: string }) {
         name="q"
         type="search"
         enterKeyHint="search"
-        placeholder="Search books and authors"
+        placeholder={placeholder}
         className="h-11 w-full rounded-[var(--radius-control)] border-0 bg-surface-2 pr-3 pl-9 text-[0.9375rem] text-fg outline-none placeholder:text-muted focus:bg-surface focus:shadow-[0_0_0_3px_rgb(74_99_201/0.25)] focus:ring-1 focus:ring-focus pointer-fine:h-9"
       />
     </form>
@@ -52,7 +52,7 @@ export async function SiteHeader() {
       <div className="container-x flex h-14 items-center gap-3 lg:gap-5">
         <Logo className="h-9 md:h-10" />
         <HeaderNav links={SITE_LINKS} />
-        <SearchBar id="q-desktop" className="ml-auto hidden min-w-36 flex-1 md:block lg:max-w-56 xl:max-w-72" />
+        <SearchBar id="q-desktop" placeholder="Search" className="ml-auto hidden min-w-36 flex-1 md:block lg:max-w-56 xl:max-w-72" />
         <div className="ml-auto flex items-center gap-0.5 md:ml-0">
           <span className="hidden xl:block">
             <ThemeToggle />

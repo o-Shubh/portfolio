@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Minus, Plus, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
@@ -113,78 +113,120 @@ export function SampleReader({
     return () => window.removeEventListener("keydown", onKey);
   }, [go, page]);
 
-  const btn = "grid h-11 w-11 shrink-0 place-items-center rounded-full text-fg hover:bg-surface-2 disabled:opacity-40 disabled:hover:bg-transparent";
+  const btn = "grid h-11 w-11 shrink-0 place-items-center rounded-full text-fg hover:bg-surface-2 disabled:opacity-40 disabled:hover:bg-transparent pointer-fine:h-9 pointer-fine:w-9";
+  // Floating page arrows for mouse users; keyboard and screen-reader users have the labelled bar and arrow keys
+  const side = "absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-surface text-fg shadow-lift ring-1 ring-line hover:bg-surface-2 disabled:opacity-0 md:grid";
+  const atEnd = pages > 0 && page >= pages;
 
   return (
     <div className={`flex flex-col bg-surface-2 ${embedded ? "h-[75vh] overflow-hidden rounded-[var(--radius-card)] border border-line" : "h-dvh"}`} data-testid="sample-reader">
-      <header className={`${embedded ? "" : "safe-top"} flex items-center gap-2 border-b border-line bg-surface px-2 py-1.5 sm:px-4`}>
+      <header className={`${embedded ? "" : "safe-top"} glass flex items-center gap-2 border-b border-line px-2 py-1.5 sm:px-4`}>
         {backHref && (
-          <Link href={backHref} className={btn} aria-label="Close sample and go back to the book">
-            <X className="h-5 w-5" aria-hidden />
-          </Link>
+          <Link href={backHref} className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full pr-3 pl-2 text-sm hover:bg-surface-2 pointer-fine:min-h-9" aria-label="Close sample and go back to the book">
+            <ChevronLeft className="h-5 w-5" aria-hidden />
+            <span className="max-sm:hidden">Book details</span>
+                      </Link>
         )}
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold">{title}</p>
-          <p className="truncate text-xs text-muted">
-            <span className="mr-1.5 rounded bg-marigold/20 px-1.5 py-0.5 font-semibold text-marigold-fg">Free sample</span>
+        <div className="min-w-0 flex-1 sm:text-center">
+          <p className="truncate font-serif font-semibold">{title}</p>
+          <p className="truncate text-[0.7rem] text-muted">
+            <span className="mono mr-1.5 inline-flex items-center gap-1 tracking-[0.06em] text-marigold-fg uppercase">
+              <span className="h-1.5 w-1.5 rounded-full bg-marigold" aria-hidden /> Free sample
+            </span>
             {note}
           </p>
         </div>
         {buyHref && (
-          <Link href={buyHref} className="btn-accent min-h-11 shrink-0 px-4 text-sm" data-testid="sample-buy">
+          <Link href={buyHref} className="btn-accent min-h-11 shrink-0 px-4 text-sm pointer-fine:min-h-9" data-testid="sample-buy">
             {price ? `Buy · ${price}` : "Buy the book"}
           </Link>
         )}
       </header>
 
-      <div
-        ref={area}
-        className="relative flex-1 overflow-auto"
-        onTouchStart={(e) => {
-          touch.current = zoom === 1 && e.touches.length === 1 ? e.touches[0].clientX : null;
-        }}
-        onTouchEnd={(e) => {
-          if (touch.current === null) return;
-          const dx = e.changedTouches[0].clientX - touch.current;
-          if (Math.abs(dx) > 60) go(page + (dx < 0 ? 1 : -1));
-          touch.current = null;
-        }}
-      >
-        {failed ? (
-          <div className="mx-auto max-w-md p-6 text-center">
-            <p className="font-semibold">We couldn&apos;t show the sample here.</p>
-            <p className="mt-1 text-sm text-muted">Check your connection and try again, or open it as a PDF.</p>
-            <a href={url} target="_blank" rel="noopener" className="btn-ghost mt-4 inline-flex">
-              Open the sample PDF
-            </a>
-          </div>
-        ) : (
-          <div className="flex min-h-full min-w-max items-start justify-center p-4">
-            <canvas ref={canvas} className="bg-white shadow-lift" role="img" aria-label={pages ? `Sample page ${page} of ${pages}` : "Loading sample"} />
-            {(!doc || shown !== page) && (
-              <p role="status" className="absolute inset-x-0 top-6 text-center text-sm text-muted">
-                Loading page…
-              </p>
-            )}
-          </div>
-        )}
+      <div className="relative min-h-0 flex-1">
+        <button type="button" className={`${side} left-4`} onClick={() => go(page - 1)} disabled={page <= 1} aria-hidden tabIndex={-1}>
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button type="button" className={`${side} right-4`} onClick={() => go(page + 1)} disabled={!pages || page >= pages} aria-hidden tabIndex={-1}>
+          <ChevronRight className="h-5 w-5" />
+        </button>
+        <div
+          ref={area}
+          className="h-full overflow-auto"
+          onTouchStart={(e) => {
+            touch.current = zoom === 1 && e.touches.length === 1 ? e.touches[0].clientX : null;
+          }}
+          onTouchEnd={(e) => {
+            if (touch.current === null) return;
+            const dx = e.changedTouches[0].clientX - touch.current;
+            if (Math.abs(dx) > 60) go(page + (dx < 0 ? 1 : -1));
+            touch.current = null;
+          }}
+        >
+          {failed ? (
+            <div className="mx-auto mt-10 max-w-md rounded-[var(--radius-card)] bg-surface p-6 text-center ring-1 ring-line">
+              <p className="font-semibold">We couldn&apos;t show the sample here.</p>
+              <p className="mt-1 text-sm text-muted">Check your connection and try again, or open it as a PDF.</p>
+              <a href={url} target="_blank" rel="noopener" className="btn-ghost mt-4 inline-flex">
+                Open the sample PDF
+              </a>
+            </div>
+          ) : (
+            <div className="flex min-h-full min-w-max flex-col items-center p-4 md:px-20 md:py-8">
+              <canvas ref={canvas} className="rounded-[4px] bg-white shadow-sheet" role="img" aria-label={pages ? `Sample page ${page} of ${pages}` : "Loading sample"} />
+              {(!doc || shown !== page) && (
+                <p role="status" className="absolute inset-x-0 top-6 text-center text-sm text-muted">
+                  Loading page…
+                </p>
+              )}
+              {atEnd && buyHref && !embedded && (
+                <section className="mt-6 w-full max-w-[min(100%,46rem)] rounded-[18px] bg-primary p-5 text-on-primary sm:p-7" data-testid="sample-end">
+                  <p className="mono text-[0.7rem] tracking-[0.06em] text-on-primary/70 uppercase">End of the free sample</p>
+                  <h2 className="display mt-1.5 text-2xl text-on-primary">Enjoying {title}?</h2>
+                  <p className="mt-1.5 text-sm text-on-primary/80">Order the full book. It&apos;s printed fresh for you and delivered across India.</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link href={buyHref} className="btn-accent min-h-11">
+                      {price ? `Buy the book · ${price}` : "Buy the book"}
+                    </Link>
+                    {backHref && (
+                      <Link href={backHref} className="btn min-h-11 bg-white/10 text-on-primary hover:bg-white/15">
+                        Back to book details
+                      </Link>
+                    )}
+                  </div>
+                </section>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      <nav aria-label="Sample pages" className={`${embedded ? "" : "safe-bottom"} flex items-center justify-center gap-1 border-t border-line bg-surface px-2 py-1.5 sm:gap-3`}>
+      <nav aria-label="Sample pages" className={`${embedded ? "" : "safe-bottom"} glass flex items-center justify-center gap-1 border-t border-line px-2 py-1.5 sm:gap-3`}>
         <button type="button" className={btn} onClick={() => go(page - 1)} disabled={page <= 1} aria-label="Previous page">
           <ChevronLeft className="h-5 w-5" aria-hidden />
         </button>
-        <p className="min-w-24 text-center text-sm tabular-nums" aria-live="polite" data-testid="sample-page">
+        <p className="mono min-w-24 text-center text-sm" aria-live="polite" data-testid="sample-page">
           {pages ? `Page ${page} of ${pages}` : "…"}
         </p>
         <button type="button" className={btn} onClick={() => go(page + 1)} disabled={!pages || page >= pages} aria-label="Next page">
           <ChevronRight className="h-5 w-5" aria-hidden />
         </button>
+        {pages > 2 && (
+          <input
+            type="range"
+            min={1}
+            max={pages}
+            value={page}
+            onChange={(e) => go(Number(e.target.value))}
+            aria-label="Go to page"
+            className="mx-2 hidden w-40 accent-[var(--color-primary)] md:block lg:w-64"
+          />
+        )}
         <span className="mx-1 h-6 w-px bg-line" aria-hidden />
         <button type="button" className={btn} onClick={() => zoomBy(-1)} disabled={zoom <= ZOOMS[0]} aria-label="Zoom out">
           <Minus className="h-5 w-5" aria-hidden />
         </button>
-        <button type="button" className="min-h-11 min-w-14 rounded-full px-2 text-sm tabular-nums hover:bg-surface-2" onClick={() => setZoom(1)} aria-label="Reset zoom" data-testid="sample-zoom">
+        <button type="button" className="mono min-h-11 min-w-14 rounded-full px-2 text-sm hover:bg-surface-2 pointer-fine:min-h-9" onClick={() => setZoom(1)} aria-label="Reset zoom" data-testid="sample-zoom">
           {Math.round(zoom * 100)}%
         </button>
         <button type="button" className={btn} onClick={() => zoomBy(1)} disabled={zoom >= ZOOMS[ZOOMS.length - 1]} aria-label="Zoom in">
