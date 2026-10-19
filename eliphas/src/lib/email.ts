@@ -10,7 +10,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  */
 export const emailConfigured = () => Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
 
-type Kind = "order_confirmed" | "order_shipped" | "order_delivered" | "order_cancelled" | "refund_processed" | "contact_message";
+type Kind = "order_confirmed" | "order_shipped" | "order_delivered" | "order_cancelled" | "refund_processed" | "contact_message" | "weekly_digest";
 
 export async function queueEmail(input: {
   kind: Kind;

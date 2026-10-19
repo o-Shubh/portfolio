@@ -49,24 +49,33 @@ export default async function NotificationsPage() {
                 const actor =
                   (n.actor as { full_name: string | null } | null)?.full_name ??
                   (n.kind === "verification" || n.kind === "distribution" ? "Eliphas team" : "Someone");
+                const team = n.kind === "verification" || n.kind === "distribution" || n.kind === "price_drop" || n.kind === "back_on_sale";
+                const TEAM_LABEL: Record<string, string> = {
+                  verification: "Author verification",
+                  distribution: "Distribution request",
+                  price_drop: "A book you saved is cheaper",
+                  back_on_sale: "A book you saved is back",
+                };
                 const what =
                   n.kind === "new_post"
                     ? "posted in Community"
                     : n.kind === "new_article"
                       ? "published a new article"
-                      : n.kind === "new_follower"
-                        ? "started following you"
-                        : n.kind === "reply"
-                          ? "replied to you"
-                          : "updated your author verification";
+                      : n.kind === "new_book"
+                        ? "published a new book"
+                        : n.kind === "new_follower"
+                          ? "started following you"
+                          : n.kind === "reply"
+                            ? "replied to you"
+                            : "updated your author verification";
                 return (
                   <li key={n.id} className="flex items-start gap-3 px-5 py-4" data-testid="notification" data-kind={n.kind}>
                     <span aria-hidden className={`mt-2 h-2 w-2 shrink-0 rounded-full ${n.read_at ? "bg-transparent" : "bg-gold"}`} />
                     <div className="min-w-0">
                       <p className="text-sm">
                         {!n.read_at && <span className="sr-only">Unread: </span>}
-                        {n.kind === "verification" || n.kind === "distribution" ? (
-                          <span className="font-semibold">{n.kind === "verification" ? "Author verification" : "Distribution request"}</span>
+                        {team ? (
+                          <span className="font-semibold">{TEAM_LABEL[n.kind]}</span>
                         ) : (
                           <>
                             <span className="font-semibold">{actor}</span> {what}
@@ -97,6 +106,8 @@ export default async function NotificationsPage() {
             <div className="group-list">
               <ArticleNotificationToggle on={me.notify_new_articles} />
               <PostNotificationToggle on={me.notify_new_posts} />
+              <PrefToggle field="notify_new_books" on={me.notify_new_books} label="New books" hint="When an author you follow publishes a book." />
+              <PrefToggle field="notify_saved_books" on={me.notify_saved_books} label="Saved books" hint="When a book you saved gets cheaper or is back on sale." />
               <PrefToggle field="notify_followers" on={me.notify_followers} label="New followers" hint="When someone starts following you." />
               <PrefToggle
                 field="notify_replies"
@@ -106,8 +117,29 @@ export default async function NotificationsPage() {
               />
             </div>
             <p className="mt-2 px-1 text-xs text-muted">
-              Notifications appear here only, never by SMS, email or push. Verification decisions and distribution reviews are always shown.
+              Notifications appear here only, never by SMS or push. Verification decisions and distribution reviews are always shown.
             </p>
+          </section>
+
+          <section aria-labelledby="digest-h">
+            <h2 id="digest-h" className="mb-2 px-1 text-sm font-medium text-muted">
+              Email
+            </h2>
+            <div className="group-list">
+              <PrefToggle
+                field="weekly_digest"
+                on={me.weekly_digest}
+                label="Weekly email"
+                hint={`Once a week: new books and posts from people you follow, and price drops on books you saved. Nothing is sent in a week with no news.${me.email ? "" : " Add your email in Settings first."}`}
+              />
+            </div>
+            {!me.email && (
+              <p className="mt-2 px-1 text-xs">
+                <Link href="/account/profile" className="font-medium underline underline-offset-2">
+                  Add your email in Settings
+                </Link>
+              </p>
+            )}
           </section>
 
           <section aria-labelledby="follows-h">

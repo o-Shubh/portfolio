@@ -52,3 +52,21 @@ test("cancel and refund emails explain the refund", () => {
   assert.ok(orderEmail("order_cancelled", { ...base, cancelReason: "Out of stock" }).text.includes("Reason: Out of stock"));
   assert.ok(orderEmail("refund_processed", { ...base, refundLabel: "₹359" }).text.includes("₹359 has been refunded"));
 });
+
+test("weekly email: nothing to send when there's no news", async () => {
+  const { digestEmail } = await import("./email-templates.ts");
+  const empty = { books: [], savedBooks: [], articles: [], posts: [] };
+  assert.equal(digestEmail({ siteUrl: "https://e.in", businessName: "Eliphas", name: "Asha", unsubscribeUrl: "https://e.in/u?t=1", sections: empty }), null);
+  const m = digestEmail({
+    siteUrl: "https://e.in",
+    businessName: "Eliphas",
+    name: "Asha <b>",
+    unsubscribeUrl: "https://e.in/unsubscribe?t=abc",
+    sections: { ...empty, savedBooks: [{ title: "Monsoon <Letters>", note: "Now ₹249", url: "https://e.in/books/m" }], books: [{ title: "New", by: "Meera", url: "https://e.in/books/n" }] },
+  });
+  assert.ok(m);
+  assert.equal(m.subject, "2 new things for you this week");
+  assert.ok(m.html.includes("Monsoon &lt;Letters&gt;") && !m.html.includes("<b>"), "escaped");
+  assert.ok(m.html.includes("https://e.in/unsubscribe?t=abc") && m.text.includes("Unsubscribe: https://e.in/unsubscribe?t=abc"));
+  assert.ok(m.text.indexOf("BOOKS YOU SAVED") < m.text.indexOf("NEW BOOKS"), "saved books first");
+});

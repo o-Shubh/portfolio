@@ -563,6 +563,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"book_stats_daily": {
+                  Row: {
+                    "book_id": string,"day": string,"sample_opens": number,"views": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"day": string,"sample_opens"?: number,"views"?: number
+                  }
+                  Update: {
+                    "book_id"?: string,"day"?: string,"sample_opens"?: number,"views"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "book_stats_daily_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "books"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"books": {
                   Row: {
                     "approved_files": Json | null,"approved_files_at": string | null,"author_id": string,"author_name": string,"binding": string,"cover_finish": string,"cover_path": string | null,"created_at": string,"description": string | null,"edition_label": string | null,"eeid": string | null,"eeid_assigned_at": string | null,"eeid_assigned_by": string | null,"files_confirmed_at": string | null,"genre": string | null,"id": string,"interior": string,"isbn": string | null,"language": string,"manuscript_height_in": number | null,"manuscript_path": string | null,"manuscript_width_in": number | null,"mrp": number | null,"page_count": number | null,"paper": string,"print_cost": number | null,"print_cover_height_in": number | null,"print_cover_path": string | null,"print_cover_width_in": number | null,"print_review_requested_at": string | null,"published_at": string | null,"removed_at": string | null,"removed_reason": string | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"sample_approved_at": string | null,"sample_draft_from": number | null,"sample_draft_path": string | null,"sample_draft_source": string | null,"sample_draft_to": number | null,"sample_from": number | null,"sample_manuscript_version": number | null,"sample_path": string | null,"sample_source": string | null,"sample_to": number | null,"slug": string,"status": Database["public"]['Enums']["book_status"],"submitted_at": string | null,"subtitle": string | null,"title": string,"trim_size": string,"updated_at": string,"work_id": string
@@ -1981,14 +2001,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "author_terms_accepted_at": string | null,"author_terms_version": string | null,"avatar_path": string | null,"bio": string | null,"city": string | null,"created_at": string,"email": string | null,"full_name": string | null,"handle": string | null,"id": string,"notify_followers": boolean,"notify_new_articles": boolean,"notify_new_posts": boolean,"notify_order_emails": boolean,"notify_replies": boolean,"payout_upi": string | null,"phone": string | null,"pincode": string | null,"role": Database["public"]['Enums']["app_role"],"state": string | null,"updated_at": string,"verified_author_at": string | null,"verified_author_by": string | null
+                    "author_terms_accepted_at": string | null,"author_terms_version": string | null,"avatar_path": string | null,"bio": string | null,"city": string | null,"created_at": string,"digest_token": string,"email": string | null,"full_name": string | null,"handle": string | null,"id": string,"notify_followers": boolean,"notify_new_articles": boolean,"notify_new_books": boolean,"notify_new_posts": boolean,"notify_order_emails": boolean,"notify_replies": boolean,"notify_saved_books": boolean,"payout_upi": string | null,"phone": string | null,"pincode": string | null,"role": Database["public"]['Enums']["app_role"],"state": string | null,"updated_at": string,"verified_author_at": string | null,"verified_author_by": string | null,"weekly_digest": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id": string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null
+                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"digest_token"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id": string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_books"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"notify_saved_books"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null,"weekly_digest"?: boolean
                   }
                   Update: {
-                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null
+                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"digest_token"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_books"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"notify_saved_books"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null,"weekly_digest"?: boolean
                   }
                   Relationships: [
                     {
@@ -2647,6 +2667,50 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"wishlist": {
+                  Row: {
+                    "book_id": string,"created_at": string,"price_at_save": number | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"created_at"?: string,"price_at_save"?: number | null,"user_id": string
+                  }
+                  Update: {
+                    "book_id"?: string,"created_at"?: string,"price_at_save"?: number | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "wishlist_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wishlist_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "wishlist_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wishlist_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wishlist_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -2820,6 +2884,9 @@ isOneToOne: false
                            },
 "cancel_referral_reward":
 { Args: { "p_actor": string,"p_note": string,"p_reward": string }; Returns: boolean
+                           },
+"count_book_event":
+{ Args: { "p_book": string,"p_kind": string }; Returns: undefined
                            },
 "create_payout_run":
 { Args: { "p_actor": string,"p_minimum": number }; Returns: string

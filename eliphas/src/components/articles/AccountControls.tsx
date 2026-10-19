@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { markNotificationsRead, setArticleNotifications, setBlock, setBookmark, setNotificationPref } from "@/app/actions/community";
+import { markNotificationsRead, setArticleNotifications, setBlock, setBookmark, setNotificationPref, type NotificationPref } from "@/app/actions/community";
 import { setPostNotifications } from "@/app/actions/posts";
 import { offlineSafe } from "@/lib/use-form-action";
 
@@ -118,9 +118,10 @@ export function PostNotificationToggle({ on }: { on: boolean }) {
 }
 
 /** On/off for a notification type (new followers, replies). In-app only. */
-export function PrefToggle({ field, on, label, hint }: { field: "notify_followers" | "notify_replies"; on: boolean; label: string; hint: string }) {
+export function PrefToggle({ field, on, label, hint }: { field: NotificationPref; on: boolean; label: string; hint: string }) {
   const [value, setValue] = useState(on);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
   const [pending, start] = useTransition();
   return (
     <SwitchRow
@@ -129,15 +130,20 @@ export function PrefToggle({ field, on, label, hint }: { field: "notify_follower
       checked={value}
       disabled={pending}
       saved={saved}
+      error={error}
       testId={`pref-${field}`}
       onChange={(e) => {
         const next = e.target.checked;
         setValue(next);
         setSaved(false);
         start(async () => {
+          setError("");
           const res = await offlineSafe(setNotificationPref(field, next));
           if ("ok" in res) setSaved(true);
-          else setValue(!next);
+          else {
+            setValue(!next);
+            if ("error" in res && res.error) setError(res.error);
+          }
         });
       }}
     />
@@ -151,6 +157,7 @@ function SwitchRow({
   checked,
   disabled,
   saved,
+  error,
   testId,
   onChange,
 }: {
@@ -159,6 +166,7 @@ function SwitchRow({
   checked: boolean;
   disabled: boolean;
   saved: boolean;
+  error?: string;
   testId?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
@@ -171,6 +179,11 @@ function SwitchRow({
           {saved && (
             <span role="status" className="ml-2 font-medium text-success">
               Saved.
+            </span>
+          )}
+          {error && (
+            <span role="alert" className="ml-2 font-medium text-danger">
+              {error}
             </span>
           )}
         </span>
