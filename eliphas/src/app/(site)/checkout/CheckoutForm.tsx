@@ -66,16 +66,17 @@ export function CheckoutForm({
   const [pincode, setPincode] = useState(defaults.ship_pincode ?? "");
   const [result, setResult] = useState<{ key: string; quote: ShippingQuoteResult } | null>(null);
   const [quoting, startQuote] = useTransition();
+  const [useCredit, setUseCredit] = useState(false);
   const validPin = /^[1-9]\d{5}$/.test(pincode);
-  const key = `${pincode}:${qtys.join(",")}`;
+  const key = `${pincode}:${qtys.join(",")}:${useCredit ? 1 : 0}`;
 
   // Shipping depends on the PIN code and parcel weight, so ask the server for a quote
   useEffect(() => {
     if (!validPin) return;
     const forKey = key;
     const order = items.map((it, i) => ({ slug: it.slug, qty: qtys[i] }));
-    startQuote(async () => setResult({ key: forKey, quote: await quoteCheckout(order, pincode) }));
-    // key covers the PIN code and every quantity
+    startQuote(async () => setResult({ key: forKey, quote: await quoteCheckout(order, pincode, useCredit) }));
+    // key covers the PIN code, every quantity and the credit choice
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validPin, key]);
   // Only show a quote that matches what's on screen now
@@ -145,6 +146,7 @@ export function CheckoutForm({
       <form onSubmit={onSubmit} className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
         <input type="hidden" name="items" value={JSON.stringify(lines)} />
         <input type="hidden" name="from_cart" value={fromCart ? "1" : "0"} />
+        <input type="hidden" name="use_credit" value={useCredit ? "1" : "0"} />
 
         <section className="card space-y-4">
           <h2 className="text-xl">Delivery address</h2>
@@ -255,6 +257,30 @@ export function CheckoutForm({
                 <p className="text-xs text-success">
                   {priced.promotion}: {formatPaise(priced.discountPaise)} off shipping (was {formatPaise(priced.basePaise)})
                 </p>
+              )}
+              {priced && priced.inviteDiscountPaise > 0 && (
+                <div className="flex justify-between text-success">
+                  <dt>Invite discount</dt>
+                  <dd className="mono">−{formatPaise(priced.inviteDiscountPaise)}</dd>
+                </div>
+              )}
+              {priced && (priced.creditUsablePaise > 0 || useCredit) && (
+                <label className="flex items-start gap-3 rounded-[var(--radius-control)] bg-surface-2 p-3 text-sm">
+                  <input type="checkbox" checked={useCredit} onChange={(e) => setUseCredit(e.target.checked)} className="mt-0.5 h-5 w-5 accent-fg" />
+                  <span>
+                    <span className="font-semibold">Use my credit</span>
+                    <span className="block text-muted">
+                      {formatPaise(priced.creditBalancePaise)} available
+                      {priced.creditUsablePaise < priced.creditBalancePaise && `, up to ${formatPaise(priced.creditUsablePaise)} on this order`}
+                    </span>
+                  </span>
+                </label>
+              )}
+              {priced && priced.creditPaise > 0 && (
+                <div className="flex justify-between text-success">
+                  <dt>Credit</dt>
+                  <dd className="mono">−{formatPaise(priced.creditPaise)}</dd>
+                </div>
               )}
               {quote && "error" in quote && <p className="text-xs text-danger">{quote.error}</p>}
               <div className="flex items-baseline justify-between border-t border-line pt-3 text-lg font-semibold">

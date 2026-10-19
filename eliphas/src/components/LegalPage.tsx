@@ -7,6 +7,7 @@ export const LEGAL_LINKS = [
   { href: "/refunds", label: "Refunds and cancellations" },
   { href: "/shipping", label: "Shipping and delivery" },
   { href: "/community-guidelines", label: "Community guidelines" },
+  { href: "/referral-terms", label: "Invite programme" },
   { href: "/contact", label: "Contact us" },
 ];
 

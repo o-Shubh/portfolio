@@ -1,6 +1,6 @@
 import "server-only";
 import { MAX_QTY } from "@/lib/cart-codec";
-import { estimateCopy, splitOrder, toRupees, type OrderLineInput, type OrderSplit } from "@/lib/commission";
+import { allocate, estimateCopy, splitOrder, toRupees, type OrderLineInput, type OrderSplit } from "@/lib/commission";
 import type { PlanVersion } from "@/lib/plans";
 import { authorRule } from "@/lib/plans";
 import { gatewayPercent, printCost, type PricingSettings } from "@/lib/pricing";
@@ -67,6 +67,7 @@ export async function priceOrder(
   items: { book: Book; quantity: number }[],
   pincode: string,
   s: PricingSettings,
+  platformDiscountPaise = 0, // invite discount and credit: paid by the platform, spread across the books by value
 ): Promise<PricedOrder | { error: string }> {
   if (!items.length) return { error: "Your order is empty." };
   const inputs: OrderLineInput[] = [];
@@ -107,6 +108,11 @@ export async function priceOrder(
   });
   if (!quote.serviceable) return { error: quote.reason };
 
+  if (platformDiscountPaise > 0) {
+    if (platformDiscountPaise >= booksPaise) return { error: "The discount can't be more than the books." };
+    const shares = allocate(platformDiscountPaise, inputs.map((l) => l.unitPricePaise * l.quantity));
+    inputs.forEach((l, i) => (l.platformDiscountPaise = shares[i]));
+  }
   const split = splitOrder(inputs, quote.chargePaise, { percent: gatewayPercent(s.fees) });
   return { split, shipping: quote, versions, books };
 }
@@ -132,6 +138,7 @@ export function orderItemRows(orderId: string, p: PricedOrder) {
       commission_gst: toRupees(l.commissionGstPaise),
       gateway_allocated: toRupees(l.gatewayPaise),
       author_earning_total: toRupees(l.authorEarningPaise),
+      platform_discount: toRupees(l.platformDiscountPaise ?? 0),
       author_plan: v.plan,
       commission_rule: {
         plan: v.plan,

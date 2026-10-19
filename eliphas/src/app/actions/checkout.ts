@@ -14,6 +14,7 @@ import { parseEmail } from "@/lib/email-format";
 import { checkCapture, createRazorpayOrder, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
 import { cleanIndianMobile } from "@/lib/phone";
 import { verifyPaymentSignature } from "@/lib/razorpay-signature";
+import { checkoutBenefits, releaseHeldCredit } from "@/lib/referrals";
 import { getPricingSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -36,7 +37,19 @@ const text = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 
 export type ShippingQuoteResult =
   | { error: string }
-  | { shippingPaise: number; basePaise: number; discountPaise: number; promotion: string | null; booksPaise: number; totalPaise: number; isSample: boolean };
+  | {
+      shippingPaise: number;
+      basePaise: number;
+      discountPaise: number;
+      promotion: string | null;
+      booksPaise: number; // full books value, before the invite discount and credit
+      inviteDiscountPaise: number;
+      creditPaise: number; // credit this order uses (when the reader ticks "Use my credit")
+      creditUsablePaise: number; // the most credit it could use
+      creditBalancePaise: number;
+      totalPaise: number;
+      isSample: boolean;
+    };
 
 /** The published books for the order, in the order given. Every book must still be on sale. */
 async function orderLines(items: CheckoutItem[]): Promise<{ lines: { book: Book; quantity: number }[] } | { error: string }> {
@@ -58,21 +71,39 @@ async function orderLines(items: CheckoutItem[]): Promise<{ lines: { book: Book;
   return { lines };
 }
 
+/**
+ * Prices the order with the buyer's invite discount (first order of an invited account) and, if they chose to,
+ * their credit. Both are paid by the platform; authors' earnings don't change.
+ */
+async function priceWithBenefits(lines: { book: Book; quantity: number }[], pincode: string, buyerId: string | null, useCredit: boolean) {
+  const booksPaise = lines.reduce((a, l) => a + Number(l.book.mrp) * 100 * l.quantity, 0);
+  const benefits = buyerId ? await checkoutBenefits(buyerId, booksPaise) : { referral: null, creditBalancePaise: 0, creditUsablePaise: 0 };
+  const inviteDiscountPaise = benefits.referral?.discountPaise ?? 0;
+  const creditPaise = useCredit ? benefits.creditUsablePaise : 0;
+  const priced = await priceOrder(lines, pincode, await getPricingSettings(), inviteDiscountPaise + creditPaise);
+  return { priced, booksPaise, benefits, inviteDiscountPaise, creditPaise };
+}
+
 /** Live quote shown before payment: shipping for this PIN code (one parcel for all books) and the total to pay. */
-export async function quoteCheckout(input: CheckoutItem[], pincode: string): Promise<ShippingQuoteResult> {
+export async function quoteCheckout(input: CheckoutItem[], pincode: string, useCredit = false): Promise<ShippingQuoteResult> {
   if (!/^[1-9]\d{5}$/.test(pincode)) return { error: "Enter a 6-digit PIN code to see shipping." };
   const items = parseCheckoutItems(input);
   if ("error" in items) return items;
   const found = await orderLines(items);
   if ("error" in found) return { error: found.error };
-  const priced = await priceOrder(found.lines, pincode, await getPricingSettings());
+  const profile = await getCurrentProfile();
+  const { priced, booksPaise, benefits, inviteDiscountPaise, creditPaise } = await priceWithBenefits(found.lines, pincode, profile?.id ?? null, useCredit);
   if ("error" in priced) return { error: priced.error };
   return {
     shippingPaise: priced.split.shippingPaise,
     basePaise: priced.shipping.basePaise,
     discountPaise: priced.shipping.discountPaise,
     promotion: priced.shipping.promotionName,
-    booksPaise: priced.split.booksPaise,
+    booksPaise,
+    inviteDiscountPaise,
+    creditPaise,
+    creditUsablePaise: benefits.creditUsablePaise,
+    creditBalancePaise: benefits.creditBalancePaise,
     totalPaise: priced.split.totalPaise,
     isSample: priced.shipping.isSample,
   };
@@ -108,8 +139,10 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   const supabase = await createClient();
   const found = await orderLines(items);
   if ("error" in found) return { error: found.error };
-  const settings = await getPricingSettings();
-  const priced = await priceOrder(found.lines, pincode, settings);
+  const useCredit = fd.get("use_credit") === "1";
+  // An earlier unpaid checkout holding credit or the first-order discount is cancelled, freeing them for this one
+  await releaseHeldCredit({ buyerId: profile.id });
+  const { priced, booksPaise, benefits, inviteDiscountPaise, creditPaise } = await priceWithBenefits(found.lines, pincode, profile.id, useCredit);
   if ("error" in priced) return { error: priced.error };
   // The reader must see the same total they are asked to pay
   if (Number.isFinite(expectedTotal) && expectedTotal > 0 && expectedTotal !== priced.split.totalPaise) {
@@ -137,7 +170,10 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
     .from("orders")
     .insert({
       buyer_id: profile.id,
-      subtotal: toRupees(priced.split.booksPaise),
+      subtotal: toRupees(booksPaise),
+      referral_discount: toRupees(inviteDiscountPaise),
+      credit_used: toRupees(creditPaise),
+      referral_id: inviteDiscountPaise > 0 ? benefits.referral!.id : null,
       shipping: toRupees(priced.split.shippingPaise),
       total: toRupees(priced.split.totalPaise),
       shipping_quote: priced.shipping,
@@ -164,6 +200,14 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   if (itemError) {
     await admin.from("orders").delete().eq("id", order.id);
     return { error: "Could not create the order. Please try again." };
+  }
+  // Spend the credit in the database, under a lock, so two checkouts can't use the same credit
+  if (creditPaise > 0) {
+    const { error: creditError } = await admin.rpc("spend_credit", { p_user: profile.id, p_order: order.id, p_amount: toRupees(creditPaise) });
+    if (creditError) {
+      await admin.from("orders").delete().eq("id", order.id); // its lines go with it
+      return { error: "Your credit balance changed. Please check the new total and pay again." };
+    }
   }
 
   // Remember the address for next time

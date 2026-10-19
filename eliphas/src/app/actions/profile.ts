@@ -4,6 +4,7 @@ import { parseEmail } from "@/lib/email-format";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
+import { attachReferral } from "@/lib/referrals";
 import { createClient } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; ok?: boolean } | undefined;
@@ -53,6 +54,8 @@ export async function completeOnboarding(_prev: FormState, formData: FormData): 
   const supabase = await createClient();
   const { error } = await supabase.from("profiles").update(update).eq("id", profile.id);
   if (error) return { error: "Could not save. Please try again." };
+  // A brand-new account that came from someone's invite link
+  if (!profile.full_name) await attachReferral(profile);
 
   revalidatePath("/", "layout");
   const next = String(formData.get("next") ?? "");

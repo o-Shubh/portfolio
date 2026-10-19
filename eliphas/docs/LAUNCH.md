@@ -43,7 +43,7 @@ README under "Deploy to Vercel".
       switched off rather than pretending.
 
 ## 4. Supabase (your existing project)
-- [ ] All migrations up to `20261028000022_operations.sql` run (see "Database" below).
+- [ ] All migrations up to `20261029000023_referrals.sql` run (see "Database" below).
 - [ ] Authentication → URL Configuration: **Site URL** `https://your-domain.in`; add `https://your-domain.in/**`
       to Redirect URLs.
 - [ ] Authentication → Phone: real SMS provider details (step 1). **Remove the test phone numbers.**
@@ -80,6 +80,9 @@ README under "Deploy to Vercel".
 - [ ] Decide your payout schedule (e.g. monthly) and minimum. Admin → Payouts → Start payout run: download the sheet,
       pay each author by UPI or bank bulk transfer, then enter each reference (UTR) and mark it paid.
 - [ ] FAQ promises (review time, delivery time) match what you can deliver: `src/content/faq.ts`.
+- [ ] Optional, any time after launch: the invite programme (Admin → Referrals). It is off with zero amounts until you
+      set them. Have your accountant check how discounts and credit are treated for GST, and your lawyer read the
+      Invite programme terms page, before switching it on. The daily job that gives rewards uses `CRON_SECRET`.
 
 ## 7. Legal
 - [ ] Lawyer review of Terms, Privacy, Refunds, Shipping, author terms, Pro and service terms.
@@ -99,7 +102,7 @@ With live keys, on the real domain:
 
 ## Database
 Run each new file in `supabase/migrations/` once, in order, in the SQL Editor. Never run `hosted-setup.sql` on the
-existing database. Latest: `20261028000022_operations.sql`.
+existing database. Latest: `20261029000023_referrals.sql`.
 
 ## Play Store (optional, after the site is live)
 See [`PLAY-STORE.md`](PLAY-STORE.md): listing text, graphics, Data safety answers and the two Vercel settings.
@@ -107,5 +110,7 @@ See [`PLAY-STORE.md`](PLAY-STORE.md): listing text, graphics, Data safety answer
 ## After launch
 - Admin → Overview: "Refunds to check" and "New messages" should be 0; see Admin → Refunds and Admin → Messages.
 - Admin → Emails: failed emails show here; they're retried daily.
+- Admin → Referrals (if switched on): rewards are given daily; use "Give due rewards now" to run it by hand, and block
+  invites or cancel rewards that look like misuse.
 - Vercel → Logs for errors; Razorpay → Webhooks for failed deliveries (they're retried automatically).
 - GitHub runs lint, typecheck, unit tests and a build on every pull request ("Eliphas checks").

@@ -143,6 +143,18 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
                 <dt>Shipping</dt>
                 <dd>{Number(o.shipping) === 0 ? "Free" : rupees(Number(o.shipping))}</dd>
               </div>
+              {Number(o.referral_discount) > 0 && (
+                <div className="flex justify-between text-success">
+                  <dt>Invite discount</dt>
+                  <dd>−{rupees(Number(o.referral_discount))}</dd>
+                </div>
+              )}
+              {Number(o.credit_used) > 0 && (
+                <div className="flex justify-between text-success">
+                  <dt>Credit used</dt>
+                  <dd>−{rupees(Number(o.credit_used))}</dd>
+                </div>
+              )}
               <div className="flex justify-between pt-1 text-base font-semibold">
                 <dt>Paid</dt>
                 <dd>{rupees(Number(o.total))}</dd>

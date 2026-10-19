@@ -44,7 +44,7 @@ export default async function FinancePage({ searchParams }: PageProps<"/admin/fi
   const groups: { title: string; note?: string; rows: [string, number][] }[] = [
     {
       title: "Book sales (passes through us)",
-      note: "Book sales value is what readers paid for books. It is not platform income.",
+      note: "Book sales value is the books at full price (readers paid less where an invite discount or credit was used; see below). It is not platform income.",
       rows: [
         ["Book sales value", n("book_sales_value")],
         ["Print costs (owed to printers)", n("print_costs")],
@@ -68,6 +68,7 @@ export default async function FinancePage({ searchParams }: PageProps<"/admin/fi
       rows: [
         ["Shipping collected from readers", n("shipping_collected")],
         ["Shipping promotions (platform-funded)", n("shipping_promotions")],
+        ["Invite discounts and credit (platform-funded)", n("platform_discounts")],
         ["Book order refunds", n("book_refunds")],
         ["Service and subscription refunds", n("other_refunds")],
       ],

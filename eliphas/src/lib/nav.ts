@@ -34,6 +34,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/refunds", label: "Refunds", icon: "money", sidebarOnly: true },
   { href: "/admin/emails", label: "Emails", icon: "notifications", sidebarOnly: true },
   { href: "/admin/messages", label: "Messages", icon: "community", sidebarOnly: true },
+  { href: "/admin/referrals", label: "Referrals", icon: "invite", sidebarOnly: true },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: "plan", sidebarOnly: true },
   { href: "/admin/issues", label: "Issues", icon: "issues", sidebarOnly: true },
   { href: "/admin/authors", label: "Authors", icon: "profile", sidebarOnly: true },
@@ -44,14 +45,18 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/settings", label: "Settings", icon: "settings", sidebarOnly: true },
 ];
 
+/** Shown while the referral programme is switched on (Admin → Referrals). */
+export const INVITE_NAV: NavItem = { href: "/account/invite", label: "Invite friends", icon: "invite", sidebarOnly: true };
+
 /** The account area is shared by everyone; it links back to their workspace. */
-export function accountNav(role: Role): NavItem[] {
+export function accountNav(role: Role, invites = false): NavItem[] {
   const items: NavItem[] = [
     { href: "/account", label: "My orders", icon: "shop", exact: true },
     { href: "/account/profile", label: "Profile", icon: "profile" },
     { href: "/account/saved", label: "Saved", icon: "saved" },
     { href: "/account/notifications", label: "Notifications", icon: "notifications" },
     { href: "/account/verification", label: "Author verification", icon: "review" },
+    ...(invites ? [INVITE_NAV] : []),
   ];
   const workspace: Record<Role, NavItem | null> = {
     reader: null,

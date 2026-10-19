@@ -22,6 +22,7 @@ import {
   ShieldAlert,
   MoreHorizontal,
   MessagesSquare,
+  Gift,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -51,6 +52,7 @@ const ICONS = {
   notifications: Bell,
   moderation: ShieldAlert,
   community: MessagesSquare,
+  invite: Gift,
 };
 
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; exact?: boolean; /** hide from the phone tab bar (sidebar only) */ sidebarOnly?: boolean };
