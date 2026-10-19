@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { LoginForm } from "@/app/login/LoginForm";
-import { googleSignInEnabled } from "@/lib/google-auth";
+import { signInMethods } from "@/lib/google-auth";
 import { GoogleButton } from "./GoogleButton";
 import { LoginSwitch } from "./LoginSwitch";
+import { SignInChoice } from "./SignInChoice";
 
 const COPY = {
   reader: {
@@ -16,8 +16,9 @@ const COPY = {
 } as const;
 
 const ERRORS: Record<string, string> = {
-  google: "Google sign-in didn't finish. Try again, or use your mobile number.",
-  google_cancelled: "Google sign-in was cancelled. You can try again, or use your mobile number.",
+  google: "Google sign-in didn't finish. Please try again.",
+  google_cancelled: "Google sign-in was cancelled. You can try again.",
+  email_link: "That sign-in link has expired or was opened on another device. Enter the code from the email instead, or ask for a new one.",
 };
 
 /**
@@ -26,7 +27,8 @@ const ERRORS: Record<string, string> = {
  */
 export async function AuthEntrance({ audience, mode, next, error }: { audience: "reader" | "author"; mode: "login" | "signup"; next: string; error?: string }) {
   const copy = COPY[audience][mode];
-  const google = await googleSignInEnabled();
+  const { google, phone, email, emailCodes } = await signInMethods();
+  const other = phone && email ? "your mobile number or email" : phone ? "your mobile number" : "your email";
   const base = audience === "author" ? "/login/author" : "/login";
   const keepNext = (n: string) => (n === (audience === "author" ? "/author" : "/dashboard") ? "" : `next=${encodeURIComponent(n)}`);
   const href = (m: "login" | "signup") => {
@@ -50,11 +52,19 @@ export async function AuthEntrance({ audience, mode, next, error }: { audience: 
         <div className="mt-6 space-y-4">
           <GoogleButton next={next} audience={audience} label={mode === "signup" ? "Sign up with Google" : "Continue with Google"} />
           <p className="flex items-center gap-3 text-xs text-muted" aria-hidden>
-            <span className="h-px flex-1 bg-line" /> or use your mobile number <span className="h-px flex-1 bg-line" />
+            <span className="h-px flex-1 bg-line" /> or use {other} <span className="h-px flex-1 bg-line" />
           </p>
         </div>
       )}
-      <LoginForm next={next} audience={audience} submitLabel={mode === "signup" ? "Sign up: send code" : "Send code"} />
+      {phone || email ? (
+        <SignInChoice phone={phone} email={email} codes={emailCodes} next={next} audience={audience} mode={mode} />
+      ) : (
+        !google && (
+          <p role="status" className="notice-info mt-6" data-testid="auth-unavailable">
+            Sign-in is being set up and will open shortly. Please check back soon, or contact us from the Contact page.
+          </p>
+        )
+      )}
       <p className="mt-6 rounded-[var(--radius-control)] bg-surface-2 p-3 text-center text-sm" data-testid="auth-mode-switch">
         {mode === "login" ? (
           <>
@@ -74,9 +84,13 @@ export async function AuthEntrance({ audience, mode, next, error }: { audience: 
       </p>
       <p className="mt-3 text-center text-xs text-muted">
         {mode === "signup"
-          ? "Enter your number and we'll text you a code. Your account is created when you confirm it."
-          : "No account yet? Enter your number anyway and we'll create one."}
-        {google && " Google and mobile-number sign-ins are separate accounts unless you connect Google in Settings."}
+          ? phone
+            ? "With a mobile number we text you a code; your account is created when you confirm it."
+            : "Your account is created straight away."
+          : phone
+            ? "No account yet? Enter your mobile number anyway and we'll create one."
+            : "New here? Create a free account above."}
+        {(phone || email) && (google || (phone && email)) && " Each way of signing in is a separate account unless you connect them in Settings."}
       </p>
       <p className="mt-4 text-center text-sm text-muted">
         {audience === "reader" ? (

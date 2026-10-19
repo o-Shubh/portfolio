@@ -37,6 +37,7 @@ README under "Deploy to Vercel".
   | `EMAIL_FROM` | e.g. `Eliphas Indicus <orders@your-domain.in>` (a domain verified in Resend) |
   | `EMAIL_REPLY_TO` | Optional: your support inbox, where customer replies go |
   | `CRON_SECRET` | A long random text; protects the daily email retry job |
+  | `AUTH_EMAILS_ENABLED` | `true` once Supabase can send sign-in emails through your SMTP (step 4) |
 
 - [ ] Settings → Domains → add your domain and follow the DNS instructions. Redeploy after changing variables.
 - [ ] Test payments (the pretend payment window) never run on a hosted site. Without Razorpay keys, checkout is
@@ -47,6 +48,23 @@ README under "Deploy to Vercel".
 - [ ] Authentication → URL Configuration: **Site URL** `https://your-domain.in`; add `https://your-domain.in/**`
       to Redirect URLs.
 - [ ] Authentication → Phone: real SMS provider details (step 1). **Remove the test phone numbers.**
+- [ ] **Sign-in while SMS isn't ready.** The login page shows only the ways that work: the mobile-number form appears
+      once the Phone provider is switched on. Until then, switch on at least one of these:
+  - **Email + password (fastest, works today, no email setup):** Supabase → Authentication → Sign In / Providers →
+    **Email**: enabled, and turn **Confirm email** off for now. People sign up with an email and password straight
+    away. (Their email isn't verified until you turn Confirm email back on after the SMTP step below.)
+  - **Google** (about 10 minutes, free): README → "Google sign-in setup".
+  - **Email codes, confirming sign-ups and "Forgot password?"** need Supabase to send email. After your domain is
+    verified in Resend (step 5b):
+    1. Supabase → Authentication → **Emails → SMTP Settings**: enable custom SMTP. Host `smtp.resend.com`, port
+       `465`, username `resend`, password = your Resend API key, sender e.g. `login@your-domain.in`, name
+       "Eliphas Indicus". (Supabase's built-in email only reaches your own team, so this is required.)
+    2. Supabase → Authentication → **Emails → Templates**: in **Magic link**, **Confirm signup** and **Reset password**,
+       set a subject (e.g. "Your Eliphas sign-in code") and paste the body from `supabase/templates/sign-in-code.html`
+       (for Reset password, use `supabase/templates/reset-password.html`).
+    3. Vercel → Environment variables: `AUTH_EMAILS_ENABLED` = `true`, then redeploy. "Email me a code" and
+       "Forgot password?" appear on the login pages. Now turn **Confirm email** back on.
+  - Each way of signing in makes its own account; people can connect Google to their account in Settings.
 - [ ] Optional: Google sign-in (README → "Google sign-in setup").
 - [ ] Database → Backups: confirm daily backups are on (paid plans) or take a manual backup before launch.
 - [ ] Make your own number admin (README, Supabase step 4) and check nobody else has the admin role:
