@@ -837,6 +837,80 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"credit_ledger": {
+                  Row: {
+                    "amount": number,"created_at": string,"created_by": string | null,"expires_at": string | null,"id": string,"kind": string,"note": string | null,"order_id": string | null,"reward_id": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"created_at"?: string,"created_by"?: string | null,"expires_at"?: string | null,"id"?: string,"kind": string,"note"?: string | null,"order_id"?: string | null,"reward_id"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "amount"?: number,"created_at"?: string,"created_by"?: string | null,"expires_at"?: string | null,"id"?: string,"kind"?: string,"note"?: string | null,"order_id"?: string | null,"reward_id"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "credit_ledger_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "credit_ledger_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "credit_ledger_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "credit_ledger_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "credit_ledger_order_id_fkey"
+      columns: ["order_id"]
+isOneToOne: false
+      referencedRelation: "orders"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "credit_ledger_reward_id_fkey"
+      columns: ["reward_id"]
+isOneToOne: false
+      referencedRelation: "referral_rewards"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "credit_ledger_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "credit_ledger_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "credit_ledger_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "credit_ledger_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"distribution_requests": {
                   Row: {
                     "author_id": string,"author_replied_at": string | null,"author_reply": string,"book_id": string,"channel": string,"created_at": string,"id": string,"markets": string,"residence_country": string,"review_note": string,"reviewed_at": string | null,"reviewed_by": string | null,"rights_confirmed": boolean,"status": string,"updated_at": string
@@ -1313,14 +1387,14 @@ isOneToOne: false
                   ]
                 },"orders": {
                   Row: {
-                    "accepted_at": string | null,"buyer_id": string | null,"campaign_link_id": string | null,"cancel_reason": string | null,"cancelled_at": string | null,"cancelled_by": string | null,"contact_email": string | null,"courier": string | null,"created_at": string,"delivered_at": string | null,"gateway_fee": number | null,"gateway_fee_source": string | null,"id": string,"order_number": string,"packed_at": string | null,"paid_at": string | null,"payment_mode": string | null,"printed_at": string | null,"printer_id": string | null,"printing_at": string | null,"razorpay_order_id": string | null,"razorpay_payment_id": string | null,"refund_amount": number | null,"refund_id": string | null,"refund_status": string | null,"refunded_at": string | null,"replacement_of": string | null,"ship_city": string,"ship_line1": string,"ship_line2": string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at": string | null,"shipping": number,"shipping_discount": number,"shipping_promotion_id": string | null,"shipping_quote": Json | null,"status": Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number": string | null,"tracking_url": string | null,"updated_at": string
+                    "accepted_at": string | null,"buyer_id": string | null,"campaign_link_id": string | null,"cancel_reason": string | null,"cancelled_at": string | null,"cancelled_by": string | null,"contact_email": string | null,"courier": string | null,"created_at": string,"credit_used": number,"delivered_at": string | null,"gateway_fee": number | null,"gateway_fee_source": string | null,"id": string,"order_number": string,"packed_at": string | null,"paid_at": string | null,"payment_mode": string | null,"printed_at": string | null,"printer_id": string | null,"printing_at": string | null,"razorpay_order_id": string | null,"razorpay_payment_id": string | null,"referral_discount": number,"referral_id": string | null,"refund_amount": number | null,"refund_id": string | null,"refund_status": string | null,"refunded_at": string | null,"replacement_of": string | null,"ship_city": string,"ship_line1": string,"ship_line2": string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at": string | null,"shipping": number,"shipping_discount": number,"shipping_promotion_id": string | null,"shipping_quote": Json | null,"status": Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number": string | null,"tracking_url": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"contact_email"?: string | null,"courier"?: string | null,"created_at"?: string,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city": string,"ship_line1": string,"ship_line2"?: string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number"?: string | null,"tracking_url"?: string | null,"updated_at"?: string
+                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"contact_email"?: string | null,"courier"?: string | null,"created_at"?: string,"credit_used"?: number,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"referral_discount"?: number,"referral_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city": string,"ship_line1": string,"ship_line2"?: string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number"?: string | null,"tracking_url"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"contact_email"?: string | null,"courier"?: string | null,"created_at"?: string,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city"?: string,"ship_line1"?: string,"ship_line2"?: string | null,"ship_name"?: string,"ship_phone"?: string,"ship_pincode"?: string,"ship_state"?: string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal"?: number,"total"?: number,"tracking_number"?: string | null,"tracking_url"?: string | null,"updated_at"?: string
+                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"contact_email"?: string | null,"courier"?: string | null,"created_at"?: string,"credit_used"?: number,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"referral_discount"?: number,"referral_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city"?: string,"ship_line1"?: string,"ship_line2"?: string | null,"ship_name"?: string,"ship_phone"?: string,"ship_pincode"?: string,"ship_state"?: string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal"?: number,"total"?: number,"tracking_number"?: string | null,"tracking_url"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -1364,6 +1438,12 @@ isOneToOne: false
       columns: ["printer_id"]
 isOneToOne: false
       referencedRelation: "printers"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "orders_referral_id_fkey"
+      columns: ["referral_id"]
+isOneToOne: false
+      referencedRelation: "referrals"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "orders_replacement_of_fkey"
@@ -1932,6 +2012,162 @@ isOneToOne: false
     },{
       foreignKeyName: "profiles_verified_author_by_fkey"
       columns: ["verified_author_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"referral_codes": {
+                  Row: {
+                    "code": string,"created_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "code": string,"created_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "code"?: string,"created_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "referral_codes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "referral_codes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referral_codes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referral_codes_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"referral_rewards": {
+                  Row: {
+                    "amount": number,"book_id": string | null,"cancelled_at": string | null,"created_at": string,"id": string,"note": string | null,"order_id": string | null,"reason": string,"referral_id": string,"status": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"book_id"?: string | null,"cancelled_at"?: string | null,"created_at"?: string,"id"?: string,"note"?: string | null,"order_id"?: string | null,"reason": string,"referral_id": string,"status": string,"user_id": string
+                  }
+                  Update: {
+                    "amount"?: number,"book_id"?: string | null,"cancelled_at"?: string | null,"created_at"?: string,"id"?: string,"note"?: string | null,"order_id"?: string | null,"reason"?: string,"referral_id"?: string,"status"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "referral_rewards_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referral_rewards_order_id_fkey"
+      columns: ["order_id"]
+isOneToOne: false
+      referencedRelation: "orders"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referral_rewards_referral_id_fkey"
+      columns: ["referral_id"]
+isOneToOne: false
+      referencedRelation: "referrals"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referral_rewards_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "referral_rewards_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referral_rewards_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referral_rewards_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"referrals": {
+                  Row: {
+                    "blocked_reason": string | null,"code": string,"created_at": string,"id": string,"referred_id": string,"referrer_id": string | null,"referrer_kind": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "blocked_reason"?: string | null,"code": string,"created_at"?: string,"id"?: string,"referred_id": string,"referrer_id"?: string | null,"referrer_kind": string,"status"?: string
+                  }
+                  Update: {
+                    "blocked_reason"?: string | null,"code"?: string,"created_at"?: string,"id"?: string,"referred_id"?: string,"referrer_id"?: string | null,"referrer_kind"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "referrals_referred_id_fkey"
+      columns: ["referred_id"]
+isOneToOne: true
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "referrals_referred_id_fkey"
+      columns: ["referred_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referrals_referred_id_fkey"
+      columns: ["referred_id"]
+isOneToOne: true
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referrals_referred_id_fkey"
+      columns: ["referred_id"]
+isOneToOne: true
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referrals_referrer_id_fkey"
+      columns: ["referrer_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "referrals_referrer_id_fkey"
+      columns: ["referrer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referrals_referrer_id_fkey"
+      columns: ["referrer_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "referrals_referrer_id_fkey"
+      columns: ["referrer_id"]
 isOneToOne: false
       referencedRelation: "public_profiles"
       referencedColumns: ["id"]
@@ -2533,6 +2769,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"adjust_credit":
+{ Args: { "p_actor": string,"p_amount": number,"p_expiry_days": number,"p_note": string,"p_user": string }; Returns: undefined
+                           },
 "admin_finance":
 { Args: { "p_from": string,"p_to": string }; Returns: Json
                            },
@@ -2579,8 +2818,17 @@ isOneToOne: false
 "cancel_payout_run":
 { Args: { "p_run": string }; Returns: undefined
                            },
+"cancel_referral_reward":
+{ Args: { "p_actor": string,"p_note": string,"p_reward": string }; Returns: boolean
+                           },
 "create_payout_run":
 { Args: { "p_actor": string,"p_minimum": number }; Returns: string
+                           },
+"credit_balance":
+{ Args: { "p_user": string }; Returns: Record<string, unknown>
+                           },
+"grant_referral_reward":
+{ Args: { "p_amount": number,"p_book"?: string,"p_cap": number,"p_expiry_days": number,"p_order"?: string,"p_reason": string,"p_referral": string,"p_user": string }; Returns: string
                            },
 "has_active_pro":
 { Args: { "p_author": string }; Returns: boolean
@@ -2717,6 +2965,9 @@ isOneToOne: false
                            },
 "settle_run_payout":
 { Args: { "p_paid": boolean,"p_payout": string,"p_reference": string }; Returns: undefined
+                           },
+"spend_credit":
+{ Args: { "p_amount": number,"p_order": string,"p_user": string }; Returns: undefined
                            },
 "use_pro_credit":
 { Args: { "p_author": string,"p_service_order": string }; Returns: string

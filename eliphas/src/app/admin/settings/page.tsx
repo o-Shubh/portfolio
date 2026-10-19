@@ -74,6 +74,14 @@ export default async function SettingsPage() {
         <BusinessForm fields={BUSINESS_FIELDS} values={business} />
       </div>
 
+      <p className="card mb-8 text-sm">
+        <span className="font-semibold">Invite programme:</span> amounts, switches and limits are in{" "}
+        <Link href="/admin/referrals" className="underline underline-offset-2">
+          Admin → Referrals
+        </Link>
+        .
+      </p>
+
       <SettingsForm settings={settings} />
 
       <details className="card mt-8">

@@ -24,6 +24,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 12 | Distribution requests (Amazon India, Flipkart, international): intake and review only | ✅ Done (migrations 000019, 000020) |
 | 13 | Launch hardening: captured-only payments, refund ledger and Admin → Refunds, CI checks | ✅ Done (migration 000021) |
 | 14 | Operations: order emails, contact form inbox, payout runs, parcel tracking links, Play Store assets | ✅ Done (migration 000022) |
+| 15 | Invite programme: invite links, first-order discount, account credit, rewards, Admin → Referrals (off by default) | ✅ Done (migration 000023) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -548,6 +549,27 @@ See [`docs/DISTRIBUTION-HANDOFF.md`](docs/DISTRIBUTION-HANDOFF.md) for limits an
 - **Parcel tracking**: the printer picks the courier and can paste the courier's tracking link; readers get a
   **Track parcel** button (Delhivery and Shiprocket links are built automatically from the number).
 - **Play Store**: listing text, Data safety answers and graphics in [`docs/PLAY-STORE.md`](docs/PLAY-STORE.md).
+
+### Invite programme (migration 000023)
+
+Off with zero amounts until an admin sets it up in **Admin → Referrals**.
+- **Invite links**: every member gets `/r/CODE` on **Invite friends** (account menu); authors also get a link per
+  book (`/r/CODE?b=slug`). The code is kept in a first-party cookie for 30 days and counts only for an account set up
+  within a day of opening the link (not your own, not an account that already ordered).
+- **First-order discount** for the invited person (reader invite or author link, each with its own amount and an
+  optional minimum order).
+- **Credit** for the inviter, given by the daily job `/api/cron/referrals` once the friend's first order has been
+  delivered for the wait period (default 7 days) and wasn't refunded; and for both sides when an invited person
+  publishes their first book. Optional monthly limit per person. Orders delivered to the inviter's own phone or
+  address earn nothing.
+- **Using credit**: a "Use my credit" tick at checkout, up to a set percentage of the books (not shipping); oldest
+  credit first; expires after a set number of days. Cancelled or refunded orders give credit back and take back any
+  reward they earned (database trigger). Unpaid checkouts holding credit are released when the buyer starts another
+  checkout, or after a day.
+- **Money**: discounts and credit are stored on the order (`referral_discount`, `credit_used`) and on each line as
+  `platform_discount`. Authors always earn on the full price; the platform pays. Finance shows the total.
+- **Admin**: switches and amounts, stats, recent invites, block an invite, cancel a reward, adjust someone's credit by
+  phone. Terms for readers at `/referral-terms` show the live amounts.
 
 ### Google sign-in setup (about 10 minutes)
 
