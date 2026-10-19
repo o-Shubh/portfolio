@@ -5,7 +5,12 @@ import { useState } from "react";
 import { formatPaise } from "@/lib/commission";
 
 type Start = { paymentId: string; mode: "razorpay" | "mock"; razorpayOrderId: string; keyId: string; amountPaise: number; description: string };
-type Confirm = (input: { paymentId: string; razorpayOrderId: string; razorpayPaymentId: string; razorpaySignature: string }) => Promise<{ ok: true } | { error: string }>;
+type Confirm = (input: {
+  paymentId: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+}) => Promise<{ ok: true; pending?: boolean } | { error: string }>;
 
 type RazorpayResponse = { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string };
 
@@ -41,6 +46,7 @@ export function PayButton({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [mock, setMock] = useState<Start | null>(null);
 
   async function finish(s: Start, paymentId: string, signature: string) {
@@ -48,6 +54,11 @@ export function PayButton({
     setBusy(false);
     setMock(null);
     if ("error" in res) return setError(res.error);
+    if (res.pending) {
+      // Authorised but not captured yet: Razorpay's webhook completes it, usually within a minute
+      setNotice("Payment received. We're confirming it with your bank; this usually takes under a minute. Refresh the page shortly.");
+      return router.refresh();
+    }
     if (doneHref) router.push(doneHref);
     router.refresh();
   }
@@ -92,6 +103,11 @@ export function PayButton({
       <button type="button" className={className} onClick={onClick} disabled={busy}>
         {busy ? "Opening payment…" : label}
       </button>
+      {notice && (
+        <p role="status" className="notice-info">
+          {notice}
+        </p>
+      )}
       {error && (
         <p role="alert" className="text-sm font-medium text-danger">
           {error}

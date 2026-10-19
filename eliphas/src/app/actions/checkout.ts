@@ -10,7 +10,7 @@ import { INDIAN_STATES } from "@/lib/india";
 import type { Book } from "@/lib/publishing";
 import { markOrderPaid } from "@/lib/orders";
 import { orderItemRows, priceOrder } from "@/lib/order-pricing";
-import { createRazorpayOrder, fetchPaymentFee, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
+import { checkCapture, createRazorpayOrder, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
 import { cleanIndianMobile } from "@/lib/phone";
 import { verifyPaymentSignature } from "@/lib/razorpay-signature";
 import { getPricingSettings } from "@/lib/settings";
@@ -163,7 +163,10 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
 
   // Remember the address for next time
   if (!profile.pincode || !profile.city) {
-    await supabase.from("profiles").update({ city: profile.city ?? city, pincode: profile.pincode ?? pincode }).eq("id", profile.id);
+    await supabase
+      .from("profiles")
+      .update({ city: profile.city ?? city, pincode: profile.pincode ?? pincode })
+      .eq("id", profile.id);
   }
 
   let razorpayOrderId: string;
@@ -204,16 +207,12 @@ export async function confirmPayment(input: {
   razorpayPaymentId: string;
   razorpaySignature: string;
   fromCart?: boolean;
-}): Promise<{ ok: true } | { error: string }> {
+}): Promise<{ ok: true; pending?: boolean } | { error: string }> {
   const profile = await getCurrentProfile();
   if (!profile) return { error: "Please log in again." };
 
   const admin = createAdminClient();
-  const { data: order } = await admin
-    .from("orders")
-    .select("id, buyer_id, razorpay_order_id, status")
-    .eq("id", input.orderId)
-    .single();
+  const { data: order } = await admin.from("orders").select("id, buyer_id, razorpay_order_id, status, total").eq("id", input.orderId).single();
   if (!order || order.buyer_id !== profile.id) return { error: "Order not found." };
   if (order.razorpay_order_id !== input.razorpayOrderId) return { error: "Payment doesn't match this order." };
 
@@ -226,8 +225,14 @@ export async function confirmPayment(input: {
     return { error: "Invalid test payment." };
   }
 
-  // The actual Razorpay fee, when available, replaces the estimate in the money split
-  const fee = mode === "razorpay" ? await fetchPaymentFee(input.razorpayPaymentId) : null;
+  // Only captured money sends a book to print. Until then the order waits and the payment.captured webhook finishes it.
+  let fee: number | null = null;
+  if (mode === "razorpay") {
+    const check = await checkCapture(input.razorpayPaymentId, input.razorpayOrderId, Math.round(Number(order.total) * 100));
+    if (check.state === "invalid") return { error: check.reason };
+    if (check.state === "pending") return { ok: true, pending: true };
+    fee = check.fee; // the actual Razorpay fee replaces the estimate in the money split
+  }
   const res = await markOrderPaid(order.id, input.razorpayPaymentId, mode, fee);
   if (!res.ok) return { error: "Payment received, but we couldn't update your order. Our team will fix it." };
   // Take the books just bought out of the cart (anything else stays for later)

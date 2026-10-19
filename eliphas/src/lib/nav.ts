@@ -31,6 +31,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/distribution", label: "Distribution", icon: "shipping", sidebarOnly: true },
   { href: "/admin/payouts", label: "Payouts", icon: "money", sidebarOnly: true },
   { href: "/admin/finance", label: "Finance", icon: "finance", sidebarOnly: true },
+  { href: "/admin/refunds", label: "Refunds", icon: "money", sidebarOnly: true },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: "plan", sidebarOnly: true },
   { href: "/admin/issues", label: "Issues", icon: "issues", sidebarOnly: true },
   { href: "/admin/authors", label: "Authors", icon: "profile", sidebarOnly: true },

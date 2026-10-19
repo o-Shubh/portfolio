@@ -22,6 +22,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 10 | Eliphas Edition IDs (EEID) and QR codes | ✅ Done (migration 000017) |
 | 11 | Redesign to the shared "Cupertino Editorial" system; admin Finance fix | ✅ Done (migration 000018) |
 | 12 | Distribution requests (Amazon India, Flipkart, international): intake and review only | ✅ Done (migrations 000019, 000020) |
+| 13 | Launch hardening: captured-only payments, refund ledger and Admin → Refunds, CI checks | ✅ Done (migration 000021) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -57,9 +58,8 @@ with a real link. You only need a browser. Free plans are enough to start.
    | `RAZORPAY_KEY_SECRET` | Razorpay test Key Secret |
    | `RAZORPAY_WEBHOOK_SECRET` | Any long random text; use the same in step 4 |
 
-3. **Deploy.** The app code lives on the branch `claude/eliphas-indicus-platform-yee31f`. Either merge it into
-   `main` (via a pull request), or in Vercel → Settings → Git set **Production Branch** to that branch.
-   Every other push gets its own preview link automatically.
+3. **Deploy.** The app code is on `main`; keep **Production Branch** = `main`. Every other branch and pull request
+   gets its own preview link automatically.
 
 **3. Supabase again:** Authentication → URL Configuration → **Site URL** = your Vercel address.
 
@@ -85,8 +85,10 @@ Back up the database first (Supabase → Database → Backups). Existing authors
 ₹15-per-copy terms until they accept the new terms themselves; past orders are not changed.
 
 ### Launch checklist
-Admin → **Overview** shows a live checklist of the items it can check (business details, rates, printers,
-Razorpay keys, webhook, site address).
+**Start with [`docs/LAUNCH.md`](docs/LAUNCH.md)**: the ordered go-live steps (domain, hosting, keys, approvals,
+real-money smoke test). Admin → **Overview** shows a live checklist of the items it can check (business details,
+rates, printers, Razorpay keys, webhook, site address, QR address, Edition IDs, shipping rates) and a "Refunds to
+check" count.
 - [ ] Business details in Admin → Settings (name, address, email, phone): they fill the Contact, Terms,
       Privacy, Refunds and Shipping pages that Razorpay checks during KYC. Have the policies reviewed by
       someone who knows Indian e-commerce law.

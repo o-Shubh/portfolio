@@ -1,6 +1,7 @@
 import "server-only";
 import { withGst } from "@/lib/commission";
-import { createRazorpayOrderPaise, fetchPaymentFee, paymentMode, razorpayKeyId, razorpaySecret, refundPayment } from "@/lib/payments";
+import { checkCapture, createRazorpayOrderPaise, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
+import { startPaymentRefund } from "@/lib/refunds";
 import { getCurrentPlans, logAudit } from "@/lib/plans";
 import { verifyPaymentSignature } from "@/lib/razorpay-signature";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -169,7 +170,7 @@ export async function confirmPaymentRecord(
   input: { paymentId: string; razorpayOrderId: string; razorpayPaymentId: string; razorpaySignature: string },
 ) {
   const admin = createAdminClient();
-  const { data: pay } = await admin.from("payments").select("id, payer_id, razorpay_order_id, mode, status").eq("id", input.paymentId).single();
+  const { data: pay } = await admin.from("payments").select("id, payer_id, razorpay_order_id, mode, status, amount_paise").eq("id", input.paymentId).single();
   if (!pay || pay.payer_id !== userId) return { error: "Payment not found." };
   if (pay.razorpay_order_id !== input.razorpayOrderId) return { error: "Payment doesn't match." };
   if (pay.mode === "razorpay") {
@@ -179,41 +180,26 @@ export async function confirmPaymentRecord(
   } else if (!input.razorpayPaymentId.startsWith("mock_pay_")) {
     return { error: "Invalid test payment." };
   }
-  const fee = pay.mode === "razorpay" ? await fetchPaymentFee(input.razorpayPaymentId) : null;
+  // Only captured money activates Pro or queues work; otherwise the payment.captured webhook finishes it
+  let fee: number | null = null;
+  if (pay.mode === "razorpay") {
+    const check = await checkCapture(input.razorpayPaymentId, input.razorpayOrderId, pay.amount_paise);
+    if (check.state === "invalid") return { error: check.reason };
+    if (check.state === "pending") return { ok: true as const, pending: true };
+    fee = check.fee;
+  }
   const res = await fulfilPayment(pay.id, input.razorpayPaymentId, fee);
   return res.ok ? { ok: true as const } : { error: "Payment received, but we couldn't finish updating your account. Our team has been alerted." };
 }
 
-/** Refunds part or all of a services/subscription payment (Razorpay, or recorded for test payments). */
+/**
+ * Refunds part or all of a services/subscription payment through the refund ledger. The amount is reserved first, so
+ * concurrent refunds can't exceed what was paid; the payment's refunded total updates when Razorpay confirms.
+ */
 export async function refundPaymentRecord(paymentId: string, amountPaise: number, actorId: string, reason: string) {
-  const admin = createAdminClient();
-  const { data: pay } = await admin.from("payments").select("*").eq("id", paymentId).single();
-  if (!pay) return { error: "Payment not found." };
-  if (!["paid", "partially_refunded"].includes(pay.status)) return { error: "Only paid payments can be refunded." };
-  const left = pay.amount_paise - pay.refunded_paise;
-  if (!Number.isInteger(amountPaise) || amountPaise <= 0 || amountPaise > left) return { error: `Refund must be between ₹0.01 and ${left / 100}.` };
-  let refundId: string;
-  if (pay.mode === "razorpay") {
-    if (!pay.razorpay_payment_id) return { error: "No Razorpay payment to refund." };
-    try {
-      refundId = (await refundPayment(pay.razorpay_payment_id, amountPaise, pay.receipt_number ?? pay.id)).id;
-    } catch (e) {
-      console.error(e);
-      return { error: "Razorpay refused the refund. Try again or refund from the Razorpay dashboard." };
-    }
-  } else {
-    refundId = `mock_rfnd_${Date.now()}`;
-  }
-  const refunded = pay.refunded_paise + amountPaise;
-  await admin
-    .from("payments")
-    .update({
-      refunded_paise: refunded,
-      status: refunded >= pay.amount_paise ? "refunded" : "partially_refunded",
-      refund_id: refundId,
-      refunded_at: new Date().toISOString(),
-    })
-    .eq("id", pay.id);
-  await logAudit(actorId, "payment.refunded", "payment", pay.id, { amount_paise: amountPaise, reason, refund_id: refundId });
-  return { ok: true as const, refundId, fullyRefunded: refunded >= pay.amount_paise };
+  if (!Number.isInteger(amountPaise) || amountPaise <= 0) return { error: "Enter a refund amount." };
+  const r = await startPaymentRefund(paymentId, amountPaise, actorId, reason);
+  if (!r.ok) return { error: r.error };
+  await logAudit(actorId, "payment.refunded", "payment", paymentId, { amount_paise: amountPaise, reason, refund_id: r.refundId, status: r.status });
+  return { ok: true as const, refundId: r.refundId, status: r.status };
 }

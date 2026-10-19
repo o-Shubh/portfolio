@@ -47,6 +47,15 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
         <ArrowLeft className="h-4 w-4" aria-hidden /> My orders
       </Link>
 
+      {paid && o.status === "pending_payment" && !o.cancelled_at && (
+        <div role="status" className="notice-info mt-3">
+          <p>
+            <span className="font-semibold">We&apos;re confirming your payment with your bank.</span> This usually takes under a minute. Refresh this page
+            shortly. If money was taken and the order isn&apos;t confirmed, it will be refunded automatically.
+          </p>
+        </div>
+      )}
+
       {paid && o.status !== "pending_payment" && (
         <div role="status" className="card mt-3 flex items-center gap-3 ring-2 ring-success/40">
           <CheckCircle2 className="h-7 w-7 shrink-0 text-success" aria-hidden />

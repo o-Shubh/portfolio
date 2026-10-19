@@ -5,41 +5,66 @@ import { timeAgo } from "@/lib/admin";
 import { requireRole } from "@/lib/auth";
 import { rupees } from "@/lib/pricing";
 import { getBusiness, getPricingSettings, missingBusiness } from "@/lib/settings";
+import { checkPublicOrigin } from "@/lib/eeid-format";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin" };
 
+/** Start of this month at midnight India time, whatever the server's time zone. */
+function istMonthStart() {
+  const ist = new Date(Date.now() + 5.5 * 3_600_000);
+  return new Date(Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), 1) - 5.5 * 3_600_000).toISOString();
+}
+
 export default async function AdminHome() {
   await requireRole(["admin"]);
   const supabase = await createClient();
-  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+  const monthStart = istMonthStart();
 
   const count = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0);
-  const [waiting, live, printers, ordersThisMonth, toPrint, balances, queue, noSample, applications] = await Promise.all([
+  const [
+    waiting,
+    live,
+    printers,
+    ordersThisMonth,
+    toPrint,
+    balances,
+    queue,
+    noSample,
+    applications,
+    noEeid,
+    sampleZones,
+    openOrderRefunds,
+    openPaymentRefunds,
+  ] = await Promise.all([
     count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "in_review")),
     count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "published")),
     count(supabase.from("printers").select("*", { count: "exact", head: true }).eq("active", true)),
+    count(supabase.from("orders").select("*", { count: "exact", head: true }).gte("paid_at", monthStart).not("status", "in", "(pending_payment,cancelled)")),
+    count(supabase.from("orders").select("*", { count: "exact", head: true }).in("status", ["paid", "accepted", "printing", "printed", "packed"])),
+    supabase.from("author_balances").select("balance"),
+    supabase.from("books").select("id, title, author_name, submitted_at").eq("status", "in_review").order("submitted_at", { ascending: true }).limit(5),
+    count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "published").is("sample_path", null)),
+    count(supabase.from("author_applications").select("*", { count: "exact", head: true }).eq("status", "pending")),
+    count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "published").is("eeid", null)),
+    count(supabase.from("shipping_zones").select("id", { count: "exact", head: true }).eq("active", true).eq("is_sample", true)),
     count(
       supabase
         .from("orders")
-        .select("*", { count: "exact", head: true })
-        .gte("paid_at", monthStart)
-        .not("status", "in", "(pending_payment,cancelled)"),
+        .select("id", { count: "exact", head: true })
+        .eq("status", "cancelled")
+        .not("razorpay_payment_id", "is", null)
+        .or("refund_status.is.null,refund_status.in.(requested,failed)"),
     ),
-    count(supabase.from("orders").select("*", { count: "exact", head: true }).in("status", ["paid", "accepted", "printing", "printed", "packed"])),
-    supabase.from("author_balances").select("balance"),
-    supabase
-      .from("books")
-      .select("id, title, author_name, submitted_at")
-      .eq("status", "in_review")
-      .order("submitted_at", { ascending: true })
-      .limit(5),
-    count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "published").is("sample_path", null)),
-    count(supabase.from("author_applications").select("*", { count: "exact", head: true }).eq("status", "pending")),
+    count(supabase.from("payment_refunds").select("id", { count: "exact", head: true }).in("status", ["requested", "failed"])),
   ]);
   const [business, pricing] = await Promise.all([getBusiness(), getPricingSettings()]);
   const keyId = process.env.RAZORPAY_KEY_ID ?? "";
   const missing = missingBusiness(business);
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const siteIsLive = /^https:\/\/[^/]+\.[^/]+/.test(site) && !/localhost|127\.0\.0\.1/.test(site);
+  const origin = checkPublicOrigin(process.env.PUBLIC_SITE_ORIGIN);
+  const refundsToCheck = openOrderRefunds + openPaymentRefunds;
   const checklist = [
     {
       done: missing.length === 0,
@@ -55,7 +80,15 @@ export default async function AdminHome() {
       hint: keyId.startsWith("rzp_test_") ? "Test keys are set: payments are not real yet." : keyId ? undefined : "No keys yet: payments are pretend.",
     },
     { done: Boolean(process.env.RAZORPAY_WEBHOOK_SECRET), label: "Razorpay webhook secret set" },
-    { done: Boolean(process.env.NEXT_PUBLIC_SITE_URL), label: "Website address (NEXT_PUBLIC_SITE_URL) set" },
+    { done: siteIsLive, label: "Website address is your https domain (NEXT_PUBLIC_SITE_URL)", hint: siteIsLive ? undefined : `Now: ${site || "not set"}` },
+    { done: origin.ok, label: "QR code address set (PUBLIC_SITE_ORIGIN)", hint: origin.ok ? undefined : origin.problem },
+    {
+      done: noEeid === 0,
+      label: "Every live book has an Edition ID",
+      hint: noEeid ? `${noEeid} live ${noEeid === 1 ? "book has" : "books have"} none. Run the backfill.` : undefined,
+      href: "/admin/editions",
+    },
+    { done: sampleZones === 0, label: "Real shipping rates (no sample zones)", href: "/admin/shipping" },
   ];
   const owed = (balances.data ?? []).reduce((s, b) => s + Math.max(0, Number(b.balance)), 0);
 
@@ -68,6 +101,7 @@ export default async function AdminHome() {
     { label: "Author applications", value: applications, href: "/admin/authors", alert: applications > 0 },
     { label: "Live books without a sample", value: noSample, href: "/admin/review?status=published&sample=missing", alert: noSample > 0 },
     { label: "Owed to authors", value: rupees(Math.round(owed)), href: "/admin/payouts" },
+    { label: "Refunds to check", value: refundsToCheck, href: "/admin/refunds", alert: refundsToCheck > 0 },
   ];
 
   return (
