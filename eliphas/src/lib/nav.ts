@@ -3,7 +3,6 @@ import type { Role } from "@/lib/auth";
 
 // Navigation for each logged-in area. Later milestones add items here.
 export const AUTHOR_NAV: NavItem[] = [
-  { href: "/author/distribution", label: "Distribution", icon: "shipping", sidebarOnly: true },
   { href: "/author", label: "Overview", icon: "dashboard", exact: true },
   { href: "/author/books", label: "My books", icon: "books" },
   { href: "/author/earnings", label: "Earnings & payouts", icon: "money" },
@@ -11,6 +10,7 @@ export const AUTHOR_NAV: NavItem[] = [
   { href: "/author/community", label: "Community", icon: "community", sidebarOnly: true },
   { href: "/author/articles", label: "My articles", icon: "articles", sidebarOnly: true },
   { href: "/author/services", label: "Services", icon: "services", sidebarOnly: true },
+  { href: "/author/distribution", label: "Distribution", icon: "shipping", sidebarOnly: true },
   { href: "/author/plan", label: "Pro membership", icon: "plan", sidebarOnly: true },
   { href: "/author/analytics", label: "Analytics", icon: "analytics", sidebarOnly: true },
   { href: "/author/payments", label: "Service payments", icon: "finance", sidebarOnly: true },
@@ -23,12 +23,12 @@ export const PRINTER_NAV: NavItem[] = [
 ];
 
 export const ADMIN_NAV: NavItem[] = [
-  { href: "/admin/distribution", label: "Distribution", icon: "shipping", sidebarOnly: true },
   { href: "/admin", label: "Overview", icon: "dashboard", exact: true },
   { href: "/admin/review", label: "Review", icon: "review" },
   { href: "/admin/orders", label: "Orders", icon: "orders" },
   { href: "/admin/printers", label: "Printers", icon: "printer" },
   { href: "/admin/services", label: "Services", icon: "services" },
+  { href: "/admin/distribution", label: "Distribution", icon: "shipping", sidebarOnly: true },
   { href: "/admin/payouts", label: "Payouts", icon: "money", sidebarOnly: true },
   { href: "/admin/finance", label: "Finance", icon: "finance", sidebarOnly: true },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: "plan", sidebarOnly: true },

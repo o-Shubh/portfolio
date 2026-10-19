@@ -21,6 +21,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 9 | Author verification, community for everyone, samples on every book, open reviews | ✅ Done (migration 000015) |
 | 10 | Eliphas Edition IDs (EEID) and QR codes | ✅ Done (migration 000017) |
 | 11 | Redesign to the shared "Cupertino Editorial" system; admin Finance fix | ✅ Done (migration 000018) |
+| 12 | Distribution requests (Amazon India, Flipkart, international): intake and review only | ✅ Done (migration 000019) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -509,6 +510,23 @@ reduced motion.
 - **QR address.** QR codes use `PUBLIC_SITE_ORIGIN` (validated: https, a real domain, no path; localhost, preview
   and storage hosts are refused). Without it, previews are labelled "not for print" and downloads are off, with an
   admin message explaining what to set.
+
+### Distribution requests (migration 000019)
+
+Intake and review only: no retailer is connected, nothing is submitted, charged or paid, and royalties are unchanged.
+See [`docs/DISTRIBUTION-HANDOFF.md`](docs/DISTRIBUTION-HANDOFF.md) for limits and the activation checklist.
+
+- **Author → Distribution** (`/author/distribution`): pick one of your published books and a channel (Amazon India,
+  Flipkart or International), enter country of residence and target countries, and confirm distribution rights.
+  One request per book and channel (database unique constraint); requested channels show as "Already requested".
+  The list shows each request's status and the team's note.
+- **Admin → Distribution** (`/admin/distribution`): Open / Declined / All queue. Set a status (In review, Needs
+  information, Declined) with a note the author sees. The database records who reviewed and when, and a save made
+  from an out-of-date page is rejected ("Someone updated this request…") instead of overwriting.
+- **Channel margin calculator** (admin): a planning tool with example numbers. Not commercial pricing; it doesn't
+  create quotes or touch the existing fee and royalty calculations.
+- **Security.** Authors can read only their own requests and can create them only for their own live books; they
+  can't set status, notes or reviewer fields, edit or delete requests. Only admins can review.
 
 ### Google sign-in setup (about 10 minutes)
 

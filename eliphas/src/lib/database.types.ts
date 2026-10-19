@@ -23,14 +23,7 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "distribution_requests": {
- Row: {id: string; author_id: string; book_id: string; channel: string; markets: string; residence_country: string; rights_confirmed: boolean; status: string; review_note: string; created_at: string; updated_at: string;}
- ComputedFields: never
- Insert: {id?: string; author_id: string; book_id: string; channel: string; markets: string; residence_country: string; rights_confirmed: boolean; status?: string; review_note?: string; created_at?: string; updated_at?: string;}
- Update: {status?: string; review_note?: string; updated_at?: string;}
- Relationships: []
- },
- "account_restrictions": {
+            "account_restrictions": {
                   Row: {
                     "created_at": string,"created_by": string | null,"reason": string,"until": string | null,"user_id": string
                   }
@@ -777,6 +770,74 @@ isOneToOne: false
     },{
       foreignKeyName: "content_reports_resolved_by_fkey"
       columns: ["resolved_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"distribution_requests": {
+                  Row: {
+                    "author_id": string,"book_id": string,"channel": string,"created_at": string,"id": string,"markets": string,"residence_country": string,"review_note": string,"reviewed_at": string | null,"reviewed_by": string | null,"rights_confirmed": boolean,"status": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"book_id": string,"channel": string,"created_at"?: string,"id"?: string,"markets": string,"residence_country": string,"review_note"?: string,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed": boolean,"status"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "author_id"?: string,"book_id"?: string,"channel"?: string,"created_at"?: string,"id"?: string,"markets"?: string,"residence_country"?: string,"review_note"?: string,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed"?: boolean,"status"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "distribution_requests_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "distribution_requests_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "distribution_requests_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "distribution_requests_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "distribution_requests_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "distribution_requests_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "distribution_requests_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "distribution_requests_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "distribution_requests_reviewed_by_fkey"
+      columns: ["reviewed_by"]
 isOneToOne: false
       referencedRelation: "public_profiles"
       referencedColumns: ["id"]
@@ -2309,8 +2370,14 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"can_add_live_print_cover":
+{ Args: { "object_name": string }; Returns: boolean
+                           },
 "can_edit_book_files":
 { Args: { "object_name": string }; Returns: boolean
+                           },
+"can_request_distribution":
+{ Args: { "target": string }; Returns: boolean
                            },
 "has_active_pro":
 { Args: { "p_author": string }; Returns: boolean
