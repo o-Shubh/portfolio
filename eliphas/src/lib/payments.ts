@@ -1,4 +1,5 @@
 import "server-only";
+import { captureDecision, mockAllowed, type CaptureCheck } from "@/lib/payment-rules";
 
 /**
  * How payments are taken:
@@ -12,8 +13,8 @@ export function paymentMode(): PaymentMode {
   const hasKeys = Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
   const wantsMock = process.env.PAYMENTS_MODE === "mock" || !hasKeys;
   if (wantsMock) {
-    if (process.env.VERCEL_ENV === "production") {
-      throw new Error("Razorpay keys are missing on the live site. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Vercel.");
+    if (!mockAllowed({ VERCEL_ENV: process.env.VERCEL_ENV, NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL })) {
+      throw new Error("Razorpay keys are missing. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET on the server.");
     }
     return "mock";
   }
@@ -61,19 +62,54 @@ export async function createRazorpayOrderPaise(input: { amountPaise: number; rec
   return ((await res.json()) as { id: string }).id;
 }
 
-/**
- * The actual fee Razorpay charged on a payment (fee includes its GST), in paise.
- * Returns null if it isn't available yet (fees appear once the payment is captured).
- */
-export async function fetchPaymentFee(paymentId: string): Promise<number | null> {
+export type RazorpayPayment = { id: string; status: string; order_id: string; amount: number; fee: number | null };
+
+/** A payment as Razorpay sees it, or null if it can't be fetched right now. */
+export async function fetchPayment(paymentId: string): Promise<RazorpayPayment | null> {
   try {
     const res = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}`, {
       headers: { Authorization: authHeader() },
       cache: "no-store",
     });
     if (!res.ok) return null;
-    const p = (await res.json()) as { fee?: number | null; status?: string; order_id?: string; amount?: number };
-    return typeof p.fee === "number" ? p.fee : null;
+    const p = (await res.json()) as { id: string; status: string; order_id: string; amount: number; fee?: number | null };
+    return { id: p.id, status: p.status, order_id: p.order_id, amount: p.amount, fee: typeof p.fee === "number" ? p.fee : null };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The actual fee Razorpay charged on a payment (fee includes its GST), in paise.
+ * Returns null if it isn't available yet (fees appear once the payment is captured).
+ */
+export async function fetchPaymentFee(paymentId: string): Promise<number | null> {
+  return (await fetchPayment(paymentId))?.fee ?? null;
+}
+
+export type RazorpayRefund = { id: string; status: "pending" | "processed" | "failed"; amount: number; receipt?: string | null };
+
+/** One refund as Razorpay sees it, or null if it can't be fetched right now. */
+export async function fetchRefund(refundId: string): Promise<RazorpayRefund | null> {
+  try {
+    const res = await fetch(`https://api.razorpay.com/v1/refunds/${encodeURIComponent(refundId)}`, {
+      headers: { Authorization: authHeader() },
+      cache: "no-store",
+    });
+    return res.ok ? ((await res.json()) as RazorpayRefund) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Every refund on a payment (to find one whose reply we never received), or null if unavailable. */
+export async function listRefunds(paymentId: string): Promise<RazorpayRefund[] | null> {
+  try {
+    const res = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}/refunds?count=100`, {
+      headers: { Authorization: authHeader() },
+      cache: "no-store",
+    });
+    return res.ok ? ((await res.json()) as { items: RazorpayRefund[] }).items : null;
   } catch {
     return null;
   }
@@ -89,4 +125,9 @@ export async function refundPayment(paymentId: string, amountPaise: number, rece
   });
   if (!res.ok) throw new Error(`Razorpay refund failed (${res.status}): ${await res.text()}`);
   return (await res.json()) as { id: string; status: "pending" | "processed" | "failed" };
+}
+
+/** After the browser reports success, ask Razorpay whether the money was actually captured (see captureDecision). */
+export async function checkCapture(paymentId: string, razorpayOrderId: string, amountPaise: number): Promise<CaptureCheck> {
+  return captureDecision(await fetchPayment(paymentId), razorpayOrderId, amountPaise);
 }

@@ -19,16 +19,25 @@ export async function POST(request: Request) {
   const signature = request.headers.get("x-razorpay-signature") ?? "";
   if (!verifyWebhookSignature(raw, signature, secret)) return new Response("Bad signature", { status: 401 });
 
-  const event = JSON.parse(raw) as {
+  let event: {
     event: string;
     payload?: {
       payment?: { entity?: { id: string; order_id: string; amount: number; fee?: number | null } };
       refund?: { entity?: { id: string } };
     };
   };
+  try {
+    event = JSON.parse(raw);
+  } catch {
+    return new Response("Bad JSON", { status: 400 });
+  }
+  // Any database error returns 500 so Razorpay retries the event; only a real "nothing to do" returns 200.
   if (event.event === "refund.processed" || event.event === "refund.failed") {
     const refundId = event.payload?.refund?.entity?.id;
-    if (refundId) await applyRefundEvent(refundId, event.event === "refund.processed" ? "processed" : "failed");
+    if (refundId) {
+      const res = await applyRefundEvent(refundId, event.event === "refund.processed" ? "processed" : "failed");
+      if (!res.ok) return new Response("Database error", { status: 500 });
+    }
     return Response.json({ ok: true });
   }
   const payment = event.payload?.payment?.entity;
@@ -36,7 +45,8 @@ export async function POST(request: Request) {
 
   if (event.event === "payment.failed") {
     if (payment?.order_id) {
-      await admin.from("payments").update({ status: "failed" }).eq("razorpay_order_id", payment.order_id).eq("status", "created");
+      const { error } = await admin.from("payments").update({ status: "failed" }).eq("razorpay_order_id", payment.order_id).eq("status", "created");
+      if (error) return new Response("Database error", { status: 500 });
     }
     return Response.json({ ok: true });
   }
@@ -45,7 +55,8 @@ export async function POST(request: Request) {
   const fee = typeof payment.fee === "number" ? payment.fee : null;
 
   // Book orders
-  const { data: order } = await admin.from("orders").select("id, total").eq("razorpay_order_id", payment.order_id).maybeSingle();
+  const { data: order, error: orderError } = await admin.from("orders").select("id, total").eq("razorpay_order_id", payment.order_id).maybeSingle();
+  if (orderError) return new Response("Database error", { status: 500 });
   if (order) {
     if (Math.round(Number(order.total) * 100) !== payment.amount) {
       console.error("Webhook amount mismatch", payment.order_id);
@@ -56,7 +67,8 @@ export async function POST(request: Request) {
   }
 
   // Pro subscriptions and author services
-  const { data: pay } = await admin.from("payments").select("id, amount_paise").eq("razorpay_order_id", payment.order_id).maybeSingle();
+  const { data: pay, error: payError } = await admin.from("payments").select("id, amount_paise").eq("razorpay_order_id", payment.order_id).maybeSingle();
+  if (payError) return new Response("Database error", { status: 500 });
   if (!pay) return Response.json({ ignored: "unknown order" });
   if (pay.amount_paise !== payment.amount) {
     console.error("Webhook amount mismatch", payment.order_id);

@@ -95,7 +95,7 @@ export function CheckoutForm({
       setError(res.error);
       return;
     }
-    router.push(`/account/orders/${order.orderId}?paid=1`);
+    router.push(`/account/orders/${order.orderId}?paid=${res.pending ? "pending" : "1"}`);
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {

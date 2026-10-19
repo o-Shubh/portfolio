@@ -1273,6 +1273,50 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"payment_refunds": {
+                  Row: {
+                    "amount_paise": number,"created_at": string,"created_by": string | null,"error": string | null,"id": string,"payment_id": string,"processed_at": string | null,"razorpay_refund_id": string | null,"reason": string,"status": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount_paise": number,"created_at"?: string,"created_by"?: string | null,"error"?: string | null,"id"?: string,"payment_id": string,"processed_at"?: string | null,"razorpay_refund_id"?: string | null,"reason"?: string,"status"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "amount_paise"?: number,"created_at"?: string,"created_by"?: string | null,"error"?: string | null,"id"?: string,"payment_id"?: string,"processed_at"?: string | null,"razorpay_refund_id"?: string | null,"reason"?: string,"status"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "payment_refunds_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "payment_refunds_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payment_refunds_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payment_refunds_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payment_refunds_payment_id_fkey"
+      columns: ["payment_id"]
+isOneToOne: false
+      referencedRelation: "payments"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"payments": {
                   Row: {
                     "amount_paise": number,"base_paise": number,"created_at": string,"description": string,"fee_paise": number | null,"gst_paise": number,"gst_percent": number,"id": string,"mode": string,"paid_at": string | null,"payer_id": string | null,"purpose": string,"razorpay_order_id": string | null,"razorpay_payment_id": string | null,"receipt_number": string | null,"refund_id": string | null,"refunded_at": string | null,"refunded_paise": number,"service_quote_id": string | null,"status": string
@@ -2370,6 +2414,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"begin_payment_refund":
+{ Args: { "p_actor": string,"p_amount": number,"p_payment": string,"p_reason": string,"p_retry"?: string }; Returns: string
+                           },
 "can_add_live_print_cover":
 { Args: { "object_name": string }; Returns: boolean
                            },
@@ -2505,6 +2552,9 @@ isOneToOne: false
                            },
 "review_is_verified":
 { Args: { "p_book": string,"p_user": string }; Returns: boolean
+                           },
+"settle_payment_refund":
+{ Args: { "p_error"?: string,"p_razorpay_id"?: string,"p_refund": string,"p_status": string }; Returns: undefined
                            },
 "use_pro_credit":
 { Args: { "p_author": string,"p_service_order": string }; Returns: string
