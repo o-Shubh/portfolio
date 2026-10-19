@@ -49,9 +49,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
     <div className="grid max-w-5xl gap-6 lg:grid-cols-3">
       <section className="card">
         <h2 className="text-xl">1. Manuscript</h2>
-        <p className="mt-1 text-sm text-muted">
-          The inside pages as one print-ready PDF. Embed all fonts (needed for Hindi). Up to 50 MB.
-        </p>
+        <p className="mt-1 text-sm text-muted">The inside pages as one print-ready PDF. Embed all fonts (needed for Hindi). Up to 50 MB.</p>
         <FileUploader
           kind="manuscript"
           bookId={book.id}
@@ -74,17 +72,15 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
         />
         {pageWarning && trim && (
           <p role="note" className="mt-4 rounded-[var(--radius-card)] bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
-            Your PDF pages are {book.manuscript_width_in} × {book.manuscript_height_in} in, but the book size is{" "}
-            <strong>{trim.label}</strong>. Change the size on the {printLink} step, or export your PDF at the right size.
+            Your PDF pages are {book.manuscript_width_in} × {book.manuscript_height_in} in, but the book size is <strong>{trim.label}</strong>. Change the size
+            on the {printLink} step, or export your PDF at the right size.
           </p>
         )}
       </section>
 
       <section className="card">
         <h2 className="text-xl">2. Front cover image</h2>
-        <p className="mt-1 text-sm text-muted">
-          Shown in the bookstore. JPG, PNG or WebP, at least 1600 px tall, up to 10 MB.
-        </p>
+        <p className="mt-1 text-sm text-muted">Shown in the bookstore. JPG, PNG or WebP, at least 1600 px tall, up to 10 MB.</p>
         <FileUploader
           kind="cover"
           bookId={book.id}
@@ -104,9 +100,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
 
       <section className="card">
         <h2 className="text-xl">3. Print cover PDF</h2>
-        <p className="mt-1 text-sm text-muted">
-          The full cover the printer uses: back, spine and front in one PDF, with bleed. Up to 10 MB.
-        </p>
+        <p className="mt-1 text-sm text-muted">The full cover the printer uses: back, spine and front in one PDF, with bleed. Up to 10 MB.</p>
         <div className="mt-3 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
           {expected ? (
             <>
@@ -114,8 +108,7 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
                 Make it {expected.widthIn} × {expected.heightIn} in
               </p>
               <p className="text-muted">
-                Spine {expected.spineMm} mm for {book.page_count} pages. Includes {rates.cover_bleed_in ?? 0.125} in bleed on
-                every side.
+                Spine {expected.spineMm} mm for {book.page_count} pages. Includes {rates.cover_bleed_in ?? 0.125} in bleed on every side.
                 {book.binding === "hardcover" && " Hardcover covers need extra wrap: we'll confirm the size during review."}
               </p>
             </>
@@ -140,17 +133,15 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
               ? {
                   name: "print-cover.pdf",
                   href: printCoverLink,
-                  detail: book.print_cover_width_in
-                    ? `${book.print_cover_width_in} × ${book.print_cover_height_in} in`
-                    : undefined,
+                  detail: book.print_cover_width_in ? `${book.print_cover_width_in} × ${book.print_cover_height_in} in` : undefined,
                 }
               : null
           }
         />
         {coverWarning && expected && (
           <p role="note" className="mt-4 rounded-[var(--radius-card)] bg-accent/10 ring-1 ring-accent/30 p-3 text-sm">
-            This PDF is {book.print_cover_width_in} × {book.print_cover_height_in} in, but it should be {expected.widthIn} ×{" "}
-            {expected.heightIn} in. Please re-export it at that size.
+            This PDF is {book.print_cover_width_in} × {book.print_cover_height_in} in, but it should be {expected.widthIn} × {expected.heightIn} in. Please
+            re-export it at that size.
           </p>
         )}
       </section>
@@ -165,15 +156,24 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
             <table className="w-full text-left text-sm">
               <thead className="text-muted">
                 <tr>
-                  <th scope="col" className="py-2 pr-4 font-medium">File</th>
-                  <th scope="col" className="py-2 pr-4 font-medium">Version</th>
-                  <th scope="col" className="py-2 pr-4 font-medium">Uploaded</th>
-                  <th scope="col" className="py-2 font-medium">Status</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">
+                    File
+                  </th>
+                  <th scope="col" className="py-2 pr-4 font-medium">
+                    Version
+                  </th>
+                  <th scope="col" className="py-2 pr-4 font-medium">
+                    Uploaded
+                  </th>
+                  <th scope="col" className="py-2 font-medium">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {(versions ?? []).map((v) => {
-                  const current = v.path === (v.kind === "manuscript" ? book.manuscript_path : v.kind === "print_cover" ? book.print_cover_path : book.cover_path);
+                  const current =
+                    v.path === (v.kind === "manuscript" ? book.manuscript_path : v.kind === "print_cover" ? book.print_cover_path : book.cover_path);
                   return (
                     <tr key={v.id}>
                       <td className="py-2 pr-4">{v.kind === "manuscript" ? "Manuscript" : v.kind === "print_cover" ? "Print cover" : "Front cover image"}</td>
@@ -181,9 +181,17 @@ export default async function FilesPage({ params }: PageProps<"/author/books/[id
                         v{v.version}
                         {v.page_count ? ` · ${v.page_count} pages` : ""}
                       </td>
-                      <td className="py-2 pr-4 mono">{new Date(v.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</td>
+                      <td className="py-2 pr-4 mono">
+                        {new Date(v.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}
+                      </td>
                       <td className="py-2">
-                        {approved[v.kind]?.id === v.id ? <span className="badge bg-success/15 text-success">Approved</span> : current ? <span className="badge bg-surface-2">Current</span> : <span className="text-muted">Earlier</span>}
+                        {approved[v.kind]?.id === v.id ? (
+                          <span className="badge bg-success/15 text-success">Approved</span>
+                        ) : current ? (
+                          <span className="badge bg-surface-2">Current</span>
+                        ) : (
+                          <span className="text-muted">Earlier</span>
+                        )}
                       </td>
                     </tr>
                   );

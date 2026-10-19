@@ -15,14 +15,17 @@ export default async function BookSamplePage({ params }: PageProps<"/author/book
   const limit = sampleLimit(book.page_count ?? 24);
   const [preview, latest] = await Promise.all([draftPreviewUrl(book.sample_draft_path), latestManuscriptVersion(book.id)]);
   const live = Boolean(book.published_at);
-  const outdated = Boolean(book.sample_path && book.sample_source === "pages" && latest && book.sample_manuscript_version && latest > book.sample_manuscript_version);
+  const outdated = Boolean(
+    book.sample_path && book.sample_source === "pages" && latest && book.sample_manuscript_version && latest > book.sample_manuscript_version,
+  );
 
   return (
     <div className="max-w-3xl space-y-5">
       <div>
         <h2 className="text-xl">Free sample</h2>
         <p className="mt-1 text-sm text-muted">
-          Every book page has a &ldquo;Read a sample&rdquo; button. Choose pages from your manuscript or upload your own sample PDF, check the preview, then approve it. We publish a separate copy of just those pages; your full manuscript stays private.
+          Every book page has a &ldquo;Read a sample&rdquo; button. Choose pages from your manuscript or upload your own sample PDF, check the preview, then
+          approve it. We publish a separate copy of just those pages; your full manuscript stays private.
           {!live && " New books need an approved sample before they go live."}
         </p>
       </div>
@@ -43,7 +46,8 @@ export default async function BookSamplePage({ params }: PageProps<"/author/book
           {outdated && (
             <p role="note" className="flex items-start gap-2 rounded-[var(--radius-control)] bg-marigold/15 p-3 text-sm" data-testid="sample-outdated">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-marigold-fg" aria-hidden />
-              You&apos;ve uploaded a newer manuscript since this sample was made. The sample hasn&apos;t changed. Make a new draft below if the pages should be updated.
+              You&apos;ve uploaded a newer manuscript since this sample was made. The sample hasn&apos;t changed. Make a new draft below if the pages should be
+              updated.
             </p>
           )}
           <RemoveSample bookId={id} />
@@ -63,7 +67,8 @@ export default async function BookSamplePage({ params }: PageProps<"/author/book
               Preview your draft
             </h3>
             <p className="text-sm text-muted">
-              {book.sample_draft_source === "upload" ? "Your uploaded PDF" : `Pages ${book.sample_draft_from}–${book.sample_draft_to}`}. Only you and our team can see this until you approve it.
+              {book.sample_draft_source === "upload" ? "Your uploaded PDF" : `Pages ${book.sample_draft_from}–${book.sample_draft_to}`}. Only you and our team
+              can see this until you approve it.
             </p>
           </div>
           {preview ? (
@@ -77,7 +82,8 @@ export default async function BookSamplePage({ params }: PageProps<"/author/book
 
       <DraftForm bookId={id} limit={limit} hasManuscript={Boolean(book.manuscript_path)} hasDraft={Boolean(book.sample_draft_path)} />
       <p className="text-xs text-muted">
-        Tip: skip the title and copyright pages and start where the story starts. Anyone can read and save a public sample, so share only pages you&apos;re happy to give away.
+        Tip: skip the title and copyright pages and start where the story starts. Anyone can read and save a public sample, so share only pages you&apos;re
+        happy to give away.
       </p>
       {!live && (
         <Link href={`/author/books/${id}/preview`} className={book.sample_path ? "btn-primary" : "btn-ghost"} data-testid="sample-continue">

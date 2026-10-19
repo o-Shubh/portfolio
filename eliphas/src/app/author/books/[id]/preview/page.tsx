@@ -27,9 +27,23 @@ export default async function PreviewPage({ params }: PageProps<"/author/books/[
   const ready = Boolean(book.manuscript_path && book.print_cover_path && book.cover_path);
 
   const files = [
-    { key: "manuscript", name: "Inside pages (manuscript PDF)", href: manuscript, version: versionOf("manuscript", book.manuscript_path), detail: book.page_count ? `${book.page_count} pages` : null, icon: FileText },
+    {
+      key: "manuscript",
+      name: "Inside pages (manuscript PDF)",
+      href: manuscript,
+      version: versionOf("manuscript", book.manuscript_path),
+      detail: book.page_count ? `${book.page_count} pages` : null,
+      icon: FileText,
+    },
     { key: "print_cover", name: "Print cover PDF", href: printCover, version: versionOf("print_cover", book.print_cover_path), detail: null, icon: FileText },
-    { key: "cover", name: "Front cover image", href: coverUrl(book.cover_path), version: versionOf("cover", book.cover_path), detail: "Shown in the bookstore", icon: ImageIcon },
+    {
+      key: "cover",
+      name: "Front cover image",
+      href: coverUrl(book.cover_path),
+      version: versionOf("cover", book.cover_path),
+      detail: "Shown in the bookstore",
+      icon: ImageIcon,
+    },
   ];
 
   return (
@@ -53,7 +67,11 @@ export default async function PreviewPage({ params }: PageProps<"/author/books/[
               <p className="mt-3 text-2xl font-semibold mono" lang="en">
                 {book.mrp !== null ? rupees(Number(book.mrp)) : "Price not set"}
               </p>
-              {book.description ? <p className="mt-3 line-clamp-6 whitespace-pre-line text-fg/90">{book.description}</p> : <p className="mt-3 text-muted">No description yet.</p>}
+              {book.description ? (
+                <p className="mt-3 line-clamp-6 whitespace-pre-line text-fg/90">{book.description}</p>
+              ) : (
+                <p className="mt-3 text-muted">No description yet.</p>
+              )}
               <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 text-sm" lang="en">
                 <dt className="text-muted">Language</dt>
                 <dd>{LANGUAGE_LABEL[book.language]}</dd>
@@ -80,9 +98,16 @@ export default async function PreviewPage({ params }: PageProps<"/author/books/[
                 <f.icon className="mt-0.5 h-5 w-5 shrink-0 text-muted" aria-hidden />
                 <div className="min-w-0 flex-1 text-sm">
                   <p className="font-medium">{f.name}</p>
-                  <p className="text-muted">{[f.version ? `Version ${f.version}` : null, f.detail].filter(Boolean).join(" · ") || (f.href ? "" : "Not uploaded")}</p>
+                  <p className="text-muted">
+                    {[f.version ? `Version ${f.version}` : null, f.detail].filter(Boolean).join(" · ") || (f.href ? "" : "Not uploaded")}
+                  </p>
                   {f.href && (
-                    <a href={f.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-semibold text-accent-fg underline-offset-2 hover:underline">
+                    <a
+                      href={f.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex min-h-11 items-center font-semibold text-accent-fg underline-offset-2 hover:underline"
+                    >
                       Open and check
                     </a>
                   )}
@@ -95,7 +120,8 @@ export default async function PreviewPage({ params }: PageProps<"/author/books/[
           <ConfirmFiles bookId={book.id} confirmed={Boolean(book.files_confirmed_at)} ready={ready} disabled={!isEditable(book)} />
           {book.files_confirmed_at && (
             <p className="mt-3 text-sm text-success" role="status">
-              Confirmed {new Date(book.files_confirmed_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}. Uploading a file again asks you to confirm again.
+              Confirmed {new Date(book.files_confirmed_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}.
+              Uploading a file again asks you to confirm again.
             </p>
           )}
         </section>

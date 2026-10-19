@@ -24,13 +24,10 @@ export default async function PayoutsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Payouts"
-        intro="Author earnings from paid orders, minus what has already been paid. Pay by UPI or bank, then record it here."
-      />
+      <PageHeader title="Payouts" intro="Author earnings from paid orders, minus what has already been paid. Pay by UPI or bank, then record it here." />
       <div className="card mb-6">
         <p className="text-sm text-muted">Total owed to authors</p>
-        <p className="font-heading text-3xl tracking-tight">{rupees(Math.round(owed * 100) / 100)}</p>
+        <p className="mono text-3xl font-semibold tracking-tight">{rupees(Math.round(owed * 100) / 100)}</p>
       </div>
 
       <h2 className="mb-3 text-xl">Balances</h2>
@@ -47,7 +44,7 @@ export default async function PayoutsPage() {
                     {formatPhone(b.phone)} · UPI: {b.payout_upi ?? <span className="text-danger">not added yet</span>}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <p className="text-sm text-muted">Balance</p>
                   <p className="mono text-2xl font-medium">{rupees(Number(b.balance))}</p>
                 </div>

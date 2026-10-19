@@ -24,11 +24,7 @@ export default async function PrintPage({ params }: PageProps<"/author/books/[id
       gatewayPercent={gatewayPercent(fees)}
       plans={plans}
       disabled={!isEditable(book)}
-      pdfSize={
-        book.manuscript_width_in && book.manuscript_height_in
-          ? { w: Number(book.manuscript_width_in), h: Number(book.manuscript_height_in) }
-          : null
-      }
+      pdfSize={book.manuscript_width_in && book.manuscript_height_in ? { w: Number(book.manuscript_width_in), h: Number(book.manuscript_height_in) } : null}
       initial={{
         page_count: book.page_count ?? NaN,
         trim_size: book.trim_size,

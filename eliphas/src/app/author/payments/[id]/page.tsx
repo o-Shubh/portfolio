@@ -70,8 +70,7 @@ export default async function ReceiptPage({ params }: PageProps<"/author/payment
         </table>
         <p className="text-xs text-muted">
           Paid by {p.mode === "razorpay" ? "Razorpay" : "test payment"}
-          {p.razorpay_payment_id && ` · ${p.razorpay_payment_id}`}.{" "}
-          {!taxInvoice && "This is a payment receipt, not a GST tax invoice."}
+          {p.razorpay_payment_id && ` · ${p.razorpay_payment_id}`}. {!taxInvoice && "This is a payment receipt, not a GST tax invoice."}
         </p>
       </div>
       <div className="mt-4 print:hidden">

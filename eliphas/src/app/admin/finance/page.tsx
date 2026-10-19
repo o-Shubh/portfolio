@@ -11,13 +11,24 @@ export const metadata: Metadata = { title: "Finance" };
 
 type F = Record<string, number>;
 
+/** "2026-10": the current month in India */
+function currentIstMonth() {
+  return new Date(Date.now() + 5.5 * 3_600_000).toISOString().slice(0, 7);
+}
+
 export default async function FinancePage({ searchParams }: PageProps<"/admin/finance">) {
   await requireRole(["admin"]);
   const sp = await searchParams;
-  const month = typeof sp.month === "string" && /^\d{4}-\d{2}$/.test(sp.month) ? sp.month : new Date().toISOString().slice(0, 7);
-  const from = new Date(`${month}-01T00:00:00+05:30`);
-  const to = new Date(from);
-  to.setMonth(to.getMonth() + 1);
+  // Months run midnight to midnight in India. Work from year and month numbers so the server's time zone can't shift them.
+  const month = typeof sp.month === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(sp.month) ? sp.month : currentIstMonth();
+  const [year, mon] = month.split("-").map(Number);
+  const ym = (offset: number) => {
+    const d = new Date(Date.UTC(year, mon - 1 + offset, 1));
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+  };
+  const startOf = (key: string) => new Date(`${key}-01T00:00:00+05:30`);
+  const from = startOf(month);
+  const to = startOf(ym(1));
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("admin_finance", { p_from: from.toISOString(), p_to: to.toISOString() });
   const f = (data ?? {}) as F;
@@ -28,11 +39,7 @@ export default async function FinancePage({ searchParams }: PageProps<"/admin/fi
     .gte("created_at", from.toISOString())
     .lt("created_at", to.toISOString())
     .order("created_at", { ascending: false });
-  const prev = new Date(from);
-  prev.setMonth(prev.getMonth() - 1);
-  const next = new Date(from);
-  next.setMonth(next.getMonth() + 1);
-  const ym = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const label = (key: string, style: "long" | "short") => startOf(key).toLocaleDateString("en-IN", { month: style, year: "numeric", timeZone: "Asia/Kolkata" });
 
   const groups: { title: string; note?: string; rows: [string, number][] }[] = [
     {
@@ -72,12 +79,12 @@ export default async function FinancePage({ searchParams }: PageProps<"/admin/fi
     <>
       <PageHeader title="Finance" intro="Each figure is kept separately. GST figures are as configured and need your accountant's review." />
       <nav aria-label="Month" className="mb-6 flex items-center gap-3 text-sm">
-        <Link href={`/admin/finance?month=${ym(prev)}`} className="btn-ghost px-3">
-          ← {ym(prev)}
+        <Link href={`/admin/finance?month=${ym(-1)}`} className="btn-ghost px-3" aria-label={`Previous month, ${label(ym(-1), "long")}`}>
+          ← {label(ym(-1), "short")}
         </Link>
-        <span className="font-semibold">{from.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}</span>
-        <Link href={`/admin/finance?month=${ym(next)}`} className="btn-ghost px-3">
-          {ym(next)} →
+        <span className="font-semibold">{label(month, "long")}</span>
+        <Link href={`/admin/finance?month=${ym(1)}`} className="btn-ghost px-3" aria-label={`Next month, ${label(ym(1), "long")}`}>
+          {label(ym(1), "short")} →
         </Link>
       </nav>
       {error && <p className="card mb-6 text-danger">Could not load figures.</p>}

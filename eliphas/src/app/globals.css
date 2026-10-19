@@ -369,6 +369,25 @@ body {
 @utility group-list {
   @apply overflow-hidden rounded-[var(--radius-card)] bg-surface ring-1 ring-line divide-y divide-line;
 }
+/* On/off switch (iOS style) on a real checkbox: use with role="switch" */
+@utility switch {
+  @apply relative h-[31px] w-[51px] shrink-0 cursor-pointer appearance-none rounded-full bg-surface-3 ring-1 ring-line-strong ring-inset transition-colors duration-[var(--motion-ui)] ease-[var(--ease-out)] outline-none checked:bg-success checked:ring-success focus-visible:shadow-[0_0_0_3px_rgb(74_99_201/0.35)] disabled:cursor-not-allowed disabled:opacity-55;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    height: 27px;
+    width: 27px;
+    border-radius: 9999px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.2);
+    transition: transform var(--motion-ui) var(--ease-out);
+  }
+  &:checked::before {
+    transform: translateX(20px);
+  }
+}
 @utility group-row {
   @apply flex min-h-12 items-center gap-3 px-4 py-2.5;
 }

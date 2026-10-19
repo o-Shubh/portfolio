@@ -30,7 +30,13 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
     .eq("buyer_id", profile.id)
     .maybeSingle();
   if (!o) notFound();
-  const { data: issue } = await supabase.from("order_issues").select("status, resolution_note, kind").eq("order_id", o.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+  const { data: issue } = await supabase
+    .from("order_issues")
+    .select("status, resolution_note, kind")
+    .eq("order_id", o.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   const canReport =
     !issue &&
     ((o.status === "delivered" && o.delivered_at && new Date().getTime() - new Date(o.delivered_at).getTime() < 7 * 86_400_000) || o.status === "shipped");
@@ -45,14 +51,16 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
         <div role="status" className="card mt-3 flex items-center gap-3 ring-2 ring-success/40">
           <CheckCircle2 className="h-7 w-7 shrink-0 text-success" aria-hidden />
           <div>
-            <p className="font-heading text-2xl">Thank you! Your order is confirmed.</p>
+            <p className="text-xl font-semibold">Thank you! Your order is confirmed.</p>
             <p className="text-muted">We&apos;ll print your copy fresh and send it to you.</p>
           </div>
         </div>
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="display text-3xl">Order <span className="id-mono">{o.order_number}</span></h1>
+        <h1 className="display text-3xl">
+          Order <span className="id-mono">{o.order_number}</span>
+        </h1>
         <OrderStatusBadge status={o.status} />
       </div>
       <p className="mt-1 text-muted">{ORDER_STATUS[o.status].reader}</p>

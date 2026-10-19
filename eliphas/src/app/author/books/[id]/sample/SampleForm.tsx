@@ -35,7 +35,14 @@ export function DraftForm({ bookId, limit, hasManuscript, hasDraft }: { bookId: 
         <legend className="font-semibold">{hasDraft ? "Make a different draft" : "How do you want to make the sample?"}</legend>
         <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1">
           <label className="flex min-h-11 items-center gap-2">
-            <input type="radio" name="sample-mode" checked={mode === "pages"} onChange={() => setMode("pages")} disabled={!hasManuscript} className="h-4 w-4 accent-fg" />
+            <input
+              type="radio"
+              name="sample-mode"
+              checked={mode === "pages"}
+              onChange={() => setMode("pages")}
+              disabled={!hasManuscript}
+              className="h-4 w-4 accent-fg"
+            />
             Choose pages from my manuscript
           </label>
           <label className="flex min-h-11 items-center gap-2">
@@ -99,7 +106,9 @@ export function DraftForm({ bookId, limit, hasManuscript, hasDraft }: { bookId: 
               Sample PDF
             </label>
             <input id="s-file" name="file" type="file" accept="application/pdf,.pdf" className="field py-2" />
-            <p className="mt-1 text-xs text-muted">Up to {limit} pages and 9 MB. We remove the file&apos;s hidden details (author, software) before saving it.</p>
+            <p className="mt-1 text-xs text-muted">
+              Up to {limit} pages and 9 MB. We remove the file&apos;s hidden details (author, software) before saving it.
+            </p>
           </div>
           <button type="submit" className="btn-primary" disabled={uploading}>
             {uploading ? "Uploading…" : "Upload draft"}

@@ -62,22 +62,61 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
 
   // Everything that needs the author, in one place, each with the action to take
   const todo: { key: string; text: React.ReactNode; href: string; action: string }[] = [
-    ...needsAction.map((b) => ({ key: b.id, text: <><span className="font-semibold">{b.title}</span>: our team asked for changes.</>, href: `/author/books/${b.id}`, action: "See note" })),
+    ...needsAction.map((b) => ({
+      key: b.id,
+      text: (
+        <>
+          <span className="font-semibold">{b.title}</span>: our team asked for changes.
+        </>
+      ),
+      href: `/author/books/${b.id}`,
+      action: "See note",
+    })),
     ...books
       .filter((b) => b.status === "published" && !b.sample_path)
-      .map((b) => ({ key: `sample-${b.id}`, text: <><span className="font-semibold">{b.title}</span> shows &ldquo;Sample coming soon&rdquo;. Add a free sample so readers can try it.</>, href: `/author/books/${b.id}/sample`, action: "Add sample" })),
-    ...(serviceActions ?? []).map((o) => ({ key: o.id, text: <>Service request <span className="id-mono font-medium">{o.order_number}</span> is waiting for you.</>, href: `/author/services/${o.id}`, action: "Open" })),
-    ...(!profile.author_terms_accepted_at ? [{ key: "terms", text: <>New author terms need your acceptance before you publish new books.</>, href: "/author/plan", action: "Review terms" }] : []),
-    ...(!totals.upi && totals.balance > 0 ? [{ key: "upi", text: <>Add your UPI ID so we can pay your earnings.</>, href: "/account/profile", action: "Add UPI ID" }] : []),
+      .map((b) => ({
+        key: `sample-${b.id}`,
+        text: (
+          <>
+            <span className="font-semibold">{b.title}</span> shows &ldquo;Sample coming soon&rdquo;. Add a free sample so readers can try it.
+          </>
+        ),
+        href: `/author/books/${b.id}/sample`,
+        action: "Add sample",
+      })),
+    ...(serviceActions ?? []).map((o) => ({
+      key: o.id,
+      text: (
+        <>
+          Service request <span className="id-mono font-medium">{o.order_number}</span> is waiting for you.
+        </>
+      ),
+      href: `/author/services/${o.id}`,
+      action: "Open",
+    })),
+    ...(!profile.author_terms_accepted_at
+      ? [{ key: "terms", text: <>New author terms need your acceptance before you publish new books.</>, href: "/author/plan", action: "Review terms" }]
+      : []),
+    ...(!totals.upi && totals.balance > 0
+      ? [{ key: "upi", text: <>Add your UPI ID so we can pay your earnings.</>, href: "/account/profile", action: "Add UPI ID" }]
+      : []),
   ];
 
   const draft = books[0];
   const startSteps = [
-    { label: "Complete your profile (name, city, UPI ID for payouts)", done: Boolean(profile.full_name && profile.city && totals.upi), href: "/account/profile" },
+    {
+      label: "Complete your profile (name, city, UPI ID for payouts)",
+      done: Boolean(profile.full_name && profile.city && totals.upi),
+      href: "/account/profile",
+    },
     { label: "Upload your first book", done: Boolean(draft), href: draft ? `/author/books/${draft.id}/files` : "/author/books/new" },
     { label: "Set your price", done: Boolean(draft && draft.mrp !== null), href: draft ? `/author/books/${draft.id}/print` : "/author/books/new" },
     { label: "Prepare a free sample", done: Boolean(draft?.sample_path), href: draft ? `/author/books/${draft.id}/sample` : "/author/books/new" },
-    { label: "Preview and submit for review", done: Boolean(draft && draft.status !== "draft"), href: draft ? `/author/books/${draft.id}/preview` : "/author/books/new" },
+    {
+      label: "Preview and submit for review",
+      done: Boolean(draft && draft.status !== "draft"),
+      href: draft ? `/author/books/${draft.id}/preview` : "/author/books/new",
+    },
   ];
 
   return (
@@ -101,7 +140,10 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
           <ol className="mt-3 divide-y divide-line">
             {startSteps.map((st, i) => (
               <li key={st.label} className="flex items-center gap-3 py-3">
-                <span aria-hidden className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-semibold ${st.done ? "bg-success/15 text-success" : "bg-surface-2"}`}>
+                <span
+                  aria-hidden
+                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-semibold ${st.done ? "bg-success/15 text-success" : "bg-surface-2"}`}
+                >
                   {st.done ? "✓" : i + 1}
                 </span>
                 <span className="min-w-0 flex-1">
@@ -149,7 +191,11 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
           subHref={totals.upi ? undefined : "/account/profile"}
           highlight
         />
-        <Tile label="Paid to you" value={compactRupees(totals.paid)} sub={stats.payouts[0] ? `Last on ${fmtDate(stats.payouts[0].paid_at ?? stats.payouts[0].created_at)}` : "No payouts yet"} />
+        <Tile
+          label="Paid to you"
+          value={compactRupees(totals.paid)}
+          sub={stats.payouts[0] ? `Last on ${fmtDate(stats.payouts[0].paid_at ?? stats.payouts[0].created_at)}` : "No payouts yet"}
+        />
       </dl>
       <p className="mt-3 text-sm text-muted">
         {totals.inProgress > 0 && (
@@ -157,7 +203,8 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
             <span className="font-medium text-fg">{rupees(totals.inProgress)}</span> of your earnings is on orders still being printed or delivered.{" "}
           </>
         )}
-        Earnings are your share after printing, platform commission (+ GST) and payment charges; what readers pay is not shown as income. No tax is withheld at present; any TDS will be shown here separately. Shipping is paid by readers and never deducted.
+        Earnings are your share after printing, platform commission (+ GST) and payment charges; what readers pay is not shown as income. No tax is withheld at
+        present; any TDS will be shown here separately. Shipping is paid by readers and never deducted.
       </p>
       <Link href="/author/earnings" className="mt-1 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-fg">
         Earnings by order and payouts <ChevronRight className="h-4 w-4" aria-hidden />
@@ -174,65 +221,84 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
           </Link>
         </div>
         {books.length === 0 ? (
-          <EmptyState icon={BookOpen} title="No books yet" text="Add your title and manuscript; you can save and come back at any step." action={<Link href="/author/books/new" className="btn-primary">Start your first book</Link>} />
+          <EmptyState
+            icon={BookOpen}
+            title="No books yet"
+            text="Add your title and manuscript; you can save and come back at any step."
+            action={
+              <Link href="/author/books/new" className="btn-primary">
+                Start your first book
+              </Link>
+            }
+          />
         ) : (
           <>
-          {/* Phones: one row per book */}
-          <ul className="divide-y divide-line rounded-[var(--radius-card)] bg-surface ring-1 ring-line sm:hidden">
-            {books.map((b) => {
-              const st = stats.byBook.get(b.id);
-              return (
-                <li key={b.id}>
-                  <Link href={`/author/books/${b.id}`} className="flex items-center gap-3 px-4 py-3">
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-semibold" lang={b.language}>{b.title}</span>
-                      <span className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
-                        <StatusBadge status={b.status} />
-                        <span className="mono">{copiesText(st?.copies ?? 0)}</span>
-                      </span>
-                    </span>
-                    <span className="text-right">
-                      <span className="block font-semibold mono">{rupees(st?.earnings ?? 0)}</span>
-                      <span className="text-xs text-muted">your earnings</span>
-                    </span>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-muted" aria-hidden />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="hidden overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line sm:block">
-            <table className="w-full text-left text-sm">
-              <caption className="sr-only">Status, copies sold and your earnings per book, all time</caption>
-              <thead className="border-b border-line text-muted">
-                <tr>
-                  <th scope="col" className="p-4 font-medium">Book</th>
-                  <th scope="col" className="p-4 font-medium">Status</th>
-                  <th scope="col" className="p-4 text-right font-medium">Copies</th>
-                  <th scope="col" className="p-4 text-right font-medium">Your earnings</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {books.map((b) => {
-                  const st = stats.byBook.get(b.id);
-                  return (
-                    <tr key={b.id}>
-                      <th scope="row" className="p-4 font-semibold" lang={b.language}>
-                        <Link href={`/author/books/${b.id}`} className="hover:underline">
+            {/* Phones: one row per book */}
+            <ul className="divide-y divide-line rounded-[var(--radius-card)] bg-surface ring-1 ring-line sm:hidden">
+              {books.map((b) => {
+                const st = stats.byBook.get(b.id);
+                return (
+                  <li key={b.id}>
+                    <Link href={`/author/books/${b.id}`} className="flex items-center gap-3 px-4 py-3">
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-semibold" lang={b.language}>
                           {b.title}
-                        </Link>
-                      </th>
-                      <td className="p-4">
-                        <StatusBadge status={b.status} />
-                      </td>
-                      <td className="p-4 text-right mono">{st?.copies ?? 0}</td>
-                      <td className="p-4 text-right mono">{rupees(st?.earnings ?? 0, true)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        </span>
+                        <span className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
+                          <StatusBadge status={b.status} />
+                          <span className="mono">{copiesText(st?.copies ?? 0)}</span>
+                        </span>
+                      </span>
+                      <span className="text-right">
+                        <span className="block font-semibold mono">{rupees(st?.earnings ?? 0)}</span>
+                        <span className="text-xs text-muted">your earnings</span>
+                      </span>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-muted" aria-hidden />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="hidden overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line sm:block">
+              <table className="w-full text-left text-sm">
+                <caption className="sr-only">Status, copies sold and your earnings per book, all time</caption>
+                <thead className="border-b border-line text-muted">
+                  <tr>
+                    <th scope="col" className="p-4 font-medium">
+                      Book
+                    </th>
+                    <th scope="col" className="p-4 font-medium">
+                      Status
+                    </th>
+                    <th scope="col" className="p-4 text-right font-medium">
+                      Copies
+                    </th>
+                    <th scope="col" className="p-4 text-right font-medium">
+                      Your earnings
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {books.map((b) => {
+                    const st = stats.byBook.get(b.id);
+                    return (
+                      <tr key={b.id}>
+                        <th scope="row" className="p-4 font-semibold" lang={b.language}>
+                          <Link href={`/author/books/${b.id}`} className="hover:underline">
+                            {b.title}
+                          </Link>
+                        </th>
+                        <td className="p-4">
+                          <StatusBadge status={b.status} />
+                        </td>
+                        <td className="p-4 text-right mono">{st?.copies ?? 0}</td>
+                        <td className="p-4 text-right mono">{rupees(st?.earnings ?? 0, true)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </>
         )}
       </section>
@@ -339,7 +405,10 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
             </ul>
           )}
           {!totals.upi && (
-            <Link href="/account/profile" className="mt-4 flex items-center justify-between rounded-[var(--radius-card)] bg-accent/10 p-3 text-sm font-semibold ring-1 ring-accent/30">
+            <Link
+              href="/account/profile"
+              className="mt-4 flex items-center justify-between rounded-[var(--radius-card)] bg-accent/10 p-3 text-sm font-semibold ring-1 ring-accent/30"
+            >
               Add your UPI ID to get paid <ChevronRight className="h-4 w-4" aria-hidden />
             </Link>
           )}
@@ -349,7 +418,17 @@ export default async function AuthorHome({ searchParams }: PageProps<"/author">)
       <section className="card mt-10 flex flex-wrap items-center justify-between gap-4" aria-label="Plan">
         <div>
           <p className="text-sm text-muted">Your plan</p>
-          <p className="flex items-center gap-2 text-lg font-semibold">{pro.active ? <>Author Pro <ProBadge /></> : profile.author_terms_accepted_at ? "Free" : "Original terms"}</p>
+          <p className="flex items-center gap-2 text-lg font-semibold">
+            {pro.active ? (
+              <>
+                Author Pro <ProBadge />
+              </>
+            ) : profile.author_terms_accepted_at ? (
+              "Free"
+            ) : (
+              "Original terms"
+            )}
+          </p>
           <p className="text-sm text-muted">
             {pro.active
               ? `Paid until ${new Date(pro.accessUntil!).toLocaleDateString("en-IN", { dateStyle: "medium" })} · ${pro.credits} creative credit${pro.credits === 1 ? "" : "s"} left · renews only if you pay again`
@@ -377,19 +456,7 @@ function fmtDate(iso: string | null) {
   return iso ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" }) : "";
 }
 
-function Tile({
-  label,
-  value,
-  sub,
-  subHref,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-  subHref?: string;
-  highlight?: boolean;
-}) {
+function Tile({ label, value, sub, subHref, highlight }: { label: string; value: string; sub: string; subHref?: string; highlight?: boolean }) {
   return (
     <div className={`card p-4 md:p-5 ${highlight ? "bg-tint-info ring-accent-fg/20" : ""}`}>
       <dt className="text-[0.72rem] font-semibold tracking-[0.04em] text-muted uppercase">{label}</dt>

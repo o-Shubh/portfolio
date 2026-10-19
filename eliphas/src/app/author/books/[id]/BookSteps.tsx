@@ -29,13 +29,7 @@ export function BookSteps({ bookId }: { bookId: string }) {
                   active ? "border-accent text-fg" : "border-transparent text-muted hover:text-fg"
                 }`}
               >
-                <span
-                  className={`grid h-6 w-6 place-items-center rounded-full text-xs ${
-                    active ? "bg-accent text-on-accent" : "bg-surface-2"
-                  }`}
-                >
-                  {i + 1}
-                </span>
+                <span className={`grid h-6 w-6 place-items-center rounded-full text-xs ${active ? "bg-accent text-on-accent" : "bg-surface-2"}`}>{i + 1}</span>
                 {s.label}
               </Link>
             </li>

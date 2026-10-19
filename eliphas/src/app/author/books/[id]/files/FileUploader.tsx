@@ -57,8 +57,10 @@ export function FileUploader({
     setDone(null);
 
     const mb = (file.size / 1024 / 1024).toFixed(1);
-    if (file.size > maxMb * 1024 * 1024) return setError(`This file is ${mb} MB. The limit is ${maxMb} MB${isPdf ? " — try exporting the PDF with compressed images" : ""}.`);
-    if (isPdf && file.type !== "application/pdf") return setError(`“${file.name}” isn't a PDF. Export your ${kind === "manuscript" ? "manuscript" : "print cover"} as a PDF and choose that file.`);
+    if (file.size > maxMb * 1024 * 1024)
+      return setError(`This file is ${mb} MB. The limit is ${maxMb} MB${isPdf ? " — try exporting the PDF with compressed images" : ""}.`);
+    if (isPdf && file.type !== "application/pdf")
+      return setError(`“${file.name}” isn't a PDF. Export your ${kind === "manuscript" ? "manuscript" : "print cover"} as a PDF and choose that file.`);
     if (kind === "cover" && !COVER_TYPES[file.type]) return setError(`“${file.name}” isn't a JPG, PNG or WebP image.`);
 
     let info: Awaited<ReturnType<typeof inspectPdf>> = null;
@@ -122,10 +124,7 @@ export function FileUploader({
 
       {!disabled && (
         <>
-          <label
-            htmlFor={inputId}
-            className={`btn-ghost w-full cursor-pointer ${busy ? "pointer-events-none opacity-60" : ""}`}
-          >
+          <label htmlFor={inputId} className={`btn-ghost w-full cursor-pointer ${busy ? "pointer-events-none opacity-60" : ""}`}>
             <Upload className="h-5 w-5" aria-hidden />
             {status === "checking"
               ? "Reading PDF…"
@@ -143,7 +142,14 @@ export function FileUploader({
         </>
       )}
       {status === "uploading" && (
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-label="Upload progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+        <div
+          className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-2"
+          role="progressbar"
+          aria-label="Upload progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress * 100)}
+        >
           <div className="h-full rounded-full bg-primary transition-[width] duration-150" style={{ width: `${Math.max(2, progress * 100)}%` }} />
         </div>
       )}

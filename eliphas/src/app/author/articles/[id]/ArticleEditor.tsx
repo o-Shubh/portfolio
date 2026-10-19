@@ -176,10 +176,7 @@ export function ArticleEditor({
 
   const blocks = parseArticle(f.body_md);
   const words = wordCount(blocks);
-  const problems = publishProblems(
-    { ...f, topic: f.topic || null, tags: [], cover_path: cover, cover_alt: f.cover_alt },
-    f.rights,
-  );
+  const problems = publishProblems({ ...f, topic: f.topic || null, tags: [], cover_path: cover, cover_alt: f.cover_alt }, f.rights);
 
   const run = (fn: () => Promise<void>) => startBusy(fn);
   const onPublish = () =>
@@ -228,7 +225,8 @@ export function ArticleEditor({
       <div className="min-w-0 space-y-5">
         {moderated && (
           <p role="note" className="rounded-[var(--radius-card)] bg-danger/10 p-3 text-sm ring-1 ring-danger/25">
-            Our team has {moderated === "removed" ? "removed" : "hidden"} this article from the site.{moderationReason && <> Reason: {moderationReason}.</>} Contact support to discuss it.
+            Our team has {moderated === "removed" ? "removed" : "hidden"} this article from the site.{moderationReason && <> Reason: {moderationReason}.</>}{" "}
+            Contact support to discuss it.
           </p>
         )}
         {offerRestore ? (
@@ -265,7 +263,10 @@ export function ArticleEditor({
           </div>
         ) : (
           message && (
-            <p role={message.error ? "alert" : "status"} className={`rounded-[var(--radius-card)] p-3 text-sm font-medium ${message.error ? "bg-danger/10 text-danger" : "bg-success/15 text-success"}`}>
+            <p
+              role={message.error ? "alert" : "status"}
+              className={`rounded-[var(--radius-card)] p-3 text-sm font-medium ${message.error ? "bg-danger/10 text-danger" : "bg-success/15 text-success"}`}
+            >
               {message.error ?? message.ok}
             </p>
           )
@@ -273,14 +274,29 @@ export function ArticleEditor({
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-full bg-surface-2 p-1" role="group" aria-label="Editor view">
-            <button type="button" aria-pressed={!preview} onClick={() => setPreview(false)} className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${!preview ? "bg-surface" : "text-muted"}`}>
+            <button
+              type="button"
+              aria-pressed={!preview}
+              onClick={() => setPreview(false)}
+              className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${!preview ? "bg-surface" : "text-muted"}`}
+            >
               <Pencil className="h-4 w-4" aria-hidden /> Write
             </button>
-            <button type="button" aria-pressed={preview} onClick={() => setPreview(true)} className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${preview ? "bg-surface" : "text-muted"}`}>
+            <button
+              type="button"
+              aria-pressed={preview}
+              onClick={() => setPreview(true)}
+              className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ${preview ? "bg-surface" : "text-muted"}`}
+            >
               <Eye className="h-4 w-4" aria-hidden /> Preview
             </button>
           </div>
-          <p className={`ml-auto text-sm ${save.kind === "error" ? "font-medium text-danger" : "text-muted"}`} role="status" aria-live="polite" data-testid="save-state">
+          <p
+            className={`ml-auto text-sm ${save.kind === "error" ? "font-medium text-danger" : "text-muted"}`}
+            role="status"
+            aria-live="polite"
+            data-testid="save-state"
+          >
             {saveLabel}
           </p>
         </div>
@@ -306,10 +322,25 @@ export function ArticleEditor({
         ) : (
           <div className="card space-y-5">
             <Field label="Title" count={`${f.title.length}/${LIMITS.title}`} htmlFor="a-title">
-              <input id="a-title" className="field text-lg font-semibold" maxLength={LIMITS.title} value={f.title} onChange={(e) => update({ title: e.target.value })} lang={f.language} />
+              <input
+                id="a-title"
+                className="field text-lg font-semibold"
+                maxLength={LIMITS.title}
+                value={f.title}
+                onChange={(e) => update({ title: e.target.value })}
+                lang={f.language}
+              />
             </Field>
             <Field label="Short excerpt" hint="Shown in lists and when the link is shared." count={`${f.excerpt.length}/${LIMITS.excerpt}`} htmlFor="a-excerpt">
-              <textarea id="a-excerpt" className="field py-2.5" rows={2} maxLength={LIMITS.excerpt} value={f.excerpt} onChange={(e) => update({ excerpt: e.target.value })} lang={f.language} />
+              <textarea
+                id="a-excerpt"
+                className="field py-2.5"
+                rows={2}
+                maxLength={LIMITS.excerpt}
+                value={f.excerpt}
+                onChange={(e) => update({ excerpt: e.target.value })}
+                lang={f.language}
+              />
             </Field>
             <div>
               <div className="flex items-baseline justify-between gap-2">
@@ -333,7 +364,14 @@ export function ArticleEditor({
                     ["link", Link2, "Link"],
                   ] as const
                 ).map(([k, Icon, label]) => (
-                  <button key={k} type="button" onClick={() => format(k)} className="grid h-11 w-11 place-items-center rounded-lg hover:bg-surface" aria-label={label} title={label}>
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => format(k)}
+                    className="grid h-11 w-11 place-items-center rounded-lg hover:bg-surface"
+                    aria-label={label}
+                    title={label}
+                  >
                     <Icon className="h-4 w-4" aria-hidden />
                   </button>
                 ))}
@@ -349,8 +387,8 @@ export function ArticleEditor({
                 aria-describedby="a-body-help"
               />
               <p id="a-body-help" className="mt-1 text-xs text-muted">
-                Use the buttons, or type: ## heading, **bold**, *italic*, - list, 1. list, &gt; quote, [text](https://link). Leave a blank line between paragraphs.
-                Share an excerpt rather than a whole book.
+                Use the buttons, or type: ## heading, **bold**, *italic*, - list, 1. list, &gt; quote, [text](https://link). Leave a blank line between
+                paragraphs. Share an excerpt rather than a whole book.
               </p>
             </div>
           </div>
@@ -392,7 +430,11 @@ export function ArticleEditor({
                     </ul>
                   </>
                 ) : (
-                  <p>{status === "draft" ? "Publish this article? Your followers will get one notification." : "Publish this article again? Followers aren't notified again."}</p>
+                  <p>
+                    {status === "draft"
+                      ? "Publish this article? Your followers will get one notification."
+                      : "Publish this article again? Followers aren't notified again."}
+                  </p>
                 )}
                 <div className="flex gap-2">
                   <button type="button" className="btn-accent flex-1" disabled={busy || problems.length > 0} onClick={onPublish}>
@@ -443,7 +485,11 @@ export function ArticleEditor({
               Delete article…
             </button>
           )}
-          <p className="text-xs text-muted">{live ? "Changes to a published article go live only when you press Update." : "Drafts save automatically. Nothing is published until you choose Publish."}</p>
+          <p className="text-xs text-muted">
+            {live
+              ? "Changes to a published article go live only when you press Update."
+              : "Drafts save automatically. Nothing is published until you choose Publish."}
+          </p>
         </section>
 
         <section className="card space-y-4">
@@ -496,7 +542,12 @@ export function ArticleEditor({
           ) : (
             <label className="block">
               <span className="sr-only">Upload a cover image</span>
-              <input type="file" accept="image/jpeg,image/png,image/webp" className="block min-h-11 w-full py-2 text-sm" onChange={(e) => e.target.files?.[0] && void uploadCover(e.target.files[0])} />
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="block min-h-11 w-full py-2 text-sm"
+                onChange={(e) => e.target.files?.[0] && void uploadCover(e.target.files[0])}
+              />
               <span className="mt-1 block text-xs text-muted">JPEG, PNG or WebP, up to 5 MB. We remove location and camera details.</span>
             </label>
           )}
@@ -510,7 +561,9 @@ export function ArticleEditor({
         <section className="card">
           <label className="flex items-start gap-3 text-sm">
             <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-fg" checked={f.rights} onChange={(e) => update({ rights: e.target.checked })} />
-            <span>I wrote this article, or have permission to publish it, and I own or have permission to use the images. Excerpts from my book are authorised.</span>
+            <span>
+              I wrote this article, or have permission to publish it, and I own or have permission to use the images. Excerpts from my book are authorised.
+            </span>
           </label>
         </section>
       </aside>

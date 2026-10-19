@@ -50,16 +50,21 @@ export default async function MyArticlesPage() {
       {!articles?.length ? (
         <div className="card text-center">
           <p className="text-lg">You haven&apos;t written an article yet.</p>
-          <p className="mt-1 text-sm text-muted">Start with something readers can&apos;t find on your book page: why you wrote it, how you work, what you&apos;ve learned.</p>
+          <p className="mt-1 text-sm text-muted">
+            Start with something readers can&apos;t find on your book page: why you wrote it, how you work, what you&apos;ve learned.
+          </p>
         </div>
       ) : (
         <ul className="card divide-y divide-line py-0">
           {articles.map((a) => {
             const state =
-              a.moderation !== "visible" ? { label: a.moderation === "removed" ? "Removed by our team" : "Hidden by our team", tone: "bg-danger/15 text-danger" }
-              : a.status === "published" ? { label: "Published", tone: "bg-success/15 text-success" }
-              : a.status === "unpublished" ? { label: "Unpublished", tone: "bg-surface-2 text-muted" }
-              : { label: "Draft", tone: "bg-accent/20 text-fg" };
+              a.moderation !== "visible"
+                ? { label: a.moderation === "removed" ? "Removed by our team" : "Hidden by our team", tone: "bg-danger/15 text-danger" }
+                : a.status === "published"
+                  ? { label: "Published", tone: "bg-success/15 text-success" }
+                  : a.status === "unpublished"
+                    ? { label: "Unpublished", tone: "bg-surface-2 text-muted" }
+                    : { label: "Draft", tone: "bg-accent/20 text-fg" };
             return (
               <li key={a.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-4">
                 <div className="min-w-0 flex-1">
@@ -70,7 +75,8 @@ export default async function MyArticlesPage() {
                     {a.status === "published" && a.published_at ? `Published ${fmt(a.published_at)}` : `Edited ${fmt(a.updated_at)}`}
                     {a.first_published_at && (
                       <span className="mono">
-                        {" "}· {tally(views.data, a.id)} views · {tally(likes.data, a.id)} likes · {tally(comments.data, a.id)} comments
+                        {" "}
+                        · {tally(views.data, a.id)} views · {tally(likes.data, a.id)} likes · {tally(comments.data, a.id)} comments
                       </span>
                     )}
                   </p>

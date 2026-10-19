@@ -10,6 +10,11 @@ export default async function DetailsPage({ params }: PageProps<"/author/books/[
   const { id } = await params;
   const { book, profile } = await getOwnBookOr404(id);
   // The author's other books, to mark this as another format or edition of the same work
-  const { data: others } = await createAdminClient().from("books").select("id, title, binding, work_id").eq("author_id", profile.id).neq("id", book.id).order("created_at");
+  const { data: others } = await createAdminClient()
+    .from("books")
+    .select("id, title, binding, work_id")
+    .eq("author_id", profile.id)
+    .neq("id", book.id)
+    .order("created_at");
   return <DetailsForm book={book} disabled={!isEditable(book)} others={others ?? []} />;
 }

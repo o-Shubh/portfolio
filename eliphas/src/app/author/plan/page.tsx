@@ -34,8 +34,8 @@ export default async function PlanPage() {
             {status.active ? (
               <p className="mt-1 text-sm text-muted">
                 Paid access until <strong className="text-fg">{fmtDate(status.accessUntil)}</strong>
-                {status.queued.length > 0 && ` (includes ${status.queued.length} renewal${status.queued.length > 1 ? "s" : ""} already paid)`}.
-                Pro doesn&apos;t renew automatically, so there&apos;s nothing to cancel. After that date, new sales use Free rates.
+                {status.queued.length > 0 && ` (includes ${status.queued.length} renewal${status.queued.length > 1 ? "s" : ""} already paid)`}. Pro doesn&apos;t
+                renew automatically, so there&apos;s nothing to cancel. After that date, new sales use Free rates.
               </p>
             ) : accepted ? (
               <p className="mt-1 text-sm text-muted">
@@ -110,7 +110,9 @@ export default async function PlanPage() {
           </ul>
           <div className="mt-5">
             {accepted ? (
-              <BuyProButton label={status.active ? `Renew for 1 more month · ${formatPaise(proPrice.totalPaise)}` : `Get Pro · ${formatPaise(proPrice.totalPaise)}`} />
+              <BuyProButton
+                label={status.active ? `Renew for 1 more month · ${formatPaise(proPrice.totalPaise)}` : `Get Pro · ${formatPaise(proPrice.totalPaise)}`}
+              />
             ) : (
               <p className="text-sm text-muted">Accept the author terms above to get Pro.</p>
             )}

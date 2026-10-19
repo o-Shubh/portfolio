@@ -28,7 +28,9 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
   const supabase = await createClient();
   let query = supabase
     .from("orders")
-    .select("id, order_number, status, total, paid_at, created_at, ship_city, ship_state, ship_name, printer_id, cancel_reason, cancelled_by, refund_status, refund_id, razorpay_payment_id, printers(name), order_items(quantity, books(title))")
+    .select(
+      "id, order_number, status, total, paid_at, created_at, ship_city, ship_state, ship_name, printer_id, cancel_reason, cancelled_by, refund_status, refund_id, razorpay_payment_id, printers(name), order_items(quantity, books(title))",
+    )
     .order("created_at", { ascending: false })
     .limit(100);
   query = q ? query.ilike("order_number", `%${q}%`) : query.in("status", filter.statuses);
@@ -76,7 +78,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
                     {new Date(o.paid_at ?? o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-1">
                   <p className="font-semibold mono">{rupees(Number(o.total))}</p>
                   <OrderStatusBadge status={o.status} />
                 </div>
@@ -113,9 +115,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
           ))}
         </ul>
       )}
-      <p className="mt-6 text-sm text-muted">
-        Order flow: Paid → Printing → Printed → Shipped → Delivered.
-      </p>
+      <p className="mt-6 text-sm text-muted">Order flow: Paid → Printing → Printed → Shipped → Delivered.</p>
     </>
   );
 }

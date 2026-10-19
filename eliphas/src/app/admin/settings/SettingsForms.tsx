@@ -33,7 +33,14 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
         <h2 className="text-lg">Payment gateway estimate</h2>
         <p className="text-sm text-muted">
           Used to estimate payment charges before an order exists. The actual Razorpay fee replaces it when a payment is confirmed. Commission is set in{" "}
-          <a href="/admin/plans" className="underline">Plans</a>; shipping in <a href="/admin/shipping" className="underline">Shipping</a>.
+          <a href="/admin/plans" className="underline">
+            Plans
+          </a>
+          ; shipping in{" "}
+          <a href="/admin/shipping" className="underline">
+            Shipping
+          </a>
+          .
         </p>
         <div className="grid gap-4 sm:grid-cols-3">
           <Num name="gateway_percent" label="Razorpay charge (%)" value={fees.gateway_percent} />
@@ -55,9 +62,7 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
           <Num name="max_pages" label="Maximum pages" value={rates.max_pages} step="1" />
           <Num name="cover_bleed_in" label="Cover bleed (in)" value={rates.cover_bleed_in ?? 0.125} />
         </div>
-        <p className="text-sm text-muted">
-          Print cost per copy = binding + finish + pages × (inside ₹ per page + paper extra) × size multiplier, rounded up.
-        </p>
+        <p className="text-sm text-muted">Print cost per copy = binding + finish + pages × (inside ₹ per page + paper extra) × size multiplier, rounded up.</p>
       </section>
 
       {(Object.keys(RATE_FIELDS) as RateGroup[]).map((group) => (
@@ -74,12 +79,7 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
                   <input id={`${group}|${key}|label`} name={`${group}|${key}|label`} defaultValue={opt.label} className="field" required />
                 </div>
                 {RATE_FIELDS[group].map((f) => (
-                  <Num
-                    key={f}
-                    name={`${group}|${key}|${f}`}
-                    label={FIELD_LABEL[f]}
-                    value={(opt as unknown as Record<string, number | undefined>)[f] ?? 0}
-                  />
+                  <Num key={f} name={`${group}|${key}|${f}`} label={FIELD_LABEL[f]} value={(opt as unknown as Record<string, number | undefined>)[f] ?? 0} />
                 ))}
               </fieldset>
             ))}
@@ -87,9 +87,12 @@ export function SettingsForm({ settings }: { settings: PricingSettings }) {
         </section>
       ))}
 
-      <div className="sticky bottom-20 z-10 rounded-[var(--radius-card)] bg-surface ring-1 ring-line/95 p-4 backdrop-blur md:bottom-4">
-        <FormMessage state={state} />
-        <button type="submit" className="btn-primary mt-2" disabled={pending}>
+      <div className="sticky bottom-20 z-10 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] bg-surface p-3 shadow-sheet ring-1 ring-line md:bottom-4">
+        <div className="min-w-0 flex-1">
+          <FormMessage state={state} />
+          {!state && <p className="text-sm text-muted">Changes apply to new orders only.</p>}
+        </div>
+        <button type="submit" className="btn-primary" disabled={pending}>
           {pending ? "Saving…" : "Save all changes"}
         </button>
       </div>
@@ -133,8 +136,7 @@ export function BusinessForm({ fields, values }: { fields: BusinessField[]; valu
       <div>
         <h2 className="text-lg">Business details</h2>
         <p className="mt-1 text-sm text-muted">
-          Shown on the Contact, Terms, Privacy, Refund and Shipping pages. Razorpay checks these before approving live
-          payments.
+          Shown on the Contact, Terms, Privacy, Refund and Shipping pages. Razorpay checks these before approving live payments.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

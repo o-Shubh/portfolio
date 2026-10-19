@@ -6,7 +6,15 @@ import { saveDetails } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
 import { GENRES, type Book } from "@/lib/publishing";
 
-export function DetailsForm({ book, disabled, others }: { book: Book; disabled: boolean; others: { id: string; title: string; binding: string; work_id: string }[] }) {
+export function DetailsForm({
+  book,
+  disabled,
+  others,
+}: {
+  book: Book;
+  disabled: boolean;
+  others: { id: string; title: string; binding: string; work_id: string }[];
+}) {
   const linked = others.find((o) => o.work_id === book.work_id);
   const [state, onSubmit, pending, { onChange }] = useFormAction(saveDetails.bind(null, book.id), { warnUnsaved: true });
   const [desc, setDesc] = useState(book.description ?? "");
@@ -72,7 +80,8 @@ export function DetailsForm({ book, disabled, others }: { book: Book; disabled: 
             aria-describedby="desc-help"
           />
           <p id="desc-help" className="mt-1 text-sm text-muted">
-            What is the book about, and who will love it? {desc.trim().length < 50 ? `At least 50 characters (${desc.trim().length} so far).` : `${desc.length} / 4000`}
+            What is the book about, and who will love it?{" "}
+            {desc.trim().length < 50 ? `At least 50 characters (${desc.trim().length} so far).` : `${desc.length} / 4000`}
           </p>
         </div>
         <div className="sm:w-1/2">
@@ -80,14 +89,23 @@ export function DetailsForm({ book, disabled, others }: { book: Book; disabled: 
             ISBN <span className="font-normal text-muted">(optional)</span>
           </label>
           <input id="isbn" name="isbn" className="field" inputMode="numeric" defaultValue={book.isbn ?? ""} maxLength={17} />
-          <p className="mt-1 text-sm text-muted">Free from isbn.gov.in. You can add it later. Your Eliphas Edition ID is separate and assigned when the book is approved.</p>
+          <p className="mt-1 text-sm text-muted">
+            Free from isbn.gov.in. You can add it later. Your Eliphas Edition ID is separate and assigned when the book is approved.
+          </p>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="edition_label" className="label">
               Edition <span className="font-normal text-muted">(optional)</span>
             </label>
-            <input id="edition_label" name="edition_label" className="field" defaultValue={book.edition_label ?? ""} maxLength={60} placeholder="e.g. Second edition" />
+            <input
+              id="edition_label"
+              name="edition_label"
+              className="field"
+              defaultValue={book.edition_label ?? ""}
+              maxLength={60}
+              placeholder="e.g. Second edition"
+            />
           </div>
           {others.length > 0 && (
             <div>
