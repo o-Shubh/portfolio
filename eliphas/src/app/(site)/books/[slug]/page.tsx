@@ -2,6 +2,8 @@ import { BookOpen, PackageCheck, Printer, ShieldCheck, Truck } from "lucide-reac
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { BookEventBeacon } from "@/components/BookEventBeacon";
+import { SaveBookButton } from "@/components/SaveBookButton";
 import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -43,7 +45,17 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
     listReviews(book.id),
     createAdminClient().from("public_profiles").select("avatar_path, bio, verified_author").eq("id", book.author_id).maybeSingle().then((r) => r.data),
   ]);
-  const following = me ? (await readerState(me.id, "00000000-0000-0000-0000-000000000000", book.author_id)).following : false;
+  const [following, saved] = me
+    ? await Promise.all([
+        readerState(me.id, "00000000-0000-0000-0000-000000000000", book.author_id).then((r) => r.following),
+        createAdminClient()
+          .from("wishlist")
+          .select("book_id", { count: "exact", head: true })
+          .eq("user_id", me.id)
+          .eq("book_id", book.id)
+          .then((r) => Boolean(r.count)),
+      ])
+    : [false, false];
   const isAuthor = me?.id === book.author_id;
   const canReview = Boolean(me?.full_name) && !isAuthor;
   const myReview = me ? reviews.find((r) => r.user_id === me.id) : undefined;
@@ -109,6 +121,14 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
         </Link>
         <AddToCartButton bookId={book.id} className="min-h-12 text-base" />
       </div>
+      <div className="mt-2.5 grid">
+        <SaveBookButton bookId={book.id} slug={book.slug} saved={saved} loggedIn={Boolean(me)} className="w-full" />
+      </div>
+      {isAuthor && (
+        <Link href={`/author/books/${book.id}/share`} className="mt-2.5 block text-center text-sm font-semibold text-accent-fg hover:underline">
+          Your book: open the share kit
+        </Link>
+      )}
       <ul className="mt-4 space-y-2 border-t border-line pt-4 text-sm text-muted">
         <li className="flex items-center gap-2">
           <Printer className="h-4 w-4 text-fg" aria-hidden /> Printed fresh for you
@@ -126,6 +146,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   return (
     <div className="container-x pt-4 pb-28 md:py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      {!isAuthor && <BookEventBeacon slug={book.slug} kind="view" />}
       <nav aria-label="Breadcrumb" className="truncate text-sm text-muted">
         <Link href="/" className="inline-flex min-h-11 items-center hover:text-fg md:min-h-0">
           Home

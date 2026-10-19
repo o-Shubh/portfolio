@@ -10,6 +10,7 @@ const STEPS = [
   { slug: "sample", label: "Free sample" },
   { slug: "preview", label: "Preview" },
   { slug: "submit", label: "Submit" },
+  { slug: "share", label: "Share" },
 ];
 
 export function BookSteps({ bookId }: { bookId: string }) {

@@ -181,13 +181,20 @@ export async function setArticleNotifications(on: boolean): Promise<CommunityRes
   return { ok: true, on };
 }
 
-/** In-app notification preferences for new followers and replies to your posts, comments and reviews. */
-export async function setNotificationPref(field: "notify_followers" | "notify_replies", on: boolean): Promise<CommunityResult> {
+const PREFS = ["notify_followers", "notify_replies", "notify_new_books", "notify_saved_books", "weekly_digest"] as const;
+export type NotificationPref = (typeof PREFS)[number];
+
+/** Notification preferences: followers, replies, new books, saved-book alerts, and the opt-in weekly email. */
+export async function setNotificationPref(field: NotificationPref, on: boolean): Promise<CommunityResult> {
   const me = await getCurrentProfile();
   if (!me) return LOGIN;
   if (!me.full_name) return ONBOARD;
-  if (field !== "notify_followers" && field !== "notify_replies") return { error: "Unknown setting." };
-  await createAdminClient().from("profiles").update(field === "notify_followers" ? { notify_followers: Boolean(on) } : { notify_replies: Boolean(on) }).eq("id", me.id);
+  if (!PREFS.includes(field)) return { error: "Unknown setting." };
+  if (field === "weekly_digest" && on && !me.email) return { error: "Add your email in Settings first." };
+  await createAdminClient()
+    .from("profiles")
+    .update({ [field]: Boolean(on) } as Record<NotificationPref, boolean>)
+    .eq("id", me.id);
   revalidatePath("/account/notifications");
   return { ok: true, on };
 }

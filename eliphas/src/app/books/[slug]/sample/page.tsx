@@ -1,3 +1,4 @@
+import { BookEventBeacon } from "@/components/BookEventBeacon";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -38,6 +39,7 @@ export default async function SamplePage({ params }: PageProps<"/books/[slug]/sa
   return (
     <main id="main">
       <h1 className="sr-only">Free sample of {book.title}</h1>
+      <BookEventBeacon slug={book.slug} kind="sample" />
       <SampleReader
         url={url}
         title={book.title}

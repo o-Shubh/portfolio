@@ -25,6 +25,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 13 | Launch hardening: captured-only payments, refund ledger and Admin → Refunds, CI checks | ✅ Done (migration 000021) |
 | 14 | Operations: order emails, contact form inbox, payout runs, parcel tracking links, Play Store assets | ✅ Done (migration 000022) |
 | 15 | Invite programme: invite links, first-order discount, account credit, rewards, Admin → Referrals (off by default) | ✅ Done (migration 000023) |
+| 16 | Share kit and reach for authors; wishlist, saved-book and new-book notices; weekly email | ✅ Done (migration 000024) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -570,6 +571,21 @@ Off with zero amounts until an admin sets it up in **Admin → Referrals**.
   `platform_discount`. Authors always earn on the full price; the platform pays. Finance shows the total.
 - **Admin**: switches and amounts, stats, recent invites, block an invite, cancel a reward, adjust someone's credit by
   phone. Terms for readers at `/referral-terms` show the live amounts.
+
+### Share kit, reach and wishlist (migration 000024)
+
+- **Share kit** (author → My books → a live book → **Share**): pictures to post (1080×1080 and 1080×1920, made from
+  the cover, title, author and price), a QR code, three ready-made captions with WhatsApp sharing, and the book link
+  (through the author's invite link while the invite programme is on). Hindi titles are left to the cover image,
+  because the picture renderer can't shape Devanagari correctly.
+- **Reach**: page views and sample opens per book per day (once per device per day, bots ignored, nothing stored
+  about visitors), copies sold and how many readers saved the book.
+- **Wishlist**: "Save for later" on book pages; **Saved → Books** shows the price change since saving. In-app notices
+  when a saved book gets cheaper or is back on sale, and when an author you follow publishes a new book (each can be
+  turned off in Notifications).
+- **Weekly email** (opt-in, needs an email address): new books, articles and posts from people you follow and price
+  drops on saved books, sent on Mondays by the daily job; nothing is sent in a quiet week. Each email has a one-click
+  unsubscribe link (the page asks for a button press so email scanners can't unsubscribe people).
 
 ### Ways to sign in
 

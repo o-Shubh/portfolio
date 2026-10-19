@@ -1,4 +1,4 @@
-// Order update and contact emails: subject, HTML and plain text. Pure, so they can be unit-tested.
+// Order update, contact and weekly emails: subject, HTML and plain text. Pure, so they can be unit-tested.
 import { escapeHtml } from "./email-format.ts";
 
 export type OrderEmailKind = "order_confirmed" | "order_shipped" | "order_delivered" | "order_cancelled" | "refund_processed";
@@ -48,16 +48,18 @@ const COPY: Record<OrderEmailKind, { subject: (n: string) => string; heading: st
   },
 };
 
+const ORDER_FOOTER = "You're receiving this because you placed an order. You can turn off order emails in Settings.";
 const shell = (
   business: string,
   inner: string,
+  footer = escapeHtml(ORDER_FOOTER),
 ) => `<!doctype html><html><body style="margin:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1d1d1f">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;padding:28px">
 <tr><td style="font-size:13px;color:#6e6e73;padding-bottom:16px">${escapeHtml(business)}</td></tr>
 ${inner}
 </table>
-<p style="font-size:12px;color:#6e6e73;margin:16px 0 0">You're receiving this because you placed an order. You can turn off order emails in Settings.</p>
+<p style="font-size:12px;color:#6e6e73;margin:16px 0 0">${footer}</p>
 </td></tr></table></body></html>`;
 
 /** Subject, HTML and text for one order update. */
@@ -107,4 +109,46 @@ export function contactEmail(d: { siteUrl: string; businessName: string; name: s
     html: shell(d.businessName, inner),
     text: `New message: ${d.topic}\nFrom ${d.name} <${d.email}>${d.phone ? ` · ${d.phone}` : ""}\n\n${d.message}\n\nInbox: ${inbox}`,
   };
+}
+
+export type DigestItem = { title: string; by?: string; note?: string; url: string };
+export type DigestSections = { books: DigestItem[]; savedBooks: DigestItem[]; articles: DigestItem[]; posts: DigestItem[] };
+
+/** The opt-in weekly email. Returns null when there's nothing to say, so nothing is sent that week. */
+export function digestEmail(d: { siteUrl: string; businessName: string; name: string; unsubscribeUrl: string; sections: DigestSections }) {
+  const groups: [string, DigestItem[]][] = [
+    ["Books you saved", d.sections.savedBooks],
+    ["New books from authors you follow", d.sections.books],
+    ["New articles", d.sections.articles],
+    ["From the community", d.sections.posts],
+  ].filter(([, items]) => (items as DigestItem[]).length > 0) as [string, DigestItem[]][];
+  if (!groups.length) return null;
+  const count = groups.reduce((a, [, items]) => a + items.length, 0);
+  const html = groups
+    .map(
+      ([heading, items]) => `
+<tr><td style="font-size:13px;font-weight:600;color:#6e6e73;text-transform:uppercase;letter-spacing:.04em;padding:18px 0 6px">${escapeHtml(heading)}</td></tr>
+${items
+  .map(
+    (i) => `<tr><td style="padding:6px 0;font-size:15px;line-height:1.45"><a href="${escapeHtml(i.url)}" style="color:#17214a;font-weight:600;text-decoration:none">${escapeHtml(i.title)}</a>${
+      i.by ? `<span style="color:#6e6e73"> · ${escapeHtml(i.by)}</span>` : ""
+    }${i.note ? `<div style="color:#1f7a3d;font-size:13px">${escapeHtml(i.note)}</div>` : ""}</td></tr>`,
+  )
+  .join("")}`,
+    )
+    .join("");
+  const inner = `
+<tr><td style="font-size:22px;font-weight:600;padding-bottom:4px">Your week on ${escapeHtml(d.businessName)}</td></tr>
+<tr><td style="font-size:15px;color:#6e6e73">Hi ${escapeHtml(d.name)}, here's what's new for you.</td></tr>
+${html}`;
+  const footer = `You asked for this weekly email. <a href="${escapeHtml(d.unsubscribeUrl)}" style="color:#6e6e73">Unsubscribe</a> with one click.`;
+  const text = [
+    `Your week on ${d.businessName}`,
+    "",
+    `Hi ${d.name}, here's what's new for you.`,
+    ...groups.flatMap(([heading, items]) => ["", heading.toUpperCase(), ...items.map((i) => `- ${i.title}${i.by ? ` · ${i.by}` : ""}${i.note ? ` (${i.note})` : ""}: ${i.url}`)]),
+    "",
+    `Unsubscribe: ${d.unsubscribeUrl}`,
+  ].join("\n");
+  return { subject: `${count} new ${count === 1 ? "thing" : "things"} for you this week`, html: shell(d.businessName, inner, footer), text };
 }

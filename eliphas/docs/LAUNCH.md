@@ -36,7 +36,7 @@ README under "Deploy to Vercel".
   | `RESEND_API_KEY` | From resend.com (order emails), step 5b |
   | `EMAIL_FROM` | e.g. `Eliphas Indicus <orders@your-domain.in>` (a domain verified in Resend) |
   | `EMAIL_REPLY_TO` | Optional: your support inbox, where customer replies go |
-  | `CRON_SECRET` | A long random text; protects the daily email retry job |
+  | `CRON_SECRET` | A long random text; protects the daily job (email retries, invite rewards, Monday weekly email) |
   | `AUTH_EMAILS_ENABLED` | `true` once Supabase can send sign-in emails through your SMTP (step 4) |
 
 - [ ] Settings → Domains → add your domain and follow the DNS instructions. Redeploy after changing variables.
@@ -44,7 +44,7 @@ README under "Deploy to Vercel".
       switched off rather than pretending.
 
 ## 4. Supabase (your existing project)
-- [ ] All migrations up to `20261029000023_referrals.sql` run (see "Database" below).
+- [ ] All migrations up to `20261030000024_growth.sql` run (see "Database" below).
 - [ ] Authentication → URL Configuration: **Site URL** `https://your-domain.in`; add `https://your-domain.in/**`
       to Redirect URLs.
 - [ ] Authentication → Phone: real SMS provider details (step 1). **Remove the test phone numbers.**
@@ -120,13 +120,15 @@ With live keys, on the real domain:
 
 ## Database
 Run each new file in `supabase/migrations/` once, in order, in the SQL Editor. Never run `hosted-setup.sql` on the
-existing database. Latest: `20261029000023_referrals.sql`.
+existing database. Latest: `20261030000024_growth.sql`.
 
 ## Play Store (optional, after the site is live)
 See [`PLAY-STORE.md`](PLAY-STORE.md): listing text, graphics, Data safety answers and the two Vercel settings.
 
 ## After launch
 - Admin → Overview: "Refunds to check" and "New messages" should be 0; see Admin → Refunds and Admin → Messages.
+- One daily job (`/api/cron/daily`, set up by `vercel.json`) retries failed emails, gives invite rewards and, on
+  Mondays, sends the weekly email to readers who turned it on (Notifications → Weekly email).
 - Admin → Emails: failed emails show here; they're retried daily.
 - Admin → Referrals (if switched on): rewards are given daily; use "Give due rewards now" to run it by hand, and block
   invites or cancel rewards that look like misuse.
