@@ -127,7 +127,12 @@ export default async function PrintJobPage({ params }: PageProps<"/printer/order
             <p className="mt-2 font-medium">{formatPhone(o.ship_phone)}</p>
             {o.tracking_number && (
               <p className="mt-3 rounded-[var(--radius-card)] bg-surface-2 p-3">
-                {o.courier}: <span className="font-semibold">{o.tracking_number}</span>
+                {o.courier}: <span className="id-mono font-semibold">{o.tracking_number}</span>
+                {o.tracking_url && (
+                  <a href={o.tracking_url} target="_blank" rel="noopener noreferrer" className="ml-2 underline">
+                    Tracking link
+                  </a>
+                )}
               </p>
             )}
           </section>

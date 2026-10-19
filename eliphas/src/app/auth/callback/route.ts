@@ -1,3 +1,4 @@
+import { parseEmail } from "@/lib/email-format";
 import { NextResponse } from "next/server";
 import { postLoginPath } from "@/lib/post-login";
 import { safeNext } from "@/lib/safe-next";
@@ -22,6 +23,11 @@ export async function GET(request: Request) {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error || !data.user) return fail("google");
-  const { data: profile } = await supabase.from("profiles").select("full_name, role").eq("id", data.user.id).maybeSingle();
+  const { data: profile } = await supabase.from("profiles").select("full_name, role, email").eq("id", data.user.id).maybeSingle();
+  // Google gives a verified email: use it for order updates unless the person already set one
+  const googleEmail = parseEmail(data.user.email);
+  if (profile && !profile.email && googleEmail && googleEmail !== "invalid") {
+    await supabase.from("profiles").update({ email: googleEmail }).eq("id", data.user.id);
+  }
   return NextResponse.redirect(new URL(postLoginPath(profile, audience, next), url.origin));
 }

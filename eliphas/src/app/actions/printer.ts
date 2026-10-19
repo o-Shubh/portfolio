@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
+import { cleanTrackingUrl } from "@/lib/couriers";
+import { sendOrderEmail } from "@/lib/order-emails";
 import { PRINTER_NEXT, type OrderStatus } from "@/lib/order-status";
 import type { Database } from "@/lib/database.types";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -41,11 +43,17 @@ export async function advanceOrder(orderId: string, _prev: ActionState, fd: Form
     const tracking = String(fd.get("tracking_number") ?? "").trim();
     if (courier.length < 2) return { error: "Enter the courier name." };
     if (!/^[A-Za-z0-9-]{6,40}$/.test(tracking)) return { error: "Enter the tracking number (letters and numbers)." };
-    Object.assign(update, { courier, tracking_number: tracking, shipped_at: now });
+    const rawUrl = String(fd.get("tracking_url") ?? "").trim();
+    const trackingUrl = cleanTrackingUrl(rawUrl);
+    if (rawUrl && !trackingUrl) return { error: "The tracking link must be a full https:// address, or leave it empty." };
+    Object.assign(update, { courier, tracking_number: tracking, tracking_url: trackingUrl, shipped_at: now });
   }
 
-  const { error } = await admin.from("orders").update(update).eq("id", orderId).eq("status", order.status);
+  const { data: moved, error } = await admin.from("orders").update(update).eq("id", orderId).eq("status", order.status).select("id");
   if (error) return { error: "Could not update. Please try again." };
+  if (!moved?.length) return { error: "This order has already moved on. Refresh the page." };
+  if (next.to === "shipped") await sendOrderEmail(orderId, "order_shipped");
+  if (next.to === "delivered") await sendOrderEmail(orderId, "order_delivered");
 
   revalidatePath("/printer", "layout");
   revalidatePath("/admin/orders");

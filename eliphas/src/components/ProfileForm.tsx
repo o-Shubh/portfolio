@@ -10,6 +10,22 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   return (
     <form onSubmit={onSubmit} onChange={onChange} className="card space-y-4">
       <ProfileFields profile={profile} />
+      <div>
+        <label htmlFor="email" className="label">
+          Email <span className="font-normal text-muted">(optional)</span>
+        </label>
+        <input id="email" name="email" type="email" autoComplete="email" inputMode="email" defaultValue={profile.email ?? ""} className="field" aria-describedby="email-help" />
+        <p id="email-help" className="hint">
+          For order updates and receipts. You still log in with your mobile number.
+        </p>
+      </div>
+      <label className="flex items-center justify-between gap-4">
+        <span>
+          <span className="block font-medium">Order updates by email</span>
+          <span className="block text-sm text-muted">Confirmed, shipped, delivered and refunds.</span>
+        </span>
+        <input type="checkbox" role="switch" name="notify_order_emails" className="switch" defaultChecked={profile.notify_order_emails} />
+      </label>
       {(profile.role === "author" || profile.role === "admin") && (
         <div>
           <label htmlFor="bio" className="label">

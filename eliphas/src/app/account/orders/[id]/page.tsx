@@ -7,6 +7,7 @@ import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 import { OrderTimeline } from "@/components/OrderTimeline";
 import { requireRole } from "@/lib/auth";
 import { coverUrl } from "@/lib/books";
+import { trackingLink } from "@/lib/couriers";
 import { ORDER_STATUS } from "@/lib/order-status";
 import { formatPhone } from "@/lib/phone";
 import { rupees } from "@/lib/pricing";
@@ -37,6 +38,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  const track = trackingLink(o.courier, o.tracking_number, o.tracking_url);
   const canReport =
     !issue &&
     ((o.status === "delivered" && o.delivered_at && new Date().getTime() - new Date(o.delivered_at).getTime() < 7 * 86_400_000) || o.status === "shipped");
@@ -100,10 +102,17 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
             <h2 className="mb-5 text-xl">Tracking</h2>
             <OrderTimeline order={o} />
             {o.tracking_number && (
-              <p className="mt-6 flex items-center gap-2 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
-                <Truck className="h-4 w-4 shrink-0" aria-hidden />
-                {o.courier}: <span className="font-semibold mono select-all">{o.tracking_number}</span>
-              </p>
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] bg-surface-2 p-3 text-sm">
+                <p className="flex min-w-0 items-center gap-2">
+                  <Truck className="h-4 w-4 shrink-0" aria-hidden />
+                  {o.courier}: <span className="id-mono font-semibold select-all">{o.tracking_number}</span>
+                </p>
+                {track && (
+                  <a href={track} target="_blank" rel="noopener noreferrer" className="btn-primary min-h-10 px-4 text-sm">
+                    Track parcel
+                  </a>
+                )}
+              </div>
             )}
           </section>
         </div>

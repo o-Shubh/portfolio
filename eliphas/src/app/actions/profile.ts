@@ -1,5 +1,6 @@
 "use server";
 
+import { parseEmail } from "@/lib/email-format";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
@@ -71,10 +72,15 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   const bio = bioField === null || !["author", "admin"].includes(profile.role) ? undefined : String(bioField).trim();
   if (bio && bio.length > 600) return { error: "Keep your bio under 600 characters." };
 
+  const email = parseEmail(formData.get("email"));
+  if (email === "invalid") return { error: "Enter a valid email address, or leave it empty." };
+  // Only forms that show the email fields change them (onboarding doesn't)
+  const emailFields = formData.has("email") ? { email, notify_order_emails: formData.get("notify_order_emails") === "on" } : {};
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
-    .update({ ...parsed.values, ...(bio !== undefined ? { bio: bio || null } : {}) })
+    .update({ ...parsed.values, ...emailFields, ...(bio !== undefined ? { bio: bio || null } : {}) })
     .eq("id", profile.id);
   if (error) return { error: "Could not save. Please try again." };
 

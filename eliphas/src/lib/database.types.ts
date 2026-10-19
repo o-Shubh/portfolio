@@ -713,6 +713,68 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"contact_messages": {
+                  Row: {
+                    "admin_note": string | null,"created_at": string,"email": string,"handled_at": string | null,"handled_by": string | null,"id": string,"ip_hash": string | null,"message": string,"name": string,"order_number": string | null,"phone": string | null,"status": string,"topic": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "admin_note"?: string | null,"created_at"?: string,"email": string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"ip_hash"?: string | null,"message": string,"name": string,"order_number"?: string | null,"phone"?: string | null,"status"?: string,"topic": string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "admin_note"?: string | null,"created_at"?: string,"email"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"ip_hash"?: string | null,"message"?: string,"name"?: string,"order_number"?: string | null,"phone"?: string | null,"status"?: string,"topic"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"content_reports": {
                   Row: {
                     "created_at": string,"details": string | null,"id": string,"reason": string,"reporter_id": string,"resolved_at": string | null,"resolved_by": string | null,"status": string,"target_id": string,"target_type": string
@@ -884,6 +946,50 @@ isOneToOne: false
       columns: ["book_id"]
 isOneToOne: true
       referencedRelation: "books"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"email_outbox": {
+                  Row: {
+                    "attempts": number,"created_at": string,"dedupe_key": string | null,"html": string,"id": string,"kind": string,"last_error": string | null,"order_id": string | null,"provider_id": string | null,"sent_at": string | null,"status": string,"subject": string,"text_body": string,"to_email": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attempts"?: number,"created_at"?: string,"dedupe_key"?: string | null,"html": string,"id"?: string,"kind": string,"last_error"?: string | null,"order_id"?: string | null,"provider_id"?: string | null,"sent_at"?: string | null,"status"?: string,"subject": string,"text_body": string,"to_email": string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "attempts"?: number,"created_at"?: string,"dedupe_key"?: string | null,"html"?: string,"id"?: string,"kind"?: string,"last_error"?: string | null,"order_id"?: string | null,"provider_id"?: string | null,"sent_at"?: string | null,"status"?: string,"subject"?: string,"text_body"?: string,"to_email"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "email_outbox_order_id_fkey"
+      columns: ["order_id"]
+isOneToOne: false
+      referencedRelation: "orders"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_outbox_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "email_outbox_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_outbox_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_outbox_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
       referencedColumns: ["id"]
     }
                   ]
@@ -1207,14 +1313,14 @@ isOneToOne: false
                   ]
                 },"orders": {
                   Row: {
-                    "accepted_at": string | null,"buyer_id": string | null,"campaign_link_id": string | null,"cancel_reason": string | null,"cancelled_at": string | null,"cancelled_by": string | null,"courier": string | null,"created_at": string,"delivered_at": string | null,"gateway_fee": number | null,"gateway_fee_source": string | null,"id": string,"order_number": string,"packed_at": string | null,"paid_at": string | null,"payment_mode": string | null,"printed_at": string | null,"printer_id": string | null,"printing_at": string | null,"razorpay_order_id": string | null,"razorpay_payment_id": string | null,"refund_amount": number | null,"refund_id": string | null,"refund_status": string | null,"refunded_at": string | null,"replacement_of": string | null,"ship_city": string,"ship_line1": string,"ship_line2": string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at": string | null,"shipping": number,"shipping_discount": number,"shipping_promotion_id": string | null,"shipping_quote": Json | null,"status": Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number": string | null,"updated_at": string
+                    "accepted_at": string | null,"buyer_id": string | null,"campaign_link_id": string | null,"cancel_reason": string | null,"cancelled_at": string | null,"cancelled_by": string | null,"contact_email": string | null,"courier": string | null,"created_at": string,"delivered_at": string | null,"gateway_fee": number | null,"gateway_fee_source": string | null,"id": string,"order_number": string,"packed_at": string | null,"paid_at": string | null,"payment_mode": string | null,"printed_at": string | null,"printer_id": string | null,"printing_at": string | null,"razorpay_order_id": string | null,"razorpay_payment_id": string | null,"refund_amount": number | null,"refund_id": string | null,"refund_status": string | null,"refunded_at": string | null,"replacement_of": string | null,"ship_city": string,"ship_line1": string,"ship_line2": string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at": string | null,"shipping": number,"shipping_discount": number,"shipping_promotion_id": string | null,"shipping_quote": Json | null,"status": Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number": string | null,"tracking_url": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"courier"?: string | null,"created_at"?: string,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city": string,"ship_line1": string,"ship_line2"?: string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number"?: string | null,"updated_at"?: string
+                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"contact_email"?: string | null,"courier"?: string | null,"created_at"?: string,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city": string,"ship_line1": string,"ship_line2"?: string | null,"ship_name": string,"ship_phone": string,"ship_pincode": string,"ship_state": string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal": number,"total": number,"tracking_number"?: string | null,"tracking_url"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"courier"?: string | null,"created_at"?: string,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city"?: string,"ship_line1"?: string,"ship_line2"?: string | null,"ship_name"?: string,"ship_phone"?: string,"ship_pincode"?: string,"ship_state"?: string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal"?: number,"total"?: number,"tracking_number"?: string | null,"updated_at"?: string
+                    "accepted_at"?: string | null,"buyer_id"?: string | null,"campaign_link_id"?: string | null,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"cancelled_by"?: string | null,"contact_email"?: string | null,"courier"?: string | null,"created_at"?: string,"delivered_at"?: string | null,"gateway_fee"?: number | null,"gateway_fee_source"?: string | null,"id"?: string,"order_number"?: string,"packed_at"?: string | null,"paid_at"?: string | null,"payment_mode"?: string | null,"printed_at"?: string | null,"printer_id"?: string | null,"printing_at"?: string | null,"razorpay_order_id"?: string | null,"razorpay_payment_id"?: string | null,"refund_amount"?: number | null,"refund_id"?: string | null,"refund_status"?: string | null,"refunded_at"?: string | null,"replacement_of"?: string | null,"ship_city"?: string,"ship_line1"?: string,"ship_line2"?: string | null,"ship_name"?: string,"ship_phone"?: string,"ship_pincode"?: string,"ship_state"?: string,"shipped_at"?: string | null,"shipping"?: number,"shipping_discount"?: number,"shipping_promotion_id"?: string | null,"shipping_quote"?: Json | null,"status"?: Database["public"]['Enums']["order_status"],"subtotal"?: number,"total"?: number,"tracking_number"?: string | null,"tracking_url"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -1361,16 +1467,54 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
-                },"payouts": {
+                },"payout_runs": {
                   Row: {
-                    "amount": number,"author_id": string,"created_at": string,"created_by": string | null,"id": string,"note": string | null,"paid_at": string | null,"period_end": string | null,"period_start": string | null,"reference": string | null,"status": Database["public"]['Enums']["payout_status"]
+                    "authors": number,"closed_at": string | null,"created_at": string,"created_by": string | null,"id": string,"minimum": number,"status": string,"total": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "amount": number,"author_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"status"?: Database["public"]['Enums']["payout_status"]
+                    "authors"?: number,"closed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"minimum"?: number,"status"?: string,"total"?: number
                   }
                   Update: {
-                    "amount"?: number,"author_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"status"?: Database["public"]['Enums']["payout_status"]
+                    "authors"?: number,"closed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"minimum"?: number,"status"?: string,"total"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"payouts": {
+                  Row: {
+                    "amount": number,"author_id": string,"created_at": string,"created_by": string | null,"id": string,"note": string | null,"paid_at": string | null,"period_end": string | null,"period_start": string | null,"reference": string | null,"run_id": string | null,"status": Database["public"]['Enums']["payout_status"],"upi": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"author_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"run_id"?: string | null,"status"?: Database["public"]['Enums']["payout_status"],"upi"?: string | null
+                  }
+                  Update: {
+                    "amount"?: number,"author_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"run_id"?: string | null,"status"?: Database["public"]['Enums']["payout_status"],"upi"?: string | null
                   }
                   Relationships: [
                     {
@@ -1420,6 +1564,12 @@ isOneToOne: false
       columns: ["created_by"]
 isOneToOne: false
       referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payouts_run_id_fkey"
+      columns: ["run_id"]
+isOneToOne: false
+      referencedRelation: "payout_runs"
       referencedColumns: ["id"]
     }
                   ]
@@ -1751,14 +1901,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "author_terms_accepted_at": string | null,"author_terms_version": string | null,"avatar_path": string | null,"bio": string | null,"city": string | null,"created_at": string,"full_name": string | null,"handle": string | null,"id": string,"notify_followers": boolean,"notify_new_articles": boolean,"notify_new_posts": boolean,"notify_replies": boolean,"payout_upi": string | null,"phone": string | null,"pincode": string | null,"role": Database["public"]['Enums']["app_role"],"state": string | null,"updated_at": string,"verified_author_at": string | null,"verified_author_by": string | null
+                    "author_terms_accepted_at": string | null,"author_terms_version": string | null,"avatar_path": string | null,"bio": string | null,"city": string | null,"created_at": string,"email": string | null,"full_name": string | null,"handle": string | null,"id": string,"notify_followers": boolean,"notify_new_articles": boolean,"notify_new_posts": boolean,"notify_order_emails": boolean,"notify_replies": boolean,"payout_upi": string | null,"phone": string | null,"pincode": string | null,"role": Database["public"]['Enums']["app_role"],"state": string | null,"updated_at": string,"verified_author_at": string | null,"verified_author_by": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"full_name"?: string | null,"handle"?: string | null,"id": string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_posts"?: boolean,"notify_replies"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null
+                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id": string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null
                   }
                   Update: {
-                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"full_name"?: string | null,"handle"?: string | null,"id"?: string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_posts"?: boolean,"notify_replies"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null
+                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null
                   }
                   Relationships: [
                     {
@@ -2426,6 +2576,12 @@ isOneToOne: false
 "can_request_distribution":
 { Args: { "target": string }; Returns: boolean
                            },
+"cancel_payout_run":
+{ Args: { "p_run": string }; Returns: undefined
+                           },
+"create_payout_run":
+{ Args: { "p_actor": string,"p_minimum": number }; Returns: string
+                           },
 "has_active_pro":
 { Args: { "p_author": string }; Returns: boolean
                            },
@@ -2509,6 +2665,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"payable_now":
+{ Args: { "p_author": string }; Returns: number
+                           },
 "period_credit_balance":
 { Args: { "p_period": string }; Returns: number
                            },
@@ -2555,6 +2714,9 @@ isOneToOne: false
                            },
 "settle_payment_refund":
 { Args: { "p_error"?: string,"p_razorpay_id"?: string,"p_refund": string,"p_status": string }; Returns: undefined
+                           },
+"settle_run_payout":
+{ Args: { "p_paid": boolean,"p_payout": string,"p_reference": string }; Returns: undefined
                            },
 "use_pro_credit":
 { Args: { "p_author": string,"p_service_order": string }; Returns: string

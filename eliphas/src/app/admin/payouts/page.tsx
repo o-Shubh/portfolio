@@ -4,20 +4,23 @@ import { requireRole } from "@/lib/auth";
 import { formatPhone } from "@/lib/phone";
 import { rupees } from "@/lib/pricing";
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 import { PayoutForm } from "./PayoutForm";
+import { StartRunForm } from "./RunForms";
 
 export const metadata: Metadata = { title: "Payouts" };
 
 export default async function PayoutsPage() {
   await requireRole(["admin"]);
   const supabase = await createClient();
-  const [{ data: balances }, { data: history }] = await Promise.all([
+  const [{ data: balances }, { data: history }, { data: openRun }] = await Promise.all([
     supabase.from("author_balances").select("*").order("balance", { ascending: false }),
     supabase
       .from("payouts")
       .select("id, amount, reference, note, paid_at, created_at, status, author_id, profiles!payouts_author_id_fkey(full_name)")
       .order("created_at", { ascending: false })
       .limit(30),
+    supabase.from("payout_runs").select("id, authors, total, created_at").eq("status", "open").maybeSingle(),
   ]);
 
   const owed = (balances ?? []).reduce((sum, b) => sum + Math.max(0, Number(b.balance)), 0);
@@ -29,6 +32,30 @@ export default async function PayoutsPage() {
         <p className="text-sm text-muted">Total owed to authors</p>
         <p className="mono text-3xl font-semibold tracking-tight">{rupees(Math.round(owed * 100) / 100)}</p>
       </div>
+
+      <section className="card mb-6" aria-labelledby="run-h">
+        <h2 id="run-h" className="text-xl">
+          Payout run
+        </h2>
+        {openRun ? (
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-muted">
+              Open run: {openRun.authors} {openRun.authors === 1 ? "author" : "authors"}, <span className="mono">{rupees(Number(openRun.total), true)}</span>
+            </p>
+            <Link href={`/admin/payouts/run/${openRun.id}`} className="btn-primary">
+              Continue payout run
+            </Link>
+          </div>
+        ) : (
+          <>
+            <p className="mt-1 mb-4 text-sm text-muted">
+              Pays everyone owed at least the minimum on delivered orders who has added a UPI ID. You get one sheet to pay from, then mark each payment paid
+              with its reference.
+            </p>
+            <StartRunForm />
+          </>
+        )}
+      </section>
 
       <h2 className="mb-3 text-xl">Balances</h2>
       {!balances?.length ? (

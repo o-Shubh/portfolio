@@ -33,13 +33,17 @@ README under "Deploy to Vercel".
   | `PUBLIC_SITE_ORIGIN` | `https://your-domain.in` (for Edition ID QR codes) |
   | `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | Live keys (`rzp_live_…`) once KYC is approved; test keys before that |
   | `RAZORPAY_WEBHOOK_SECRET` | A long random text, also entered in Razorpay (step 5) |
+  | `RESEND_API_KEY` | From resend.com (order emails), step 5b |
+  | `EMAIL_FROM` | e.g. `Eliphas Indicus <orders@your-domain.in>` (a domain verified in Resend) |
+  | `EMAIL_REPLY_TO` | Optional: your support inbox, where customer replies go |
+  | `CRON_SECRET` | A long random text; protects the daily email retry job |
 
 - [ ] Settings → Domains → add your domain and follow the DNS instructions. Redeploy after changing variables.
 - [ ] Test payments (the pretend payment window) never run on a hosted site. Without Razorpay keys, checkout is
       switched off rather than pretending.
 
 ## 4. Supabase (your existing project)
-- [ ] All migrations up to `20261027000021_refund_ledger.sql` run (see "Database" below).
+- [ ] All migrations up to `20261028000022_operations.sql` run (see "Database" below).
 - [ ] Authentication → URL Configuration: **Site URL** `https://your-domain.in`; add `https://your-domain.in/**`
       to Redirect URLs.
 - [ ] Authentication → Phone: real SMS provider details (step 1). **Remove the test phone numbers.**
@@ -56,6 +60,14 @@ README under "Deploy to Vercel".
       after Razorpay confirms capture.
 - [ ] After KYC: generate live keys, put them in Vercel, redeploy. Admin → Overview shows "Razorpay live keys" done.
 
+## 5b. Email (order updates and contact form copies)
+- [ ] Create a free account at resend.com, add your domain and add the DNS records it shows (at your domain
+      registrar). Wait until Resend shows the domain as verified.
+- [ ] Create an API key; put `RESEND_API_KEY`, `EMAIL_FROM` (and optionally `EMAIL_REPLY_TO`) and `CRON_SECRET` in
+      Vercel; redeploy. Admin → Overview shows "Order emails set up".
+- [ ] Place a test order with your own email: you should get "Order … confirmed". Admin → Emails lists every email
+      and lets you retry failed ones (they're also retried once a day automatically).
+
 ## 6. Business setup in the admin
 - [ ] Admin → Settings: business details; real print rates from your printer; spine thickness per paper; untick
       "These are sample rates".
@@ -63,6 +75,10 @@ README under "Deploy to Vercel".
 - [ ] Admin → Shipping: real courier rates; untick "Sample rates" on every zone.
 - [ ] Admin → Plans: accountant-approved GST settings (GST registered? GSTIN? rate) and TDS/TCS review.
 - [ ] Admin → Edition IDs: once `PUBLIC_SITE_ORIGIN` is set, run the backfill (dry run first).
+- [ ] Admin → Settings → Business details: the support email also receives a copy of every Contact form message
+      (Admin → Messages has them all).
+- [ ] Decide your payout schedule (e.g. monthly) and minimum. Admin → Payouts → Start payout run: download the sheet,
+      pay each author by UPI or bank bulk transfer, then enter each reference (UTR) and mark it paid.
 - [ ] FAQ promises (review time, delivery time) match what you can deliver: `src/content/faq.ts`.
 
 ## 7. Legal
@@ -83,9 +99,13 @@ With live keys, on the real domain:
 
 ## Database
 Run each new file in `supabase/migrations/` once, in order, in the SQL Editor. Never run `hosted-setup.sql` on the
-existing database. Latest: `20261027000021_refund_ledger.sql`.
+existing database. Latest: `20261028000022_operations.sql`.
+
+## Play Store (optional, after the site is live)
+See [`PLAY-STORE.md`](PLAY-STORE.md): listing text, graphics, Data safety answers and the two Vercel settings.
 
 ## After launch
-- Admin → Overview: "Refunds to check" should be 0; anything else is listed on Admin → Refunds.
+- Admin → Overview: "Refunds to check" and "New messages" should be 0; see Admin → Refunds and Admin → Messages.
+- Admin → Emails: failed emails show here; they're retried daily.
 - Vercel → Logs for errors; Razorpay → Webhooks for failed deliveries (they're retried automatically).
 - GitHub runs lint, typecheck, unit tests and a build on every pull request ("Eliphas checks").

@@ -7,7 +7,7 @@ export async function addressDefaults(profile: Profile): Promise<Record<string, 
   const supabase = await createClient();
   const { data: last } = await supabase
     .from("orders")
-    .select("ship_name, ship_phone, ship_line1, ship_line2, ship_city, ship_state, ship_pincode")
+    .select("ship_name, ship_phone, ship_line1, ship_line2, ship_city, ship_state, ship_pincode, contact_email")
     .eq("buyer_id", profile.id)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -20,5 +20,6 @@ export async function addressDefaults(profile: Profile): Promise<Record<string, 
     ship_city: last?.ship_city ?? profile.city ?? "",
     ship_state: last?.ship_state ?? profile.state ?? "",
     ship_pincode: last?.ship_pincode ?? profile.pincode ?? "",
+    contact_email: last?.contact_email ?? profile.email ?? "",
   };
 }

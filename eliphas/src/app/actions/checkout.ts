@@ -10,6 +10,7 @@ import { INDIAN_STATES } from "@/lib/india";
 import type { Book } from "@/lib/publishing";
 import { markOrderPaid } from "@/lib/orders";
 import { orderItemRows, priceOrder } from "@/lib/order-pricing";
+import { parseEmail } from "@/lib/email-format";
 import { checkCapture, createRazorpayOrder, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
 import { cleanIndianMobile } from "@/lib/phone";
 import { verifyPaymentSignature } from "@/lib/razorpay-signature";
@@ -98,6 +99,8 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   if (!mobile) return { error: "Enter a valid 10-digit mobile number for the courier." };
   if (line1.length < 5) return { error: "Enter the house / street address." };
   if (!city) return { error: "Enter the city." };
+  const contactEmail = parseEmail(fd.get("contact_email"));
+  if (contactEmail === "invalid") return { error: "Enter a valid email address for order updates, or leave it empty." };
   if (!(INDIAN_STATES as readonly string[]).includes(state)) return { error: "Choose the state." };
   if (!/^[1-9]\d{5}$/.test(pincode)) return { error: "PIN code should be 6 digits." };
 
@@ -150,10 +153,12 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
       ship_city: city,
       ship_state: state,
       ship_pincode: pincode,
+      contact_email: contactEmail,
     })
     .select("id, order_number")
     .single();
   if (error || !order) return { error: "Could not create the order. Please try again." };
+  if (contactEmail && !profile.email) await admin.from("profiles").update({ email: contactEmail }).eq("id", profile.id);
 
   const { error: itemError } = await admin.from("order_items").insert(orderItemRows(order.id, priced));
   if (itemError) {
