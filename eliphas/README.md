@@ -23,6 +23,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 11 | Redesign to the shared "Cupertino Editorial" system; admin Finance fix | ✅ Done (migration 000018) |
 | 12 | Distribution requests (Amazon India, Flipkart, international): intake and review only | ✅ Done (migrations 000019, 000020) |
 | 13 | Launch hardening: captured-only payments, refund ledger and Admin → Refunds, CI checks | ✅ Done (migration 000021) |
+| 14 | Operations: order emails, contact form inbox, payout runs, parcel tracking links, Play Store assets | ✅ Done (migration 000022) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -531,6 +532,22 @@ See [`docs/DISTRIBUTION-HANDOFF.md`](docs/DISTRIBUTION-HANDOFF.md) for limits an
   create quotes or touch the existing fee and royalty calculations.
 - **Security.** Authors can read only their own requests and can create them only for their own live books; they
   can't set status, notes or reviewer fields, edit or delete requests. Only admins can review.
+
+### Operations: emails, contact form, payout runs, tracking (migration 000022)
+
+- **Order emails** (Resend): order confirmed, shipped (with tracking link), delivered, cancelled and refund sent.
+  Readers add an email at checkout or in Settings and can turn order emails off. Every email goes through
+  `email_outbox` (sent once per order and kind, retried daily by `/api/cron/emails`, visible in **Admin → Emails**).
+  Without `RESEND_API_KEY`/`EMAIL_FROM` nothing is sent (recorded as skipped). Google sign-in fills the email.
+- **Contact form** on `/contact` for guests and members, with a hidden spam field and per-sender limits. Messages go to
+  **Admin → Messages** (mark replied/closed, private note) and, when email is set up, a copy to the support email with
+  reply-to set to the sender.
+- **Payout runs** (Admin → Payouts): one batch for every author owed at least a minimum on delivered orders who has a
+  UPI ID. Download the payout sheet (CSV), pay by UPI/bank, enter each reference (UTR) and mark paid. One open run at
+  a time; money in an open run can't be paid twice (manual payouts check it too); cancelling releases it.
+- **Parcel tracking**: the printer picks the courier and can paste the courier's tracking link; readers get a
+  **Track parcel** button (Delhivery and Shiprocket links are built automatically from the number).
+- **Play Store**: listing text, Data safety answers and graphics in [`docs/PLAY-STORE.md`](docs/PLAY-STORE.md).
 
 ### Google sign-in setup (about 10 minutes)
 

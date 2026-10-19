@@ -59,7 +59,8 @@ export async function deliver(id: string, replyTo?: string): Promise<"sent" | "f
     return "skipped";
   }
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    // RESEND_API_URL only for tests (a local stand-in); production always uses Resend's address
+    const res = await fetch(process.env.RESEND_API_URL || "https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
