@@ -11,7 +11,8 @@ export const metadata: Metadata = { title: "Earnings & payouts" };
 const EARNING_STATUSES = ["paid", "accepted", "printing", "printed", "packed", "shipped", "delivered", "cancelled"] as const;
 const PAGE = 50;
 const n = (v: unknown) => Number(v ?? 0);
-const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }) : "—");
+const date = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }) : "—";
 
 type Line = {
   id: string;
@@ -29,7 +30,13 @@ type Line = {
   author_discount: number;
   reversed_at: string | null;
   books: { title: string; language: string } | null;
-  orders: { order_number: string; status: Parameters<typeof OrderStatusBadge>[0]["status"]; paid_at: string | null; delivered_at: string | null; gateway_fee_source: string | null };
+  orders: {
+    order_number: string;
+    status: Parameters<typeof OrderStatusBadge>[0]["status"];
+    paid_at: string | null;
+    delivered_at: string | null;
+    gateway_fee_source: string | null;
+  };
 };
 
 /**
@@ -62,7 +69,13 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
 
   const earning = (l: { author_earning_total: number | null; author_earning: number | null; quantity: number; reversed_at: string | null }) =>
     l.reversed_at ? 0 : l.author_earning_total !== null ? n(l.author_earning_total) : n(l.author_earning) * l.quantity;
-  const lines = (all ?? []) as unknown as { quantity: number; author_earning_total: number | null; author_earning: number | null; reversed_at: string | null; orders: { status: string } }[];
+  const lines = (all ?? []) as unknown as {
+    quantity: number;
+    author_earning_total: number | null;
+    author_earning: number | null;
+    reversed_at: string | null;
+    orders: { status: string };
+  }[];
   const total = lines.reduce((s, l) => s + earning(l), 0);
   const pending = lines.filter((l) => l.orders.status !== "delivered").reduce((s, l) => s + earning(l), 0);
   const paid = (payouts ?? []).filter((p) => p.status === "paid").reduce((s, p) => s + n(p.amount), 0);
@@ -81,7 +94,10 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
 
   return (
     <>
-      <PageHeader title="Earnings & payouts" intro="Every figure comes from what was recorded when each order was paid. Changes to plans or rates never change past orders." />
+      <PageHeader
+        title="Earnings & payouts"
+        intro="Every figure comes from what was recorded when each order was paid. Changes to plans or rates never change past orders."
+      />
 
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {tiles.map((t) => (
@@ -93,7 +109,8 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
         ))}
       </dl>
       <p className="mt-3 max-w-3xl text-sm text-muted">
-        Earnings per copy = selling price − printing − platform commission − GST on commission − the payment charge allocated to the book. Shipping is paid by readers and never deducted. No tax (TDS/TCS) is withheld at present; if that changes it will appear here as its own line. Payouts go to the UPI ID in{" "}
+        Earnings per copy = selling price − printing − platform commission − GST on commission − the payment charge allocated to the book. Shipping is paid by
+        readers and never deducted. No tax (TDS/TCS) is withheld at present; if that changes it will appear here as its own line. Payouts go to the UPI ID in{" "}
         <Link href="/account/profile" className="font-medium text-accent-fg underline-offset-2 hover:underline">
           Settings
         </Link>
@@ -105,22 +122,33 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
           Earnings by order
         </h2>
         {list.length === 0 ? (
-          <p className="mt-3 rounded-[var(--radius-card)] border border-dashed border-line-strong p-8 text-center text-muted">No paid orders yet. Your earnings appear here as soon as a reader pays.</p>
+          <p className="mt-3 rounded-[var(--radius-card)] border border-dashed border-line-strong p-8 text-center text-muted">
+            No paid orders yet. Your earnings appear here as soon as a reader pays.
+          </p>
         ) : (
           <div className="mt-3 overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line">
-            <table className="w-full min-w-[860px] text-left text-sm tabular-nums">
+            <table className="w-full min-w-[720px] text-left text-sm tabular-nums">
               <caption className="sr-only">Your earnings for each paid order line, with the costs taken from the selling price</caption>
               <thead className="border-b border-line bg-surface-2 text-muted">
                 <tr>
-                  <th scope="col" className="p-3 font-medium">Paid</th>
-                  <th scope="col" className="p-3 font-medium">Book</th>
-                  <th scope="col" className="p-3 font-medium">Status</th>
-                  <th scope="col" className="p-3 text-right font-medium">Selling price</th>
-                  <th scope="col" className="p-3 text-right font-medium">Printing</th>
-                  <th scope="col" className="p-3 text-right font-medium">Commission</th>
-                  <th scope="col" className="p-3 text-right font-medium">GST on commission</th>
-                  <th scope="col" className="p-3 text-right font-medium">Payment charge</th>
-                  <th scope="col" className="p-3 text-right font-medium">Your earnings</th>
+                  <th scope="col" className="p-3 font-medium">
+                    Paid
+                  </th>
+                  <th scope="col" className="p-3 font-medium">
+                    Book
+                  </th>
+                  <th scope="col" className="p-3 font-medium">
+                    Status
+                  </th>
+                  <th scope="col" className="p-3 text-right font-medium">
+                    Selling price
+                  </th>
+                  <th scope="col" className="p-3 text-right font-medium">
+                    Costs
+                  </th>
+                  <th scope="col" className="p-3 text-right font-medium">
+                    Your earnings
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -132,7 +160,9 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
                     <tr key={l.id} className={void_ ? "text-muted" : ""}>
                       <td className="p-3 whitespace-nowrap">{date(l.orders.paid_at)}</td>
                       <td className="p-3">
-                        <span className="font-medium" lang={l.books?.language}>{l.books?.title}</span>
+                        <span className="font-medium" lang={l.books?.language}>
+                          {l.books?.title}
+                        </span>
                         <span className="block text-xs text-muted">
                           <span className="id-mono">{l.orders.order_number}</span> · {l.quantity} {l.quantity === 1 ? "copy" : "copies"}
                           {l.author_plan ? ` · ${l.author_plan === "pro" ? "Pro" : l.author_plan === "free" ? "Free" : "original"} terms` : ""}
@@ -142,14 +172,27 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
                         {void_ ? <span className="badge bg-surface-2">Refunded or cancelled</span> : <OrderStatusBadge status={l.orders.status} />}
                       </td>
                       <td className="mono p-3 text-right">{rupees(sale, true)}</td>
-                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.print_cost_total), true)}`}</td>
-                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission), true)}`}</td>
-                      <td className="mono p-3 text-right">{legacy ? "—" : `− ${rupees(n(l.commission_gst), true)}`}</td>
-                      <td className="mono p-3 text-right">
-                        {legacy || l.gateway_allocated === null ? "—" : `− ${rupees(n(l.gateway_allocated), true)}`}
-                        {!legacy && l.orders.gateway_fee_source === "estimated" && <span className="block text-xs text-muted">estimated</span>}
+                      <td className="p-3 text-right">
+                        {legacy ? (
+                          "—"
+                        ) : (
+                          <>
+                            <span className="mono block">
+                              − {rupees(n(l.print_cost_total) + n(l.commission) + n(l.commission_gst) + n(l.gateway_allocated), true)}
+                            </span>
+                            <span className="block text-xs whitespace-nowrap text-muted">
+                              Printing {rupees(n(l.print_cost_total), true)} · Commission {rupees(n(l.commission), true)}
+                            </span>
+                            <span className="block text-xs whitespace-nowrap text-muted">
+                              GST {rupees(n(l.commission_gst), true)} · Payment {l.gateway_allocated === null ? "—" : rupees(n(l.gateway_allocated), true)}
+                              {l.orders.gateway_fee_source === "estimated" && " (estimated)"}
+                            </span>
+                          </>
+                        )}
                       </td>
-                      <td className="mono p-3 text-right font-semibold">{void_ ? <s>{rupees(earning({ ...l, reversed_at: null }), true)}</s> : rupees(earning(l), true)}</td>
+                      <td className="mono p-3 text-right font-semibold">
+                        {void_ ? <s>{rupees(earning({ ...l, reversed_at: null }), true)}</s> : rupees(earning(l), true)}
+                      </td>
                     </tr>
                   );
                 })}
@@ -157,8 +200,12 @@ export default async function EarningsPage({ searchParams }: PageProps<"/author/
             </table>
           </div>
         )}
-        {list.some((l) => l.commission === null) && <p className="mt-2 text-xs text-muted">“—” marks orders from before itemised records; their earnings are as recorded at the time.</p>}
-        {reversed.length > 0 && <p className="mt-2 text-xs text-muted">Refunded lines are struck through and count as ₹0. They stay listed so every adjustment is visible.</p>}
+        {list.some((l) => l.commission === null) && (
+          <p className="mt-2 text-xs text-muted">“—” marks orders from before itemised records; their earnings are as recorded at the time.</p>
+        )}
+        {reversed.length > 0 && (
+          <p className="mt-2 text-xs text-muted">Refunded lines are struck through and count as ₹0. They stay listed so every adjustment is visible.</p>
+        )}
         {pages > 1 && (
           <nav aria-label="Pages" className="mt-6 flex items-center justify-center gap-3">
             {page > 1 && (

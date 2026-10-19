@@ -36,7 +36,10 @@ export default async function AccountHome() {
       ) : (
         <ul className="group-list">
           {orders.map((o) => {
-            const titles = o.order_items.map((i) => i.books?.title).filter(Boolean).join(", ");
+            const titles = o.order_items
+              .map((i) => i.books?.title)
+              .filter(Boolean)
+              .join(", ");
             const copies = o.order_items.reduce((n, i) => n + i.quantity, 0);
             return (
               <li key={o.id}>
@@ -44,8 +47,8 @@ export default async function AccountHome() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{titles}</p>
                     <p className="text-sm text-muted">
-                      <span className="id-mono">{o.order_number}</span> · {copies} {copies === 1 ? "copy" : "copies"} · <span className="mono">{rupees(Number(o.total))}</span> ·{" "}
-                      {new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                      <span className="id-mono">{o.order_number}</span> · {copies} {copies === 1 ? "copy" : "copies"} ·{" "}
+                      <span className="mono">{rupees(Number(o.total))}</span> · {new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}
                     </p>
                     <div className="mt-2">
                       <OrderStatusBadge status={o.status} />
@@ -62,9 +65,7 @@ export default async function AccountHome() {
       {profile.role === "reader" && (
         <div className="mt-8 rounded-[18px] bg-primary p-6 text-on-primary">
           <h2 className="display text-xl text-on-primary">Have a book in you?</h2>
-          <p className="mt-1 text-on-primary/80">
-            Publish in print across India. No upfront cost: we print each copy when someone orders it.
-          </p>
+          <p className="mt-1 text-on-primary/80">Publish in print across India. No upfront cost: we print each copy when someone orders it.</p>
           <form action={becomeAuthor} className="mt-4">
             <button type="submit" className="btn bg-white text-primary hover:bg-white/90">
               Start publishing

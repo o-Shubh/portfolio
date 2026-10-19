@@ -78,8 +78,8 @@ export default async function ArticleStatsPage({ params }: PageProps<"/author/ar
               <>
                 <p className="mt-2 text-3xl font-semibold mono">{bookClicks}</p>
                 <p className="mt-1 text-sm text-muted">
-                  Times readers opened your book from this article (once per reader or browser per day). This shows interest, not sales: we don&apos;t link these clicks
-                  to orders.
+                  Times readers opened your book from this article (once per reader or browser per day). This shows interest, not sales: we don&apos;t link
+                  these clicks to orders.
                 </p>
               </>
             ) : (

@@ -7,7 +7,13 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Payments" };
 
-const STATUS: Record<string, string> = { created: "Not completed", paid: "Paid", failed: "Failed", refunded: "Refunded", partially_refunded: "Partly refunded" };
+const STATUS: Record<string, string> = {
+  created: "Not completed",
+  paid: "Paid",
+  failed: "Failed",
+  refunded: "Refunded",
+  partially_refunded: "Partly refunded",
+};
 
 export default async function PaymentsPage() {
   await requireRole(["author", "admin"]);
@@ -16,13 +22,24 @@ export default async function PaymentsPage() {
   return (
     <>
       <PageHeader
-        title="Payments"
+        title="Service payments"
         intro="What you've paid us for Pro and author services. Book royalties and payouts are under Earnings & payouts; we never take these payments out of your royalties."
       />
       {!payments?.length ? (
-        <div className="card text-muted">No payments yet.</div>
+        <div className="card max-w-2xl text-center">
+          <p className="font-medium">No payments yet</p>
+          <p className="mx-auto mt-1 max-w-md text-sm text-muted">When you pay for Author Pro or a service, the payment and its receipt appear here.</p>
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            <Link href="/author/services" className="btn-ghost">
+              Browse services
+            </Link>
+            <Link href="/author/plan" className="btn-ghost">
+              See Author Pro
+            </Link>
+          </div>
+        </div>
       ) : (
-        <div className="card overflow-x-auto p-0 md:p-0">
+        <div className="ledger-wrap">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead className="border-b border-line bg-surface-2 text-muted">
               <tr>

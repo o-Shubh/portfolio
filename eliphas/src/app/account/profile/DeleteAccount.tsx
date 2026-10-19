@@ -13,12 +13,10 @@ export function DeleteAccount() {
 
   return (
     <section className="card" aria-labelledby="delete-heading">
-      <h2 id="delete-heading" className="text-xl">
+      <h2 id="delete-heading" className="text-lg">
         Delete account
       </h2>
-      <p className="mt-1 text-sm text-muted">
-        Removes your login and profile for good. Past orders are kept for tax records but no longer linked to you.
-      </p>
+      <p className="mt-1 text-sm text-muted">Removes your login and profile for good. Past orders are kept for tax records but no longer linked to you.</p>
       {!open ? (
         <button type="button" className="mt-2 min-h-11 text-sm text-danger underline underline-offset-2" onClick={() => setOpen(true)}>
           Delete my account

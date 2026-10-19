@@ -11,6 +11,9 @@ const PER_PAGE = 25;
 const d = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }) : "—";
 
+const shipped = (o: { delivered_at: string | null; shipped_at: string | null }) =>
+  o.delivered_at ? `Delivered ${d(o.delivered_at)}` : o.shipped_at ? `Shipped ${d(o.shipped_at)}` : null;
+
 export default async function AuthorOrders({ searchParams }: PageProps<"/author/orders">) {
   await requireRole(["author", "admin"]);
   const page = Math.max(1, Number((await searchParams).page) || 1);
@@ -26,37 +29,71 @@ export default async function AuthorOrders({ searchParams }: PageProps<"/author/
       {rows.length === 0 ? (
         <div className="card text-center text-muted">No orders yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="border-b border-line text-muted">
-              <tr>
-                {["Order", "Book", "Copies", "City", "Paid", "Status", "Shipped / delivered", "Your earning"].map((h, i) => (
-                  <th key={h} scope="col" className={`p-4 font-medium ${i === 2 || i === 7 ? "text-right" : ""}`}>
-                    {h}
+        <>
+          {/* Phones: one row per order */}
+          <ul className="group-list md:hidden">
+            {rows.map((o) => (
+              <li key={o.order_item_id} className="space-y-1 px-4 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="min-w-0 font-medium">
+                    {o.book_title} <span className="text-muted">× {o.quantity}</span>
+                  </p>
+                  <span className="mono shrink-0 font-semibold">{rupees(Number(o.earning), true)}</span>
+                </div>
+                <p className="text-sm text-muted">
+                  <span className="id-mono">{o.order_number}</span> · {d(o.paid_at)} · {o.ship_city}
+                </p>
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+                  <OrderStatusBadge status={o.status} />
+                  {shipped(o)}
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Tablets and desktops: a compact table */}
+          <div className="ledger-wrap hidden md:block">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-line text-muted">
+                <tr>
+                  <th scope="col" className="p-4 font-medium">
+                    Order
                   </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {rows.map((o) => (
-                <tr key={o.order_item_id}>
-                  <td className="p-4 font-medium whitespace-nowrap id-mono">{o.order_number}</td>
-                  <td className="p-4 font-semibold">{o.book_title}</td>
-                  <td className="p-4 text-right mono">{o.quantity}</td>
-                  <td className="p-4">
-                    {o.ship_city}, <span className="text-muted">{o.ship_state}</span>
-                  </td>
-                  <td className="p-4 whitespace-nowrap">{d(o.paid_at)}</td>
-                  <td className="p-4">
-                    <OrderStatusBadge status={o.status} />
-                  </td>
-                  <td className="p-4 whitespace-nowrap text-muted">{o.delivered_at ? `Delivered ${d(o.delivered_at)}` : o.shipped_at ? `Shipped ${d(o.shipped_at)}` : "—"}</td>
-                  <td className="p-4 text-right font-semibold mono">{rupees(Number(o.earning), true)}</td>
+                  <th scope="col" className="p-4 font-medium">
+                    Book
+                  </th>
+                  <th scope="col" className="p-4 font-medium">
+                    Status
+                  </th>
+                  <th scope="col" className="p-4 text-right font-medium">
+                    Your earning
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {rows.map((o) => (
+                  <tr key={o.order_item_id} className="align-top">
+                    <td className="p-4 whitespace-nowrap">
+                      <span className="id-mono block font-medium">{o.order_number}</span>
+                      <span className="text-muted">Paid {d(o.paid_at)}</span>
+                    </td>
+                    <td className="p-4">
+                      <span className="block font-medium">{o.book_title}</span>
+                      <span className="text-muted">
+                        {o.quantity === 1 ? "1 copy" : `${o.quantity} copies`} · {o.ship_city}, {o.ship_state}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <OrderStatusBadge status={o.status} />
+                      <span className="mt-1 block whitespace-nowrap text-muted">{shipped(o)}</span>
+                    </td>
+                    <td className="mono p-4 text-right font-semibold whitespace-nowrap">{rupees(Number(o.earning), true)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
       {pages > 1 && (
         <nav aria-label="Pages" className="mt-6 flex items-center justify-center gap-3">

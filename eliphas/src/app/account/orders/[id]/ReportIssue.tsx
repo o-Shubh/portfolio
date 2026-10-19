@@ -23,7 +23,8 @@ export function ReportIssue({ orderId, userId, shippedOnly }: { orderId: string;
     const f = e.target.files?.[0];
     if (!f) return;
     setUpErr(undefined);
-    if (!["image/png", "image/jpeg", "image/webp"].includes(f.type) || f.size > 5 * 1024 * 1024) return setUpErr("Photos must be JPG, PNG or WebP, up to 5 MB.");
+    if (!["image/png", "image/jpeg", "image/webp"].includes(f.type) || f.size > 5 * 1024 * 1024)
+      return setUpErr("Photos must be JPG, PNG or WebP, up to 5 MB.");
     const path = `${userId}/${orderId}/${crypto.randomUUID()}.${f.type.split("/")[1]}`;
     const { error } = await createClient().storage.from("issue-photos").upload(path, f, { contentType: f.type });
     if (error) return setUpErr("Upload failed. Try again.");

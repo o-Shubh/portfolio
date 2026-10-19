@@ -3,28 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import {
-  deleteDraft,
-  submitForReview,
-  unpublishBook,
-  withdrawFromReview,
-  type ActionState,
-} from "@/app/actions/books";
+import { deleteDraft, submitForReview, unpublishBook, withdrawFromReview, type ActionState } from "@/app/actions/books";
 import { FormMessage } from "@/components/FormMessage";
 import type { BookStatus } from "@/lib/publishing";
 import { offlineSafe } from "@/lib/use-form-action";
 
-export function SubmitActions({
-  bookId,
-  status,
-  ready,
-  slug,
-}: {
-  bookId: string;
-  status: BookStatus;
-  ready: boolean;
-  slug: string;
-}) {
+export function SubmitActions({ bookId, status, ready, slug }: { bookId: string; status: BookStatus; ready: boolean; slug: string }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<ActionState>();
@@ -44,10 +28,7 @@ export function SubmitActions({
       {(status === "draft" || status === "changes_requested" || status === "unpublished") && (
         <>
           <h2 className="text-xl">{status === "draft" ? "Send for review" : "Send for review again"}</h2>
-          <p className="text-muted">
-            Our team checks your files for print quality. Editing is locked while we review. You&apos;ll see the result
-            here.
-          </p>
+          <p className="text-muted">Our team checks your files for print quality. Editing is locked while we review. You&apos;ll see the result here.</p>
           <button type="button" className="btn-primary" disabled={!ready || pending} onClick={run(submitForReview)}>
             {pending ? "Sending…" : "Send for review"}
           </button>

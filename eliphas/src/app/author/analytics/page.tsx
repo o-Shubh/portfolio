@@ -1,3 +1,4 @@
+import { BarChart3 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
@@ -22,12 +23,36 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
   if (!status.active) {
     return (
       <>
-        <PageHeader title="Analytics" />
-        <div className="card max-w-xl space-y-3">
-          <p>Detailed analytics and campaign-link tracking are part of Pro. Your sales, earnings and payouts are always on your dashboard for free.</p>
-          <Link href="/author/plan" className="btn-primary">
-            See plans
-          </Link>
+        <PageHeader title="Analytics" intro="Your sales, earnings and payouts are always free on your dashboard. Detailed analytics are part of Author Pro." />
+        <div className="card max-w-2xl">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-tint-info text-accent-fg">
+              <BarChart3 className="h-5 w-5" aria-hidden />
+            </span>
+            <h2 className="text-xl">What Pro analytics adds</h2>
+          </div>
+          <ul className="mt-4 space-y-3 text-[0.9375rem]">
+            <li>
+              <span className="block font-medium">Sales over time</span>
+              <span className="text-sm text-muted">Copies and earnings by day, week or month for the last 30 days, 90 days or 12 months.</span>
+            </li>
+            <li>
+              <span className="block font-medium">Each book compared</span>
+              <span className="text-sm text-muted">Copies and earnings per book for the period you choose.</span>
+            </li>
+            <li>
+              <span className="block font-medium">Campaign links</span>
+              <span className="text-sm text-muted">Make a link for a post or event and see how many clicks and paid orders it brings.</span>
+            </li>
+          </ul>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/author/plan" className="btn-primary">
+              See Author Pro
+            </Link>
+            <Link href="/author" className="btn-ghost">
+              Back to overview
+            </Link>
+          </div>
         </div>
       </>
     );
@@ -93,7 +118,12 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
               <tbody className="divide-y divide-line">
                 {[...byPeriod.entries()].map(([period, v]) => (
                   <tr key={period}>
-                    <td className="py-1.5">{new Date(period).toLocaleDateString("en-IN", range.grain === "month" ? { month: "short", year: "numeric" } : { day: "numeric", month: "short" })}</td>
+                    <td className="py-1.5">
+                      {new Date(period).toLocaleDateString(
+                        "en-IN",
+                        range.grain === "month" ? { month: "short", year: "numeric" } : { day: "numeric", month: "short" },
+                      )}
+                    </td>
                     <td className="py-1.5 text-right mono">{v.copies}</td>
                     <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100, true)}</td>
                   </tr>
@@ -116,13 +146,15 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/author
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {[...byBook.entries()].sort((a, b) => b[1].copies - a[1].copies).map(([id, v]) => (
-                  <tr key={id}>
-                    <td className="py-1.5">{titles.get(id) ?? "—"}</td>
-                    <td className="py-1.5 text-right mono">{v.copies}</td>
-                    <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100, true)}</td>
-                  </tr>
-                ))}
+                {[...byBook.entries()]
+                  .sort((a, b) => b[1].copies - a[1].copies)
+                  .map(([id, v]) => (
+                    <tr key={id}>
+                      <td className="py-1.5">{titles.get(id) ?? "—"}</td>
+                      <td className="py-1.5 text-right mono">{v.copies}</td>
+                      <td className="py-1.5 text-right mono">{rupees(Math.round(v.earnings * 100) / 100, true)}</td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           )}

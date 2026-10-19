@@ -16,7 +16,11 @@ export default async function ServicesPage() {
   const admin = createAdminClient();
   const [{ data: catalog }, { data: orders }, pro] = await Promise.all([
     admin.from("current_service_catalog").select("*").eq("active", true).order("sort"),
-    admin.from("service_orders").select("id, order_number, kind, status, created_at, requirements, service_catalog(name, code)").eq("author_id", profile.id).order("created_at", { ascending: false }),
+    admin
+      .from("service_orders")
+      .select("id, order_number, kind, status, created_at, requirements, service_catalog(name, code)")
+      .eq("author_id", profile.id)
+      .order("created_at", { ascending: false }),
     proStatus(profile.id),
   ]);
 

@@ -35,7 +35,13 @@ export function CreativeForm({ books }: { books: { id: string; title: string }[]
         <label htmlFor="brief" className="label">
           What should it say or show?
         </label>
-        <textarea id="brief" name="brief" rows={4} className="field py-2.5" placeholder="e.g. Launch day post with the cover, a short quote from chapter 3 and 'Order now'." />
+        <textarea
+          id="brief"
+          name="brief"
+          rows={4}
+          className="field py-2.5"
+          placeholder="e.g. Launch day post with the cover, a short quote from chapter 3 and 'Order now'."
+        />
       </div>
       <label className="flex items-start gap-3 text-sm">
         <input type="checkbox" name="rights" className="mt-0.5 h-5 w-5 accent-fg" />

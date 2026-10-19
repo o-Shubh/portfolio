@@ -33,7 +33,8 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
     openUpgradeFor(order.id),
   ]);
   const portfolio = order.service_catalog ? SERVICE_PORTFOLIO[order.service_catalog.code] : undefined;
-  const canUpgrade = Boolean(order.service_catalog && BUNDLE_PARTS.includes(order.service_catalog.code)) && !replacedBy && !["cancelled", "refunded"].includes(order.status);
+  const canUpgrade =
+    Boolean(order.service_catalog && BUNDLE_PARTS.includes(order.service_catalog.code)) && !replacedBy && !["cancelled", "refunded"].includes(order.status);
   const cat = order.service_catalog;
   const reqs = order.requirements as Record<string, string>;
   const openQuote = (quotes ?? []).find((q) => q.status === "issued" || q.status === "accepted");
@@ -127,12 +128,10 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
                 ))}
               </ul>
               {openQuote.notes && <p className="mt-3 rounded-lg bg-surface-2 p-3 text-sm">{openQuote.notes}</p>}
-              {cat && (cat.exclusions ?? []).length > 0 && (
-                <p className="mt-3 text-xs text-muted">Not included: {cat.exclusions!.join("; ")}.</p>
-              )}
+              {cat && (cat.exclusions ?? []).length > 0 && <p className="mt-3 text-xs text-muted">Not included: {cat.exclusions!.join("; ")}.</p>}
               <p className="mt-2 text-xs text-muted">
-                The delivery date counts from when we receive payment and complete requirements. Extra changes beyond the included revisions need a new quote you
-                accept first. No surprise charges.
+                The delivery date counts from when we receive payment and complete requirements. Extra changes beyond the included revisions need a new quote
+                you accept first. No surprise charges.
               </p>
               <div className="mt-4">
                 <QuoteActions quoteId={openQuote.id} status={openQuote.status} totalLabel={formatPaise(openQuote.total_paise)} />
@@ -154,7 +153,9 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
             <section className="card">
               <h2 className="text-lg">Delivered files</h2>
               <FileList files={delivered} />
-              {order.qc && <p className="mt-3 text-xs text-success">Final print files passed our quality check (dimensions, bleed, spine, fonts, images, licences).</p>}
+              {order.qc && (
+                <p className="mt-3 text-xs text-success">Final print files passed our quality check (dimensions, bleed, spine, fonts, images, licences).</p>
+              )}
             </section>
           )}
 
@@ -183,8 +184,8 @@ export default async function AuthorServiceOrder({ params }: PageProps<"/author/
             <section className="card space-y-2">
               <h2 className="text-lg">Want the full bundle?</h2>
               <p className="text-sm text-muted">
-                Upgrade to the Book Design & Launch Bundle (cover, formatting and launch kit). We review what you&apos;ve paid for and what&apos;s done, then send an
-                itemised quote for the difference.
+                Upgrade to the Book Design & Launch Bundle (cover, formatting and launch kit). We review what you&apos;ve paid for and what&apos;s done, then
+                send an itemised quote for the difference.
               </p>
               <UpgradeToBundle orderId={order.id} />
             </section>
