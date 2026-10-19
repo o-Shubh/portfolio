@@ -24,7 +24,7 @@ function callbackUrl(next: string, audience: Audience) {
  */
 export function EmailForm({ next, audience, mode, codes }: { next: string; audience: Audience; mode: "login" | "signup"; codes: boolean }) {
   const router = useRouter();
-  const [step, setStep] = useState<"password" | "code-request" | "code" | "reset" | "reset-sent">("password");
+  const [step, setStep] = useState<"password" | "code-request" | "code" | "reset" | "reset-sent" | "confirm-link">("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -64,11 +64,12 @@ export function EmailForm({ next, audience, mode, codes }: { next: string; audie
         return;
       }
       if (data.session) return done(supabase, data.user?.id, address);
-      // Email confirmation is on: Supabase sent a code and link. (It also lands here for an address that already has an account.)
+      // Email confirmation is on: Supabase sent a confirmation email. (It also lands here for an address that already has
+      // an account.) Our template has a code in it only once sign-in emails are set up; otherwise just the link.
       setBusy(false);
       setEmail(address);
       setSentFor("signup");
-      setStep("code");
+      setStep(codes ? "code" : "confirm-link");
       return;
     }
     const { data, error } = await supabase.auth.signInWithPassword({ email: address, password });
@@ -228,6 +229,18 @@ export function EmailForm({ next, audience, mode, codes }: { next: string; audie
         </button>
         <p className="text-center text-sm text-muted">{link("Use a password instead", "password")}</p>
       </form>
+    );
+  }
+
+  if (step === "confirm-link") {
+    return (
+      <div className="mt-6 space-y-3" role="status">
+        <p className="notice-info">
+          Almost done: open the confirmation link we emailed to {email}, on this device. Check your spam folder if it isn&apos;t there in a minute. If no email
+          comes, please contact us.
+        </p>
+        <p className="text-center text-sm text-muted">{link("Use a different email", "password")}</p>
+      </div>
     );
   }
 
