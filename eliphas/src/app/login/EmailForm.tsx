@@ -50,7 +50,8 @@ export function EmailForm({ next, audience, mode, codes }: { next: string; audie
     setError(null);
     const address = cleanEmail();
     if (!address) return;
-    if (password.length < 8) {
+    // Length rules apply when choosing a password; when logging in, any wrong password gets the same "don't match"
+    if (mode === "signup" ? password.length < 8 : password.length === 0) {
       setError(mode === "signup" ? "Choose a password of at least 8 characters." : "Enter your password.");
       return;
     }
