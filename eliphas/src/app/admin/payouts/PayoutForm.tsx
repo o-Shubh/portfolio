@@ -12,17 +12,7 @@ export function PayoutForm({ authorId, balance }: { authorId: string; balance: n
         <label className="label" htmlFor={`amount-${authorId}`}>
           Amount (₹)
         </label>
-        <input
-          id={`amount-${authorId}`}
-          name="amount"
-          type="number"
-          step="0.01"
-          min="1"
-          max={balance}
-          defaultValue={balance}
-          className="field"
-          required
-        />
+        <input id={`amount-${authorId}`} name="amount" type="number" step="0.01" min="1" max={balance} defaultValue={balance} className="field" required />
       </div>
       <div>
         <label className="label" htmlFor={`ref-${authorId}`}>

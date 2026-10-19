@@ -218,7 +218,10 @@ export async function recordPayout(authorId: string, _prev: ActionState, fd: For
   // Check against the current balance, not the number shown when the page loaded
   const { data: bal } = await supabase.from("author_balances").select("balance").eq("author_id", authorId).single();
   if (!bal) return { error: "Author not found." };
-  if (amount > Number(bal.balance)) return { error: `That's more than the balance of ₹${bal.balance}.` };
+  // Payouts already waiting in a payout run are owed too: don't pay the same money twice
+  const { data: waiting } = await supabase.from("payouts").select("amount").eq("author_id", authorId).eq("status", "pending");
+  const available = Number(bal.balance) - (waiting ?? []).reduce((s, p) => s + Number(p.amount), 0);
+  if (amount > available) return { error: `That's more than the ₹${Math.max(0, available).toFixed(2)} available (payouts waiting in a payout run count too).` };
 
   const { error } = await supabase.from("payouts").insert({
     author_id: authorId,

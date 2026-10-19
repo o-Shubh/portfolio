@@ -1467,16 +1467,54 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
-                },"payouts": {
+                },"payout_runs": {
                   Row: {
-                    "amount": number,"author_id": string,"created_at": string,"created_by": string | null,"id": string,"note": string | null,"paid_at": string | null,"period_end": string | null,"period_start": string | null,"reference": string | null,"status": Database["public"]['Enums']["payout_status"]
+                    "authors": number,"closed_at": string | null,"created_at": string,"created_by": string | null,"id": string,"minimum": number,"status": string,"total": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "amount": number,"author_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"status"?: Database["public"]['Enums']["payout_status"]
+                    "authors"?: number,"closed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"minimum"?: number,"status"?: string,"total"?: number
                   }
                   Update: {
-                    "amount"?: number,"author_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"status"?: Database["public"]['Enums']["payout_status"]
+                    "authors"?: number,"closed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"minimum"?: number,"status"?: string,"total"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payout_runs_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"payouts": {
+                  Row: {
+                    "amount": number,"author_id": string,"created_at": string,"created_by": string | null,"id": string,"note": string | null,"paid_at": string | null,"period_end": string | null,"period_start": string | null,"reference": string | null,"run_id": string | null,"status": Database["public"]['Enums']["payout_status"],"upi": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"author_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"run_id"?: string | null,"status"?: Database["public"]['Enums']["payout_status"],"upi"?: string | null
+                  }
+                  Update: {
+                    "amount"?: number,"author_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"note"?: string | null,"paid_at"?: string | null,"period_end"?: string | null,"period_start"?: string | null,"reference"?: string | null,"run_id"?: string | null,"status"?: Database["public"]['Enums']["payout_status"],"upi"?: string | null
                   }
                   Relationships: [
                     {
@@ -1526,6 +1564,12 @@ isOneToOne: false
       columns: ["created_by"]
 isOneToOne: false
       referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payouts_run_id_fkey"
+      columns: ["run_id"]
+isOneToOne: false
+      referencedRelation: "payout_runs"
       referencedColumns: ["id"]
     }
                   ]
@@ -2532,6 +2576,12 @@ isOneToOne: false
 "can_request_distribution":
 { Args: { "target": string }; Returns: boolean
                            },
+"cancel_payout_run":
+{ Args: { "p_run": string }; Returns: undefined
+                           },
+"create_payout_run":
+{ Args: { "p_actor": string,"p_minimum": number }; Returns: string
+                           },
 "has_active_pro":
 { Args: { "p_author": string }; Returns: boolean
                            },
@@ -2615,6 +2665,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"payable_now":
+{ Args: { "p_author": string }; Returns: number
+                           },
 "period_credit_balance":
 { Args: { "p_period": string }; Returns: number
                            },
@@ -2661,6 +2714,9 @@ isOneToOne: false
                            },
 "settle_payment_refund":
 { Args: { "p_error"?: string,"p_razorpay_id"?: string,"p_refund": string,"p_status": string }; Returns: undefined
+                           },
+"settle_run_payout":
+{ Args: { "p_paid": boolean,"p_payout": string,"p_reference": string }; Returns: undefined
                            },
 "use_pro_credit":
 { Args: { "p_author": string,"p_service_order": string }; Returns: string
