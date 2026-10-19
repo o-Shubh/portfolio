@@ -46,7 +46,9 @@ export default async function NotificationsPage() {
                 const content = n.kind === "new_post" || n.kind === "new_article";
                 const art = (n.kind === "new_post" ? n.post : n.article) as { status: string; moderation: string } | null;
                 const live = !content || (art?.status === "published" && art.moderation === "visible");
-                const actor = (n.actor as { full_name: string | null } | null)?.full_name ?? (n.kind === "verification" ? "Eliphas team" : "Someone");
+                const actor =
+                  (n.actor as { full_name: string | null } | null)?.full_name ??
+                  (n.kind === "verification" || n.kind === "distribution" ? "Eliphas team" : "Someone");
                 const what =
                   n.kind === "new_post"
                     ? "posted in Community"
@@ -63,8 +65,8 @@ export default async function NotificationsPage() {
                     <div className="min-w-0">
                       <p className="text-sm">
                         {!n.read_at && <span className="sr-only">Unread: </span>}
-                        {n.kind === "verification" ? (
-                          <span className="font-semibold">Author verification</span>
+                        {n.kind === "verification" || n.kind === "distribution" ? (
+                          <span className="font-semibold">{n.kind === "verification" ? "Author verification" : "Distribution request"}</span>
                         ) : (
                           <>
                             <span className="font-semibold">{actor}</span> {what}
@@ -104,7 +106,7 @@ export default async function NotificationsPage() {
               />
             </div>
             <p className="mt-2 px-1 text-xs text-muted">
-              Notifications appear here only, never by SMS, email or push. Verification decisions are always shown.
+              Notifications appear here only, never by SMS, email or push. Verification decisions and distribution reviews are always shown.
             </p>
           </section>
 

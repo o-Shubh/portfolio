@@ -29,14 +29,17 @@ existing fees and royalty calculations are unchanged. No screen says a book is "
 ## Deploy
 
 1. **Back up** the database (Supabase → Database → Backups).
-2. In Supabase → SQL Editor, run **only**
-   `supabase/migrations/20261025000019_distribution_requests.sql`. It creates one new table and two functions
-   and changes no existing table. **Do not run `hosted-setup.sql` on an existing database** (that file is only for a
+2. In Supabase → SQL Editor, run **only** the distribution migrations not yet applied, in order:
+   `supabase/migrations/20261025000019_distribution_requests.sql`, then `20261026000020_distribution_replies.sql`.
+   000019 creates the table and two functions; 000020 adds the reply columns, one function and the `distribution`
+   notification type. Neither changes existing rows. **Do not run `hosted-setup.sql` on an existing database** (that file is only for a
    brand-new project).
-3. Check it worked: `select count(*) from public.distribution_requests;` returns `0`.
+3. Check it worked: `select count(*) from public.distribution_requests;` runs without an error (after 000020:
+   `select author_reply from public.distribution_requests limit 1;` also runs).
 4. Deploy the app (merge the PR; Vercel deploys `main`). No new environment variables.
 5. Smoke test on the live site: as an author, request one channel for a published book and confirm it appears as
-   "Requested"; as an admin, set "Needs information" with a note; as the author, confirm the note shows.
+   "Requested"; as an admin, set "Needs information" with a note; as the author, confirm the note and a notification
+   show, then send a reply and confirm the admin sees it.
 
 Rollback (only if needed, before real requests exist):
 `drop table public.distribution_requests; drop function public.stamp_distribution_review(); drop function public.can_request_distribution(uuid);`
@@ -45,9 +48,11 @@ Rollback (only if needed, before real requests exist):
 
 - No approval status. There is no "eligible" or "listed" state, because there is no integration or agreed terms.
   When terms exist, add a status and the acceptance flow together.
-- Authors can't reply in the app to "Needs information"; they contact support. A declined request can't be re-sent
-  for the same book and channel (an admin would need to delete it).
-- No in-app notification when a review is saved; the author sees it on the page.
+- Authors can reply once each time we ask for information (migration 000020); the reply and any corrected countries
+  send the request back to the open queue. Only the latest reply is kept.
+- A declined request can't be re-sent by the author for the same book and channel. An admin can reopen it by setting
+  "In review" or "Needs information" from the Declined filter.
+- Each review sends the author one in-app notification (never SMS or email).
 - Country fields are free-text self-declarations, not verified.
 - Lists show the latest 100 requests. Add pagination when volume grows.
 - Each review keeps the latest note only, not a full history.

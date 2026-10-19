@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
-import { CHANNELS, REVIEW_STATUSES } from "@/lib/distribution";
+import { CHANNELS, REVIEW_STATUSES, channelLabel, statusOf } from "@/lib/distribution";
+import { notify } from "@/lib/notify";
 import { createClient } from "@/lib/supabase/server";
 
 type State = { error?: string; ok?: string } | undefined;
@@ -40,13 +41,7 @@ export async function requestDistribution(_: State, fd: FormData): Promise<State
 
   // A removed book can never be "published" (guarded in migration 000017), so this also excludes removed books
   const db = await createClient();
-  const { data: book } = await db
-    .from("books")
-    .select("id")
-    .eq("id", book_id)
-    .eq("author_id", me.id)
-    .eq("status", "published")
-    .maybeSingle();
+  const { data: book } = await db.from("books").select("id").eq("id", book_id).eq("author_id", me.id).eq("status", "published").maybeSingle();
   if (!book) return { error: "Choose one of your published books." };
 
   const { error } = await db.from("distribution_requests").insert({
@@ -88,7 +83,7 @@ export async function reviewDistribution(_: State, fd: FormData): Promise<State>
     .update({ status, review_note })
     .eq("id", id)
     .eq("updated_at", previous)
-    .select("id")
+    .select("id, author_id, channel, books(title)")
     .maybeSingle();
   if (error) {
     console.error("Distribution review failed", error);
@@ -98,6 +93,45 @@ export async function reviewDistribution(_: State, fd: FormData): Promise<State>
     return {
       error: "Someone updated this request after you opened it. Refresh to see the latest version, then try again.",
     };
+  // In-app notification only (never SMS or email). A fresh refId, so every review notifies once.
+  await notify({
+    userId: data.author_id,
+    kind: "distribution",
+    actorId: null,
+    refId: crypto.randomUUID(),
+    title: `${data.books?.title ?? "Your book"} · ${channelLabel(data.channel)}: ${statusOf(status).label}`,
+    link: "/author/distribution",
+  });
   refresh();
-  return { ok: "Review saved. The author can now see your note." };
+  return { ok: "Review saved. The author has been notified and can see your note." };
+}
+
+/** Author reply to "Needs information". The database function checks ownership, status and staleness. */
+export async function replyDistribution(_: State, fd: FormData): Promise<State> {
+  await requireRole(["author", "admin"]);
+  const id = String(fd.get("id") ?? "");
+  const previous = String(fd.get("previous") ?? "");
+  const reply = String(fd.get("reply") ?? "").trim();
+  const residence = clean(fd.get("residence_country"));
+  const markets = clean(fd.get("markets"));
+  if (!UUID.test(id) || !previous) return { error: "Refresh the page and try again." };
+  if (reply.length < 5 || reply.length > 2000) return { error: "Write your reply (5–2,000 characters)." };
+  if (residence.length < 2 || residence.length > 80) return { error: "Enter your country of residence." };
+  if (markets.length < 2 || markets.length > 200) return { error: "Enter the countries where you want to sell (up to 200 characters)." };
+
+  const db = await createClient();
+  const { data, error } = await db.rpc("reply_to_distribution_review", {
+    p_id: id,
+    p_previous: previous,
+    p_reply: reply,
+    p_markets: markets,
+    p_residence: residence,
+  });
+  if (error) {
+    console.error("Distribution reply failed", error);
+    return { error: "We couldn’t send your reply. Please try again." };
+  }
+  if (!data) return { error: "This request changed after you opened it. Refresh to see the latest version." };
+  refresh();
+  return { ok: "Reply sent. We’ll review it and update you here." };
 }

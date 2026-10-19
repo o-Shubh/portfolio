@@ -777,14 +777,14 @@ isOneToOne: false
                   ]
                 },"distribution_requests": {
                   Row: {
-                    "author_id": string,"book_id": string,"channel": string,"created_at": string,"id": string,"markets": string,"residence_country": string,"review_note": string,"reviewed_at": string | null,"reviewed_by": string | null,"rights_confirmed": boolean,"status": string,"updated_at": string
+                    "author_id": string,"author_replied_at": string | null,"author_reply": string,"book_id": string,"channel": string,"created_at": string,"id": string,"markets": string,"residence_country": string,"review_note": string,"reviewed_at": string | null,"reviewed_by": string | null,"rights_confirmed": boolean,"status": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "author_id": string,"book_id": string,"channel": string,"created_at"?: string,"id"?: string,"markets": string,"residence_country": string,"review_note"?: string,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed": boolean,"status"?: string,"updated_at"?: string
+                    "author_id": string,"author_replied_at"?: string | null,"author_reply"?: string,"book_id": string,"channel": string,"created_at"?: string,"id"?: string,"markets": string,"residence_country": string,"review_note"?: string,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed": boolean,"status"?: string,"updated_at"?: string
                   }
                   Update: {
-                    "author_id"?: string,"book_id"?: string,"channel"?: string,"created_at"?: string,"id"?: string,"markets"?: string,"residence_country"?: string,"review_note"?: string,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed"?: boolean,"status"?: string,"updated_at"?: string
+                    "author_id"?: string,"author_replied_at"?: string | null,"author_reply"?: string,"book_id"?: string,"channel"?: string,"created_at"?: string,"id"?: string,"markets"?: string,"residence_country"?: string,"review_note"?: string,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"rights_confirmed"?: boolean,"status"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -2499,6 +2499,9 @@ isOneToOne: false
 { Args: { "p_author": string,"p_post": string }; Returns: {
               "first_time": boolean,"notified": number
             }[]
+                           },
+"reply_to_distribution_review":
+{ Args: { "p_id": string,"p_markets": string,"p_previous": string,"p_reply": string,"p_residence": string }; Returns: boolean
                            },
 "review_is_verified":
 { Args: { "p_book": string,"p_user": string }; Returns: boolean
