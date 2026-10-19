@@ -713,6 +713,68 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"contact_messages": {
+                  Row: {
+                    "admin_note": string | null,"created_at": string,"email": string,"handled_at": string | null,"handled_by": string | null,"id": string,"ip_hash": string | null,"message": string,"name": string,"order_number": string | null,"phone": string | null,"status": string,"topic": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "admin_note"?: string | null,"created_at"?: string,"email": string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"ip_hash"?: string | null,"message": string,"name": string,"order_number"?: string | null,"phone"?: string | null,"status"?: string,"topic": string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "admin_note"?: string | null,"created_at"?: string,"email"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"ip_hash"?: string | null,"message"?: string,"name"?: string,"order_number"?: string | null,"phone"?: string | null,"status"?: string,"topic"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"content_reports": {
                   Row: {
                     "created_at": string,"details": string | null,"id": string,"reason": string,"reporter_id": string,"resolved_at": string | null,"resolved_by": string | null,"status": string,"target_id": string,"target_type": string

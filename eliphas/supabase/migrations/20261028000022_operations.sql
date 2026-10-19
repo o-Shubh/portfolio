@@ -42,3 +42,29 @@ alter table public.email_outbox enable row level security;
 revoke all on public.email_outbox from anon, authenticated;
 grant select on public.email_outbox to authenticated;
 create policy "email outbox: admin reads" on public.email_outbox for select to authenticated using (public.is_admin());
+
+-- ---------------------------------------------------------------------------
+-- 3. Contact form inbox (guests and members). Written by the server only.
+-- ---------------------------------------------------------------------------
+create table public.contact_messages (
+  id           uuid primary key default gen_random_uuid(),
+  name         text not null check (length(btrim(name)) between 2 and 80),
+  email        text not null check (length(email) <= 254 and email ~ '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'),
+  phone        text check (length(phone) <= 20),
+  topic        text not null check (topic in ('order', 'publishing', 'payout', 'services', 'other')),
+  order_number text check (length(order_number) <= 40),
+  message      text not null check (length(btrim(message)) between 10 and 4000),
+  user_id      uuid references public.profiles (id) on delete set null,
+  ip_hash      text,                         -- salted hash, only for rate limiting
+  status       text not null default 'new' check (status in ('new', 'replied', 'closed')),
+  admin_note   text check (length(admin_note) <= 2000),
+  handled_by   uuid references public.profiles (id) on delete set null,
+  handled_at   timestamptz,
+  created_at   timestamptz not null default now()
+);
+create index contact_messages_inbox_idx on public.contact_messages (status, created_at desc);
+create index contact_messages_rate_idx on public.contact_messages (ip_hash, created_at);
+alter table public.contact_messages enable row level security;
+revoke all on public.contact_messages from anon, authenticated;
+grant select on public.contact_messages to authenticated;
+create policy "contact messages: admin reads" on public.contact_messages for select to authenticated using (public.is_admin());

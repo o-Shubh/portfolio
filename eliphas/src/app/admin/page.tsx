@@ -37,6 +37,7 @@ export default async function AdminHome() {
     sampleZones,
     openOrderRefunds,
     openPaymentRefunds,
+    newMessages,
   ] = await Promise.all([
     count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "in_review")),
     count(supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "published")),
@@ -58,6 +59,7 @@ export default async function AdminHome() {
         .or("refund_status.is.null,refund_status.in.(requested,failed)"),
     ),
     count(supabase.from("payment_refunds").select("id", { count: "exact", head: true }).in("status", ["requested", "failed"])),
+    count(supabase.from("contact_messages").select("id", { count: "exact", head: true }).eq("status", "new")),
   ]);
   const [business, pricing] = await Promise.all([getBusiness(), getPricingSettings()]);
   const keyId = process.env.RAZORPAY_KEY_ID ?? "";
@@ -104,6 +106,7 @@ export default async function AdminHome() {
     { label: "Live books without a sample", value: noSample, href: "/admin/review?status=published&sample=missing", alert: noSample > 0 },
     { label: "Owed to authors", value: rupees(Math.round(owed)), href: "/admin/payouts" },
     { label: "Refunds to check", value: refundsToCheck, href: "/admin/refunds", alert: refundsToCheck > 0 },
+    { label: "New messages", value: newMessages, href: "/admin/messages", alert: newMessages > 0 },
   ];
 
   return (
