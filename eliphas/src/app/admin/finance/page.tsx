@@ -11,12 +11,16 @@ export const metadata: Metadata = { title: "Finance" };
 
 type F = Record<string, number>;
 
+/** "2026-10": the current month in India */
+function currentIstMonth() {
+  return new Date(Date.now() + 5.5 * 3_600_000).toISOString().slice(0, 7);
+}
+
 export default async function FinancePage({ searchParams }: PageProps<"/admin/finance">) {
   await requireRole(["admin"]);
   const sp = await searchParams;
   // Months run midnight to midnight in India. Work from year and month numbers so the server's time zone can't shift them.
-  const nowIst = new Date(Date.now() + 5.5 * 3_600_000).toISOString().slice(0, 7);
-  const month = typeof sp.month === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(sp.month) ? sp.month : nowIst;
+  const month = typeof sp.month === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(sp.month) ? sp.month : currentIstMonth();
   const [year, mon] = month.split("-").map(Number);
   const ym = (offset: number) => {
     const d = new Date(Date.UTC(year, mon - 1 + offset, 1));
