@@ -52,10 +52,7 @@ export function LoginForm({ next, audience = "reader", submitLabel = "Send code"
       setError(friendly(error.message));
       return;
     }
-    // New accounts set up their name first, then carry on to where they were going (e.g. liking an article).
-    // On the author login, new accounts are set up as authors, and existing reader accounts are offered publishing.
-    const { data: profile } = data.user ? await supabase.from("profiles").select("full_name, role").eq("id", data.user.id).maybeSingle() : { data: null };
-    router.replace(postLoginPath(profile, audience, next));
+    router.replace(await afterSignIn(supabase, data.user?.id, null, audience, next));
     router.refresh();
   }
 
@@ -159,7 +156,18 @@ export function LoginForm({ next, audience = "reader", submitLabel = "Send code"
   );
 }
 
-function ErrorText({ children }: { children: React.ReactNode }) {
+/**
+ * Where to go once signed in. New accounts set up their name first, then carry on to where they were going (e.g. liking
+ * an article). On the author login, new accounts are set up as authors, and existing reader accounts are offered
+ * publishing. An email sign-in also becomes the address for order updates if none is set.
+ */
+export async function afterSignIn(supabase: ReturnType<typeof createClient>, userId: string | undefined, email: string | null, audience: "reader" | "author", next: string) {
+  const { data: profile } = userId ? await supabase.from("profiles").select("full_name, role, email").eq("id", userId).maybeSingle() : { data: null };
+  if (userId && email && profile && !profile.email) await supabase.from("profiles").update({ email }).eq("id", userId);
+  return postLoginPath(profile, audience, next);
+}
+
+export function ErrorText({ children }: { children: React.ReactNode }) {
   return (
     <p id="login-error" role="alert" className="text-sm font-medium text-danger">
       {children}
@@ -167,10 +175,16 @@ function ErrorText({ children }: { children: React.ReactNode }) {
   );
 }
 
-function friendly(message: string) {
+export function friendly(message: string, method: "phone" | "email" = "phone") {
   const m = message.toLowerCase();
+  if (m.includes("invalid login credentials")) return "That email and password don't match. Check them, or create an account.";
+  if (m.includes("already registered") || m.includes("already been registered")) return "This email already has an account. Log in instead.";
+  if (m.includes("password should") || m.includes("weak password")) return "Choose a longer password: at least 8 characters, not easy to guess.";
+  if (m.includes("email not confirmed")) return "Please confirm your email first: use the code or link we sent you.";
+  if (m.includes("sending") && m.includes("email")) return "We couldn't send the email right now. Please try again later or use another way to sign in.";
   if (m.includes("expired") || m.includes("invalid")) return "That code is wrong or has expired. Try again.";
   if (m.includes("rate") || m.includes("security purposes")) return "Too many attempts. Please wait a minute and try again.";
-  if (m.includes("signups not allowed") || m.includes("provider")) return "Phone login isn't set up yet. Please contact support.";
+  if (m.includes("signups not allowed") || m.includes("provider") || m.includes("not authorized"))
+    return method === "email" ? "Email sign-in isn't available right now. Please try another way or contact us." : "Phone login isn't set up yet. Please contact support.";
   return message;
 }

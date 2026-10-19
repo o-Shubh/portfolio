@@ -21,9 +21,10 @@ export default async function ProfilePage() {
   const [{ data: auth }, google] = await Promise.all([(await createClient()).auth.getUser(), googleSignInEnabled()]);
   const googleId = auth.user?.identities?.find((i) => i.provider === "google");
   const googleEmail = (googleId?.identity_data as { email?: string } | undefined)?.email;
+  const signInEmail = auth.user?.identities?.some((i) => i.provider === "email") ? auth.user.email : null;
   return (
     <>
-      <PageHeader title="Settings & help" intro={`${formatPhone(profile.phone) || "Signed in with Google"} · ${ROLE_LABEL[profile.role]} account`} />
+      <PageHeader title="Settings & help" intro={`${formatPhone(profile.phone) || signInEmail || "Signed in with Google"} · ${ROLE_LABEL[profile.role]} account`} />
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <div className="min-w-0 space-y-8">
           <AvatarUpload name={profile.full_name} path={profile.avatar_path} url={avatarUrl(profile.avatar_path)} />
@@ -40,6 +41,20 @@ export default async function ProfilePage() {
                 <span>Mobile number</span>
                 <span className="text-muted">{profile.phone ? formatPhone(profile.phone) : "Not added"}</span>
               </li>
+              {signInEmail && (
+                <li className="group-row justify-between gap-3">
+                  <span>Email</span>
+                  <span className="truncate text-muted">{signInEmail}</span>
+                </li>
+              )}
+              {signInEmail && (
+                <li className="group-row justify-between">
+                  <span>Password</span>
+                  <Link href="/account/password" className="font-medium text-accent-fg hover:underline">
+                    Change
+                  </Link>
+                </li>
+              )}
               {(google || googleId) && (
                 <li className="group-row flex-wrap justify-between">
                   <span>Google</span>

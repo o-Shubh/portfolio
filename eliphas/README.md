@@ -571,6 +571,16 @@ Off with zero amounts until an admin sets it up in **Admin → Referrals**.
 - **Admin**: switches and amounts, stats, recent invites, block an invite, cancel a reward, adjust someone's credit by
   phone. Terms for readers at `/referral-terms` show the live amounts.
 
+### Ways to sign in
+
+The login pages show only the methods that work, checked from Supabase every 5 minutes:
+- **Mobile number + SMS code**: appears once Supabase → Authentication → Phone has an SMS provider (DLT in India).
+- **Email + password**: Supabase → Authentication → Email (on by default). With "Confirm email" off it works with no
+  email setup at all. Settings → Password lets people change it.
+- **Email codes, sign-up confirmation and "Forgot password?"**: need Supabase to send email through your own SMTP
+  (Resend), the templates in `supabase/templates/`, and `AUTH_EMAILS_ENABLED=true`. See docs/LAUNCH.md, step 4.
+- **Google**: see below.
+
 ### Google sign-in setup (about 10 minutes)
 
 1. **Google Cloud Console** → APIs & Services → **OAuth consent screen**: External, app name "Eliphas Indicus

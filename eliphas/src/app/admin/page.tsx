@@ -7,6 +7,7 @@ import { rupees } from "@/lib/pricing";
 import { getBusiness, getPricingSettings, missingBusiness } from "@/lib/settings";
 import { checkPublicOrigin } from "@/lib/eeid-format";
 import { emailConfigured } from "@/lib/email";
+import { signInMethods } from "@/lib/google-auth";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin" };
@@ -61,7 +62,7 @@ export default async function AdminHome() {
     count(supabase.from("payment_refunds").select("id", { count: "exact", head: true }).in("status", ["requested", "failed"])),
     count(supabase.from("contact_messages").select("id", { count: "exact", head: true }).eq("status", "new")),
   ]);
-  const [business, pricing] = await Promise.all([getBusiness(), getPricingSettings()]);
+  const [business, pricing, signIn] = await Promise.all([getBusiness(), getPricingSettings(), signInMethods()]);
   const keyId = process.env.RAZORPAY_KEY_ID ?? "";
   const missing = missingBusiness(business);
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -69,6 +70,15 @@ export default async function AdminHome() {
   const origin = checkPublicOrigin(process.env.PUBLIC_SITE_ORIGIN);
   const refundsToCheck = openOrderRefunds + openPaymentRefunds;
   const checklist = [
+    {
+      done: signIn.phone,
+      label: "Mobile-number sign-in works (SMS provider in Supabase)",
+      hint: signIn.phone
+        ? undefined
+        : signIn.google || signIn.email
+          ? `Meanwhile people can sign in with ${[signIn.google && "Google", signIn.email && "email"].filter(Boolean).join(" and ")}.`
+          : "Nobody can sign in yet. Switch on Google or email sign-in (docs/LAUNCH.md, step 4).",
+    },
     {
       done: missing.length === 0,
       label: "Business details added",
