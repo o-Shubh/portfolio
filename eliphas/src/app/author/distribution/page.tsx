@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { DistributionRequestForm } from "@/components/DistributionForms";
+import { DistributionReplyForm, DistributionRequestForm } from "@/components/DistributionForms";
 import { PageHeader } from "@/components/PageHeader";
 import { requireRole } from "@/lib/auth";
 import { channelLabel, statusOf } from "@/lib/distribution";
@@ -86,6 +86,15 @@ export default async function DistributionPage() {
                           </div>
                         ) : (
                           <p className="text-sm text-muted">Waiting for review. Nothing has been charged.</p>
+                        )}
+                        {r.author_reply && (
+                          <div className="rounded-[var(--radius-control)] px-3.5 py-3 ring-1 ring-line">
+                            <p className="text-xs font-medium text-muted">Your reply{r.author_replied_at ? ` · ${day(r.author_replied_at)}` : ""}</p>
+                            <p className="mt-1 text-[0.9375rem] whitespace-pre-wrap">{r.author_reply}</p>
+                          </div>
+                        )}
+                        {r.status === "needs_information" && (
+                          <DistributionReplyForm id={r.id} updatedAt={r.updated_at} markets={r.markets} residence={r.residence_country} />
                         )}
                       </li>
                     );

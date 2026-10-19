@@ -1,7 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-type Kind = "new_follower" | "reply" | "verification";
+type Kind = "new_follower" | "reply" | "verification" | "distribution";
 
 /**
  * One in-app notification. `refId` makes it idempotent: the same follower, comment or decision never

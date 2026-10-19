@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { requestDistribution, reviewDistribution } from "@/app/actions/distribution";
+import { replyDistribution, requestDistribution, reviewDistribution } from "@/app/actions/distribution";
 import { FormMessage } from "@/components/FormMessage";
 import { formatPaise } from "@/lib/commission";
 import { CHANNELS, DISTRIBUTION_STATUS, REVIEW_STATUSES, distributionEstimate, type Channel } from "@/lib/distribution";
@@ -287,5 +287,42 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
       <dt className="text-[0.9375rem] text-muted">{label}</dt>
       <dd className={`mono ${strong ? "font-semibold" : ""}`}>{value}</dd>
     </div>
+  );
+}
+
+/** Author: answer "Needs information" and, if needed, correct the countries. Sends the request back for review. */
+export function DistributionReplyForm({ id, updatedAt, markets, residence }: { id: string; updatedAt: string; markets: string; residence: string }) {
+  const [state, submit, pending] = useFormAction(replyDistribution);
+  const uid = useId();
+  if (state?.ok) return <FormMessage state={state} />;
+  return (
+    <form onSubmit={submit} className="space-y-3 border-t border-line pt-3">
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="previous" value={updatedAt} />
+      <div>
+        <label htmlFor={`${uid}-reply`} className="label">
+          Your reply
+        </label>
+        <textarea id={`${uid}-reply`} name="reply" required minLength={5} maxLength={2000} rows={3} className="field py-2.5" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label htmlFor={`${uid}-country`} className="label">
+            Country of residence
+          </label>
+          <input id={`${uid}-country`} name="residence_country" defaultValue={residence} required minLength={2} maxLength={80} className="field" />
+        </div>
+        <div>
+          <label htmlFor={`${uid}-markets`} className="label">
+            Where you want to sell
+          </label>
+          <input id={`${uid}-markets`} name="markets" defaultValue={markets} required minLength={2} maxLength={200} className="field" />
+        </div>
+      </div>
+      <FormMessage state={state} />
+      <button type="submit" className="btn-primary" disabled={pending}>
+        {pending ? "Sending…" : "Send reply"}
+      </button>
+    </form>
   );
 }

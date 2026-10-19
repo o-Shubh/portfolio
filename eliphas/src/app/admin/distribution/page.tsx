@@ -104,6 +104,12 @@ export default async function DistributionAdminPage({ searchParams }: PageProps<
                         </>
                       )}
                     </dl>
+                    {r.author_reply && (
+                      <div className="mt-3 rounded-[var(--radius-control)] bg-tint-info px-3.5 py-3">
+                        <p className="text-xs font-medium text-accent-fg">Author replied{r.author_replied_at ? ` · ${day(r.author_replied_at)}` : ""}</p>
+                        <p className="mt-1 text-[0.9375rem] whitespace-pre-wrap">{r.author_reply}</p>
+                      </div>
+                    )}
                     <DistributionReviewForm id={r.id} updatedAt={r.updated_at} status={r.status} note={r.review_note} />
                   </li>
                 );

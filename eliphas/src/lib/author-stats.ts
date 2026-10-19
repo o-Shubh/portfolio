@@ -9,9 +9,9 @@ export const monthLong = (d: string) =>
 /** Everything the author dashboard shows, for the logged-in author only. */
 export async function getAuthorStats(profileId: string, months: number) {
   const supabase = await createClient();
-  const since = new Date();
-  since.setMonth(since.getMonth() - (months - 1), 1);
-  since.setHours(0, 0, 0, 0);
+  // Start of the first month in the window, at midnight India time (not the server's time zone)
+  const nowIst = new Date(Date.now() + 5.5 * 3_600_000);
+  const since = new Date(Date.UTC(nowIst.getUTCFullYear(), nowIst.getUTCMonth() - (months - 1), 1) - 5.5 * 3_600_000);
 
   const [balance, profile, byMonth, byCity, byBook, recent, payouts, open] = await Promise.all([
     supabase.rpc("my_balance").single(),

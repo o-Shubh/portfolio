@@ -103,8 +103,7 @@ the rest needed no per-screen change. Shared additions: an iOS-style `switch` ut
 grouped-list settings sections (small section label above a `group-list`). The Distribution screens (Author → Distribution,
 Admin → Distribution) were built on the same system in PR #23.
 
-Known, not changed here: the author dashboard's city chart counts from midnight UTC rather than midnight India time
-(`src/lib/author-stats.ts`), which affects only the first few hours of its 12-month window.
+The author dashboard's city chart now starts at midnight India time (fixed after P3).
 
 
 Design pack (COMPLETE-DESIGN-BRIEF.md): homepage, book page, shelves and copy were done individually. Public screens 5–24 (except 3) were not individually revisited in that pass; they use the shared typography, colours and components.
