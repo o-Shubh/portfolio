@@ -159,6 +159,13 @@ export function CheckoutForm({
               defaultValue={defaults.ship_phone}
             />
           </div>
+          <div>
+            <label htmlFor="contact_email" className="label">
+              Email for order updates <span className="font-normal text-muted">(optional)</span>
+            </label>
+            <input id="contact_email" name="contact_email" type="email" autoComplete="email" inputMode="email" defaultValue={defaults.contact_email} className="field" />
+            <p className="hint">We&apos;ll email you when your order is confirmed, ships and arrives.</p>
+          </div>
           <Field id="ship_line1" label="House, building, street" autoComplete="address-line1" defaultValue={defaults.ship_line1} />
           <Field id="ship_line2" label="Area, landmark (optional)" autoComplete="address-line2" defaultValue={defaults.ship_line2} required={false} />
           <div className="grid gap-4 sm:grid-cols-3">

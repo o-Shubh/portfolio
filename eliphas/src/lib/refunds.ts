@@ -1,5 +1,6 @@
 import "server-only";
 import type { OrderStatus } from "@/lib/order-status";
+import { sendOrderEmail } from "@/lib/order-emails";
 import { fetchRefund, listRefunds, refundPayment, type RazorpayRefund } from "@/lib/payments";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -60,6 +61,7 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
       .from("orders")
       .update({ refund_id: refund.id, refund_status: status, refunded_at: status === "processed" ? new Date().toISOString() : null })
       .eq("id", orderId);
+    if (status === "processed") await sendOrderEmail(orderId, "refund_processed");
     return status === "failed" ? { ok: false, reason: "Razorpay could not refund this payment." } : { ok: true, status };
   } catch (e) {
     console.error("Refund failed", orderId, e);
@@ -95,6 +97,7 @@ export async function reconcileOrderRefund(orderId: string): Promise<RefundResul
       refunded_at: status === "processed" ? new Date().toISOString() : null,
     })
     .eq("id", orderId);
+  if (status === "processed") await sendOrderEmail(orderId, "refund_processed");
   return status === "failed" ? { ok: false, reason: "Razorpay reports this refund failed. You can retry it." } : { ok: true, status };
 }
 
@@ -116,6 +119,7 @@ export async function cancelOrder(orderId: string, by: "buyer" | "admin", reason
       ok: false as const,
       reason: by === "buyer" ? "Printing has already started, so this order can't be cancelled." : "This order can no longer be cancelled.",
     };
+  await sendOrderEmail(orderId, "order_cancelled");
   const refund = await refundOrder(orderId);
   return { ok: true as const, refund };
 }
@@ -227,12 +231,14 @@ export async function retryPaymentRefund(rowId: string, actorId: string): Promis
 /** Applies refund.processed / refund.failed to book orders and the payment ledger. Reports database errors. */
 export async function applyRefundEvent(refundId: string, status: "processed" | "failed"): Promise<{ ok: boolean }> {
   const admin = createAdminClient();
-  const { error: orderError } = await admin
+  const { data: orders, error: orderError } = await admin
     .from("orders")
     .update({ refund_status: status, refunded_at: status === "processed" ? new Date().toISOString() : null })
     .eq("refund_id", refundId)
-    .neq("refund_status", "processed");
+    .neq("refund_status", "processed")
+    .select("id");
   if (orderError) return { ok: false };
+  if (status === "processed") for (const o of orders ?? []) await sendOrderEmail(o.id, "refund_processed");
   const { data: row, error: readError } = await admin.from("payment_refunds").select("id").eq("razorpay_refund_id", refundId).maybeSingle();
   if (readError) return { ok: false };
   if (row) {

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { cleanTrackingUrl } from "@/lib/couriers";
+import { sendOrderEmail } from "@/lib/order-emails";
 import { PRINTER_NEXT, type OrderStatus } from "@/lib/order-status";
 import type { Database } from "@/lib/database.types";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -48,8 +49,11 @@ export async function advanceOrder(orderId: string, _prev: ActionState, fd: Form
     Object.assign(update, { courier, tracking_number: tracking, tracking_url: trackingUrl, shipped_at: now });
   }
 
-  const { error } = await admin.from("orders").update(update).eq("id", orderId).eq("status", order.status);
+  const { data: moved, error } = await admin.from("orders").update(update).eq("id", orderId).eq("status", order.status).select("id");
   if (error) return { error: "Could not update. Please try again." };
+  if (!moved?.length) return { error: "This order has already moved on. Refresh the page." };
+  if (next.to === "shipped") await sendOrderEmail(orderId, "order_shipped");
+  if (next.to === "delivered") await sendOrderEmail(orderId, "order_delivered");
 
   revalidatePath("/printer", "layout");
   revalidatePath("/admin/orders");

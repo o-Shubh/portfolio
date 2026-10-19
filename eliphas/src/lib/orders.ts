@@ -1,6 +1,7 @@
 import "server-only";
 import { refundOrder } from "@/lib/refunds";
 import { applyActualGatewayFee } from "@/lib/order-pricing";
+import { sendOrderEmail } from "@/lib/order-emails";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export { MAX_QTY } from "@/lib/order-pricing";
@@ -59,5 +60,6 @@ export async function markOrderPaid(orderId: string, paymentId: string, mode: "r
     .select("id");
   if (error) return { ok: false as const, reason: error.message };
   if (updated?.length && feePaise !== null) await applyActualGatewayFee(orderId, feePaise);
+  if (updated?.length) await sendOrderEmail(orderId, "order_confirmed");
   return { ok: true as const, already: !updated?.length };
 }

@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/auth";
 import { rupees } from "@/lib/pricing";
 import { getBusiness, getPricingSettings, missingBusiness } from "@/lib/settings";
 import { checkPublicOrigin } from "@/lib/eeid-format";
+import { emailConfigured } from "@/lib/email";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin" };
@@ -89,6 +90,7 @@ export default async function AdminHome() {
       href: "/admin/editions",
     },
     { done: sampleZones === 0, label: "Real shipping rates (no sample zones)", href: "/admin/shipping" },
+    { done: emailConfigured(), label: "Order emails set up (RESEND_API_KEY, EMAIL_FROM)", href: "/admin/emails" },
   ];
   const owed = (balances.data ?? []).reduce((s, b) => s + Math.max(0, Number(b.balance)), 0);
 
