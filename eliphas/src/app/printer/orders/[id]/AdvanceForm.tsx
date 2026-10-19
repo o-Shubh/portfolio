@@ -3,9 +3,8 @@
 import { useFormAction } from "@/lib/use-form-action";
 import { advanceOrder } from "@/app/actions/printer";
 import { FormMessage } from "@/components/FormMessage";
+import { COURIERS } from "@/lib/couriers";
 import { PRINTER_NEXT, type OrderStatus } from "@/lib/order-status";
-
-const COURIERS = ["India Post", "Delhivery", "DTDC", "Blue Dart", "Ekart", "Xpressbees", "Shiprocket"];
 
 export function AdvanceForm({ orderId, status }: { orderId: string; status: OrderStatus }) {
   const [state, onSubmit, pending] = useFormAction(advanceOrder.bind(null, orderId));
@@ -37,6 +36,23 @@ export function AdvanceForm({ orderId, status }: { orderId: string; status: Orde
               Tracking number
             </label>
             <input id="tracking_number" name="tracking_number" className="field" autoCapitalize="characters" required />
+          </div>
+          <div>
+            <label htmlFor="tracking_url" className="label">
+              Tracking link <span className="font-normal text-muted">(optional)</span>
+            </label>
+            <input
+              id="tracking_url"
+              name="tracking_url"
+              type="url"
+              inputMode="url"
+              placeholder="https://…"
+              className="field"
+              aria-describedby="tracking_url-hint"
+            />
+            <p id="tracking_url-hint" className="hint">
+              Paste the link from the courier&apos;s receipt so the reader can track the parcel in one tap.
+            </p>
           </div>
         </>
       )}
