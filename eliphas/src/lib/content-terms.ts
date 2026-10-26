@@ -127,7 +127,7 @@ export const BUILT_IN_TERMS: Record<TermCategory, string[]> = {
     "म्लेच्छ",
     "छक्का",
   ],
-  // Sexually explicit content (decides whether the book needs the 18+ label)
+  // Sexually explicit content (we don't publish adult books)
   adult: [
     "porn",
     "porno",
