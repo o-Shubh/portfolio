@@ -1,4 +1,6 @@
 import { BookEventBeacon } from "@/components/BookEventBeacon";
+import { AgeGate } from "@/components/AgeGate";
+import { seesMature } from "@/lib/mature";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,6 +20,7 @@ export default async function SamplePage({ params }: PageProps<"/books/[slug]/sa
   const { slug } = await params;
   const book = await getPublishedBook(slug);
   if (!book) notFound();
+  if (book.age_rating === "mature" && !(await seesMature())) return <AgeGate title={book.title} back={`/books/${book.slug}`} />;
   const url = sampleUrl(book.sample_path);
 
   if (!url) {

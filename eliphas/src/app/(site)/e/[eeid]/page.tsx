@@ -11,10 +11,12 @@ import { authorHandle, coverUrl, LANGUAGE_LABEL } from "@/lib/books";
 import { editionUrl, isEeid } from "@/lib/eeid-format";
 import { rupees } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
+import { AgeGate } from "@/components/AgeGate";
+import { seesMature } from "@/lib/mature";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // Public, permanent page for an Eliphas Edition ID. Reads only public fields; never files, contacts or admin data.
-const PUBLIC = "id, slug, title, subtitle, author_name, author_id, language, binding, trim_size, interior, paper, page_count, edition_label, isbn, mrp, cover_path, sample_path, status, published_at, removed_at, eeid" as const;
+const PUBLIC = "id, slug, title, subtitle, author_name, author_id, language, binding, trim_size, interior, paper, page_count, edition_label, isbn, mrp, cover_path, sample_path, status, published_at, removed_at, eeid, age_rating" as const;
 
 const lookup = cache(async (eeid: string) => {
   if (!isEeid(eeid)) return null;
@@ -43,6 +45,7 @@ export default async function EditionPage({ params }: PageProps<"/e/[eeid]">) {
   const { eeid } = await params;
   const found = await lookup(eeid);
   if (!found) notFound();
+  if (found.book?.age_rating === "mature" && found.book.status === "published" && !(await seesMature())) return <AgeGate title={found.book.title} back="/" />;
   const b = found.book;
   const state = stateOf(b);
 

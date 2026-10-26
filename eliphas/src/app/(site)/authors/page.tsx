@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { EmptyState } from "@/components/EmptyState";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { seesMature } from "@/lib/mature";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
@@ -22,7 +23,12 @@ export default async function AuthorsPage({ searchParams }: PageProps<"/authors"
   const onlyVerified = sp.verified === "1";
   const admin = createAdminClient();
   const [{ data: books }, { data: articles }, { data: verifiedRows }] = await Promise.all([
-    admin.from("books").select("author_id, title, slug, language").eq("status", "published").order("published_at", { ascending: false }),
+    admin
+      .from("books")
+      .select("author_id, title, slug, language")
+      .eq("status", "published")
+      .in("age_rating", (await seesMature()) ? ["general", "mature"] : ["general"])
+      .order("published_at", { ascending: false }),
     admin.from("articles").select("author_id").eq("status", "published").eq("moderation", "visible"),
     admin.from("public_profiles").select("id").eq("verified_author", true),
   ]);

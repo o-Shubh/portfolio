@@ -14,6 +14,11 @@ import { getPricingSettings } from "@/lib/settings";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { BookServicesCard } from "@/components/BookServicesCard";
 import { EditionIdentity } from "@/components/editions/EditionIdentity";
+import { ContentCheckReport } from "@/components/ContentCheckReport";
+import { submitBlockers } from "@/lib/content-check";
+import { checkResults, latestCheck } from "@/lib/manuscript-check";
+import { RunContentCheck } from "@/components/RunContentCheck";
+import { ContentSettingsForm } from "./ContentCheck";
 import { SubmitActions } from "./SubmitActions";
 
 export const metadata: Metadata = { title: "Submit for review" };
@@ -28,7 +33,11 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
   const version = termsReq.required ? plans.free : current.version;
   const rule = termsReq.required ? ruleFromPlanVersion(plans.free) : current.rule;
   const checklist = submitChecklist(book, settings, rule, termsReq);
-  const ready = checklist.every((c) => c.ok);
+  const check = await latestCheck(book);
+  const results = checkResults(check);
+  const blockers = submitBlockers(results, { ageRating: book.age_rating, contentNote: book.content_note });
+  const ready = checklist.every((c) => c.ok) && blockers.length === 0;
+  const editable = ["draft", "changes_requested", "unpublished"].includes(book.status);
 
   const cost =
     book.page_count && book.mrp !== null
@@ -69,6 +78,39 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="card space-y-3" aria-labelledby="content-check-h">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="content-check-h" className="text-xl">
+              Content check
+            </h2>
+            {check && <span className="text-xs text-muted">Checked {new Date(check.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" })}</span>}
+          </div>
+          <p className="text-sm text-muted">
+            Seven automatic checks on your manuscript, title and description. They help you fix problems before review; our team makes the final decision.
+          </p>
+          {!book.manuscript_path ? (
+            <p className="text-sm">Upload your manuscript first.</p>
+          ) : (
+            <>
+              {results && <ContentCheckReport results={results} />}
+              {blockers.length > 0 && results && (
+                <div role="note" className="notice-danger">
+                  <div>
+                    <p className="font-semibold">Before you can send it for review</p>
+                    <ul className="mt-1 list-disc pl-5">
+                      {blockers.map((b) => (
+                        <li key={b}>{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+              {editable && <RunContentCheck bookId={book.id} auto={!check} label={check ? "Check again" : "Run the check"} />}
+            </>
+          )}
+          <ContentSettingsForm bookId={book.id} ageRating={book.age_rating} note={book.content_note ?? ""} editable={editable} />
         </section>
 
         {termsReq.required && !termsReq.accepted && (

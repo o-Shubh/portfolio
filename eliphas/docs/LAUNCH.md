@@ -44,7 +44,7 @@ README under "Deploy to Vercel".
       switched off rather than pretending.
 
 ## 4. Supabase (your existing project)
-- [ ] All migrations up to `20261030000024_growth.sql` run (see "Database" below).
+- [ ] All migrations up to `20261031000025_content_checks.sql` run (see "Database" below).
 - [ ] Authentication → URL Configuration: **Site URL** `https://your-domain.in`; add `https://your-domain.in/**`
       to Redirect URLs.
 - [ ] Authentication → Phone: real SMS provider details (step 1). **Remove the test phone numbers.**
@@ -98,6 +98,9 @@ README under "Deploy to Vercel".
 - [ ] Decide your payout schedule (e.g. monthly) and minimum. Admin → Payouts → Start payout run: download the sheet,
       pay each author by UPI or bank bulk transfer, then enter each reference (UTR) and mark it paid.
 - [ ] FAQ promises (review time, delivery time) match what you can deliver: `src/content/faq.ts`.
+- [ ] Admin → Content checks: look through the built-in word lists' purpose, add local words you want flagged, and
+      allow words that cause false alarms. Have your lawyer read the "Books: content standards and 18+" section of the
+      Community guidelines.
 - [ ] Optional, any time after launch: the invite programme (Admin → Referrals). It is off with zero amounts until you
       set them. Have your accountant check how discounts and credit are treated for GST, and your lawyer read the
       Invite programme terms page, before switching it on. The daily job that gives rewards uses `CRON_SECRET`.
@@ -120,7 +123,7 @@ With live keys, on the real domain:
 
 ## Database
 Run each new file in `supabase/migrations/` once, in order, in the SQL Editor. Never run `hosted-setup.sql` on the
-existing database. Latest: `20261030000024_growth.sql`.
+existing database. Latest: `20261031000025_content_checks.sql`.
 
 ## Play Store (optional, after the site is live)
 See [`PLAY-STORE.md`](PLAY-STORE.md): listing text, graphics, Data safety answers and the two Vercel settings.

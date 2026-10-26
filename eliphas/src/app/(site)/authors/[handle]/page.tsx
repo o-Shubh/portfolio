@@ -13,6 +13,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { getPublicAuthor, listPublicArticles, PAGE_SIZE, readerState } from "@/lib/articles";
 import { getCurrentProfile } from "@/lib/auth";
 import type { PublicBook } from "@/lib/books";
+import { seesMature } from "@/lib/mature";
 import { createClient } from "@/lib/supabase/server";
 
 export async function generateMetadata({ params }: PageProps<"/authors/[handle]">): Promise<Metadata> {
@@ -42,8 +43,9 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
     getCurrentProfile(),
     supabase
       .from("books")
-      .select("id, slug, title, subtitle, author_name, description, language, genre, isbn, page_count, trim_size, binding, interior, paper, cover_finish, mrp, cover_path, published_at, author_id, sample_path, sample_from, sample_to, eeid, edition_label", { count: "exact" })
+      .select("id, slug, title, subtitle, author_name, description, language, genre, isbn, page_count, trim_size, binding, interior, paper, cover_finish, mrp, cover_path, published_at, author_id, sample_path, sample_from, sample_to, eeid, edition_label, age_rating", { count: "exact" })
       .eq("status", "published")
+      .in("age_rating", (await seesMature()) ? ["general", "mature"] : ["general"])
       .eq("author_id", author.id)
       .order("published_at", { ascending: false })
       .limit(48),

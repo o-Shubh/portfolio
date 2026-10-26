@@ -40,6 +40,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/authors", label: "Authors", icon: "profile", sidebarOnly: true },
   { href: "/admin/editions", label: "Edition IDs", icon: "books", sidebarOnly: true },
   { href: "/admin/moderation", label: "Moderation", icon: "moderation", sidebarOnly: true },
+  { href: "/admin/content", label: "Content checks", icon: "moderation", sidebarOnly: true },
   { href: "/admin/shipping", label: "Shipping", icon: "shipping", sidebarOnly: true },
   { href: "/admin/plans", label: "Plans", icon: "plan", sidebarOnly: true },
   { href: "/admin/settings", label: "Settings", icon: "settings", sidebarOnly: true },

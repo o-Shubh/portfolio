@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!url || !key) return pages; // keys not set yet: still build, just without book pages
   const supabase = createClient(url, key);
   const [{ data }, { data: articles }, { data: authors }] = await Promise.all([
-    supabase.from("books").select("slug, updated_at").eq("status", "published"),
+    supabase.from("books").select("slug, updated_at").eq("status", "published").eq("age_rating", "general"), // 18+ books aren't listed for search engines
     // Row Level Security only shows the public published, visible articles (never drafts or hidden ones)
     supabase.from("articles").select("short_id, slug, updated_at").eq("status", "published").eq("moderation", "visible").limit(5000),
     supabase.from("public_authors").select("handle").limit(5000),

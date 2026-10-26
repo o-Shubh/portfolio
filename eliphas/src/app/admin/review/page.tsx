@@ -8,6 +8,7 @@ import { requireRole } from "@/lib/auth";
 import { coverUrl, LANGUAGE_LABEL } from "@/lib/books";
 import { isEeid } from "@/lib/eeid-format";
 import { STATUS, type BookStatus } from "@/lib/publishing";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Review queue" };
@@ -32,7 +33,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
   const supabase = await createClient();
   let query = supabase
     .from("books")
-    .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp, eeid")
+    .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp, eeid, age_rating")
     .limit(100);
   if (status !== "all" && !eeidQ) query = query.eq("status", status);
   if (noSample) query = query.is("sample_path", null);
@@ -44,6 +45,21 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
     query,
     supabase.from("books").select("id", { count: "exact", head: true }).eq("status", "in_review"),
   ]);
+  // Content check of each book's current manuscript (file paths are private, so read with full access)
+  const ids = (books ?? []).map((b) => b.id);
+  const admin = createAdminClient();
+  const [{ data: paths }, { data: checks }] = ids.length
+    ? await Promise.all([
+        admin.from("books").select("id, manuscript_path").in("id", ids),
+        admin.from("manuscript_checks").select("book_id, manuscript_path, results").in("book_id", ids),
+      ])
+    : [{ data: [] }, { data: [] }];
+  const manuscriptOf = new Map((paths ?? []).map((p) => [p.id, p.manuscript_path]));
+  const flagged = (bookId: string) => {
+    const c = (checks ?? []).find((x) => x.book_id === bookId && x.manuscript_path === manuscriptOf.get(bookId));
+    if (!c) return null;
+    return (c.results as { status: string }[]).filter((r) => r.status !== "pass").length;
+  };
 
   return (
     <>
@@ -111,6 +127,20 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
                     <StatusBadge status={b.status} />
                     {b.status === "in_review" && <span className="text-xs text-muted">submitted {timeAgo(b.submitted_at)}</span>}
                     {b.eeid && <span className="id-mono text-xs text-muted" data-testid="row-eeid">{b.eeid}</span>}
+                    {b.age_rating === "mature" && <span className="badge bg-tint-danger text-danger">18+</span>}
+                    {manuscriptOf.get(b.id) &&
+                      (() => {
+                        const n = flagged(b.id);
+                        return n === null ? (
+                          <span className="text-xs text-muted">not checked</span>
+                        ) : n ? (
+                          <span className="badge bg-tint-warn text-fg" data-testid="row-flags">
+                            {n} content {n === 1 ? "flag" : "flags"}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-success">content clear</span>
+                        );
+                      })()}
                   </div>
                 </div>
               </Link>

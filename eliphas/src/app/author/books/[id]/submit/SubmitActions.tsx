@@ -32,7 +32,7 @@ export function SubmitActions({ bookId, status, ready, slug }: { bookId: string;
           <button type="button" className="btn-primary" disabled={!ready || pending} onClick={run(submitForReview)}>
             {pending ? "Sending…" : "Send for review"}
           </button>
-          {!ready && <p className="text-sm text-muted">Finish the checklist first.</p>}
+          {!ready && <p className="text-sm text-muted">Finish the checklist and the content check first.</p>}
         </>
       )}
 

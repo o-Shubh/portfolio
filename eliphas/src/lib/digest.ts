@@ -40,7 +40,7 @@ export async function sendWeeklyDigests(limit = 500) {
     const none = { data: [] as never[] };
     const [books, articles, posts, saved] = await Promise.all([
       authors.length
-        ? admin.from("books").select("title, slug, author_name").eq("status", "published").in("author_id", authors).gte("published_at", since).limit(10)
+        ? admin.from("books").select("title, slug, author_name").eq("status", "published").eq("age_rating", "general").in("author_id", authors).gte("published_at", since).limit(10)
         : none,
       authors.length
         ? admin

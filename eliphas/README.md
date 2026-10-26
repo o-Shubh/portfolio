@@ -26,6 +26,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 14 | Operations: order emails, contact form inbox, payout runs, parcel tracking links, Play Store assets | ✅ Done (migration 000022) |
 | 15 | Invite programme: invite links, first-order discount, account credit, rewards, Admin → Referrals (off by default) | ✅ Done (migration 000023) |
 | 16 | Share kit and reach for authors; wishlist, saved-book and new-book notices; weekly email | ✅ Done (migration 000024) |
+| 17 | Manuscript content checks (7 checks), 18+ label and age check, Admin → Content checks | ✅ Done (migration 000025) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -586,6 +587,22 @@ Off with zero amounts until an admin sets it up in **Admin → Referrals**.
 - **Weekly email** (opt-in, needs an email address): new books, articles and posts from people you follow and price
   drops on saved books, sent on Mondays by the daily job; nothing is sent in a quiet week. Each email has a one-click
   unsubscribe link (the page asks for a button press so email scanners can't unsubscribe people).
+
+### Content checks and 18+ books (migration 000025)
+
+- **Seven automatic checks** on every manuscript (plus its title and description) before it can be sent for review:
+  readable file, abusive language, hate speech, sexual content, violence and self-harm, personal data (phone, email,
+  Aadhaar, PAN) and professional quality (placeholders, unfinished notes, capitals, spam links). English, Hindi
+  (Devanagari) and Hinglish word lists in `src/lib/content-terms.ts`, matched as whole words; admins add words or allow
+  false alarms in **Admin → Content checks**. The text is read from the PDF on the server with pdf.js.
+- **Results** appear on the author's Submit step and on the admin review page, with the page and a masked example for
+  each match. A failed check is resolved by fixing the manuscript, adding the 18+ label (sexual content, heavy
+  language, violence) or a note to reviewers (slurs used in context, false alarms). Nothing is published or rejected
+  automatically; our team decides.
+- **18+ label** (books.age_rating): such books are left out of the bookstore, author pages, search engines, the
+  sitemap and the weekly email for visitors who haven't confirmed they're 18 or older. The book, sample, Edition ID
+  and checkout pages ask first; Settings has a "Show 18+ books" switch. Sexually explicit material isn't allowed even
+  with the label (Community guidelines).
 
 ### Ways to sign in
 

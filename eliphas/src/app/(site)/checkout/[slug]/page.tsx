@@ -8,6 +8,8 @@ import { coverUrl } from "@/lib/books";
 import { canSell, MAX_QTY } from "@/lib/order-pricing";
 import { paymentMode } from "@/lib/payments";
 import { getPricingSettings } from "@/lib/settings";
+import { AgeGate } from "@/components/AgeGate";
+import { seesMature } from "@/lib/mature";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { addressDefaults } from "../address";
 import { CheckoutForm } from "../CheckoutForm";
@@ -22,6 +24,7 @@ export default async function CheckoutPage({ params }: PageProps<"/checkout/[slu
 
   const { data: book } = await createAdminClient().from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
   if (!book) notFound();
+  if (book.age_rating === "mature" && !(await seesMature())) return <AgeGate title={book.title} back={`/books/${book.slug}`} />;
   const settings = await getPricingSettings();
   const sellable = await canSell(book, settings);
 

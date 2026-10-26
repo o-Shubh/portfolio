@@ -5,6 +5,8 @@ import { ProfileForm } from "@/components/ProfileForm";
 import { avatarUrl } from "@/lib/avatars";
 import { requireRole, ROLE_LABEL } from "@/lib/auth";
 import { formatPhone } from "@/lib/phone";
+import { seesMature } from "@/lib/mature";
+import { MatureToggle } from "@/components/MatureToggle";
 import { ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
@@ -77,6 +79,7 @@ export default async function ProfilePage() {
                 </span>
                 <ThemeToggle />
               </div>
+              <MatureToggle on={await seesMature()} />
               <form action={signOut}>
                 <button type="submit" className="group-row w-full text-left hover:bg-surface-2">
                   <LogOut className="h-4 w-4 text-muted" aria-hidden /> Log out

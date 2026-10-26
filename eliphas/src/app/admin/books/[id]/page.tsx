@@ -19,6 +19,10 @@ import { createClient } from "@/lib/supabase/server";
 import { EditionIdentity } from "@/components/editions/EditionIdentity";
 import { EditionActions } from "./EditionActions";
 import { ReviewActions } from "./ReviewActions";
+import { AgeRatingForm } from "./ContentAdmin";
+import { ContentCheckReport } from "@/components/ContentCheckReport";
+import { RunContentCheck } from "@/components/RunContentCheck";
+import { checkResults, latestCheck } from "@/lib/manuscript-check";
 
 export const metadata: Metadata = { title: "Review book" };
 
@@ -30,11 +34,13 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
   const supabase = await createClient();
   const { data: book } = await createAdminClient().from("books").select("*").eq("id", id).maybeSingle();
   if (!book) notFound();
-  const [{ data: author }, settings, links] = await Promise.all([
+  const [{ data: author }, settings, links, check] = await Promise.all([
     supabase.from("profiles").select("full_name, phone, city, state").eq("id", book.author_id).single(),
     getPricingSettings(),
     printFileLinks(book),
+    latestCheck(book),
   ]);
+  const results = checkResults(check);
   const { rates, fees } = settings;
   const label = (g: Record<string, { label: string }>, k: string) => g[k]?.label ?? `${k} (missing)`;
 
@@ -152,6 +158,32 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
         </div>
 
         <aside className="space-y-6">
+          <section className="card space-y-3" aria-labelledby="admin-content-h" data-testid="admin-content-check">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 id="admin-content-h" className="text-lg">
+                Content check
+              </h2>
+              {book.age_rating === "mature" && <span className="badge bg-tint-danger text-danger">18+</span>}
+            </div>
+            {results ? (
+              <>
+                <p className={`text-sm font-medium ${check!.overall === "pass" ? "text-success" : check!.overall === "blocked" ? "text-danger" : ""}`}>
+                  {check!.overall === "pass" ? "Nothing found." : check!.overall === "blocked" ? "Needed action from the author (see below)." : "Things to look at."}
+                </p>
+                <ContentCheckReport results={results} />
+              </>
+            ) : (
+              <p className="text-sm text-muted">{book.manuscript_path ? "This manuscript hasn't been checked yet." : "No manuscript yet."}</p>
+            )}
+            {book.content_note && (
+              <div className="rounded-[var(--radius-control)] bg-surface-2 p-3 text-sm">
+                <p className="font-semibold">Author&apos;s note</p>
+                <p className="whitespace-pre-line">{book.content_note}</p>
+              </div>
+            )}
+            {book.manuscript_path && <RunContentCheck bookId={book.id} auto={false} label={results ? "Check again" : "Run the check"} />}
+            <AgeRatingForm bookId={book.id} rating={book.age_rating} />
+          </section>
           <section className="card">
             <ReviewActions bookId={book.id} status={book.status} slug={book.slug} lastNote={book.review_note} />
           </section>

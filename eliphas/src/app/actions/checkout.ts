@@ -14,6 +14,7 @@ import { parseEmail } from "@/lib/email-format";
 import { checkCapture, createRazorpayOrder, paymentMode, razorpayKeyId, razorpaySecret } from "@/lib/payments";
 import { cleanIndianMobile } from "@/lib/phone";
 import { verifyPaymentSignature } from "@/lib/razorpay-signature";
+import { seesMature } from "@/lib/mature";
 import { checkoutBenefits, releaseHeldCredit } from "@/lib/referrals";
 import { getPricingSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -139,6 +140,9 @@ export async function startCheckout(fd: FormData): Promise<CheckoutResult> {
   const supabase = await createClient();
   const found = await orderLines(items);
   if ("error" in found) return { error: found.error };
+  if (found.lines.some((l) => l.book.age_rating === "mature") && !(await seesMature())) {
+    return { error: "This order has an 18+ book. Open the book page and confirm you're 18 or older first." };
+  }
   const useCredit = fd.get("use_credit") === "1";
   // An earlier unpaid checkout holding credit or the first-order discount is cancelled, freeing them for this one
   await releaseHeldCredit({ buyerId: profile.id });

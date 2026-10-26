@@ -4,6 +4,8 @@ import Link from "next/link";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { BookEventBeacon } from "@/components/BookEventBeacon";
 import { SaveBookButton } from "@/components/SaveBookButton";
+import { AgeGate } from "@/components/AgeGate";
+import { seesMature } from "@/lib/mature";
 import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -29,6 +31,8 @@ export async function generateMetadata({ params }: PageProps<"/books/[slug]">): 
     title: `${book.title} by ${book.author_name}`,
     description: book.description?.slice(0, 160) ?? undefined,
     openGraph: { title: book.title, description: book.description ?? undefined, images: cover ? [cover] : undefined },
+    // 18+ books stay out of search engines
+    ...(book.age_rating === "mature" ? { robots: { index: false } } : {}),
   };
 }
 
@@ -36,6 +40,7 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
   const { slug } = await params;
   const book = await getPublishedBook(slug);
   if (!book) notFound();
+  if (book.age_rating === "mature" && !(await seesMature())) return <AgeGate title={book.title} />;
 
   const [more, { rates }, handle, me, { reviews, average, counts }, author] = await Promise.all([
     moreByAuthor(book),
@@ -220,6 +225,13 @@ export default async function BookPage({ params }: PageProps<"/books/[slug]">) {
               ))}
             </div>
             <h1 className="display mt-3 text-[1.875rem] leading-tight md:text-[2.375rem]">{book.title}</h1>
+            {book.age_rating === "mature" && (
+              <p className="mt-2">
+                <span className="badge bg-tint-danger text-danger" data-testid="mature-badge">
+                  18+ · mature themes
+                </span>
+              </p>
+            )}
             {book.subtitle && <p className="mt-1.5 text-lg text-muted md:text-xl">{book.subtitle}</p>}
             <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2" lang="en">
               <AuthorAvatar name={book.author_name} path={author?.avatar_path ?? null} size="sm" />

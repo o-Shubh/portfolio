@@ -18,6 +18,7 @@ export function BookCard({ book, priority, showAdd = true }: { book: PublicBook;
     <div className="group relative flex h-full flex-col has-[a:focus-visible]:rounded-[var(--radius-card)] has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-focus">
       <div className="relative rounded-[var(--radius-card)] bg-ivory px-[13%] pt-[11%] pb-[9%]">
         <div className="book-lift">{cover}</div>
+        {book.age_rating === "mature" && <span className="badge absolute top-2 left-2 bg-tint-danger text-danger">18+</span>}
         <div className="absolute top-2 right-2">
           <QuickLook
             book={{ id: book.id, slug: book.slug, title: book.title, author: book.author_name, price: rupees(Number(book.mrp)), language: book.language, description: book.description, meta, sample: Boolean(book.sample_path) }}
@@ -78,8 +79,9 @@ export function BookRow({ book, verified, priority }: { book: PublicBook; verifi
         <BookCover title={book.title} author={book.author_name} slug={book.slug} src={coverUrl(book.cover_path)} size="sm" priority={priority} />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col">
-        {(book.eeid || book.isbn) && (
+        {(book.eeid || book.isbn || book.age_rating === "mature") && (
           <p className="flex flex-wrap gap-1.5 text-[0.7rem] text-muted">
+            {book.age_rating === "mature" && <span className="badge bg-tint-danger text-danger">18+</span>}
             {book.eeid && <span className="id-mono rounded bg-surface-2 px-1.5 py-0.5">EEID {book.eeid}</span>}
             {book.isbn && <span className="id-mono rounded bg-surface-2 px-1.5 py-0.5">ISBN {book.isbn}</span>}
           </p>
