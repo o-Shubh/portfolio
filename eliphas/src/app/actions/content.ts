@@ -8,18 +8,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export type ContentActionState = { error?: string; ok?: string } | undefined;
 const CATEGORIES = ["language", "hate", "adult", "violence", "allow"] as const;
 
-/** Our team sets a book's audience (also on live books). */
-export async function setAgeRating(bookId: string, _prev: ContentActionState, fd: FormData): Promise<ContentActionState> {
-  const me = await requireRole(["admin"]);
-  const rating = fd.get("age_rating") === "mature" ? "mature" : "general";
-  const { error } = await createAdminClient().from("books").update({ age_rating: rating }).eq("id", bookId);
-  if (error) return { error: "Could not save." };
-  await logAudit(me.id, "book.age_rating", "book", bookId, { age_rating: rating });
-  revalidatePath(`/admin/books/${bookId}`);
-  revalidatePath("/books", "layout");
-  return { ok: rating === "mature" ? "Marked 18+." : "Marked for everyone." };
-}
-
 /** Adds a word or phrase to a list, or to the allowed list (to stop false alarms). */
 export async function addContentTerm(_prev: ContentActionState, fd: FormData): Promise<ContentActionState> {
   const me = await requireRole(["admin"]);

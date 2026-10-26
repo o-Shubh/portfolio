@@ -72,7 +72,7 @@ export default async function CommunityGuidelinesPage() {
         </li>
       </ul>
 
-      <h2>Books: content standards and 18+</h2>
+      <h2>Books: content standards</h2>
       <p>
         Every manuscript goes through seven automatic checks before it can be sent for review: a readable file, abusive language, hate speech,
         sexual content, violence and self-harm, personal data, and professional quality (placeholder text, unfinished notes and the like). The
@@ -80,11 +80,7 @@ export default async function CommunityGuidelinesPage() {
       </p>
       <ul>
         <li>
-          <strong>18+ books</strong> are books with mature themes, such as strong language, violence or adult situations. They carry an 18+ label
-          and are shown only to readers who confirm they are 18 or older. They are left out of search engines.
-        </li>
-        <li>
-          <strong>Never allowed, with or without the label:</strong> sexually explicit material, sexual content involving minors, hate speech
+          <strong>Never allowed:</strong> sexually explicit material (we don&apos;t publish adult books), sexual content involving minors, hate speech
           meant to demean a group, instructions for causing harm, and other content that is illegal in India.
         </li>
         <li>

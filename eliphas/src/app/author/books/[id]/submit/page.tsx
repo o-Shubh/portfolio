@@ -35,7 +35,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
   const checklist = submitChecklist(book, settings, rule, termsReq);
   const check = await latestCheck(book);
   const results = checkResults(check);
-  const blockers = submitBlockers(results, { ageRating: book.age_rating, contentNote: book.content_note });
+  const blockers = submitBlockers(results, { contentNote: book.content_note });
   const ready = checklist.every((c) => c.ok) && blockers.length === 0;
   const editable = ["draft", "changes_requested", "unpublished"].includes(book.status);
 
@@ -110,7 +110,7 @@ export default async function SubmitPage({ params }: PageProps<"/author/books/[i
               {editable && <RunContentCheck bookId={book.id} auto={!check} label={check ? "Check again" : "Run the check"} />}
             </>
           )}
-          <ContentSettingsForm bookId={book.id} ageRating={book.age_rating} note={book.content_note ?? ""} editable={editable} />
+          <ContentSettingsForm bookId={book.id} note={book.content_note ?? ""} editable={editable} />
         </section>
 
         {termsReq.required && !termsReq.accepted && (

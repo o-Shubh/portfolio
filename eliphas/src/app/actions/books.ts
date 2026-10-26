@@ -259,7 +259,7 @@ export async function submitForReview(bookId: string): Promise<ActionState> {
   const missing = submitChecklist(book as Book, settings, rule, termsRequirement(book, profile)).filter((c) => !c.ok);
   if (missing.length) return { error: `Still to do: ${missing.map((m) => m.label).join(", ")}.` };
   // The seven content checks on the current manuscript
-  const blockers = submitBlockers(checkResults(await latestCheck(book)), { ageRating: book.age_rating, contentNote: book.content_note });
+  const blockers = submitBlockers(checkResults(await latestCheck(book)), { contentNote: book.content_note });
   if (blockers.length) return { error: `Content check: ${blockers.join("; ")}.` };
 
   // Re-snapshot the print cost with today's rates
@@ -284,18 +284,17 @@ export async function submitForReview(bookId: string): Promise<ActionState> {
   return { ok: "Sent for review." };
 }
 
-/** The 18+ label and the note to reviewers about flagged content (while the book can be edited). */
+/** The note to reviewers about flagged content (while the book can be edited). */
 export async function saveContentSettings(bookId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
   const { book } = await ownBook(bookId);
   if (!book) return { error: "Book not found." };
   if (!isEditable(book)) return { error: "The book can't be changed while it's in review or live." };
-  const ageRating = fd.get("age_rating") === "mature" ? "mature" : "general";
   const note = String(fd.get("content_note") ?? "").trim();
   if (note.length > 1000) return { error: "Keep the note under 1,000 characters." };
-  const { error } = await createAdminClient().from("books").update({ age_rating: ageRating, content_note: note || null }).eq("id", bookId);
+  const { error } = await createAdminClient().from("books").update({ content_note: note || null }).eq("id", bookId);
   if (error) return { error: "Could not save. Please try again." };
   refresh(bookId);
-  return { ok: ageRating === "mature" ? "Saved. The book will carry the 18+ label." : "Saved." };
+  return { ok: "Saved." };
 }
 
 export async function withdrawFromReview(bookId: string): Promise<ActionState> {

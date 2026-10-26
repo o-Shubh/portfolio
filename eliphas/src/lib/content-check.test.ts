@@ -90,20 +90,16 @@ test("readable: unopenable PDF fails; scanned or garbled text warns", () => {
 });
 
 test("submit rules: what a failed check needs", () => {
-  assert.deepEqual(submitBlockers(null, { ageRating: "general", contentNote: null }), ["Run the content check on your manuscript"]);
+  assert.deepEqual(submitBlockers(null, { contentNote: null }), ["Run the content check on your manuscript"]);
   const adult = runChecks(book(`${clean} porn porn erotica`), 1).results;
-  assert.equal(
-    submitBlockers(adult, { ageRating: "general", contentNote: "This is a long explanation note." }).length,
-    1,
-    "a note doesn't replace the 18+ label",
-  );
-  assert.equal(submitBlockers(adult, { ageRating: "mature", contentNote: null }).length, 0);
+  assert.equal(submitBlockers(adult, { contentNote: null }).length, 1);
+  assert.equal(submitBlockers(adult, { contentNote: "Medical textbook: the words are used clinically." }).length, 0);
   const hate = runChecks(book(`${clean} katua`), 1).results;
-  assert.equal(submitBlockers(hate, { ageRating: "mature", contentNote: null }).length, 1, "18+ doesn't excuse slurs");
-  assert.equal(submitBlockers(hate, { ageRating: "general", contentNote: "Quoted to show the prejudice the hero faces." }).length, 0);
-  assert.equal(submitBlockers(hate, { ageRating: "general", contentNote: "short" }).length, 1, "the note must say something");
+  assert.equal(submitBlockers(hate, { contentNote: null }).length, 1);
+  assert.equal(submitBlockers(hate, { contentNote: "Quoted to show the prejudice the hero faces." }).length, 0);
+  assert.equal(submitBlockers(hate, { contentNote: "short" }).length, 1, "the note must say something");
   const unreadable = runChecks(book(), 0).results;
-  assert.equal(submitBlockers(unreadable, { ageRating: "mature", contentNote: "Please check it yourselves, thank you." }).length, 1);
+  assert.equal(submitBlockers(unreadable, { contentNote: "Please check it yourselves, thank you." }).length, 1, "a note can't fix an unreadable file");
   const warnOnly = runChecks(book(`${clean} fuck`), 1).results;
-  assert.equal(submitBlockers(warnOnly, { ageRating: "general", contentNote: null }).length, 0, "warnings never block");
+  assert.equal(submitBlockers(warnOnly, { contentNote: null }).length, 0, "warnings never block");
 });

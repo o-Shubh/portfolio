@@ -33,7 +33,7 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
   const supabase = await createClient();
   let query = supabase
     .from("books")
-    .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp, eeid, age_rating")
+    .select("id, title, author_name, slug, status, language, cover_path, submitted_at, updated_at, page_count, mrp, eeid")
     .limit(100);
   if (status !== "all" && !eeidQ) query = query.eq("status", status);
   if (noSample) query = query.is("sample_path", null);
@@ -127,7 +127,6 @@ export default async function ReviewQueue({ searchParams }: PageProps<"/admin/re
                     <StatusBadge status={b.status} />
                     {b.status === "in_review" && <span className="text-xs text-muted">submitted {timeAgo(b.submitted_at)}</span>}
                     {b.eeid && <span className="id-mono text-xs text-muted" data-testid="row-eeid">{b.eeid}</span>}
-                    {b.age_rating === "mature" && <span className="badge bg-tint-danger text-danger">18+</span>}
                     {manuscriptOf.get(b.id) &&
                       (() => {
                         const n = flagged(b.id);

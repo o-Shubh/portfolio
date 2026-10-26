@@ -3488,21 +3488,16 @@ create trigger books_growth_notices after update of status, mrp on public.books
   for each row execute function public.books_growth_notices();
 
 -- ===== 20261031000025_content_checks.sql =====
--- Content checks and the 18+ label.
+-- Content checks on manuscripts.
 -- Every manuscript goes through seven automatic checks before it can be sent for review (readable file, abusive
 -- language, hate speech, sexual content, violence and self-harm, personal data, professional quality). The checks
 -- never publish or reject by themselves: they tell the author what to fix and show our reviewers what was found.
--- Books with mature themes carry an 18+ label and are shown only to readers who confirm they are 18 or older.
 
 -- ---------------------------------------------------------------------------
--- 1. Audience label and the author's note to reviewers
+-- 1. The author's note to reviewers (not public)
 -- ---------------------------------------------------------------------------
 alter table public.books
-  add column age_rating text not null default 'general' check (age_rating in ('general', 'mature')),
   add column content_note text check (length(content_note) <= 1000);  -- why flagged content is there (e.g. a quote in context)
-
--- Public: the label (stores filter on it). Not public: the note to reviewers.
-grant select (age_rating) on public.books to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
 -- 2. Check results: one row per manuscript file checked
@@ -3537,9 +3532,3 @@ create table public.content_terms (
 );
 alter table public.content_terms enable row level security;
 create policy "content terms: admin" on public.content_terms for all using (public.is_admin()) with check (public.is_admin());
-
--- ---------------------------------------------------------------------------
--- 4. Readers who confirmed they are 18 or older (to see and buy 18+ books)
--- ---------------------------------------------------------------------------
-alter table public.profiles
-  add column adult_confirmed_at timestamptz;

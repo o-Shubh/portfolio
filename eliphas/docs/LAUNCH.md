@@ -99,7 +99,7 @@ README under "Deploy to Vercel".
       pay each author by UPI or bank bulk transfer, then enter each reference (UTR) and mark it paid.
 - [ ] FAQ promises (review time, delivery time) match what you can deliver: `src/content/faq.ts`.
 - [ ] Admin → Content checks: look through the built-in word lists' purpose, add local words you want flagged, and
-      allow words that cause false alarms. Have your lawyer read the "Books: content standards and 18+" section of the
+      allow words that cause false alarms. Have your lawyer read the "Books: content standards" section of the
       Community guidelines.
 - [ ] Optional, any time after launch: the invite programme (Admin → Referrals). It is off with zero amounts until you
       set them. Have your accountant check how discounts and credit are treated for GST, and your lawyer read the

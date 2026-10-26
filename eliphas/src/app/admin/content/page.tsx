@@ -57,7 +57,7 @@ export default async function ContentChecksPage() {
         </ol>
         <p className="mt-3 text-sm text-muted">
           Words are matched as whole words or phrases, so &ldquo;class&rdquo; never matches &ldquo;ass&rdquo;. A word ending in * matches any word starting with
-          it. Authors see where each match is (with the word masked) and can fix it, add the 18+ label, or explain it in a note to you.
+          it. Authors see where each match is (with the word masked) and can fix it or explain it in a note to you.
         </p>
       </section>
 

@@ -1,7 +1,7 @@
 // The seven manuscript content checks. Pure functions (no imports from the app), unit tested directly.
 // Input: the text of each page (from the PDF) plus the book's title and description. Output: one result per check.
-// Checks never publish or reject a book: "fail" means the author must act (fix, add the 18+ label, or explain in a
-// note to reviewers), "warn" means our reviewers look closely. Every result is shown to the author and the reviewer.
+// Checks never publish or reject a book: "fail" means the author must act (fix the manuscript, or explain in a note
+// to reviewers), "warn" means our reviewers look closely. Every result is shown to the author and the reviewer.
 
 import { BUILT_IN_TERMS, type TermCategory } from "./content-terms.ts";
 
@@ -15,7 +15,7 @@ export const CHECKS: { key: CheckKey; title: string; what: string }[] = [
   { key: "readable", title: "Readable file", what: "We can read the text of your manuscript." },
   { key: "language", title: "Abusive language", what: "Swear words and vulgar language, in English, Hindi and Hinglish." },
   { key: "hate", title: "Hate speech", what: "Slurs against caste, religion, community, gender or disability." },
-  { key: "adult", title: "Sexual content", what: "Sexually explicit words. Books with mature themes need the 18+ label." },
+  { key: "adult", title: "Sexual content", what: "Sexually explicit words. We don't publish sexually explicit books." },
   { key: "violence", title: "Violence and self-harm", what: "Graphic violence, self-harm and instructions to cause harm." },
   { key: "personal", title: "Personal data", what: "Phone numbers, email addresses, Aadhaar and PAN numbers." },
   { key: "quality", title: "Professional quality", what: "Placeholder text, unfinished notes, shouting in capitals, spam links." },
@@ -189,7 +189,7 @@ export function runChecks(pages: string[], pdfPages: number, extra: ExtraTerms =
       language.count === 0
         ? "No abusive language found."
         : heavyLanguage
-          ? `Found ${language.count} times. That's a lot for a general audience: tone it down, add the 18+ label, or explain why in your note to reviewers.`
+          ? `Found ${language.count} times. That's a lot for a professional book: tone it down, or explain why in your note to reviewers.`
           : `Found ${language.count} ${language.count === 1 ? "time" : "times"}. Fine in dialogue if it fits the story; our reviewers will see where.`,
   });
   results.push({
@@ -208,8 +208,8 @@ export function runChecks(pages: string[], pdfPages: number, extra: ExtraTerms =
       adult.count === 0
         ? "No sexually explicit words found."
         : explicit
-          ? `Found ${adult.count} times. The book needs the 18+ label. Sexually explicit material is not allowed even with the label.`
-          : `Found ${adult.count} ${adult.count === 1 ? "time" : "times"}. Our reviewers will decide whether it needs the 18+ label.`,
+          ? `Found ${adult.count} times. We don't publish sexually explicit material: remove it, or if the words are used in another sense (for example medical or educational), explain in your note to reviewers.`
+          : `Found ${adult.count} ${adult.count === 1 ? "time" : "times"}. Our reviewers will look at where it's used.`,
   });
   const graphic = violence.count >= 5;
   results.push({
@@ -219,7 +219,7 @@ export function runChecks(pages: string[], pdfPages: number, extra: ExtraTerms =
       violence.count === 0
         ? "No graphic violence or self-harm found."
         : graphic
-          ? `Found ${violence.count} times. Add the 18+ label or explain in your note to reviewers. Instructions for causing harm are never allowed.`
+          ? `Found ${violence.count} times. Tone it down or explain in your note to reviewers. Instructions for causing harm are never allowed.`
           : `Found ${violence.count} ${violence.count === 1 ? "time" : "times"}. Fine when the story needs it; our reviewers will see where.`,
   });
 
@@ -271,9 +271,9 @@ export function runChecks(pages: string[], pdfPages: number, extra: ExtraTerms =
 
 /**
  * What still stops a book from being sent for review, given its latest check. A failed check is resolved by fixing
- * the manuscript (and checking again), by the 18+ label where that's the issue, or by a note to reviewers.
+ * the manuscript (and checking again) or, except for an unreadable file, by a note to reviewers explaining it.
  */
-export function submitBlockers(results: CheckResult[] | null, book: { ageRating: string; contentNote: string | null }): string[] {
+export function submitBlockers(results: CheckResult[] | null, book: { contentNote: string | null }): string[] {
   if (!results) return ["Run the content check on your manuscript"];
   const note = (book.contentNote ?? "").trim().length >= 20;
   const out: string[] = [];
@@ -281,14 +281,10 @@ export function submitBlockers(results: CheckResult[] | null, book: { ageRating:
     if (r.status !== "fail") continue;
     const title = CHECKS.find((c) => c.key === r.key)!.title;
     if (r.key === "readable") out.push(`${title}: upload the PDF again`);
-    else if (r.key === "quality" || r.key === "personal") {
-      // Usually a fix; a note covers a false alarm (e.g. a 12-digit number that isn't an Aadhaar)
-      if (!note) out.push(`${title}: fix the manuscript and upload it again, or explain in a note to reviewers`);
-    } else if (r.key === "adult") {
-      if (book.ageRating !== "mature") out.push(`${title}: add the 18+ label`);
-    } else if (r.key === "hate") {
-      if (!note) out.push(`${title}: remove the slurs, or explain them in a note to reviewers`);
-    } else if (book.ageRating !== "mature" && !note) out.push(`${title}: add the 18+ label or explain in a note to reviewers`);
+    else if (note) continue; // the reviewers read the note and decide
+    else if (r.key === "quality" || r.key === "personal") out.push(`${title}: fix the manuscript and upload it again, or explain in a note to reviewers`);
+    else if (r.key === "hate") out.push(`${title}: remove the slurs, or explain them in a note to reviewers`);
+    else out.push(`${title}: remove it, or explain in a note to reviewers`);
   }
   return out;
 }

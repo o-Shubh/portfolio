@@ -19,7 +19,6 @@ import { createClient } from "@/lib/supabase/server";
 import { EditionIdentity } from "@/components/editions/EditionIdentity";
 import { EditionActions } from "./EditionActions";
 import { ReviewActions } from "./ReviewActions";
-import { AgeRatingForm } from "./ContentAdmin";
 import { ContentCheckReport } from "@/components/ContentCheckReport";
 import { RunContentCheck } from "@/components/RunContentCheck";
 import { checkResults, latestCheck } from "@/lib/manuscript-check";
@@ -163,7 +162,6 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
               <h2 id="admin-content-h" className="text-lg">
                 Content check
               </h2>
-              {book.age_rating === "mature" && <span className="badge bg-tint-danger text-danger">18+</span>}
             </div>
             {results ? (
               <>
@@ -182,7 +180,6 @@ export default async function AdminBookPage({ params }: PageProps<"/admin/books/
               </div>
             )}
             {book.manuscript_path && <RunContentCheck bookId={book.id} auto={false} label={results ? "Check again" : "Run the check"} />}
-            <AgeRatingForm bookId={book.id} rating={book.age_rating} />
           </section>
           <section className="card">
             <ReviewActions bookId={book.id} status={book.status} slug={book.slug} lastNote={book.review_note} />
