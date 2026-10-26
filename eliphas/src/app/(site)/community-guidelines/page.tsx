@@ -72,6 +72,23 @@ export default async function CommunityGuidelinesPage() {
         </li>
       </ul>
 
+      <h2>Books: content standards</h2>
+      <p>
+        Every manuscript goes through seven automatic checks before it can be sent for review: a readable file, abusive language, hate speech,
+        sexual content, violence and self-harm, personal data, and professional quality (placeholder text, unfinished notes and the like). The
+        checks only flag what they find. Our team reads every book before it goes on sale and makes the final decision.
+      </p>
+      <ul>
+        <li>
+          <strong>Never allowed:</strong> sexually explicit material (we don&apos;t publish adult books), sexual content involving minors, hate speech
+          meant to demean a group, instructions for causing harm, and other content that is illegal in India.
+        </li>
+        <li>
+          If a book uses difficult language on purpose (for example a character&apos;s prejudice that the story criticises), the author can explain
+          this to our reviewers.
+        </li>
+      </ul>
+
       <h2>Free samples</h2>
       <p>
         Samples are chosen and approved by the author and can be read by anyone. Like any web page, a sample can be saved or

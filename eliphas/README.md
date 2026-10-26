@@ -26,6 +26,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 14 | Operations: order emails, contact form inbox, payout runs, parcel tracking links, Play Store assets | ✅ Done (migration 000022) |
 | 15 | Invite programme: invite links, first-order discount, account credit, rewards, Admin → Referrals (off by default) | ✅ Done (migration 000023) |
 | 16 | Share kit and reach for authors; wishlist, saved-book and new-book notices; weekly email | ✅ Done (migration 000024) |
+| 17 | Manuscript content checks (7 checks), Admin → Content checks | ✅ Done (migration 000025) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -586,6 +587,19 @@ Off with zero amounts until an admin sets it up in **Admin → Referrals**.
 - **Weekly email** (opt-in, needs an email address): new books, articles and posts from people you follow and price
   drops on saved books, sent on Mondays by the daily job; nothing is sent in a quiet week. Each email has a one-click
   unsubscribe link (the page asks for a button press so email scanners can't unsubscribe people).
+
+### Content checks (migration 000025)
+
+- **Seven automatic checks** on every manuscript (plus its title and description) before it can be sent for review:
+  readable file, abusive language, hate speech, sexual content, violence and self-harm, personal data (phone, email,
+  Aadhaar, PAN) and professional quality (placeholders, unfinished notes, capitals, spam links). English, Hindi
+  (Devanagari) and Hinglish word lists in `src/lib/content-terms.ts`, matched as whole words; admins add words or allow
+  false alarms in **Admin → Content checks**. The text is read from the PDF on the server with pdf.js.
+- **Results** appear on the author's Submit step and on the admin review page, with the page and a masked example for
+  each match. A failed check is resolved by fixing the manuscript or by a note to reviewers explaining it (a quote
+  in context, a false alarm); an unreadable file has to be uploaded again. Nothing is published or rejected
+  automatically; our team decides.
+- **No 18+ category**: we don't publish adult books. Sexually explicit material isn't allowed (Community guidelines).
 
 ### Ways to sign in
 

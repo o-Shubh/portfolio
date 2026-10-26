@@ -7,6 +7,8 @@ import { estimateCopy, ruleFromPlanVersion } from "@/lib/commission";
 import { authorRule, getCurrentPlans, termsRequirement } from "@/lib/plans";
 import { gatewayPercent, printCost } from "@/lib/pricing";
 import { COVER_TYPES, GENRES, isBookFilePath, isEditable, makeSlug, submitChecklist, type Book } from "@/lib/publishing";
+import { submitBlockers } from "@/lib/content-check";
+import { checkResults, latestCheck } from "@/lib/manuscript-check";
 import { getPricingSettings } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -256,6 +258,9 @@ export async function submitForReview(bookId: string): Promise<ActionState> {
   const { rule } = await authorRule(book.author_id);
   const missing = submitChecklist(book as Book, settings, rule, termsRequirement(book, profile)).filter((c) => !c.ok);
   if (missing.length) return { error: `Still to do: ${missing.map((m) => m.label).join(", ")}.` };
+  // The seven content checks on the current manuscript
+  const blockers = submitBlockers(checkResults(await latestCheck(book)), { contentNote: book.content_note });
+  if (blockers.length) return { error: `Content check: ${blockers.join("; ")}.` };
 
   // Re-snapshot the print cost with today's rates
   const cost = printCost(
@@ -277,6 +282,19 @@ export async function submitForReview(bookId: string): Promise<ActionState> {
 
   refresh(bookId);
   return { ok: "Sent for review." };
+}
+
+/** The note to reviewers about flagged content (while the book can be edited). */
+export async function saveContentSettings(bookId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  const { book } = await ownBook(bookId);
+  if (!book) return { error: "Book not found." };
+  if (!isEditable(book)) return { error: "The book can't be changed while it's in review or live." };
+  const note = String(fd.get("content_note") ?? "").trim();
+  if (note.length > 1000) return { error: "Keep the note under 1,000 characters." };
+  const { error } = await createAdminClient().from("books").update({ content_note: note || null }).eq("id", bookId);
+  if (error) return { error: "Could not save. Please try again." };
+  refresh(bookId);
+  return { ok: "Saved." };
 }
 
 export async function withdrawFromReview(bookId: string): Promise<ActionState> {

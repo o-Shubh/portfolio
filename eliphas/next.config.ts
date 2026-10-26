@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   // Cache Components is off on purpose: almost every screen here depends on who
   // is logged in, so plain dynamic rendering keeps the code simple to follow.
   cacheComponents: false,
+  // The manuscript content checks read PDFs with pdf.js on the server; load it as a normal Node package
+  serverExternalPackages: ["pdfjs-dist"],
   // The share pictures read their font files at run time; make sure they're deployed with that route
   outputFileTracingIncludes: {
     "/api/book/[slug]/share-image": ["./src/assets/fonts/*.ttf"],
