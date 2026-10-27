@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookCover } from "@/components/BookCover";
+import { InvoiceLinks } from "@/components/InvoiceLinks";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 import { OrderTimeline } from "@/components/OrderTimeline";
 import { requireRole } from "@/lib/auth";
@@ -38,6 +39,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  const { data: docs } = await supabase.from("invoices").select("id, number, kind, title").eq("order_id", o.id).order("issued_at");
   const track = trackingLink(o.courier, o.tracking_number, o.tracking_url);
   const canReport =
     !issue &&
@@ -160,6 +162,11 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ac
                 <dd>{rupees(Number(o.total))}</dd>
               </div>
             </dl>
+            {(docs ?? []).length > 0 && (
+              <div className="border-t border-line pt-3">
+                <InvoiceLinks docs={docs ?? []} />
+              </div>
+            )}
           </section>
           {(o.status === "paid" || o.status === "accepted") && (
             <section className="space-y-2">

@@ -1187,6 +1187,114 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"invoice_counters": {
+                  Row: {
+                    "financial_year": string,"last_number": number,"series": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "financial_year": string,"last_number": number,"series": string
+                  }
+                  Update: {
+                    "financial_year"?: string,"last_number"?: number,"series"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"invoice_failures": {
+                  Row: {
+                    "created_at": string,"error": string,"id": string,"kind": string,"order_id": string | null,"payment_id": string | null,"refund_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"error": string,"id"?: string,"kind": string,"order_id"?: string | null,"payment_id"?: string | null,"refund_id"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"error"?: string,"id"?: string,"kind"?: string,"order_id"?: string | null,"payment_id"?: string | null,"refund_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "invoice_failures_order_id_fkey"
+      columns: ["order_id"]
+isOneToOne: false
+      referencedRelation: "orders"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoice_failures_payment_id_fkey"
+      columns: ["payment_id"]
+isOneToOne: false
+      referencedRelation: "payments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoice_failures_refund_id_fkey"
+      columns: ["refund_id"]
+isOneToOne: false
+      referencedRelation: "payment_refunds"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"invoices": {
+                  Row: {
+                    "buyer": NonNullable<Json>,"buyer_id": string | null,"cgst_paise": number,"created_at": string,"credit_paise": number,"financial_year": string,"footer_note": string | null,"gst_registered": boolean,"id": string,"igst_paise": number,"inter_state": boolean,"is_test": boolean,"issued_at": string,"kind": string,"lines": NonNullable<Json>,"number": string,"order_id": string | null,"original_invoice_id": string | null,"paid_paise": number,"payment_id": string | null,"payment_reference": string | null,"payment_refund_id": string | null,"place_of_supply": string | null,"reason": string | null,"seller": NonNullable<Json>,"sgst_paise": number,"taxable_paise": number,"title": string,"total_paise": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "buyer": NonNullable<Json>,"buyer_id"?: string | null,"cgst_paise"?: number,"created_at"?: string,"credit_paise"?: number,"financial_year": string,"footer_note"?: string | null,"gst_registered": boolean,"id"?: string,"igst_paise"?: number,"inter_state"?: boolean,"is_test"?: boolean,"issued_at"?: string,"kind": string,"lines": NonNullable<Json>,"number": string,"order_id"?: string | null,"original_invoice_id"?: string | null,"paid_paise"?: number,"payment_id"?: string | null,"payment_reference"?: string | null,"payment_refund_id"?: string | null,"place_of_supply"?: string | null,"reason"?: string | null,"seller": NonNullable<Json>,"sgst_paise"?: number,"taxable_paise": number,"title": string,"total_paise": number
+                  }
+                  Update: {
+                    "buyer"?: NonNullable<Json>,"buyer_id"?: string | null,"cgst_paise"?: number,"created_at"?: string,"credit_paise"?: number,"financial_year"?: string,"footer_note"?: string | null,"gst_registered"?: boolean,"id"?: string,"igst_paise"?: number,"inter_state"?: boolean,"is_test"?: boolean,"issued_at"?: string,"kind"?: string,"lines"?: NonNullable<Json>,"number"?: string,"order_id"?: string | null,"original_invoice_id"?: string | null,"paid_paise"?: number,"payment_id"?: string | null,"payment_reference"?: string | null,"payment_refund_id"?: string | null,"place_of_supply"?: string | null,"reason"?: string | null,"seller"?: NonNullable<Json>,"sgst_paise"?: number,"taxable_paise"?: number,"title"?: string,"total_paise"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "invoices_buyer_id_fkey"
+      columns: ["buyer_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "invoices_buyer_id_fkey"
+      columns: ["buyer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoices_buyer_id_fkey"
+      columns: ["buyer_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoices_buyer_id_fkey"
+      columns: ["buyer_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoices_order_id_fkey"
+      columns: ["order_id"]
+isOneToOne: false
+      referencedRelation: "orders"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoices_original_invoice_id_fkey"
+      columns: ["original_invoice_id"]
+isOneToOne: false
+      referencedRelation: "invoices"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoices_payment_id_fkey"
+      columns: ["payment_id"]
+isOneToOne: false
+      referencedRelation: "payments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invoices_payment_refund_id_fkey"
+      columns: ["payment_refund_id"]
+isOneToOne: true
+      referencedRelation: "payment_refunds"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"manuscript_checks": {
                   Row: {
                     "book_id": string,"created_at": string,"error": string | null,"id": string,"manuscript_path": string,"overall": string,"pages": number | null,"results": NonNullable<Json>,"status": string,"words": number | null
@@ -2059,14 +2167,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "author_terms_accepted_at": string | null,"author_terms_version": string | null,"avatar_path": string | null,"bio": string | null,"city": string | null,"created_at": string,"digest_token": string,"email": string | null,"full_name": string | null,"handle": string | null,"id": string,"notify_followers": boolean,"notify_new_articles": boolean,"notify_new_books": boolean,"notify_new_posts": boolean,"notify_order_emails": boolean,"notify_replies": boolean,"notify_saved_books": boolean,"payout_upi": string | null,"phone": string | null,"pincode": string | null,"role": Database["public"]['Enums']["app_role"],"state": string | null,"updated_at": string,"verified_author_at": string | null,"verified_author_by": string | null,"weekly_digest": boolean
+                    "author_terms_accepted_at": string | null,"author_terms_version": string | null,"avatar_path": string | null,"bio": string | null,"city": string | null,"created_at": string,"digest_token": string,"email": string | null,"full_name": string | null,"gstin": string | null,"handle": string | null,"id": string,"notify_followers": boolean,"notify_new_articles": boolean,"notify_new_books": boolean,"notify_new_posts": boolean,"notify_order_emails": boolean,"notify_replies": boolean,"notify_saved_books": boolean,"payout_upi": string | null,"phone": string | null,"pincode": string | null,"role": Database["public"]['Enums']["app_role"],"state": string | null,"updated_at": string,"verified_author_at": string | null,"verified_author_by": string | null,"weekly_digest": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"digest_token"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id": string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_books"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"notify_saved_books"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null,"weekly_digest"?: boolean
+                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"digest_token"?: string,"email"?: string | null,"full_name"?: string | null,"gstin"?: string | null,"handle"?: string | null,"id": string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_books"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"notify_saved_books"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null,"weekly_digest"?: boolean
                   }
                   Update: {
-                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"digest_token"?: string,"email"?: string | null,"full_name"?: string | null,"handle"?: string | null,"id"?: string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_books"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"notify_saved_books"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null,"weekly_digest"?: boolean
+                    "author_terms_accepted_at"?: string | null,"author_terms_version"?: string | null,"avatar_path"?: string | null,"bio"?: string | null,"city"?: string | null,"created_at"?: string,"digest_token"?: string,"email"?: string | null,"full_name"?: string | null,"gstin"?: string | null,"handle"?: string | null,"id"?: string,"notify_followers"?: boolean,"notify_new_articles"?: boolean,"notify_new_books"?: boolean,"notify_new_posts"?: boolean,"notify_order_emails"?: boolean,"notify_replies"?: boolean,"notify_saved_books"?: boolean,"payout_upi"?: string | null,"phone"?: string | null,"pincode"?: string | null,"role"?: Database["public"]['Enums']["app_role"],"state"?: string | null,"updated_at"?: string,"verified_author_at"?: string | null,"verified_author_by"?: string | null,"weekly_digest"?: boolean
                   }
                   Relationships: [
                     {
@@ -2952,11 +3060,35 @@ isOneToOne: false
 "credit_balance":
 { Args: { "p_user": string }; Returns: Record<string, unknown>
                            },
+"financial_year":
+{ Args: { "p_at": string }; Returns: string
+                           },
 "grant_referral_reward":
 { Args: { "p_amount": number,"p_book"?: string,"p_cap": number,"p_expiry_days": number,"p_order"?: string,"p_reason": string,"p_referral": string,"p_user": string }; Returns: string
                            },
+"gst_state_code":
+{ Args: { "p_state": string }; Returns: string
+                           },
+"gst_state_name":
+{ Args: { "p_code": string }; Returns: string
+                           },
 "has_active_pro":
 { Args: { "p_author": string }; Returns: boolean
+                           },
+"insert_invoice":
+{ Args: { "p_at": string,"p_buyer": Json,"p_buyer_id": string,"p_credit": number,"p_inter": boolean,"p_is_test": boolean,"p_kind": string,"p_lines": Json,"p_order": string,"p_original": string,"p_payment": string,"p_pos": string,"p_reason": string,"p_reference": string,"p_refund": string,"p_seller": Json,"p_series": string }; Returns: string
+                           },
+"invoice_is_test":
+{ Args: { "p_mode": string }; Returns: boolean
+                           },
+"invoice_line":
+{ Args: { "p_code": string,"p_description": string,"p_discount_paise": number,"p_inter": boolean,"p_quantity": number,"p_rate": number,"p_tax_paise"?: number,"p_unit_paise": number }; Returns: Json
+                           },
+"invoice_seller":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"invoice_title":
+{ Args: { "p_lines": Json,"p_registered": boolean }; Returns: string
                            },
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -2964,8 +3096,23 @@ isOneToOne: false
 "is_earning_status":
 { Args: { "s": Database["public"]['Enums']["order_status"] }; Returns: boolean
                            },
+"issue_order_credit_note":
+{ Args: { "p_order": string }; Returns: string
+                           },
+"issue_order_invoice":
+{ Args: { "p_order": string }; Returns: string
+                           },
+"issue_payment_credit_note":
+{ Args: { "p_refund": string }; Returns: string
+                           },
+"issue_payment_invoice":
+{ Args: { "p_payment": string }; Returns: string
+                           },
 "line_earning":
 { Args: { "oi": Omit<Database["public"]['Tables']["order_items"]['Row'], Database["public"]['Tables']["order_items"]['ComputedFields']> }; Returns: number
+                           },
+"log_invoice_failure":
+{ Args: { "p_error": string,"p_kind": string,"p_order": string,"p_payment": string,"p_refund": string }; Returns: undefined
                            },
 "my_balance":
 { Args: Record<PropertyKey, never>; Returns: {
@@ -3004,6 +3151,9 @@ isOneToOne: false
 { Args: { "p_from": string,"p_grain"?: string,"p_to": string }; Returns: {
               "book_id": string,"copies": number,"earnings": number,"period": string
             }[]
+                           },
+"next_invoice_number":
+{ Args: { "p_at": string,"p_series": string }; Returns: string
                            },
 "owns_service_order":
 { Args: { "object_name": string }; Returns: boolean

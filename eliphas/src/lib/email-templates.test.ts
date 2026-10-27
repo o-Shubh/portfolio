@@ -70,3 +70,10 @@ test("weekly email: nothing to send when there's no news", async () => {
   assert.ok(m.html.includes("https://e.in/unsubscribe?t=abc") && m.text.includes("Unsubscribe: https://e.in/unsubscribe?t=abc"));
   assert.ok(m.text.indexOf("BOOKS YOU SAVED") < m.text.indexOf("NEW BOOKS"), "saved books first");
 });
+
+test("confirmation links the invoice, other emails don't need it", () => {
+  const e = orderEmail("order_confirmed", { ...base, invoice: { id: "inv-1", label: "Bill of supply" } });
+  assert.ok(e.html.includes("/invoices/inv-1") && e.html.includes("View your bill of supply"));
+  assert.ok(e.text.includes("Bill of supply: https://eliphas.in/invoices/inv-1"));
+  assert.ok(!orderEmail("order_shipped", base).html.includes("/invoices/"));
+});

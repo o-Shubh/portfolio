@@ -26,6 +26,11 @@ export async function sendOrderEmail(orderId: string, kind: OrderEmailKind): Pro
     const to = o.contact_email ?? buyer?.email;
     if (!to) return;
     const business = await getBusiness();
+    // The confirmation links the invoice, the refund email the credit note (both issued by the database)
+    const docKind = kind === "order_confirmed" ? "invoice" : kind === "refund_processed" ? "credit_note" : null;
+    const { data: doc } = docKind
+      ? await admin.from("invoices").select("id, title").eq("order_id", o.id).eq("kind", docKind).maybeSingle()
+      : { data: null };
     const email = orderEmail(kind, {
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "",
       businessName: business.legal_name || "Eliphas Indicus Publications",
@@ -39,6 +44,7 @@ export async function sendOrderEmail(orderId: string, kind: OrderEmailKind): Pro
       trackingUrl: trackingLink(o.courier, o.tracking_number, o.tracking_url),
       refundLabel: o.refund_amount !== null ? rupees(Number(o.refund_amount)) : null,
       cancelReason: o.cancelled_by === "admin" ? o.cancel_reason : null,
+      invoice: doc ? { id: doc.id, label: doc.title } : null,
     });
     await queueEmail({ kind, to, ...email, dedupeKey: `order:${o.id}:${kind}`, userId: o.buyer_id, orderId: o.id });
   } catch (e) {

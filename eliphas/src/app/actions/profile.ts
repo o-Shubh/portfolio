@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import { attachReferral } from "@/lib/referrals";
 import { createClient } from "@/lib/supabase/server";
+import { isGstin } from "@/lib/invoice-format";
 
 export type FormState = { error?: string; ok?: boolean } | undefined;
 
@@ -79,11 +80,15 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   if (email === "invalid") return { error: "Enter a valid email address, or leave it empty." };
   // Only forms that show the email fields change them (onboarding doesn't)
   const emailFields = formData.has("email") ? { email, notify_order_emails: formData.get("notify_order_emails") === "on" } : {};
+  // GSTIN for invoices: 2-digit state code + 13 letters and digits
+  const gstinField = formData.get("gstin");
+  const gstin = gstinField === null ? undefined : String(gstinField).replace(/\s/g, "").toUpperCase();
+  if (gstin && !isGstin(gstin)) return { error: "That GSTIN doesn't look right. It's 15 characters and starts with your state code, e.g. 27…" };
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
-    .update({ ...parsed.values, ...emailFields, ...(bio !== undefined ? { bio: bio || null } : {}) })
+    .update({ ...parsed.values, ...emailFields, ...(bio !== undefined ? { bio: bio || null } : {}), ...(gstin !== undefined ? { gstin: gstin || null } : {}) })
     .eq("id", profile.id);
   if (error) return { error: "Could not save. Please try again." };
 
