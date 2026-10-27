@@ -16,7 +16,25 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         </label>
         <input id="email" name="email" type="email" autoComplete="email" inputMode="email" defaultValue={profile.email ?? ""} className="field" aria-describedby="email-help" />
         <p id="email-help" className="hint">
-          For order updates and receipts. You still log in with your mobile number.
+          For order updates and invoices. You still log in with your mobile number.
+        </p>
+      </div>
+      <div>
+        <label htmlFor="gstin" className="label">
+          GSTIN <span className="font-normal text-muted">(optional)</span>
+        </label>
+        <input
+          id="gstin"
+          name="gstin"
+          autoComplete="off"
+          autoCapitalize="characters"
+          maxLength={15}
+          defaultValue={profile.gstin ?? ""}
+          className="field id-mono uppercase"
+          aria-describedby="gstin-help"
+        />
+        <p id="gstin-help" className="hint">
+          Only if you buy as a GST-registered business. It&apos;s printed on your future invoices.
         </p>
       </div>
       <label className="flex items-center justify-between gap-4">

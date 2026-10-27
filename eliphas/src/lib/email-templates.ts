@@ -16,6 +16,7 @@ export type OrderEmailData = {
   trackingUrl?: string | null;
   refundLabel?: string | null; // "₹459"
   cancelReason?: string | null;
+  invoice?: { id: string; label: string } | null; // the invoice (confirmation) or credit note (refund)
 };
 
 const COPY: Record<OrderEmailKind, { subject: (n: string) => string; heading: string; body: (d: OrderEmailData) => string }> = {
@@ -70,6 +71,7 @@ export function orderEmail(kind: OrderEmailKind, d: OrderEmailData) {
   const button = (href: string, label: string) =>
     `<a href="${escapeHtml(href)}" style="display:inline-block;background:#17214a;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:10px">${escapeHtml(label)}</a>`;
   const track = kind === "order_shipped" && d.trackingUrl ? d.trackingUrl : null;
+  const invoiceUrl = d.invoice ? `${d.siteUrl.replace(/\/$/, "")}/invoices/${d.invoice.id}` : null;
   const inner = `
 <tr><td style="font-size:22px;font-weight:600;padding-bottom:8px">${escapeHtml(c.heading)}</td></tr>
 <tr><td style="font-size:15px;line-height:1.5;padding-bottom:16px">Hi ${escapeHtml(d.name)}, ${escapeHtml(c.body(d))}</td></tr>
@@ -78,7 +80,8 @@ export function orderEmail(kind: OrderEmailKind, d: OrderEmailData) {
 ${d.items.map((i) => `<div>${escapeHtml(i.title)} × ${i.quantity}</div>`).join("")}
 <div style="margin-top:6px;font-weight:600">Total ${escapeHtml(d.totalLabel)}</div>
 </td></tr>
-<tr><td style="padding-top:20px">${track ? `${button(track, "Track parcel")}&nbsp;&nbsp;` : ""}${button(orderUrl, "View order")}</td></tr>`;
+<tr><td style="padding-top:20px">${track ? `${button(track, "Track parcel")}&nbsp;&nbsp;` : ""}${button(orderUrl, "View order")}</td></tr>
+${invoiceUrl ? `<tr><td style="padding-top:12px;font-size:14px"><a href="${escapeHtml(invoiceUrl)}" style="color:#17214a;font-weight:600">${escapeHtml(`View your ${d.invoice!.label.toLowerCase()}`)}</a></td></tr>` : ""}`;
   const text = [
     c.heading,
     "",
@@ -90,6 +93,7 @@ ${d.items.map((i) => `<div>${escapeHtml(i.title)} × ${i.quantity}</div>`).join(
     "",
     ...(track ? [`Track parcel: ${track}`] : []),
     `View order: ${orderUrl}`,
+    ...(invoiceUrl ? [`${d.invoice!.label}: ${invoiceUrl}`] : []),
     "",
     "You can turn off order emails in Settings.",
   ].join("\n");

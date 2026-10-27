@@ -27,6 +27,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 15 | Invite programme: invite links, first-order discount, account credit, rewards, Admin → Referrals (off by default) | ✅ Done (migration 000023) |
 | 16 | Share kit and reach for authors; wishlist, saved-book and new-book notices; weekly email | ✅ Done (migration 000024) |
 | 17 | Manuscript content checks (7 checks), Admin → Content checks | ✅ Done (migration 000025) |
+| 18 | Invoices and credit notes, Admin → Invoices register and CSV | ✅ Done (migration 000026) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -600,6 +601,28 @@ Off with zero amounts until an admin sets it up in **Admin → Referrals**.
   in context, a false alarm); an unreadable file has to be uploaded again. Nothing is published or rejected
   automatically; our team decides.
 - **No 18+ category**: we don't publish adult books. Sexually explicit material isn't allowed (Community guidelines).
+
+### Invoices and credit notes (migration 000026)
+
+- **Automatic**: the database issues an invoice in the same transaction that marks a book order or a Pro/service
+  payment paid, and a credit note when a refund is processed (a whole book order, or any part of a Pro/service
+  payment, with tax in proportion). Every payment path is covered; a problem is logged and never blocks the payment.
+  Admin → Invoices shows anything missing, with an "Issue missing documents" button.
+- **Numbers** run without gaps per series and financial year (April–March, India time): `EIP/26-27/00001`
+  (invoices), `ECN/26-27/00001` (credit notes). Test documents use `TST` and `TCN`: mock payments always, and every
+  payment until an admin turns on **Payments are live** in Admin → Invoices (Razorpay test-mode payments look real).
+- **Final**: issued documents can't be edited or deleted (a database trigger); corrections are credit notes.
+- **Title**: "Tax invoice" only when GST registration is on (Admin → Plans) and a GSTIN is set (Settings → Business
+  details); a registered seller's untaxed sale is a "Bill of supply"; otherwise "Invoice". GST is split CGST + SGST
+  in the seller's state, IGST otherwise (place of supply: the delivery state, or for Pro/services the buyer's GSTIN
+  state, profile state, or the seller's state). Books default to HSN 4901 at 0%; shipping 0%; both included in the
+  price. SAC codes, rates, the seller's state and a footer note are in Admin → Invoices, for the accountant to confirm.
+- **Who sees what**: the buyer (order page, Service payments page, the confirmation and refund emails) and admins
+  (Admin → Invoices, Admin → Orders). `/invoices/[id]` is a paper-style page; "Print or save as PDF" uses the
+  browser, so Hindi titles print correctly. Buyers can add a GSTIN in their profile to have it printed.
+- **Register**: Admin → Invoices filters by month and type, shows net totals (credit notes subtract) and downloads a
+  CSV per month (taxable value, CGST, SGST, IGST, place of supply, HSN/SAC, payment reference) for GST returns.
+- Paid orders and payments from before this migration got invoices when it ran, numbered in the order they were paid.
 
 ### Ways to sign in
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
+import { InvoiceLinks } from "@/components/InvoiceLinks";
 import { PageHeader } from "@/components/PageHeader";
 import { requireRole } from "@/lib/auth";
 import type { OrderStatus } from "@/lib/order-status";
@@ -29,7 +30,7 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
   let query = supabase
     .from("orders")
     .select(
-      "id, order_number, status, total, paid_at, created_at, ship_city, ship_state, ship_name, printer_id, cancel_reason, cancelled_by, refund_status, refund_id, razorpay_payment_id, printers(name), order_items(quantity, books(title))",
+      "id, order_number, status, total, paid_at, created_at, ship_city, ship_state, ship_name, printer_id, cancel_reason, cancelled_by, refund_status, refund_id, razorpay_payment_id, printers(name), order_items(quantity, books(title)), invoices(id, number, kind, title)",
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -83,6 +84,11 @@ export default async function AdminOrders({ searchParams }: PageProps<"/admin/or
                   <OrderStatusBadge status={o.status} />
                 </div>
               </div>
+              {o.invoices.length > 0 && (
+                <div className="mt-3 border-t border-line pt-3">
+                  <InvoiceLinks docs={o.invoices} compact />
+                </div>
+              )}
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3 text-sm">
                 <span className="text-muted">
                   Printer: <span className="font-semibold text-fg">{o.printers?.name ?? "not assigned"}</span>

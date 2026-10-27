@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InvoiceLinks } from "@/components/InvoiceLinks";
 import { PageHeader } from "@/components/PageHeader";
 import { requireRole } from "@/lib/auth";
 import { formatPaise } from "@/lib/commission";
@@ -19,6 +20,10 @@ export default async function PaymentsPage() {
   await requireRole(["author", "admin"]);
   const supabase = await createClient();
   const { data: payments } = await supabase.from("payments").select("*").order("created_at", { ascending: false });
+  const ids = (payments ?? []).map((p) => p.id);
+  const { data: docs } = ids.length
+    ? await supabase.from("invoices").select("id, number, kind, title, payment_id").in("payment_id", ids).order("issued_at")
+    : { data: [] };
   return (
     <>
       <PageHeader
@@ -28,7 +33,7 @@ export default async function PaymentsPage() {
       {!payments?.length ? (
         <div className="card max-w-2xl text-center">
           <p className="font-medium">No payments yet</p>
-          <p className="mx-auto mt-1 max-w-md text-sm text-muted">When you pay for Author Pro or a service, the payment and its receipt appear here.</p>
+          <p className="mx-auto mt-1 max-w-md text-sm text-muted">When you pay for Author Pro or a service, the payment and its invoice appear here.</p>
           <div className="mt-4 flex flex-wrap justify-center gap-3">
             <Link href="/author/services" className="btn-ghost">
               Browse services
@@ -48,7 +53,7 @@ export default async function PaymentsPage() {
                 <th className="p-3 text-right font-medium">Amount</th>
                 <th className="p-3 font-medium">Status</th>
                 <th className="p-3 font-medium">
-                  <span className="sr-only">Receipt</span>
+                  <span className="sr-only">Invoice</span>
                 </th>
               </tr>
             </thead>
@@ -62,11 +67,15 @@ export default async function PaymentsPage() {
                     {STATUS[p.status]}
                     {p.refunded_paise > 0 && ` (${formatPaise(p.refunded_paise, true)} back)`}
                   </td>
-                  <td className="p-3 text-right">
-                    {p.receipt_number && (
-                      <Link href={`/author/payments/${p.id}`} className="font-medium underline">
-                        Receipt
-                      </Link>
+                  <td className="p-3">
+                    {(docs ?? []).some((d) => d.payment_id === p.id) ? (
+                      <InvoiceLinks docs={(docs ?? []).filter((d) => d.payment_id === p.id)} />
+                    ) : (
+                      p.receipt_number && (
+                        <Link href={`/author/payments/${p.id}`} className="font-medium underline">
+                          Receipt
+                        </Link>
+                      )
                     )}
                   </td>
                 </tr>

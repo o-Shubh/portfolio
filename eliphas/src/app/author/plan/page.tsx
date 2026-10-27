@@ -129,7 +129,7 @@ export default async function PlanPage() {
 
       <p className="mt-6 text-sm text-muted">
         <Link href="/author/payments" className="font-medium text-fg underline">
-          Payment history and receipts
+          Payment history and invoices
         </Link>{" "}
         ·{" "}
         <Link href="/pricing" className="underline">

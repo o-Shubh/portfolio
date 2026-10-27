@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PrintButton } from "@/components/PrintButton";
 import { requireRole } from "@/lib/auth";
 import { formatPaise } from "@/lib/commission";
@@ -20,6 +20,9 @@ export default async function ReceiptPage({ params }: PageProps<"/author/payment
   const supabase = await createClient();
   const { data: p } = await supabase.from("payments").select("*").eq("id", id).maybeSingle();
   if (!p || !p.receipt_number) notFound();
+  // Paid payments have an invoice (migration 000026); this receipt remains for anything older
+  const { data: invoice } = await supabase.from("invoices").select("id").eq("payment_id", p.id).eq("kind", "invoice").maybeSingle();
+  if (invoice) redirect(`/invoices/${invoice.id}`);
   const [biz, tax] = await Promise.all([getBusiness(), getTaxSettings()]);
   const taxInvoice = tax.gst_registered && Boolean(biz.gstin);
 
