@@ -1,8 +1,9 @@
 import { AppShell } from "@/components/AppShell";
 import { redirect } from "next/navigation";
 import { getCurrentProfile, requireRole } from "@/lib/auth";
-import { AUTHOR_NAV, INVITE_NAV } from "@/lib/nav";
+import { AUTHOR_NAV, INVITE_NAV, STUDIO_LINK } from "@/lib/nav";
 import { getReferralSettings } from "@/lib/referrals";
+import { canUseStudio } from "@/lib/studio/settings";
 
 export default async function AuthorLayout({ children }: LayoutProps<"/author">) {
   const me = await getCurrentProfile();
@@ -12,7 +13,8 @@ export default async function AuthorLayout({ children }: LayoutProps<"/author">)
   if (me.role === "reader") redirect("/login/author/start");
   const profile = await requireRole(["author", "admin"]);
   // Invites sit just above Settings & help while the referral programme is on
-  const nav = (await getReferralSettings()).enabled ? [...AUTHOR_NAV.slice(0, -1), INVITE_NAV, AUTHOR_NAV[AUTHOR_NAV.length - 1]] : AUTHOR_NAV;
+  const extras = [...((await canUseStudio(profile)) ? [STUDIO_LINK] : []), ...((await getReferralSettings()).enabled ? [INVITE_NAV] : [])];
+  const nav = [...AUTHOR_NAV.slice(0, -1), ...extras, AUTHOR_NAV[AUTHOR_NAV.length - 1]];
   return (
     <AppShell profile={profile} areaLabel="Author" nav={nav}>
       {children}

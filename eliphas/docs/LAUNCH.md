@@ -44,7 +44,7 @@ README under "Deploy to Vercel".
       switched off rather than pretending.
 
 ## 4. Supabase (your existing project)
-- [ ] All migrations up to `20261101000026_invoices.sql` run (see "Database" below).
+- [ ] All migrations up to `20261102000027_studio_foundation.sql` run (see "Database" below).
 - [ ] Authentication → URL Configuration: **Site URL** `https://your-domain.in`; add `https://your-domain.in/**`
       to Redirect URLs.
 - [ ] Authentication → Phone: real SMS provider details (step 1). **Remove the test phone numbers.**
@@ -129,7 +129,7 @@ With live keys, on the real domain:
 
 ## Database
 Run each new file in `supabase/migrations/` once, in order, in the SQL Editor. Never run `hosted-setup.sql` on the
-existing database. Latest: `20261101000026_invoices.sql`.
+existing database. Latest: `20261102000027_studio_foundation.sql`.
 
 ## Play Store (optional, after the site is live)
 See [`PLAY-STORE.md`](PLAY-STORE.md): listing text, graphics, Data safety answers and the two Vercel settings.

@@ -2721,6 +2721,464 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"studio_agent_jobs": {
+                  Row: {
+                    "attempts": number,"book_id": string | null,"cache_read_tokens": number,"cache_write_tokens": number,"chapter_id": string | null,"cost_usd_micros": number,"created_at": string,"error": string | null,"error_detail": string | null,"finished_at": string | null,"id": string,"input": NonNullable<Json>,"input_tokens": number,"model": string | null,"output": Json | null,"output_tokens": number,"progress": NonNullable<Json>,"started_at": string | null,"status": string,"type": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attempts"?: number,"book_id"?: string | null,"cache_read_tokens"?: number,"cache_write_tokens"?: number,"chapter_id"?: string | null,"cost_usd_micros"?: number,"created_at"?: string,"error"?: string | null,"error_detail"?: string | null,"finished_at"?: string | null,"id"?: string,"input"?: NonNullable<Json>,"input_tokens"?: number,"model"?: string | null,"output"?: Json | null,"output_tokens"?: number,"progress"?: NonNullable<Json>,"started_at"?: string | null,"status"?: string,"type": string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "attempts"?: number,"book_id"?: string | null,"cache_read_tokens"?: number,"cache_write_tokens"?: number,"chapter_id"?: string | null,"cost_usd_micros"?: number,"created_at"?: string,"error"?: string | null,"error_detail"?: string | null,"finished_at"?: string | null,"id"?: string,"input"?: NonNullable<Json>,"input_tokens"?: number,"model"?: string | null,"output"?: Json | null,"output_tokens"?: number,"progress"?: NonNullable<Json>,"started_at"?: string | null,"status"?: string,"type"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_agent_jobs_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_agent_jobs_chapter_id_fkey"
+      columns: ["chapter_id"]
+isOneToOne: false
+      referencedRelation: "studio_chapters"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_agent_jobs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "studio_agent_jobs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_agent_jobs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_agent_jobs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_blueprints": {
+                  Row: {
+                    "book_id": string,"job_id": string | null,"locked_at": string | null,"outline": NonNullable<Json>,"reader_profile": string,"thesis": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"job_id"?: string | null,"locked_at"?: string | null,"outline"?: NonNullable<Json>,"reader_profile"?: string,"thesis"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "book_id"?: string,"job_id"?: string | null,"locked_at"?: string | null,"outline"?: NonNullable<Json>,"reader_profile"?: string,"thesis"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_blueprints_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: true
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_book_bible": {
+                  Row: {
+                    "book_id": string,"key_terms": NonNullable<Json>,"promises": NonNullable<Json>,"stories_used": NonNullable<Json>,"themes": NonNullable<Json>,"updated_after_chapter": number | null,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"key_terms"?: NonNullable<Json>,"promises"?: NonNullable<Json>,"stories_used"?: NonNullable<Json>,"themes"?: NonNullable<Json>,"updated_after_chapter"?: number | null,"updated_at"?: string
+                  }
+                  Update: {
+                    "book_id"?: string,"key_terms"?: NonNullable<Json>,"promises"?: NonNullable<Json>,"stories_used"?: NonNullable<Json>,"themes"?: NonNullable<Json>,"updated_after_chapter"?: number | null,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_book_bible_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: true
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_book_bible_history": {
+                  Row: {
+                    "book_id": string,"chapter_number": number | null,"created_at": string,"id": string,"snapshot": NonNullable<Json>
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"chapter_number"?: number | null,"created_at"?: string,"id"?: string,"snapshot": NonNullable<Json>
+                  }
+                  Update: {
+                    "book_id"?: string,"chapter_number"?: number | null,"created_at"?: string,"id"?: string,"snapshot"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_book_bible_history_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_book_packs": {
+                  Row: {
+                    "book_id": string | null,"created_at": string,"id": string,"payment_id": string | null,"status": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id"?: string | null,"created_at"?: string,"id"?: string,"payment_id"?: string | null,"status"?: string,"user_id": string
+                  }
+                  Update: {
+                    "book_id"?: string | null,"created_at"?: string,"id"?: string,"payment_id"?: string | null,"status"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_book_packs_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_book_packs_payment_id_fkey"
+      columns: ["payment_id"]
+isOneToOne: true
+      referencedRelation: "payments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_book_packs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "studio_book_packs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_book_packs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_book_packs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_books": {
+                  Row: {
+                    "ai_disclosure": string | null,"author_id": string,"created_at": string,"genre": string,"id": string,"idea": string,"language": string,"published_book_id": string | null,"status": string,"target_reader": string,"target_words": number | null,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ai_disclosure"?: string | null,"author_id": string,"created_at"?: string,"genre"?: string,"id"?: string,"idea"?: string,"language"?: string,"published_book_id"?: string | null,"status"?: string,"target_reader"?: string,"target_words"?: number | null,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "ai_disclosure"?: string | null,"author_id"?: string,"created_at"?: string,"genre"?: string,"id"?: string,"idea"?: string,"language"?: string,"published_book_id"?: string | null,"status"?: string,"target_reader"?: string,"target_words"?: number | null,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_books_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "studio_books_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_books_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_books_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_books_published_book_id_fkey"
+      columns: ["published_book_id"]
+isOneToOne: false
+      referencedRelation: "books"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_chapter_versions": {
+                  Row: {
+                    "book_id": string,"chapter_id": string,"content": Json | null,"created_at": string,"created_by": string | null,"id": string,"job_id": string | null,"source": string,"text": string,"version_no": number,"word_count": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"chapter_id": string,"content"?: Json | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"job_id"?: string | null,"source": string,"text"?: string,"version_no": number,"word_count"?: number
+                  }
+                  Update: {
+                    "book_id"?: string,"chapter_id"?: string,"content"?: Json | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"job_id"?: string | null,"source"?: string,"text"?: string,"version_no"?: number,"word_count"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_chapter_versions_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_chapter_versions_chapter_id_fkey"
+      columns: ["chapter_id"]
+isOneToOne: false
+      referencedRelation: "studio_chapters"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_chapter_versions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "studio_chapter_versions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_chapter_versions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_chapter_versions_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_chapters": {
+                  Row: {
+                    "approved_at": string | null,"book_id": string,"created_at": string,"current_version_id": string | null,"goal": string,"id": string,"number": number,"status": string,"summary": string | null,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "approved_at"?: string | null,"book_id": string,"created_at"?: string,"current_version_id"?: string | null,"goal"?: string,"id"?: string,"number": number,"status"?: string,"summary"?: string | null,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "approved_at"?: string | null,"book_id"?: string,"created_at"?: string,"current_version_id"?: string | null,"goal"?: string,"id"?: string,"number"?: number,"status"?: string,"summary"?: string | null,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_chapters_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_chapters_current_version_fkey"
+      columns: ["current_version_id"]
+isOneToOne: false
+      referencedRelation: "studio_chapter_versions"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_research_notes": {
+                  Row: {
+                    "book_id": string,"chapter_id": string,"content": NonNullable<Json>,"created_at": string,"id": string,"job_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"chapter_id": string,"content": NonNullable<Json>,"created_at"?: string,"id"?: string,"job_id"?: string | null
+                  }
+                  Update: {
+                    "book_id"?: string,"chapter_id"?: string,"content"?: NonNullable<Json>,"created_at"?: string,"id"?: string,"job_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_research_notes_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_research_notes_chapter_id_fkey"
+      columns: ["chapter_id"]
+isOneToOne: false
+      referencedRelation: "studio_chapters"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_reviews": {
+                  Row: {
+                    "applied_note_ids": (string)[],"book_id": string,"chapter_id": string | null,"created_at": string,"id": string,"job_id": string | null,"notes": NonNullable<Json>,"role": string,"version_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "applied_note_ids"?: (string)[],"book_id": string,"chapter_id"?: string | null,"created_at"?: string,"id"?: string,"job_id"?: string | null,"notes"?: NonNullable<Json>,"role": string,"version_id"?: string | null
+                  }
+                  Update: {
+                    "applied_note_ids"?: (string)[],"book_id"?: string,"chapter_id"?: string | null,"created_at"?: string,"id"?: string,"job_id"?: string | null,"notes"?: NonNullable<Json>,"role"?: string,"version_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_reviews_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_reviews_chapter_id_fkey"
+      columns: ["chapter_id"]
+isOneToOne: false
+      referencedRelation: "studio_chapters"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_reviews_version_id_fkey"
+      columns: ["version_id"]
+isOneToOne: false
+      referencedRelation: "studio_chapter_versions"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_subscriptions": {
+                  Row: {
+                    "created_at": string,"ends_at": string | null,"id": string,"payment_id": string | null,"plan": string,"starts_at": string | null,"status": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"ends_at"?: string | null,"id"?: string,"payment_id"?: string | null,"plan": string,"starts_at"?: string | null,"status"?: string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"ends_at"?: string | null,"id"?: string,"payment_id"?: string | null,"plan"?: string,"starts_at"?: string | null,"status"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_subscriptions_payment_id_fkey"
+      columns: ["payment_id"]
+isOneToOne: true
+      referencedRelation: "payments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_subscriptions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "studio_subscriptions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_subscriptions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_subscriptions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_usage_events": {
+                  Row: {
+                    "book_id": string | null,"chapter_id": string | null,"created_at": string,"id": string,"job_id": string | null,"kind": string,"status": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id"?: string | null,"chapter_id"?: string | null,"created_at"?: string,"id"?: string,"job_id"?: string | null,"kind": string,"status"?: string,"user_id": string
+                  }
+                  Update: {
+                    "book_id"?: string | null,"chapter_id"?: string | null,"created_at"?: string,"id"?: string,"job_id"?: string | null,"kind"?: string,"status"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_usage_events_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_usage_events_chapter_id_fkey"
+      columns: ["chapter_id"]
+isOneToOne: false
+      referencedRelation: "studio_chapters"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_usage_events_job_id_fkey"
+      columns: ["job_id"]
+isOneToOne: false
+      referencedRelation: "studio_agent_jobs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_usage_events_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "author_balances"
+      referencedColumns: ["author_id"]
+    },{
+      foreignKeyName: "studio_usage_events_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_usage_events_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_authors"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "studio_usage_events_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"studio_voice_samples": {
+                  Row: {
+                    "book_id": string,"created_at": string,"id": string,"position": number,"text": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "book_id": string,"created_at"?: string,"id"?: string,"position": number,"text": string
+                  }
+                  Update: {
+                    "book_id"?: string,"created_at"?: string,"id"?: string,"position"?: number,"text"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "studio_voice_samples_book_id_fkey"
+      columns: ["book_id"]
+isOneToOne: false
+      referencedRelation: "studio_books"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"subscription_periods": {
                   Row: {
                     "author_id": string,"created_at": string,"credits_granted": number,"ends_at": string | null,"id": string,"payment_id": string | null,"plan_version_id": string,"refund_note": string | null,"refunded_at": string | null,"starts_at": string | null,"status": string
@@ -3243,6 +3701,9 @@ isOneToOne: false
                            },
 "spend_credit":
 { Args: { "p_amount": number,"p_order": string,"p_user": string }; Returns: undefined
+                           },
+"studio_owns_book":
+{ Args: { "p_book": string }; Returns: boolean
                            },
 "use_pro_credit":
 { Args: { "p_author": string,"p_service_order": string }; Returns: string
