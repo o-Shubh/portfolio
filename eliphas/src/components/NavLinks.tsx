@@ -23,6 +23,7 @@ import {
   MoreHorizontal,
   MessagesSquare,
   Gift,
+  PenLine,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -53,6 +54,7 @@ const ICONS = {
   moderation: ShieldAlert,
   community: MessagesSquare,
   invite: Gift,
+  studio: PenLine,
 };
 
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; exact?: boolean; /** hide from the phone tab bar (sidebar only) */ sidebarOnly?: boolean };

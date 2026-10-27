@@ -28,6 +28,7 @@ phone OTP login, file storage) · Razorpay (test mode) · Vercel.
 | 16 | Share kit and reach for authors; wishlist, saved-book and new-book notices; weekly email | ✅ Done (migration 000024) |
 | 17 | Manuscript content checks (7 checks), Admin → Content checks | ✅ Done (migration 000025) |
 | 18 | Invoices and credit notes, Admin → Invoices register and CSV | ✅ Done (migration 000026) |
+| 19 | Writing Studio (AI book writing), Phase 1: schema, privacy rules, Studio section | ✅ Done (migration 000027) |
 
 ## Deploy to Vercel (step by step, about 20 minutes)
 
@@ -601,6 +602,24 @@ Off with zero amounts until an admin sets it up in **Admin → Referrals**.
   in context, a false alarm); an unreadable file has to be uploaded again. Nothing is published or rejected
   automatically; our team decides.
 - **No 18+ category**: we don't publish adult books. Sexually explicit material isn't allowed (Community guidelines).
+
+### Writing Studio (migration 000027 onwards)
+
+An AI book-writing studio at `/studio`: a team of Claude agents (Architect, Researcher, Writer, Editor, Voice keeper,
+Critic, Continuity tracker) takes an author from idea to blueprint to approved chapters to an exported manuscript.
+The author approves every chapter. Built in phases (plan: Architect and background jobs next).
+
+- **Closed until you open it**: the `studio` settings row has `"open": false`; until then only admins can use it and
+  nobody else sees a link. Prices (paise, before GST), plan limits and revisions per chapter are in the same row.
+- **Private by design**: every `studio_*` table has `book_id`, and `studio_owns_book()` lets only the book's author read
+  it. Browsers can only read; all writes go through the server. Admins can read books, jobs and plans, never
+  manuscript text or voice samples; job costs and technical errors never reach a browser at all.
+- **Nothing is lost**: chapter versions can't be changed or deleted (rollback adds a version). Deleting a book
+  deletes its manuscript and wipes job inputs and outputs, keeping the job's cost for your records.
+- **Later phases**: `studio_books.published_book_id` will link a finished manuscript to the printing and bookstore
+  side; Studio payments use `payments` (purpose `studio`), so invoices are automatic.
+- Keys for the AI and background jobs are listed in `.env.example` (`ANTHROPIC_API_KEY`, `CLAUDE_MODEL`,
+  `CLAUDE_MODEL_WRITER`, `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY`); nothing is needed yet for Phase 1.
 
 ### Invoices and credit notes (migration 000026)
 

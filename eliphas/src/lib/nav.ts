@@ -44,14 +44,24 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/content", label: "Content checks", icon: "moderation", sidebarOnly: true },
   { href: "/admin/shipping", label: "Shipping", icon: "shipping", sidebarOnly: true },
   { href: "/admin/plans", label: "Plans", icon: "plan", sidebarOnly: true },
+  { href: "/studio", label: "Writing Studio", icon: "studio", sidebarOnly: true },
   { href: "/admin/settings", label: "Settings", icon: "settings", sidebarOnly: true },
 ];
+
+/** The Writing Studio: AI-assisted writing, from idea to finished manuscript. */
+export const STUDIO_NAV: NavItem[] = [
+  { href: "/studio", label: "My books", icon: "studio", exact: true },
+  { href: "/account/profile", label: "Settings & help", icon: "settings", sidebarOnly: true },
+];
+
+/** Link into the Studio from other areas (shown to people who can use it). */
+export const STUDIO_LINK: NavItem = { href: "/studio", label: "Writing Studio", icon: "studio", sidebarOnly: true };
 
 /** Shown while the referral programme is switched on (Admin → Referrals). */
 export const INVITE_NAV: NavItem = { href: "/account/invite", label: "Invite friends", icon: "invite", sidebarOnly: true };
 
 /** The account area is shared by everyone; it links back to their workspace. */
-export function accountNav(role: Role, invites = false): NavItem[] {
+export function accountNav(role: Role, invites = false, studio = false): NavItem[] {
   const items: NavItem[] = [
     { href: "/account", label: "My orders", icon: "shop", exact: true },
     { href: "/account/profile", label: "Profile", icon: "profile" },
@@ -59,6 +69,7 @@ export function accountNav(role: Role, invites = false): NavItem[] {
     { href: "/account/notifications", label: "Notifications", icon: "notifications" },
     { href: "/account/verification", label: "Author verification", icon: "review" },
     ...(invites ? [INVITE_NAV] : []),
+    ...(studio ? [STUDIO_LINK] : []),
   ];
   const workspace: Record<Role, NavItem | null> = {
     reader: null,
