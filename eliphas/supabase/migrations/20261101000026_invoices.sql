@@ -445,7 +445,11 @@ begin
   end if;
   return null;
 end $$;
-create trigger orders_issue_invoice after insert or update of paid_at, refund_status, status on public.orders
+create trigger orders_issue_invoice after update of paid_at, refund_status, status on public.orders
+  for each row execute function public.orders_issue_invoice();
+-- An order inserted already paid gets its invoice at the end of the transaction, after its books are added
+create constraint trigger orders_issue_invoice_on_insert after insert on public.orders
+  deferrable initially deferred
   for each row execute function public.orders_issue_invoice();
 
 create function public.payments_issue_invoice() returns trigger language plpgsql security definer set search_path = public as $$

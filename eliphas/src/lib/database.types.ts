@@ -3078,6 +3078,9 @@ isOneToOne: false
 "insert_invoice":
 { Args: { "p_at": string,"p_buyer": Json,"p_buyer_id": string,"p_credit": number,"p_inter": boolean,"p_is_test": boolean,"p_kind": string,"p_lines": Json,"p_order": string,"p_original": string,"p_payment": string,"p_pos": string,"p_reason": string,"p_reference": string,"p_refund": string,"p_seller": Json,"p_series": string }; Returns: string
                            },
+"invoice_is_test":
+{ Args: { "p_mode": string }; Returns: boolean
+                           },
 "invoice_line":
 { Args: { "p_code": string,"p_description": string,"p_discount_paise": number,"p_inter": boolean,"p_quantity": number,"p_rate": number,"p_tax_paise"?: number,"p_unit_paise": number }; Returns: Json
                            },
